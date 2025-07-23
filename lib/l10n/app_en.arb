@@ -1,0 +1,95 @@
+{
+  "@@locale": "en",
+  "appTitle": "Wolof Quran",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "welcome": "Welcome to Wolof Quran",
+  "@welcome": {
+    "description": "Welcome message on home page"
+  },
+  "quran": "Quran",
+  "@quran": {
+    "description": "Quran text"
+  },
+  "surah": "Surah",
+  "@surah": {
+    "description": "Surah text"
+  },
+  "ayah": "Ayah",
+  "@ayah": {
+    "description": "Ayah/Verse text"
+  },
+  "play": "Play",
+  "@play": {
+    "description": "Play button text"
+  },
+  "pause": "Pause",
+  "@pause": {
+    "description": "Pause button text"
+  },
+  "stop": "Stop",
+  "@stop": {
+    "description": "Stop button text"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings page title"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language setting"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme setting"
+  },
+  "dark": "Dark",
+  "@dark": {
+    "description": "Dark theme"
+  },
+  "light": "Light",
+  "@light": {
+    "description": "Light theme"
+  },
+  "arabic": "Arabic",
+  "@arabic": {
+    "description": "Arabic language"
+  },
+  "french": "French",
+  "@french": {
+    "description": "French language"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language"
+  },
+  "wolof": "Wolof",
+  "@wolof": {
+    "description": "Wolof language"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search text"
+  },
+  "searchInQuran": "Search in Quran",
+  "@searchInQuran": {
+    "description": "Search in Quran placeholder"
+  },
+  "favorites": "Favorites",
+  "@favorites": {
+    "description": "Favorites text"
+  },
+  "bookmarks": "Bookmarks",
+  "@bookmarks": {
+    "description": "Bookmarks text"
+  },
+  "recitation": "Recitation",
+  "@recitation": {
+    "description": "Recitation text"
+  },
+  "translation": "Translation",
+  "@translation": {
+    "description": "Translation text"
+  }
+}
