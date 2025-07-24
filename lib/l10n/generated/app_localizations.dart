@@ -237,6 +237,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Translation'**
   String get translation;
+
+  /// Current selection indicator
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get current;
+
+  /// System theme option
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get system;
+
+  /// Version text
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// Support text
+  ///
+  /// In en, this message translates to:
+  /// **'Support'**
+  String get support;
+
+  /// Rate app text
+  ///
+  /// In en, this message translates to:
+  /// **'Rate App'**
+  String get rateApp;
+
+  /// Get help subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Get help'**
+  String get getHelp;
+
+  /// Give rating subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Give your rating'**
+  String get giveRating;
+
+  /// Close button text
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// About app description
+  ///
+  /// In en, this message translates to:
+  /// **'Developed with ❤️ for the Muslim community'**
+  String get developedWithLove;
 }
 
 class _AppLocalizationsDelegate

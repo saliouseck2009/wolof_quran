@@ -22,5 +22,14 @@
   "favorites": "المفضلة",
   "bookmarks": "العلامات المرجعية",
   "recitation": "التلاوة",
-  "translation": "الترجمة"
+  "translation": "الترجمة",
+  "current": "الحالي",
+  "system": "النظام",
+  "version": "الإصدار",
+  "support": "الدعم",
+  "rateApp": "قيّم التطبيق",
+  "getHelp": "احصل على المساعدة",
+  "giveRating": "أعط تقييمك",
+  "close": "إغلاق",
+  "developedWithLove": "طُور بـ ❤️ للمجتمع المسلم"
 }

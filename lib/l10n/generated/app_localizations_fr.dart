@@ -76,4 +76,32 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get translation => 'Traduction';
+
+  @override
+  String get current => 'Actuel';
+
+  @override
+  String get system => 'Système';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get support => 'Support';
+
+  @override
+  String get rateApp => 'Évaluer l\'app';
+
+  @override
+  String get getHelp => 'Obtenir de l\'aide';
+
+  @override
+  String get giveRating => 'Donnez votre avis';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String get developedWithLove =>
+      'Développé avec ❤️ pour la communauté musulmane';
 }

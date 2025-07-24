@@ -91,5 +91,41 @@
   "translation": "Translation",
   "@translation": {
     "description": "Translation text"
+  },
+  "current": "Current",
+  "@current": {
+    "description": "Current selection indicator"
+  },
+  "system": "System",
+  "@system": {
+    "description": "System theme option"
+  },
+  "version": "Version",
+  "@version": {
+    "description": "Version text"
+  },
+  "support": "Support",
+  "@support": {
+    "description": "Support text"
+  },
+  "rateApp": "Rate App",
+  "@rateApp": {
+    "description": "Rate app text"
+  },
+  "getHelp": "Get help",
+  "@getHelp": {
+    "description": "Get help subtitle"
+  },
+  "giveRating": "Give your rating",
+  "@giveRating": {
+    "description": "Give rating subtitle"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+  "developedWithLove": "Developed with ❤️ for the Muslim community",
+  "@developedWithLove": {
+    "description": "About app description"
   }
 }

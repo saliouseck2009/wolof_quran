@@ -76,4 +76,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get translation => 'Translation';
+
+  @override
+  String get current => 'Current';
+
+  @override
+  String get system => 'System';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get support => 'Support';
+
+  @override
+  String get rateApp => 'Rate App';
+
+  @override
+  String get getHelp => 'Get help';
+
+  @override
+  String get giveRating => 'Give your rating';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get developedWithLove => 'Developed with ❤️ for the Muslim community';
 }

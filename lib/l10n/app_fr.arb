@@ -22,5 +22,14 @@
   "favorites": "Favoris",
   "bookmarks": "Signets",
   "recitation": "Récitation",
-  "translation": "Traduction"
+  "translation": "Traduction",
+  "current": "Actuel",
+  "system": "Système",
+  "version": "Version",
+  "support": "Support",
+  "rateApp": "Évaluer l'app",
+  "getHelp": "Obtenir de l'aide",
+  "giveRating": "Donnez votre avis",
+  "close": "Fermer",
+  "developedWithLove": "Développé avec ❤️ pour la communauté musulmane"
 }

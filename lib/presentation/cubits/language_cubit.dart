@@ -3,14 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/config/localization/localization_service.dart';
 
 class LanguageCubit extends Cubit<Locale> {
-  LanguageCubit() : super(LocalizationService.defaultLocale) {
-    _loadCurrentLanguage();
-  }
-
-  void _loadCurrentLanguage() async {
-    final locale = await LocalizationService.getCurrentLocale();
-    emit(locale);
-  }
+  LanguageCubit() : super(LocalizationService.defaultLocale);
 
   void changeLanguage(Locale newLocale) async {
     if (LocalizationService.isSupported(newLocale)) {

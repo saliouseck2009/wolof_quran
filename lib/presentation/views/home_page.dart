@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
+import '../cubits/theme_cubit.dart';
 
 class HomePage extends StatelessWidget {
   static const String routeName = "/";

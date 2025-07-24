@@ -76,4 +76,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get translation => 'الترجمة';
+
+  @override
+  String get current => 'الحالي';
+
+  @override
+  String get system => 'النظام';
+
+  @override
+  String get version => 'الإصدار';
+
+  @override
+  String get support => 'الدعم';
+
+  @override
+  String get rateApp => 'قيّم التطبيق';
+
+  @override
+  String get getHelp => 'احصل على المساعدة';
+
+  @override
+  String get giveRating => 'أعط تقييمك';
+
+  @override
+  String get close => 'إغلاق';
+
+  @override
+  String get developedWithLove => 'طُور بـ ❤️ للمجتمع المسلم';
 }

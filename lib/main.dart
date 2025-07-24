@@ -8,6 +8,7 @@ import 'core/navigation/app_routes.dart';
 import 'core/config/theme/theme.dart';
 import 'core/config/localization/localization_service.dart';
 import 'presentation/cubits/language_cubit.dart';
+import 'presentation/cubits/theme_cubit.dart';
 import 'l10n/generated/app_localizations.dart';
 
 void main() async {
@@ -22,30 +23,37 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LanguageCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => LanguageCubit()),
+        BlocProvider(create: (context) => ThemeCubit()),
+      ],
       child: BlocBuilder<LanguageCubit, Locale>(
         builder: (context, locale) {
-          return MaterialApp(
-            title: 'Wolof Quran',
-            debugShowCheckedModeBanner: false,
+          return BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              return MaterialApp(
+                title: 'Wolof Quran',
+                debugShowCheckedModeBanner: false,
 
-            // Localization setup
-            locale: locale,
-            supportedLocales: LocalizationService.supportedLocales,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
+                // Localization setup
+                locale: locale,
+                supportedLocales: LocalizationService.supportedLocales,
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
 
-            // Theme setup
-            theme: MaterialTheme().light(),
-            darkTheme: MaterialTheme().dark(),
-            themeMode: ThemeMode.system,
+                // Theme setup
+                theme: MaterialTheme().light(),
+                darkTheme: MaterialTheme().dark(),
+                themeMode: themeMode,
 
-            onGenerateRoute: AppRoutes.onGenerateRoutes,
+                onGenerateRoute: AppRoutes.onGenerateRoutes,
+              );
+            },
           );
         },
       ),
