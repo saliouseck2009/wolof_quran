@@ -51,10 +51,10 @@ class HomePage extends StatelessWidget {
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          color: AppColor.pureWhite.withOpacity(0.2),
+                          color: AppColor.pureWhite.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(60),
                           border: Border.all(
-                            color: AppColor.pureWhite.withOpacity(0.3),
+                            color: AppColor.pureWhite.withValues(alpha: 0.3),
                             width: 2,
                           ),
                         ),
@@ -83,7 +83,7 @@ class HomePage extends StatelessWidget {
                       Text(
                         localizations.quran,
                         style: theme.textTheme.titleLarge?.copyWith(
-                          color: AppColor.pureWhite.withOpacity(0.9),
+                          color: AppColor.pureWhite.withValues(alpha: 0.9),
                           fontWeight: FontWeight.w500,
                         ),
                         textAlign: TextAlign.center,
@@ -158,7 +158,7 @@ class HomePage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: AppColor.pureWhite.withOpacity(0.2),
+      color: AppColor.pureWhite.withValues(alpha: 0.2),
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
@@ -169,7 +169,7 @@ class HomePage extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: AppColor.pureWhite.withOpacity(0.3),
+              color: AppColor.pureWhite.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -188,7 +188,7 @@ class HomePage extends StatelessWidget {
               ),
               Icon(
                 Icons.arrow_forward_ios,
-                color: AppColor.pureWhite.withOpacity(0.7),
+                color: AppColor.pureWhite.withValues(alpha: 0.7),
                 size: 16,
               ),
             ],

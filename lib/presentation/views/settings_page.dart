@@ -108,7 +108,7 @@ class SettingsPage extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColor.primaryGreen.withOpacity(0.1),
+            color: AppColor.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: AppColor.primaryGreen, size: 20),
@@ -132,7 +132,7 @@ class SettingsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColor.primaryGreen.withOpacity(0.08),
+            color: AppColor.primaryGreen.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -165,7 +165,9 @@ class SettingsPage extends StatelessWidget {
                       border: !isLast
                           ? Border(
                               bottom: BorderSide(
-                                color: AppColor.lightGray.withOpacity(0.3),
+                                color: AppColor.lightGray.withValues(
+                                  alpha: 0.3,
+                                ),
                                 width: 0.5,
                               ),
                             )
@@ -220,7 +222,9 @@ class SettingsPage extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColor.primaryGreen.withOpacity(0.1),
+                              color: AppColor.primaryGreen.withValues(
+                                alpha: 0.1,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -254,7 +258,7 @@ class SettingsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColor.primaryGreen.withOpacity(0.08),
+            color: AppColor.primaryGreen.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -294,7 +298,9 @@ class SettingsPage extends StatelessWidget {
                       border: !isLast
                           ? Border(
                               bottom: BorderSide(
-                                color: AppColor.lightGray.withOpacity(0.3),
+                                color: AppColor.lightGray.withValues(
+                                  alpha: 0.3,
+                                ),
                                 width: 0.5,
                               ),
                             )
@@ -305,7 +311,7 @@ class SettingsPage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: themeColor.withOpacity(0.1),
+                            color: themeColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(themeIcon, color: themeColor, size: 20),
@@ -388,7 +394,7 @@ class SettingsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColor.primaryGreen.withOpacity(0.08),
+            color: AppColor.primaryGreen.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -411,7 +417,7 @@ class SettingsPage extends StatelessWidget {
                   border: !isLast
                       ? Border(
                           bottom: BorderSide(
-                            color: AppColor.lightGray.withOpacity(0.3),
+                            color: AppColor.lightGray.withValues(alpha: 0.3),
                             width: 0.5,
                           ),
                         )
@@ -422,7 +428,7 @@ class SettingsPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: (item['color'] as Color).withOpacity(0.1),
+                        color: (item['color'] as Color).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -521,7 +527,7 @@ class SettingsPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColor.primaryGreen.withOpacity(0.1),
+                color: AppColor.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
