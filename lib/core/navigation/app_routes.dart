@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:wolof_quran/presentation/views/home_page.dart';
 import 'package:wolof_quran/presentation/views/settings_page.dart';
+import 'package:wolof_quran/presentation/views/surah_list_page.dart';
+import 'package:wolof_quran/presentation/views/surah_detail_page.dart';
 
 class AppRoutes {
   static Route onGenerateRoutes(RouteSettings settings) {
@@ -12,6 +14,14 @@ class AppRoutes {
         return _materialRoute(view: HomePage(), settings: settings);
       case '/settings':
         return _materialRoute(view: SettingsPage(), settings: settings);
+      case '/surahs':
+        return _materialRoute(view: SurahListPage(), settings: settings);
+      case '/surah-detail':
+        final surahNumber = args as int;
+        return _materialRoute(
+          view: SurahDetailPage(surahNumber: surahNumber),
+          settings: settings,
+        );
 
       default:
         return _errorRoute(settings);

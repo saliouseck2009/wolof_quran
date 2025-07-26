@@ -291,6 +291,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Developed with ❤️ for the Muslim community'**
   String get developedWithLove;
+
+  /// Surahs page title
+  ///
+  /// In en, this message translates to:
+  /// **'Surahs'**
+  String get surahs;
+
+  /// Search surah placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Search surah...'**
+  String get searchSurah;
+
+  /// Verses count text
+  ///
+  /// In en, this message translates to:
+  /// **'verses'**
+  String get verses;
+
+  /// Revelation type
+  ///
+  /// In en, this message translates to:
+  /// **'Revelation'**
+  String get revelation;
+
+  /// Meccan revelation type
+  ///
+  /// In en, this message translates to:
+  /// **'Meccan'**
+  String get meccan;
+
+  /// Medinan revelation type
+  ///
+  /// In en, this message translates to:
+  /// **'Medinan'**
+  String get medinan;
+
+  /// No search results message
+  ///
+  /// In en, this message translates to:
+  /// **'No surah found'**
+  String get noSurahFound;
+
+  /// No search results subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different search term'**
+  String get tryDifferentSearch;
 }
 
 class _AppLocalizationsDelegate

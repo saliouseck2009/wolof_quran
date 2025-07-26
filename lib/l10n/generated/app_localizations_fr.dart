@@ -104,4 +104,28 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get developedWithLove =>
       'Développé avec ❤️ pour la communauté musulmane';
+
+  @override
+  String get surahs => 'Sourates';
+
+  @override
+  String get searchSurah => 'Rechercher une sourate...';
+
+  @override
+  String get verses => 'versets';
+
+  @override
+  String get revelation => 'Révélation';
+
+  @override
+  String get meccan => 'Mecquoise';
+
+  @override
+  String get medinan => 'Médinoise';
+
+  @override
+  String get noSurahFound => 'Aucune sourate trouvée';
+
+  @override
+  String get tryDifferentSearch => 'Essayez un autre terme de recherche';
 }

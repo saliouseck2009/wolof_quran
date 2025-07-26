@@ -127,5 +127,37 @@
   "developedWithLove": "Developed with ❤️ for the Muslim community",
   "@developedWithLove": {
     "description": "About app description"
+  },
+  "surahs": "Surahs",
+  "@surahs": {
+    "description": "Surahs page title"
+  },
+  "searchSurah": "Search surah...",
+  "@searchSurah": {
+    "description": "Search surah placeholder"
+  },
+  "verses": "verses",
+  "@verses": {
+    "description": "Verses count text"
+  },
+  "revelation": "Revelation",
+  "@revelation": {
+    "description": "Revelation type"
+  },
+  "meccan": "Meccan",
+  "@meccan": {
+    "description": "Meccan revelation type"
+  },
+  "medinan": "Medinan",
+  "@medinan": {
+    "description": "Medinan revelation type"
+  },
+  "noSurahFound": "No surah found",
+  "@noSurahFound": {
+    "description": "No search results message"
+  },
+  "tryDifferentSearch": "Try a different search term",
+  "@tryDifferentSearch": {
+    "description": "No search results subtitle"
   }
 }

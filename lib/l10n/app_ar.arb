@@ -31,5 +31,13 @@
   "getHelp": "احصل على المساعدة",
   "giveRating": "أعط تقييمك",
   "close": "إغلاق",
-  "developedWithLove": "طُور بـ ❤️ للمجتمع المسلم"
+  "developedWithLove": "طُور بـ ❤️ للمجتمع المسلم",
+  "surahs": "السور",
+  "searchSurah": "البحث عن سورة...",
+  "verses": "آيات",
+  "revelation": "النزول",
+  "meccan": "مكية",
+  "medinan": "مدنية",
+  "noSurahFound": "لم توجد سورة",
+  "tryDifferentSearch": "جرب مصطلح بحث مختلف"
 }

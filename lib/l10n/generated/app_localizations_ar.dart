@@ -103,4 +103,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get developedWithLove => 'طُور بـ ❤️ للمجتمع المسلم';
+
+  @override
+  String get surahs => 'السور';
+
+  @override
+  String get searchSurah => 'البحث عن سورة...';
+
+  @override
+  String get verses => 'آيات';
+
+  @override
+  String get revelation => 'النزول';
+
+  @override
+  String get meccan => 'مكية';
+
+  @override
+  String get medinan => 'مدنية';
+
+  @override
+  String get noSurahFound => 'لم توجد سورة';
+
+  @override
+  String get tryDifferentSearch => 'جرب مصطلح بحث مختلف';
 }

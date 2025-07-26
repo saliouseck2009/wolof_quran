@@ -31,5 +31,13 @@
   "getHelp": "Obtenir de l'aide",
   "giveRating": "Donnez votre avis",
   "close": "Fermer",
-  "developedWithLove": "Développé avec ❤️ pour la communauté musulmane"
+  "developedWithLove": "Développé avec ❤️ pour la communauté musulmane",
+  "surahs": "Sourates",
+  "searchSurah": "Rechercher une sourate...",
+  "verses": "versets",
+  "revelation": "Révélation",
+  "meccan": "Mecquoise",
+  "medinan": "Médinoise",
+  "noSurahFound": "Aucune sourate trouvée",
+  "tryDifferentSearch": "Essayez un autre terme de recherche"
 }
