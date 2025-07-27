@@ -39,5 +39,13 @@
   "meccan": "Mecquoise",
   "medinan": "Médinoise",
   "noSurahFound": "Aucune sourate trouvée",
-  "tryDifferentSearch": "Essayez un autre terme de recherche"
+  "tryDifferentSearch": "Essayez un autre terme de recherche",
+  "quranSettings": "Paramètres du Coran",
+  "translationSettings": "Traduction",
+  "selectTranslation": "Sélectionner la traduction",
+  "currentTranslation": "Traduction actuelle",
+  "changeTranslation": "Changer la traduction",
+  "translationDescription": "Choisissez votre traduction préférée pour les versets et chapitres du Coran",
+  "translationUpdated": "Traduction mise à jour vers {language}",
+  "cancel": "Annuler"
 }

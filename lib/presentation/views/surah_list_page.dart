@@ -6,6 +6,7 @@ import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/surah_list_cubit.dart';
+import '../cubits/quran_settings_cubit.dart';
 
 class SurahListPage extends StatelessWidget {
   static const String routeName = "/surahs";
@@ -52,6 +53,23 @@ class _SurahListView extends StatelessWidget {
                     fontSize: 18,
                   ),
                 ),
+                actions: [
+                  IconButton(
+                    icon: Icon(Icons.settings, color: AppColor.pureWhite),
+                    onPressed: () async {
+                      final result = await Navigator.pushNamed(
+                        context,
+                        '/quran-settings',
+                      );
+                      // If translation was changed, reload the Surah list
+                      if (result == true) {
+                        context
+                            .read<SurahListCubit>()
+                            .reloadTranslationSettings();
+                      }
+                    },
+                  ),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
                   titlePadding: EdgeInsets.zero,
                   background: Container(
@@ -93,7 +111,7 @@ class _SurahListView extends StatelessWidget {
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate((context, index) {
                           final surahNumber = state.filteredSurahs[index];
-                          return _buildSurahCard(context, surahNumber);
+                          return _buildSurahCard(context, surahNumber, state);
                         }, childCount: state.filteredSurahs.length),
                       ),
                     ),
@@ -151,10 +169,18 @@ class _SurahListView extends StatelessWidget {
     );
   }
 
-  Widget _buildSurahCard(BuildContext context, int surahNumber) {
+  Widget _buildSurahCard(
+    BuildContext context,
+    int surahNumber,
+    SurahListLoaded state,
+  ) {
     final localizations = AppLocalizations.of(context)!;
+
     final surahNameArabic = quran.getSurahNameArabic(surahNumber);
-    final surahNameEnglish = quran.getSurahNameEnglish(surahNumber);
+    final surahNameTranslated = QuranSettingsCubit.getSurahNameInTranslation(
+      surahNumber,
+      state.selectedTranslation,
+    );
     final versesCount = quran.getVerseCount(surahNumber);
     final revelationType = quran.getPlaceOfRevelation(surahNumber);
 
@@ -214,9 +240,9 @@ class _SurahListView extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // English name
+                      // Translated name
                       Text(
-                        surahNameEnglish,
+                        surahNameTranslated,
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               fontWeight: FontWeight.w500,

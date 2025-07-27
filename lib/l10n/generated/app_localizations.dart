@@ -339,6 +339,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try a different search term'**
   String get tryDifferentSearch;
+
+  /// Quran Settings page title
+  ///
+  /// In en, this message translates to:
+  /// **'Quran Settings'**
+  String get quranSettings;
+
+  /// Translation settings section title
+  ///
+  /// In en, this message translates to:
+  /// **'Translation'**
+  String get translationSettings;
+
+  /// Translation selection modal title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Translation'**
+  String get selectTranslation;
+
+  /// Current translation label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Translation'**
+  String get currentTranslation;
+
+  /// Change translation button text
+  ///
+  /// In en, this message translates to:
+  /// **'Change Translation'**
+  String get changeTranslation;
+
+  /// Translation settings description
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your preferred translation for Quran verses and chapters'**
+  String get translationDescription;
+
+  /// Translation update confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Translation updated to {language}'**
+  String translationUpdated(String language);
+
+  /// Cancel button text
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
 }
 
 class _AppLocalizationsDelegate

@@ -4,6 +4,7 @@ import 'package:wolof_quran/presentation/views/home_page.dart';
 import 'package:wolof_quran/presentation/views/settings_page.dart';
 import 'package:wolof_quran/presentation/views/surah_list_page.dart';
 import 'package:wolof_quran/presentation/views/surah_detail_page.dart';
+import 'package:wolof_quran/presentation/views/quran_settings_page.dart';
 
 class AppRoutes {
   static Route onGenerateRoutes(RouteSettings settings) {
@@ -22,6 +23,8 @@ class AppRoutes {
           view: SurahDetailPage(surahNumber: surahNumber),
           settings: settings,
         );
+      case '/quran-settings':
+        return _materialRoute(view: QuranSettingsPage(), settings: settings);
 
       default:
         return _errorRoute(settings);

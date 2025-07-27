@@ -128,4 +128,31 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tryDifferentSearch => 'Essayez un autre terme de recherche';
+
+  @override
+  String get quranSettings => 'Paramètres du Coran';
+
+  @override
+  String get translationSettings => 'Traduction';
+
+  @override
+  String get selectTranslation => 'Sélectionner la traduction';
+
+  @override
+  String get currentTranslation => 'Traduction actuelle';
+
+  @override
+  String get changeTranslation => 'Changer la traduction';
+
+  @override
+  String get translationDescription =>
+      'Choisissez votre traduction préférée pour les versets et chapitres du Coran';
+
+  @override
+  String translationUpdated(String language) {
+    return 'Traduction mise à jour vers $language';
+  }
+
+  @override
+  String get cancel => 'Annuler';
 }

@@ -159,5 +159,43 @@
   "tryDifferentSearch": "Try a different search term",
   "@tryDifferentSearch": {
     "description": "No search results subtitle"
+  },
+  "quranSettings": "Quran Settings",
+  "@quranSettings": {
+    "description": "Quran Settings page title"
+  },
+  "translationSettings": "Translation",
+  "@translationSettings": {
+    "description": "Translation settings section title"
+  },
+  "selectTranslation": "Select Translation",
+  "@selectTranslation": {
+    "description": "Translation selection modal title"
+  },
+  "currentTranslation": "Current Translation",
+  "@currentTranslation": {
+    "description": "Current translation label"
+  },
+  "changeTranslation": "Change Translation",
+  "@changeTranslation": {
+    "description": "Change translation button text"
+  },
+  "translationDescription": "Choose your preferred translation for Quran verses and chapters",
+  "@translationDescription": {
+    "description": "Translation settings description"
+  },
+  "translationUpdated": "Translation updated to {language}",
+  "@translationUpdated": {
+    "description": "Translation update confirmation message",
+    "placeholders": {
+      "language": {
+        "type": "String",
+        "description": "The name of the selected language"
+      }
+    }
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
   }
 }

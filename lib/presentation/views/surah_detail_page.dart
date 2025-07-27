@@ -119,7 +119,10 @@ class SurahDetailContent extends StatelessWidget {
         if (surahNumber != 9) const SurahBasmalaWidget(),
 
         // List of Ayahs
-        SurahAyahsList(ayahs: state.ayahs),
+        SurahAyahsList(
+          ayahs: state.ayahs,
+          translationSource: state.translationSource,
+        ),
 
         // Bottom padding
         const SliverToBoxAdapter(child: SizedBox(height: 32)),
@@ -145,13 +148,28 @@ class SurahDetailAppBar extends StatelessWidget {
       pinned: true,
       elevation: 2,
       title: Text(
-        state.surahNameEnglish,
+        state.surahNameTranslated,
         style: GoogleFonts.amiri(
           fontWeight: FontWeight.w600,
           color: AppColor.pureWhite,
           fontSize: 18,
         ),
       ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.settings, color: AppColor.pureWhite),
+          onPressed: () async {
+            final result = await Navigator.pushNamed(
+              context,
+              '/quran-settings',
+            );
+            // Reload the Surah if user changed translation
+            if (result == true) {
+              context.read<SurahDetailCubit>().loadSurah(state.surahNumber);
+            }
+          },
+        ),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: EdgeInsets.zero,
         background: Container(
@@ -213,9 +231,9 @@ class SurahHeaderContent extends StatelessWidget {
 
         const SizedBox(height: 8),
 
-        // English name
+        // Translated name
         Text(
-          state.surahNameEnglish,
+          state.surahNameTranslated,
           style: GoogleFonts.amiri(
             fontSize: 20,
             fontWeight: FontWeight.w500,
@@ -346,8 +364,13 @@ class SurahBasmalaWidget extends StatelessWidget {
 
 class SurahAyahsList extends StatelessWidget {
   final List<AyahData> ayahs;
+  final String translationSource;
 
-  const SurahAyahsList({super.key, required this.ayahs});
+  const SurahAyahsList({
+    super.key,
+    required this.ayahs,
+    required this.translationSource,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -357,7 +380,7 @@ class SurahAyahsList extends StatelessWidget {
         return AyahCard(
           verseNumber: ayah.verseNumber,
           arabicText: ayah.arabicText,
-          translationSource: "Sahih International",
+          translationSource: translationSource,
           translation: ayah.translation,
           actions: [
             IconButton(

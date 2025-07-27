@@ -127,4 +127,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tryDifferentSearch => 'جرب مصطلح بحث مختلف';
+
+  @override
+  String get quranSettings => 'Quran Settings';
+
+  @override
+  String get translationSettings => 'Translation';
+
+  @override
+  String get selectTranslation => 'Select Translation';
+
+  @override
+  String get currentTranslation => 'Current Translation';
+
+  @override
+  String get changeTranslation => 'Change Translation';
+
+  @override
+  String get translationDescription =>
+      'Choose your preferred translation for Quran verses and chapters';
+
+  @override
+  String translationUpdated(String language) {
+    return 'Translation updated to $language';
+  }
+
+  @override
+  String get cancel => 'Cancel';
 }

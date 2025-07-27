@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'quran_settings_cubit.dart';
 
 // State classes
 abstract class SurahDetailState {}
@@ -12,15 +14,19 @@ class SurahDetailLoaded extends SurahDetailState {
   final int surahNumber;
   final String surahNameArabic;
   final String surahNameEnglish;
+  final String surahNameTranslated;
   final int versesCount;
   final List<AyahData> ayahs;
+  final String translationSource;
 
   SurahDetailLoaded({
     required this.surahNumber,
     required this.surahNameArabic,
     required this.surahNameEnglish,
+    required this.surahNameTranslated,
     required this.versesCount,
     required this.ayahs,
+    required this.translationSource,
   });
 }
 
@@ -51,9 +57,28 @@ class SurahDetailCubit extends Cubit<SurahDetailState> {
     try {
       emit(SurahDetailLoading());
 
+      // Get selected translation from SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      final translationIndex = prefs.getInt('selected_quran_translation');
+
+      quran.Translation selectedTranslation;
+      if (translationIndex != null &&
+          translationIndex < QuranSettingsCubit.availableTranslations.length) {
+        selectedTranslation = QuranSettingsCubit
+            .availableTranslations[translationIndex]
+            .translation;
+      } else {
+        // Default to French for first-time users
+        selectedTranslation = quran.Translation.frHamidullah;
+      }
+
       // Get Surah information
       final surahNameArabic = quran.getSurahNameArabic(surahNumber);
       final surahNameEnglish = quran.getSurahNameEnglish(surahNumber);
+      final surahNameTranslated = QuranSettingsCubit.getSurahNameInTranslation(
+        surahNumber,
+        selectedTranslation,
+      );
       final versesCount = quran.getVerseCount(surahNumber);
 
       // Load all verses
@@ -68,7 +93,7 @@ class SurahDetailCubit extends Cubit<SurahDetailState> {
         final translation = quran.getVerseTranslation(
           surahNumber,
           i,
-          translation: quran.Translation.enSaheeh,
+          translation: selectedTranslation,
         );
 
         ayahs.add(
@@ -80,13 +105,22 @@ class SurahDetailCubit extends Cubit<SurahDetailState> {
         );
       }
 
+      // Get translation option for display name
+      final translationOption = QuranSettingsCubit.getTranslationOption(
+        selectedTranslation,
+      );
+      final translationSource =
+          translationOption?.displayName ?? 'Unknown Translation';
+
       emit(
         SurahDetailLoaded(
           surahNumber: surahNumber,
           surahNameArabic: surahNameArabic,
           surahNameEnglish: surahNameEnglish,
+          surahNameTranslated: surahNameTranslated,
           versesCount: versesCount,
           ayahs: ayahs,
+          translationSource: translationSource,
         ),
       );
     } catch (e) {
