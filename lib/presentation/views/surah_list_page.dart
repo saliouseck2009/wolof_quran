@@ -215,8 +215,8 @@ class _SurahListView extends StatelessWidget {
               children: [
                 // Surah number circle
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
                     gradient: AppColor.primaryGradient,
                     shape: BoxShape.circle,

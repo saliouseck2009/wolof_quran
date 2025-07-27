@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:wolof_quran/core/helpers/bloc_observer.dart';
+import 'package:wolof_quran/core/services/audio_player_service.dart';
+import 'package:wolof_quran/domain/repositories/reciter_repository.dart';
+import 'package:wolof_quran/domain/usecases/download_surah_audio_usecase.dart';
+import 'package:wolof_quran/domain/usecases/get_ayah_audios_usecase.dart';
+import 'package:wolof_quran/domain/usecases/get_reciters_usecase.dart';
+import 'package:wolof_quran/domain/usecases/get_surah_audio_status_usecase.dart';
+import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/reciter_cubit.dart';
 import 'package:wolof_quran/service_locator.dart';
 
 import 'core/navigation/app_routes.dart';
@@ -15,6 +24,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting("fr_FR");
   await setupDependencies();
+  Bloc.observer = SimpleBlocObserver();
   runApp(MyApp());
 }
 
@@ -27,6 +37,20 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => LanguageCubit()),
         BlocProvider(create: (context) => ThemeCubit()),
+        BlocProvider(
+          create: (context) => ReciterCubit(
+            getRecitersUseCase: locator<GetRecitersUseCase>(),
+            reciterRepository: locator<ReciterRepository>(),
+          )..loadReciters(),
+        ),
+        BlocProvider(
+          create: (context) => AudioManagementCubit(
+            downloadSurahAudioUseCase: locator<DownloadSurahAudioUseCase>(),
+            getSurahAudioStatusUseCase: locator<GetSurahAudioStatusUseCase>(),
+            getAyahAudiosUseCase: locator<GetAyahAudiosUseCase>(),
+            audioPlayerService: locator<AudioPlayerService>(),
+          ),
+        ),
       ],
       child: BlocBuilder<LanguageCubit, Locale>(
         builder: (context, locale) {

@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/quran_settings_cubit.dart';
+import '../cubits/reciter_cubit.dart';
+import '../../service_locator.dart';
 
 class QuranSettingsPage extends StatelessWidget {
   static const String routeName = "/quran-settings";
@@ -12,8 +14,13 @@ class QuranSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => QuranSettingsCubit()..loadSettings(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => QuranSettingsCubit()..loadSettings()),
+        BlocProvider(
+          create: (context) => locator<ReciterCubit>()..loadReciters(),
+        ),
+      ],
       child: const _QuranSettingsView(),
     );
   }
@@ -118,6 +125,11 @@ class _QuranSettingsView extends StatelessWidget {
 
                 // Translation Settings Section
                 _buildTranslationSection(context, state, localizations),
+
+                const SizedBox(height: 24),
+
+                // Reciter Selection Section
+                _buildReciterSection(context, localizations),
 
                 const SizedBox(height: 24),
 
@@ -264,6 +276,132 @@ class _QuranSettingsView extends StatelessWidget {
       );
       Navigator.pop(context, true);
     }
+  }
+
+  Widget _buildReciterSection(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColor.primaryGreen.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            Navigator.pushNamed(context, '/reciter-list');
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Section header
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.volume_up,
+                        color: AppColor.primaryGreen,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Audio Tafsir Management', // TODO: Add to localizations
+                            style: GoogleFonts.amiri(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? AppColor.pureWhite
+                                  : AppColor.charcoal,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Manage reciters and download chapters', // TODO: Add to localizations
+                            style: GoogleFonts.amiri(
+                              fontSize: 13,
+                              color: AppColor.mediumGray,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: AppColor.primaryGreen,
+                      size: 16,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Action button
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppColor.primaryGreen.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.library_music,
+                        color: AppColor.primaryGreen,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'View Available Reciters', // TODO: Add to localizations
+                        style: GoogleFonts.amiri(
+                          fontSize: 14,
+                          color: AppColor.primaryGreen,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

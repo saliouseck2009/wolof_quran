@@ -5,6 +5,10 @@ import 'package:wolof_quran/presentation/views/settings_page.dart';
 import 'package:wolof_quran/presentation/views/surah_list_page.dart';
 import 'package:wolof_quran/presentation/views/surah_detail_page.dart';
 import 'package:wolof_quran/presentation/views/quran_settings_page.dart';
+import 'package:wolof_quran/presentation/views/surah_audio_list_page.dart';
+import 'package:wolof_quran/presentation/views/reciter_list_page.dart';
+import 'package:wolof_quran/presentation/views/reciter_chapters_page.dart';
+import 'package:wolof_quran/domain/entities/reciter.dart';
 
 class AppRoutes {
   static Route onGenerateRoutes(RouteSettings settings) {
@@ -25,6 +29,16 @@ class AppRoutes {
         );
       case '/quran-settings':
         return _materialRoute(view: QuranSettingsPage(), settings: settings);
+      case '/surah-audio-list':
+        return _materialRoute(view: SurahAudioListPage(), settings: settings);
+      case '/reciter-list':
+        return _materialRoute(view: ReciterListPage(), settings: settings);
+      case '/reciter-chapters':
+        final reciter = args as Reciter;
+        return _materialRoute(
+          view: ReciterChaptersPage(reciter: reciter),
+          settings: settings,
+        );
 
       default:
         return _errorRoute(settings);

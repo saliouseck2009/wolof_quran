@@ -112,7 +112,10 @@ class HomePage extends StatelessWidget {
                               icon: Icons.play_circle_fill,
                               title: localizations.recitation,
                               onTap: () {
-                                // Navigate to recitation page
+                                Navigator.pushNamed(
+                                  context,
+                                  '/surah-audio-list',
+                                );
                               },
                             ),
 
