@@ -1,16 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 enum AppThemeMode { light, dark, system }
 
 class ThemeCubit extends Cubit<ThemeMode> {
-  ThemeCubit() : super(ThemeMode.system);
+  static const String _themeKey = 'selected_theme_mode';
 
-  void changeTheme(ThemeMode themeMode) async {
-    // For now, just emit the new theme
-    // Later we'll add SharedPreferences persistence
+  ThemeCubit() : super(ThemeMode.system) {
+    _loadThemeFromPrefs();
+  }
+
+  /// Load theme from SharedPreferences
+  Future<void> _loadThemeFromPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final themeModeIndex = prefs.getInt(_themeKey);
+
+      if (themeModeIndex != null) {
+        final themeMode = ThemeMode.values[themeModeIndex];
+        emit(themeMode);
+      }
+    } catch (e) {
+      // If loading fails, keep the default system theme
+      emit(ThemeMode.system);
+    }
+  }
+
+  /// Save theme to SharedPreferences
+  Future<void> _saveThemeToPrefs(ThemeMode themeMode) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_themeKey, themeMode.index);
+    } catch (e) {
+      // Handle save error if needed
+      debugPrint('Failed to save theme preference: $e');
+    }
+  }
+
+  /// Change theme and persist it
+  Future<void> changeTheme(ThemeMode themeMode) async {
     emit(themeMode);
+    await _saveThemeToPrefs(themeMode);
+  }
+
+  /// Get the currently saved theme from SharedPreferences
+  /// This is useful for getting the theme without emitting state changes
+  static Future<ThemeMode> getSavedTheme() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final themeModeIndex = prefs.getInt(_themeKey);
+
+      if (themeModeIndex != null && themeModeIndex < ThemeMode.values.length) {
+        return ThemeMode.values[themeModeIndex];
+      }
+    } catch (e) {
+      debugPrint('Failed to load saved theme: $e');
+    }
+    return ThemeMode.system; // Default fallback
   }
 
   String getThemeName(ThemeMode themeMode, AppLocalizations localizations) {

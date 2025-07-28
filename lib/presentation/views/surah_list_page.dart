@@ -210,7 +210,7 @@ class _SurahListView extends StatelessWidget {
             );
           },
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 // Surah number circle
@@ -261,7 +261,7 @@ class _SurahListView extends StatelessWidget {
                             Icons.format_list_numbered,
                             AppColor.accent,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 4),
                           _buildInfoChip(
                             context,
                             revelationType == RevelationPlaceEnum.meccan
@@ -280,7 +280,7 @@ class _SurahListView extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
 
                 // Arabic name on the right
                 Text(
@@ -292,6 +292,7 @@ class _SurahListView extends StatelessWidget {
                   ),
                   textAlign: TextAlign.right,
                   textDirection: TextDirection.rtl,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
