@@ -53,46 +53,63 @@ class MyApp extends StatelessWidget {
             audioPlayerService: locator<AudioPlayerService>(),
           )..initialize(),
         ),
-        BlocProvider(create: (context) => QuranSettingsCubit()..loadSettings()),
+        BlocProvider(
+          lazy: false,
+          create: (context) => QuranSettingsCubit()..loadSettings(),
+        ),
       ],
-      child: Builder(
-        builder: (context) {
-          return BlocProvider(
-            create: (context) => AyahPlaybackCubit(
-              audioPlayerService: locator<AudioPlayerService>(),
-              audioManagementCubit: context.read<AudioManagementCubit>(),
-            ),
-            child: BlocBuilder<LanguageCubit, Locale>(
-              builder: (context, locale) {
-                return BlocBuilder<ThemeCubit, ThemeMode>(
-                  builder: (context, themeMode) {
-                    return MaterialApp(
-                      title: 'Wolof Quran',
-                      debugShowCheckedModeBanner: false,
-
-                      // Localization setup
-                      locale: locale,
-                      supportedLocales: LocalizationService.supportedLocales,
-                      localizationsDelegates: const [
-                        AppLocalizations.delegate,
-                        GlobalMaterialLocalizations.delegate,
-                        GlobalWidgetsLocalizations.delegate,
-                        GlobalCupertinoLocalizations.delegate,
-                      ],
-
-                      // Theme setup
-                      theme: MaterialTheme().light(),
-                      darkTheme: MaterialTheme().dark(),
-                      themeMode: themeMode,
-
-                      onGenerateRoute: AppRoutes.onGenerateRoutes,
-                    );
-                  },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<ReciterCubit, ReciterState>(
+            listener: (context, reciterState) {
+              // When reciters are loaded, update the settings cubit
+              if (reciterState is ReciterLoaded) {
+                context.read<QuranSettingsCubit>().loadReciterFromPrefs(
+                  reciterState.reciters,
                 );
-              },
-            ),
-          );
-        },
+              }
+            },
+          ),
+        ],
+        child: Builder(
+          builder: (context) {
+            return BlocProvider(
+              create: (context) => AyahPlaybackCubit(
+                audioPlayerService: locator<AudioPlayerService>(),
+                audioManagementCubit: context.read<AudioManagementCubit>(),
+              ),
+              child: BlocBuilder<LanguageCubit, Locale>(
+                builder: (context, locale) {
+                  return BlocBuilder<ThemeCubit, ThemeMode>(
+                    builder: (context, themeMode) {
+                      return MaterialApp(
+                        title: 'Wolof Quran',
+                        debugShowCheckedModeBanner: false,
+
+                        // Localization setup
+                        locale: locale,
+                        supportedLocales: LocalizationService.supportedLocales,
+                        localizationsDelegates: const [
+                          AppLocalizations.delegate,
+                          GlobalMaterialLocalizations.delegate,
+                          GlobalWidgetsLocalizations.delegate,
+                          GlobalCupertinoLocalizations.delegate,
+                        ],
+
+                        // Theme setup
+                        theme: MaterialTheme().light(),
+                        darkTheme: MaterialTheme().dark(),
+                        themeMode: themeMode,
+
+                        onGenerateRoute: AppRoutes.onGenerateRoutes,
+                      );
+                    },
+                  );
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }

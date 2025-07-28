@@ -143,6 +143,13 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         selectedTranslation = quran.Translation.frHamidullah;
       }
 
+      // Check if we have a saved reciter ID, if not set imamsarr as default
+      final savedReciterId = prefs.getString(_reciterKey);
+      if (savedReciterId == null) {
+        // Set imamsarr as default reciter ID in preferences
+        await prefs.setString(_reciterKey, 'imamsarr');
+      }
+
       // We'll emit without reciter first, then update when reciter is loaded
       emit(
         QuranSettingsLoaded(
@@ -151,15 +158,26 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         ),
       );
 
-      // If we have a saved reciter ID, we'll need to load it from ReciterCubit
-      // This will be handled by the UI when ReciterCubit loads
+      // The reciter will be loaded and set by loadReciterFromPrefs when reciters are available
     } catch (e) {
       // Fallback to French if there's an error
       emit(
         QuranSettingsLoaded(
           selectedTranslation: quran.Translation.frHamidullah,
+          selectedReciter: null,
         ),
       );
+
+      // Try to set the default reciter ID even in error case
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final savedReciterId = prefs.getString(_reciterKey);
+        if (savedReciterId == null) {
+          await prefs.setString(_reciterKey, 'imamsarr');
+        }
+      } catch (_) {
+        // Ignore errors in fallback
+      }
     }
   }
 

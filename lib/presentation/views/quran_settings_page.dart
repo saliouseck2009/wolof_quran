@@ -16,7 +16,6 @@ class QuranSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => QuranSettingsCubit()..loadSettings()),
         BlocProvider(
           create: (context) => locator<ReciterCubit>()..loadReciters(),
         ),

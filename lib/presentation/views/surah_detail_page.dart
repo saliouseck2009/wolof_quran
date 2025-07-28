@@ -195,7 +195,7 @@ class SurahDetailAppBar extends StatelessWidget {
               '/quran-settings',
             );
             // Reload the Surah if user changed translation
-            if (result == true) {
+            if (result == true && context.mounted) {
               context.read<SurahDetailCubit>().loadSurah(state.surahNumber);
             }
           },
