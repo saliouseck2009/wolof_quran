@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quran/quran.dart' as quran;
+import '../../domain/entities/reciter.dart';
 
 // State classes
 abstract class QuranSettingsState {}
@@ -9,8 +10,22 @@ class QuranSettingsInitial extends QuranSettingsState {}
 
 class QuranSettingsLoaded extends QuranSettingsState {
   final quran.Translation selectedTranslation;
+  final Reciter? selectedReciter;
 
-  QuranSettingsLoaded({required this.selectedTranslation});
+  QuranSettingsLoaded({
+    required this.selectedTranslation,
+    this.selectedReciter,
+  });
+
+  QuranSettingsLoaded copyWith({
+    quran.Translation? selectedTranslation,
+    Reciter? selectedReciter,
+  }) {
+    return QuranSettingsLoaded(
+      selectedTranslation: selectedTranslation ?? this.selectedTranslation,
+      selectedReciter: selectedReciter ?? this.selectedReciter,
+    );
+  }
 }
 
 // Available translations with their display names
@@ -29,6 +44,7 @@ class TranslationOption {
 // Cubit
 class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   static const String _translationKey = 'selected_quran_translation';
+  static const String _reciterKey = 'selected_reciter_id';
 
   QuranSettingsCubit() : super(QuranSettingsInitial());
 
@@ -79,6 +95,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
       displayName: 'Nederlands',
       language: 'Dutch',
     ),
+
     TranslationOption(
       translation: quran.Translation.ruKuliev,
       displayName: 'Русский',
@@ -126,7 +143,16 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         selectedTranslation = quran.Translation.frHamidullah;
       }
 
-      emit(QuranSettingsLoaded(selectedTranslation: selectedTranslation));
+      // We'll emit without reciter first, then update when reciter is loaded
+      emit(
+        QuranSettingsLoaded(
+          selectedTranslation: selectedTranslation,
+          selectedReciter: null,
+        ),
+      );
+
+      // If we have a saved reciter ID, we'll need to load it from ReciterCubit
+      // This will be handled by the UI when ReciterCubit loads
     } catch (e) {
       // Fallback to French if there's an error
       emit(
@@ -137,32 +163,67 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     }
   }
 
+  void updateReciter(Reciter reciter) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_reciterKey, reciter.id);
+
+      final currentState = state;
+      if (currentState is QuranSettingsLoaded) {
+        emit(currentState.copyWith(selectedReciter: reciter));
+      }
+    } catch (e) {
+      // Handle error silently or emit error state if needed
+    }
+  }
+
+  void loadReciterFromPrefs(List<Reciter> availableReciters) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final selectedReciterId = prefs.getString(_reciterKey);
+
+      if (selectedReciterId != null) {
+        final selectedReciter = availableReciters.firstWhere(
+          (reciter) => reciter.id == selectedReciterId,
+          orElse: () => availableReciters.isNotEmpty
+              ? availableReciters.first
+              : throw Exception('No reciters available'),
+        );
+
+        final currentState = state;
+        if (currentState is QuranSettingsLoaded) {
+          emit(currentState.copyWith(selectedReciter: selectedReciter));
+        }
+      } else if (availableReciters.isNotEmpty) {
+        // Set imamsarr as default if available, otherwise first reciter
+        final defaultReciter = availableReciters.firstWhere(
+          (reciter) => reciter.id == 'imamsarr',
+          orElse: () => availableReciters.first,
+        );
+        updateReciter(defaultReciter);
+      }
+    } catch (e) {
+      // Handle error silently
+    }
+  }
+
   void updateTranslation(quran.Translation translation) async {
     try {
-      print('🔄 Updating translation to: $translation'); // Debug log
-
       final prefs = await SharedPreferences.getInstance();
       final index = availableTranslations.indexWhere(
         (option) => option.translation == translation,
       );
-
-      print('📊 Translation index found: $index'); // Debug log
-
       if (index != -1) {
         await prefs.setInt(_translationKey, index);
-        print(
-          '💾 Saved translation index to SharedPreferences: $index',
-        ); // Debug log
 
-        emit(QuranSettingsLoaded(selectedTranslation: translation));
-        print(
-          '✅ Emitted new state with translation: $translation',
-        ); // Debug log
-      } else {
-        print('❌ Translation not found in available translations'); // Debug log
+        final currentState = state;
+        if (currentState is QuranSettingsLoaded) {
+          emit(currentState.copyWith(selectedTranslation: translation));
+        } else {
+          emit(QuranSettingsLoaded(selectedTranslation: translation));
+        }
       }
     } catch (e) {
-      print('💥 Error updating translation: $e'); // Debug log
       // Handle error silently or emit error state if needed
     }
   }
@@ -201,7 +262,6 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final translationIndex = prefs.getInt(_translationKey);
-
       if (translationIndex != null &&
           translationIndex < availableTranslations.length) {
         return availableTranslations[translationIndex].translation;
@@ -212,6 +272,16 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     } catch (e) {
       // Fallback to French if there's an error
       return quran.Translation.frHamidullah;
+    }
+  }
+
+  // Static utility method to get currently selected reciter ID from SharedPreferences
+  static Future<String?> getSelectedReciterId() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_reciterKey);
+    } catch (e) {
+      return null;
     }
   }
 }

@@ -19,8 +19,8 @@ class AyahCard extends StatelessWidget {
   /// The translated text
   final String translation;
 
-  /// A list of icon buttons to show in the top row (e.g. play, bookmark, etc.)
-  final List<IconButton> actions;
+  /// A list of widgets to show in the top row (e.g. play button, bookmark, etc.)
+  final List<Widget> actions;
 
   const AyahCard({
     super.key,

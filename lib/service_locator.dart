@@ -20,10 +20,6 @@ import 'domain/usecases/get_ayah_audios_usecase.dart';
 // Services
 import 'core/services/audio_player_service.dart';
 
-// Cubits
-import 'presentation/cubits/reciter_cubit.dart';
-import 'presentation/cubits/audio_management_cubit.dart';
-
 final locator = GetIt.instance;
 
 Future<void> setupDependencies() async {

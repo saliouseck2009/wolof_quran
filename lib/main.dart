@@ -10,7 +10,9 @@ import 'package:wolof_quran/domain/usecases/get_ayah_audios_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_reciters_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_surah_audio_status_usecase.dart';
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/quran_settings_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/reciter_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/ayah_playback_cubit.dart';
 import 'package:wolof_quran/service_locator.dart';
 
 import 'core/navigation/app_routes.dart';
@@ -49,35 +51,46 @@ class MyApp extends StatelessWidget {
             getSurahAudioStatusUseCase: locator<GetSurahAudioStatusUseCase>(),
             getAyahAudiosUseCase: locator<GetAyahAudiosUseCase>(),
             audioPlayerService: locator<AudioPlayerService>(),
-          ),
+          )..initialize(),
         ),
+        BlocProvider(create: (context) => QuranSettingsCubit()..loadSettings()),
       ],
-      child: BlocBuilder<LanguageCubit, Locale>(
-        builder: (context, locale) {
-          return BlocBuilder<ThemeCubit, ThemeMode>(
-            builder: (context, themeMode) {
-              return MaterialApp(
-                title: 'Wolof Quran',
-                debugShowCheckedModeBanner: false,
+      child: Builder(
+        builder: (context) {
+          return BlocProvider(
+            create: (context) => AyahPlaybackCubit(
+              audioPlayerService: locator<AudioPlayerService>(),
+              audioManagementCubit: context.read<AudioManagementCubit>(),
+            ),
+            child: BlocBuilder<LanguageCubit, Locale>(
+              builder: (context, locale) {
+                return BlocBuilder<ThemeCubit, ThemeMode>(
+                  builder: (context, themeMode) {
+                    return MaterialApp(
+                      title: 'Wolof Quran',
+                      debugShowCheckedModeBanner: false,
 
-                // Localization setup
-                locale: locale,
-                supportedLocales: LocalizationService.supportedLocales,
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
+                      // Localization setup
+                      locale: locale,
+                      supportedLocales: LocalizationService.supportedLocales,
+                      localizationsDelegates: const [
+                        AppLocalizations.delegate,
+                        GlobalMaterialLocalizations.delegate,
+                        GlobalWidgetsLocalizations.delegate,
+                        GlobalCupertinoLocalizations.delegate,
+                      ],
 
-                // Theme setup
-                theme: MaterialTheme().light(),
-                darkTheme: MaterialTheme().dark(),
-                themeMode: themeMode,
+                      // Theme setup
+                      theme: MaterialTheme().light(),
+                      darkTheme: MaterialTheme().dark(),
+                      themeMode: themeMode,
 
-                onGenerateRoute: AppRoutes.onGenerateRoutes,
-              );
-            },
+                      onGenerateRoute: AppRoutes.onGenerateRoutes,
+                    );
+                  },
+                );
+              },
+            ),
           );
         },
       ),

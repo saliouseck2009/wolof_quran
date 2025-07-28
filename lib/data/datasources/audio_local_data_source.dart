@@ -152,19 +152,27 @@ class AudioLocalDataSource implements AudioDataSource {
 
     for (final file in files) {
       if (_isAudioFile(file.path)) {
-        // Extract ayah number from filename (assuming format like "001.mp3", "002.mp3", etc.)
+        // Extract ayah number from filename (format like "114-001.mp3", "114-002.mp3", etc.)
         final filename = p.basenameWithoutExtension(file.path);
-        final ayahNumber = int.tryParse(filename);
 
-        if (ayahNumber != null) {
-          audioFiles.add(
-            AyahAudio(
-              surahNumber: surahNumber,
-              ayahNumber: ayahNumber,
-              reciterId: reciterId,
-              localPath: file.path,
-            ),
-          );
+        // Split by dash and get the second part (ayah number)
+        final parts = filename.split('-');
+        if (parts.length == 2) {
+          final ayahNumber = int.tryParse(parts[1]);
+
+          if (ayahNumber != null) {
+            // Verify the file actually exists and has content
+            if (await file.exists() && await file.length() > 0) {
+              audioFiles.add(
+                AyahAudio(
+                  surahNumber: surahNumber,
+                  ayahNumber: ayahNumber,
+                  reciterId: reciterId,
+                  localPath: file.path,
+                ),
+              );
+            }
+          }
         }
       }
     }

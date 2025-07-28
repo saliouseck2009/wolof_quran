@@ -6,7 +6,10 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../../core/helpers/revelation_place_enum.dart';
 import '../cubits/surah_detail_cubit.dart';
+import '../cubits/audio_management_cubit.dart';
+import '../cubits/quran_settings_cubit.dart';
 import '../widgets/ayah_card.dart';
+import '../widgets/ayah_play_button.dart';
 
 class SurahDetailPage extends StatelessWidget {
   static const String routeName = "/surah-detail";
@@ -108,8 +111,35 @@ class SurahDetailContent extends StatelessWidget {
     required this.surahNumber,
   });
 
+  void _initializeAudioManagement(BuildContext context) {
+    // Initialize the AudioManagementCubit if not already initialized
+    final audioManagementCubit = context.read<AudioManagementCubit>();
+    final currentState = audioManagementCubit.state;
+
+    if (currentState is! AudioManagementLoaded) {
+      audioManagementCubit.initialize();
+    }
+
+    // Load ayah audios for this surah with the selected reciter
+    final quranSettingsCubit = context.read<QuranSettingsCubit>();
+    final quranSettingsState = quranSettingsCubit.state;
+
+    if (quranSettingsState is QuranSettingsLoaded &&
+        quranSettingsState.selectedReciter != null) {
+      audioManagementCubit.loadAyahAudios(
+        quranSettingsState.selectedReciter!.id,
+        surahNumber,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Initialize audio management when widget builds
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeAudioManagement(context);
+    });
+
     return CustomScrollView(
       slivers: [
         // Modern App Bar with Surah Info
@@ -120,6 +150,7 @@ class SurahDetailContent extends StatelessWidget {
 
         // List of Ayahs
         SurahAyahsList(
+          surahNumber: surahNumber,
           ayahs: state.ayahs,
           translationSource: state.translationSource,
         ),
@@ -363,11 +394,13 @@ class SurahBasmalaWidget extends StatelessWidget {
 }
 
 class SurahAyahsList extends StatelessWidget {
+  final int surahNumber;
   final List<AyahData> ayahs;
   final String translationSource;
 
   const SurahAyahsList({
     super.key,
+    required this.surahNumber,
     required this.ayahs,
     required this.translationSource,
   });
@@ -383,11 +416,10 @@ class SurahAyahsList extends StatelessWidget {
           translationSource: translationSource,
           translation: ayah.translation,
           actions: [
-            IconButton(
-              icon: Icon(Icons.play_arrow, color: AppColor.primaryGreen),
-              onPressed: () {
-                // TODO: Implement audio playback
-              },
+            AyahPlayButton(
+              surahNumber: surahNumber,
+              ayahNumber: ayah.verseNumber,
+              surahName: quran.getSurahName(surahNumber),
             ),
             IconButton(
               icon: Icon(Icons.bookmark_border, color: AppColor.mediumGray),
