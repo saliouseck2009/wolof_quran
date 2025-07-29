@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalizationService {
   static const String _languageKey = 'app_language';
@@ -12,17 +14,46 @@ class LocalizationService {
 
   static const Locale defaultLocale = Locale('fr', 'FR');
 
-  // Get current locale (synchronous for simplicity)
-  static Locale getCurrentLocale() {
-    // In a real app, you'd load this from SharedPreferences
-    // For now, return the default locale
+  // Get current locale from SharedPreferences
+  static Future<Locale> getCurrentLocale() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final languageCode = prefs.getString(_languageKey);
+
+      if (languageCode != null) {
+        final locale = getLocaleFromLanguageCode(languageCode);
+        // Verify the locale is still supported
+        if (isSupported(locale)) {
+          return locale;
+        }
+      }
+    } catch (e) {
+      // If loading fails, return default
+      debugPrint('Failed to load saved language: $e');
+    }
+
+    // Return default locale if no saved language or loading fails
     return defaultLocale;
   }
 
-  // Save selected locale (async but simplified)
+  // Save selected locale to SharedPreferences
   static Future<void> setLocale(Locale locale) async {
-    // In a real app, you'd save this to SharedPreferences
-    // For now, we'll implement this when SharedPreferences is working
+    try {
+      if (isSupported(locale)) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_languageKey, locale.languageCode);
+      }
+    } catch (e) {
+      debugPrint('Failed to save language preference: $e');
+    }
+  }
+
+  // Get current locale synchronously (for backwards compatibility)
+  // This should be avoided in favor of the async version
+  static Locale getCurrentLocalSync() {
+    // Return default locale for synchronous access
+    // The async version should be used instead
+    return defaultLocale;
   }
 
   // Check if locale is supported
@@ -57,6 +88,27 @@ class LocalizationService {
         return 'العربية';
       default:
         return 'Français';
+    }
+  }
+
+  // Get saved language code directly from SharedPreferences
+  static Future<String?> getSavedLanguageCode() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_languageKey);
+    } catch (e) {
+      debugPrint('Failed to get saved language code: $e');
+      return null;
+    }
+  }
+
+  // Clear saved language preference
+  static Future<void> clearSavedLanguage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_languageKey);
+    } catch (e) {
+      debugPrint('Failed to clear saved language: $e');
     }
   }
 }
