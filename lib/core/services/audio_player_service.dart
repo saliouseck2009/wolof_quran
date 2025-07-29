@@ -153,7 +153,7 @@ class AudioPlayerService {
       _currentAudioSubject.add(
         PlayingAudioInfo(
           surahNumber: surahNumber,
-          ayahNumber: startIndex + 1, // Ayah numbers are 1-based
+          ayahNumber: startIndex, // + 1, // Ayah numbers are 1-based
           reciterId: reciterId,
           surahName: surahName,
           isPlaylist: true,
@@ -253,7 +253,8 @@ class AudioPlayerService {
         _currentAudioSubject.add(
           PlayingAudioInfo(
             surahNumber: currentAudio.surahNumber,
-            ayahNumber: _currentPlaylistIndex + 1, // Ayah numbers are 1-based
+            ayahNumber:
+                _currentPlaylistIndex, // + 1, // Ayah numbers are 1-based
             reciterId: currentAudio.reciterId,
             surahName: currentAudio.surahName,
             isPlaylist: true,
