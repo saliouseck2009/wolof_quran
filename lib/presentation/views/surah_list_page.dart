@@ -62,7 +62,7 @@ class _SurahListView extends StatelessWidget {
                         '/quran-settings',
                       );
                       // If translation was changed, reload the Surah list
-                      if (result == true) {
+                      if (result == true && context.mounted) {
                         context
                             .read<SurahListCubit>()
                             .reloadTranslationSettings();

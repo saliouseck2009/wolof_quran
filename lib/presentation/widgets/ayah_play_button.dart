@@ -88,7 +88,7 @@ class AyahPlayButton extends StatelessWidget {
                     if (isThisAyahLoading ||
                         (isThisAyahPlaying &&
                             playerState == AudioPlayerState.loading)) {
-                      iconData = Icons.hourglass_empty;
+                      iconData = Icons.pause;
                     } else if (isThisAyahPlaying &&
                         playerState == AudioPlayerState.playing) {
                       iconData = Icons.pause;
@@ -98,15 +98,12 @@ class AyahPlayButton extends StatelessWidget {
 
                     return IconButton(
                       icon: isThisAyahLoading
-                          ? SizedBox(
-                              width: size,
-                              height: size,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  color,
-                                ),
-                              ),
+                          ? Icon(
+                              iconData,
+                              color: isThisAyahPlaying
+                                  ? AppColor.primaryGreen
+                                  : color,
+                              size: size,
                             )
                           : Icon(
                               iconData,
