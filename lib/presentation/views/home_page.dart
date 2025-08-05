@@ -155,7 +155,7 @@ class HomePage extends StatelessWidget {
                                 icon: Icons.search,
                                 title: localizations.search,
                                 onTap: () {
-                                  // Navigate to search page
+                                  Navigator.pushNamed(context, '/search');
                                 },
                               ),
                             ],

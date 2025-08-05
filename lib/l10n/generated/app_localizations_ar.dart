@@ -154,4 +154,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get searchQuran => 'Search Quran';
+
+  @override
+  String get enterWordsToSearch => 'Enter words to search...';
+
+  @override
+  String get searchTheQuran => 'Search the Quran';
+
+  @override
+  String get enterWordsToFindVerses =>
+      'Enter words to find verses in the Quran';
+
+  @override
+  String get searchError => 'Search Error';
+
+  @override
+  String get noResultsFound => 'No Results Found';
+
+  @override
+  String get tryDifferentSearchTerms => 'Try different search terms';
+
+  @override
+  String foundOccurrences(int occurrences, int verses) {
+    return 'Found $occurrences occurrence(s) in $verses verse(s)';
+  }
 }

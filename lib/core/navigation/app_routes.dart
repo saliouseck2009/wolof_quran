@@ -8,6 +8,7 @@ import 'package:wolof_quran/presentation/views/quran_settings_page.dart';
 import 'package:wolof_quran/presentation/views/surah_audio_list_page.dart';
 import 'package:wolof_quran/presentation/views/reciter_list_page.dart';
 import 'package:wolof_quran/presentation/views/reciter_chapters_page.dart';
+import 'package:wolof_quran/presentation/views/search_page.dart';
 import 'package:wolof_quran/domain/entities/reciter.dart';
 
 class AppRoutes {
@@ -31,6 +32,8 @@ class AppRoutes {
         return _materialRoute(view: QuranSettingsPage(), settings: settings);
       case '/surah-audio-list':
         return _materialRoute(view: SurahAudioListPage(), settings: settings);
+      case '/search':
+        return _materialRoute(view: SearchPage(), settings: settings);
       case '/reciter-list':
         return _materialRoute(view: ReciterListPage(), settings: settings);
       case '/reciter-chapters':

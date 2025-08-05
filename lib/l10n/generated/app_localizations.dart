@@ -387,6 +387,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancel;
+
+  /// Search page title
+  ///
+  /// In en, this message translates to:
+  /// **'Search Quran'**
+  String get searchQuran;
+
+  /// Search input placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Enter words to search...'**
+  String get enterWordsToSearch;
+
+  /// Initial search state title
+  ///
+  /// In en, this message translates to:
+  /// **'Search the Quran'**
+  String get searchTheQuran;
+
+  /// Initial search state subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Enter words to find verses in the Quran'**
+  String get enterWordsToFindVerses;
+
+  /// Search error title
+  ///
+  /// In en, this message translates to:
+  /// **'Search Error'**
+  String get searchError;
+
+  /// No search results title
+  ///
+  /// In en, this message translates to:
+  /// **'No Results Found'**
+  String get noResultsFound;
+
+  /// No search results subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Try different search terms'**
+  String get tryDifferentSearchTerms;
+
+  /// Search results count
+  ///
+  /// In en, this message translates to:
+  /// **'Found {occurrences} occurrence(s) in {verses} verse(s)'**
+  String foundOccurrences(int occurrences, int verses);
 }
 
 class _AppLocalizationsDelegate

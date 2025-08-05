@@ -197,5 +197,47 @@
   "cancel": "Cancel",
   "@cancel": {
     "description": "Cancel button text"
+  },
+  "searchQuran": "Search Quran",
+  "@searchQuran": {
+    "description": "Search page title"
+  },
+  "enterWordsToSearch": "Enter words to search...",
+  "@enterWordsToSearch": {
+    "description": "Search input placeholder"
+  },
+  "searchTheQuran": "Search the Quran",
+  "@searchTheQuran": {
+    "description": "Initial search state title"
+  },
+  "enterWordsToFindVerses": "Enter words to find verses in the Quran",
+  "@enterWordsToFindVerses": {
+    "description": "Initial search state subtitle"
+  },
+  "searchError": "Search Error",
+  "@searchError": {
+    "description": "Search error title"
+  },
+  "noResultsFound": "No Results Found",
+  "@noResultsFound": {
+    "description": "No search results title"
+  },
+  "tryDifferentSearchTerms": "Try different search terms",
+  "@tryDifferentSearchTerms": {
+    "description": "No search results subtitle"
+  },
+  "foundOccurrences": "Found {occurrences} occurrence(s) in {verses} verse(s)",
+  "@foundOccurrences": {
+    "description": "Search results count",
+    "placeholders": {
+      "occurrences": {
+        "type": "int",
+        "description": "Number of occurrences found"
+      },
+      "verses": {
+        "type": "int",
+        "description": "Number of verses found"
+      }
+    }
   }
 }
