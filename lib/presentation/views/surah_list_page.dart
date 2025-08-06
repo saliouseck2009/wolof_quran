@@ -107,7 +107,12 @@ class _SurahListView extends StatelessWidget {
               state.filteredSurahs.isEmpty && state.isSearching
                   ? _buildNoResults(context)
                   : SliverPadding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                        bottom: 48,
+                      ),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate((context, index) {
                           final surahNumber = state.filteredSurahs[index];
