@@ -4,6 +4,7 @@ import 'package:quran/quran.dart' as quran;
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/config/theme/app_color.dart';
 import '../../core/utils/toast_service.dart';
+import '../../domain/repositories/download_repository.dart';
 import '../cubits/reciter_cubit.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
@@ -32,6 +33,19 @@ class SurahAudioListPage extends StatelessWidget {
 
 class _SurahAudioListView extends StatelessWidget {
   const _SurahAudioListView();
+
+  // Helper method to safely check download status
+  Future<bool> _checkDownloadStatus(String reciterId, int surahNumber) async {
+    try {
+      return await locator<DownloadRepository>().isSurahDownloaded(
+        reciterId,
+        surahNumber,
+      );
+    } catch (e) {
+      print('Could not check download status from database: $e');
+      return false; // Fallback to not downloaded
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -225,170 +239,176 @@ class _SurahAudioListView extends StatelessWidget {
     );
     final versesCount = quran.getVerseCount(surahNumber);
 
-    // Get download status
-    bool isDownloaded = false;
-    bool isDownloading = false;
-    double downloadProgress = 0.0;
+    return FutureBuilder<bool>(
+      future: _checkDownloadStatus(reciterId, surahNumber),
+      builder: (context, downloadSnapshot) {
+        // Get download status from database (with fallback)
+        bool isDownloaded = downloadSnapshot.data ?? false;
+        bool isDownloading = false;
+        double downloadProgress = 0.0;
 
-    if (audioState is AudioManagementLoaded) {
-      final status = audioState.getSurahStatus(reciterId, surahNumber);
-      isDownloaded = status?.isDownloaded ?? false;
-    } else if (audioState is AudioDownloading &&
-        audioState.reciterId == reciterId &&
-        audioState.surahNumber == surahNumber) {
-      isDownloading = true;
-      downloadProgress = audioState.progress;
-    }
+        // Check for current downloading state
+        if (audioState is AudioDownloading &&
+            audioState.reciterId == reciterId &&
+            audioState.surahNumber == surahNumber) {
+          isDownloading = true;
+          downloadProgress = audioState.progress;
+        }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AppColor.primaryGreen.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: AppColor.primaryGreen.withValues(alpha: 0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: isDownloaded
-            ? () {
-                // Navigate to surah detail page with audio playback
-                // TODO: Implement navigation to detail page
-              }
-            : null,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Surah number circle
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColor.primaryGreen.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColor.primaryGreen.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    surahNumber.toString(),
-                    style: GoogleFonts.amiri(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColor.primaryGreen,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: isDownloaded
+                ? () {
+                    // Navigate to surah detail page with audio playback
+                    // TODO: Implement navigation to detail page
+                  }
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Surah number circle
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColor.primaryGreen.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        surahNumber.toString(),
+                        style: GoogleFonts.amiri(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.primaryGreen,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
 
-              const SizedBox(width: 16),
+                  const SizedBox(width: 16),
 
-              // Surah info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                  // Surah info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            surahNameTranslated,
-                            style: GoogleFonts.amiri(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? AppColor.pureWhite
-                                  : AppColor.charcoal,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                surahNameTranslated,
+                                style: GoogleFonts.amiri(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark
+                                      ? AppColor.pureWhite
+                                      : AppColor.charcoal,
+                                ),
+                              ),
                             ),
-                          ),
+                            Text(
+                              surahNameArabic,
+                              style: GoogleFonts.amiri(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: AppColor.primaryGreen,
+                              ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 4),
                         Text(
-                          surahNameArabic,
+                          '$versesCount ayahs', // TODO: Add to localizations
                           style: GoogleFonts.amiri(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: AppColor.primaryGreen,
+                            fontSize: 13,
+                            color: AppColor.mediumGray,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '$versesCount ayahs', // TODO: Add to localizations
-                      style: GoogleFonts.amiri(
-                        fontSize: 13,
-                        color: AppColor.mediumGray,
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  // Download/Play button
+                  if (isDownloading)
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          CircularProgressIndicator(
+                            value: downloadProgress,
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColor.primaryGreen,
+                            ),
+                          ),
+                          Text(
+                            '${(downloadProgress * 100).round()}%',
+                            style: const TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
+                    )
+                  else
+                    IconButton(
+                      icon: Icon(
+                        isDownloaded
+                            ? Icons.play_circle_filled
+                            : Icons.download,
+                        color: isDownloaded
+                            ? AppColor.primaryGreen
+                            : AppColor.mediumGray,
+                        size: 32,
+                      ),
+                      onPressed: () {
+                        if (isDownloaded) {
+                          // Play surah
+                          context
+                              .read<AudioManagementCubit>()
+                              .playSurahPlaylist(
+                                reciterId,
+                                surahNumber,
+                                surahName: surahNameTranslated,
+                              );
+                        } else {
+                          // Download surah
+                          context
+                              .read<AudioManagementCubit>()
+                              .downloadSurahAudio(reciterId, surahNumber);
+                        }
+                      },
                     ),
-                  ],
-                ),
+                ],
               ),
-
-              const SizedBox(width: 16),
-
-              // Download/Play button
-              if (isDownloading)
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      CircularProgressIndicator(
-                        value: downloadProgress,
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColor.primaryGreen,
-                        ),
-                      ),
-                      Text(
-                        '${(downloadProgress * 100).round()}%',
-                        style: const TextStyle(
-                          fontSize: 8,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              else
-                IconButton(
-                  icon: Icon(
-                    isDownloaded ? Icons.play_circle_filled : Icons.download,
-                    color: isDownloaded
-                        ? AppColor.primaryGreen
-                        : AppColor.mediumGray,
-                    size: 32,
-                  ),
-                  onPressed: () {
-                    if (isDownloaded) {
-                      // Play surah
-                      context.read<AudioManagementCubit>().playSurahPlaylist(
-                        reciterId,
-                        surahNumber,
-                        surahName: surahNameTranslated,
-                      );
-                    } else {
-                      // Download surah
-                      context.read<AudioManagementCubit>().downloadSurahAudio(
-                        reciterId,
-                        surahNumber,
-                      );
-                    }
-                  },
-                ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

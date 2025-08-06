@@ -6,6 +6,7 @@ import '../../domain/entities/ayah_audio.dart';
 import '../../domain/usecases/download_surah_audio_usecase.dart';
 import '../../domain/usecases/get_surah_audio_status_usecase.dart';
 import '../../domain/usecases/get_ayah_audios_usecase.dart';
+import '../../domain/repositories/download_repository.dart';
 import '../../core/services/audio_player_service.dart';
 
 // States
@@ -174,6 +175,7 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
   final GetSurahAudioStatusUseCase getSurahAudioStatusUseCase;
   final GetAyahAudiosUseCase getAyahAudiosUseCase;
   final AudioPlayerService audioPlayerService;
+  final DownloadRepository downloadRepository;
 
   StreamSubscription<double>? _downloadStreamSubscription;
 
@@ -182,6 +184,7 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
     required this.getSurahAudioStatusUseCase,
     required this.getAyahAudiosUseCase,
     required this.audioPlayerService,
+    required this.downloadRepository,
   }) : super(AudioManagementInitial());
 
   @override
@@ -210,6 +213,18 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
         currentAyahAudiosMap = Map.from(loadedState.ayahAudiosMap);
       }
 
+      // Mark download as in progress in database
+      try {
+        await downloadRepository.markSurahAsInProgress(
+          reciterId,
+          surahNumber,
+          '',
+        );
+      } catch (e) {
+        print('Could not mark download in database: $e');
+        // Continue with download even if database marking fails
+      }
+
       await downloadSurahAudioUseCase.call(
         params: DownloadSurahAudioParams(
           reciterId: reciterId,
@@ -228,9 +243,43 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
         ),
       );
 
+      // Download completed, get the file path and mark as downloaded in database
+      try {
+        final downloadedSurah = await downloadRepository.getDownloadedSurah(
+          reciterId,
+          surahNumber,
+        );
+        if (downloadedSurah != null) {
+          // Update the file path if needed and mark as complete
+          final status = await getSurahAudioStatusUseCase(
+            params: GetSurahAudioStatusParams(
+              reciterId: reciterId,
+              surahNumber: surahNumber,
+            ),
+          );
+
+          if (status.isDownloaded && status.localPath != null) {
+            await downloadRepository.markSurahAsDownloaded(
+              reciterId,
+              surahNumber,
+              status.localPath!,
+            );
+          }
+        }
+      } catch (e) {
+        print('Could not update download status in database: $e');
+        // Continue even if database update fails
+      }
+
       // Download completed, refresh status
       refreshSurahStatus(reciterId, surahNumber);
     } catch (e) {
+      // Remove download record if it failed
+      try {
+        await downloadRepository.removeSurahDownload(reciterId, surahNumber);
+      } catch (dbError) {
+        print('Could not remove failed download from database: $dbError');
+      }
       emit(AudioManagementError(e.toString()));
     }
   }
@@ -252,13 +301,54 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
         currentAyahAudiosMap = Map.from(currentState.previousAyahAudiosMap);
       }
 
-      // Get updated status
-      final status = await getSurahAudioStatusUseCase(
-        params: GetSurahAudioStatusParams(
-          reciterId: reciterId,
-          surahNumber: surahNumber,
-        ),
-      );
+      // Check database for download status
+      bool isDownloaded = false;
+      try {
+        isDownloaded = await downloadRepository.isSurahDownloaded(
+          reciterId,
+          surahNumber,
+        );
+      } catch (e) {
+        // If database is not available, fallback to original method
+        print(
+          'Database not available, falling back to original status check: $e',
+        );
+        isDownloaded = false;
+      }
+
+      SurahAudioStatus status;
+      if (isDownloaded) {
+        // Get the downloaded surah info from database
+        try {
+          final downloadedSurah = await downloadRepository.getDownloadedSurah(
+            reciterId,
+            surahNumber,
+          );
+          status = SurahAudioStatus(
+            reciterId: reciterId,
+            surahNumber: surahNumber,
+            isDownloaded: true,
+            localPath: downloadedSurah?.filePath ?? '',
+            downloadProgress: 1.0,
+          );
+        } catch (e) {
+          // Fallback to original method if database fails
+          status = await getSurahAudioStatusUseCase(
+            params: GetSurahAudioStatusParams(
+              reciterId: reciterId,
+              surahNumber: surahNumber,
+            ),
+          );
+        }
+      } else {
+        // Get status from original source
+        status = await getSurahAudioStatusUseCase(
+          params: GetSurahAudioStatusParams(
+            reciterId: reciterId,
+            surahNumber: surahNumber,
+          ),
+        );
+      }
 
       // Update the status map
       currentSurahStatusMap['${reciterId}_$surahNumber'] = status;

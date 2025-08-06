@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:wolof_quran/core/helpers/bloc_observer.dart';
 import 'package:wolof_quran/core/services/audio_player_service.dart';
 import 'package:wolof_quran/domain/repositories/reciter_repository.dart';
+import 'package:wolof_quran/domain/repositories/download_repository.dart';
 import 'package:wolof_quran/domain/usecases/download_surah_audio_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_ayah_audios_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_reciters_usecase.dart';
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
             getSurahAudioStatusUseCase: locator<GetSurahAudioStatusUseCase>(),
             getAyahAudiosUseCase: locator<GetAyahAudiosUseCase>(),
             audioPlayerService: locator<AudioPlayerService>(),
+            downloadRepository: locator<DownloadRepository>(),
           )..initialize(),
         ),
         BlocProvider(

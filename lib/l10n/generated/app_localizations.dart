@@ -435,6 +435,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Found {occurrences} occurrence(s) in {verses} verse(s)'**
   String foundOccurrences(int occurrences, int verses);
+
+  /// Message shown when audio is not downloaded
+  ///
+  /// In en, this message translates to:
+  /// **'Audio not available. Please download the surah first.'**
+  String get audioNotAvailable;
 }
 
 class _AppLocalizationsDelegate

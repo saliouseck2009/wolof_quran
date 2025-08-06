@@ -47,5 +47,6 @@
   "changeTranslation": "Changer la traduction",
   "translationDescription": "Choisissez votre traduction préférée pour les versets et chapitres du Coran",
   "translationUpdated": "Traduction mise à jour vers {language}",
-  "cancel": "Annuler"
+  "cancel": "Annuler",
+  "audioNotAvailable": "Audio non disponible. Veuillez d'abord télécharger la sourate."
 }

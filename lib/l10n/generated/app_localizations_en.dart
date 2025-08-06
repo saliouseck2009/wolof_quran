@@ -181,4 +181,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String foundOccurrences(int occurrences, int verses) {
     return 'Found $occurrences occurrence(s) in $verses verse(s)';
   }
+
+  @override
+  String get audioNotAvailable =>
+      'Audio not available. Please download the surah first.';
 }

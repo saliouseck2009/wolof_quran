@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/config/theme/app_color.dart';
 import '../../core/services/audio_player_service.dart';
+import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/ayah_playback_cubit.dart';
 
@@ -48,12 +50,36 @@ class AyahPlayButton extends StatelessWidget {
             if (playbackState is AyahPlaybackError &&
                 playbackState.surahNumber == surahNumber &&
                 playbackState.ayahNumber == ayahNumber) {
+              final localizations = AppLocalizations.of(context)!;
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                    'Error playing audio: ${playbackState.message}',
+                  content: Row(
+                    children: [
+                      Icon(
+                        Icons.download_outlined,
+                        color: AppColor.pureWhite,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          localizations.audioNotAvailable,
+                          style: GoogleFonts.amiri(
+                            color: AppColor.pureWhite,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  backgroundColor: Colors.red,
+                  backgroundColor: AppColor.primaryGreen,
+                  duration: const Duration(seconds: 3),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  margin: const EdgeInsets.all(16),
                 ),
               );
             }

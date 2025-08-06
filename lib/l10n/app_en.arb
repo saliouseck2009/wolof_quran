@@ -239,5 +239,9 @@
         "description": "Number of verses found"
       }
     }
+  },
+  "audioNotAvailable": "Audio not available. Please download the surah first.",
+  "@audioNotAvailable": {
+    "description": "Message shown when audio is not downloaded"
   }
 }

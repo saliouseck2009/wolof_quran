@@ -39,5 +39,6 @@
   "meccan": "مكية",
   "medinan": "مدنية",
   "noSurahFound": "لم توجد سورة",
-  "tryDifferentSearch": "جرب مصطلح بحث مختلف"
+  "tryDifferentSearch": "جرب مصطلح بحث مختلف",
+  "audioNotAvailable": "الصوت غير متوفر. يرجى تحميل السورة أولاً."
 }
