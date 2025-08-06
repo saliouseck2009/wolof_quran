@@ -45,6 +45,14 @@ class _SurahListView extends StatelessWidget {
                 floating: false,
                 pinned: true,
                 elevation: 2,
+                backgroundColor: isDark
+                    ? AppColor.charcoal
+                    : AppColor.primaryGreen,
+                foregroundColor: AppColor.pureWhite,
+                surfaceTintColor: Colors.transparent,
+                shadowColor: isDark
+                    ? AppColor.charcoal.withValues(alpha: 0.3)
+                    : AppColor.primaryGreen.withValues(alpha: 0.3),
                 title: Text(
                   localizations.surahs,
                   style: GoogleFonts.amiri(
@@ -97,10 +105,6 @@ class _SurahListView extends StatelessWidget {
                     ),
                   ),
                 ),
-                backgroundColor: isDark
-                    ? AppColor.charcoal
-                    : AppColor.primaryGreen,
-                foregroundColor: AppColor.pureWhite,
               ),
 
               // Surah List
