@@ -48,6 +48,25 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
 
   QuranSettingsCubit() : super(QuranSettingsInitial());
 
+  // Getter for easy access to current translation
+  quran.Translation get currentTranslation {
+    final currentState = state;
+    if (currentState is QuranSettingsLoaded) {
+      return currentState.selectedTranslation;
+    }
+    // Return default translation if state is not loaded
+    return quran.Translation.frHamidullah;
+  }
+
+  // Getter for easy access to current reciter
+  Reciter? get currentReciter {
+    final currentState = state;
+    if (currentState is QuranSettingsLoaded) {
+      return currentState.selectedReciter;
+    }
+    return null;
+  }
+
   // Available translations based on the README
   static const List<TranslationOption> availableTranslations = [
     TranslationOption(

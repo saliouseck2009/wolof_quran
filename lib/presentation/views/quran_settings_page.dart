@@ -49,15 +49,12 @@ class _QuranSettingsView extends StatelessWidget {
       ),
       body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
         builder: (context, state) {
-          print('🔄 Settings page rebuilding with state: $state'); // Debug log
 
           if (state is! QuranSettingsLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          print(
-            '📋 Current translation in state: ${state.selectedTranslation}',
-          ); // Debug log
+        
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -122,13 +119,8 @@ class _QuranSettingsView extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // Translation Settings Section
-                _buildTranslationSection(context, state, localizations),
-
-                const SizedBox(height: 24),
-
-                // Reciter Selection Section
-                _buildReciterSection(context, localizations),
+                // Settings Menu Items
+                _buildSettingsMenuItems(context, state, localizations),
 
                 const SizedBox(height: 24),
 
@@ -143,105 +135,177 @@ class _QuranSettingsView extends StatelessWidget {
     );
   }
 
-  Widget _buildTranslationSection(
+  Widget _buildSettingsMenuItems(
     BuildContext context,
     QuranSettingsLoaded state,
     AppLocalizations localizations,
   ) {
-    final currentOption = QuranSettingsCubit.getTranslationOption(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final currentTranslationOption = QuranSettingsCubit.getTranslationOption(
       state.selectedTranslation,
     );
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          localizations.translationSettings,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColor.primaryGreen,
-          ),
-        ),
-
-        const SizedBox(height: 8),
-
-        Text(
-          localizations.translationDescription,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: AppColor.translationText),
+        // Translation Settings Menu Item
+        _buildSettingsMenuItem(
+          context: context,
+          icon: Icons.translate,
+          title: localizations.translationSettings,
+          subtitle: localizations.currentTranslation,
+          value: currentTranslationOption?.displayName ?? 'Unknown',
+          isDark: isDark,
+          onTap: () => _showTranslationSelector(context, state, localizations),
         ),
 
         const SizedBox(height: 16),
 
-        // Translation setting card
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: AppColor.primaryGreen.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        // Audio & Reciters Menu Item
+        _buildSettingsMenuItem(
+          context: context,
+          icon: Icons.volume_up,
+          title: 'Audio & Reciters',
+          subtitle: 'Manage reciters and download audio',
+          value: 'View available reciters',
+          isDark: isDark,
+          onTap: () {
+            Navigator.pushNamed(context, '/reciter-list');
+          },
+          showArrow: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingsMenuItem({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String value,
+    required bool isDark,
+    required VoidCallback onTap,
+    bool showArrow = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 2),
+      decoration: BoxDecoration(
+        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColor.primaryGreen.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () =>
-                  _showTranslationSelector(context, state, localizations),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColor.primaryGreen.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.translate,
-                        color: AppColor.primaryGreen,
-                        size: 24,
-                      ),
-                    ),
-
-                    const SizedBox(width: 16),
-
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            localizations.currentTranslation,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: AppColor.translationText),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            currentOption?.displayName ?? 'Unknown',
-                            style: Theme.of(context).textTheme.titleSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColor.primaryGreen,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Icon(Icons.chevron_right, color: AppColor.mediumGray),
-                  ],
+        ],
+        border: Border.all(
+          color: AppColor.primaryGreen.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                // Icon container
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: AppColor.primaryGreen, size: 24),
                 ),
-              ),
+
+                const SizedBox(width: 16),
+
+                // Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title
+                      Text(
+                        title,
+                        style: GoogleFonts.amiri(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? AppColor.pureWhite
+                              : AppColor.charcoal,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      // Subtitle
+                      Text(
+                        subtitle,
+                        style: GoogleFonts.amiri(
+                          fontSize: 12,
+                          color: AppColor.mediumGray,
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Value
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColor.primaryGreen.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          value,
+                          style: GoogleFonts.amiri(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.primaryGreen,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                // Action indicator
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    showArrow ? Icons.arrow_forward_ios : Icons.edit,
+                    color: AppColor.primaryGreen,
+                    size: 16,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -275,132 +339,6 @@ class _QuranSettingsView extends StatelessWidget {
       );
       Navigator.pop(context, true);
     }
-  }
-
-  Widget _buildReciterSection(
-    BuildContext context,
-    AppLocalizations localizations,
-  ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColor.primaryGreen.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            Navigator.pushNamed(context, '/reciter-list');
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Section header
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColor.primaryGreen.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.volume_up,
-                        color: AppColor.primaryGreen,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Audio Tafsir Management', // TODO: Add to localizations
-                            style: GoogleFonts.amiri(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? AppColor.pureWhite
-                                  : AppColor.charcoal,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Manage reciters and download chapters', // TODO: Add to localizations
-                            style: GoogleFonts.amiri(
-                              fontSize: 13,
-                              color: AppColor.mediumGray,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: AppColor.primaryGreen,
-                      size: 16,
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // Action button
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColor.primaryGreen.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: AppColor.primaryGreen.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.library_music,
-                        color: AppColor.primaryGreen,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'View Available Reciters', // TODO: Add to localizations
-                        style: GoogleFonts.amiri(
-                          fontSize: 14,
-                          color: AppColor.primaryGreen,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 

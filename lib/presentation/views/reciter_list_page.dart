@@ -180,18 +180,19 @@ class _ReciterListPageState extends State<ReciterListPage> {
                       decoration: BoxDecoration(
                         color: isDark ? AppColor.charcoal : AppColor.pureWhite,
                         borderRadius: BorderRadius.circular(16),
-                        border: isSelected
-                            ? Border.all(color: AppColor.primaryGreen, width: 2)
-                            : null,
                         boxShadow: [
                           BoxShadow(
-                            color: isSelected
-                                ? AppColor.primaryGreen.withValues(alpha: 0.2)
-                                : AppColor.primaryGreen.withValues(alpha: 0.08),
-                            blurRadius: 8,
+                            color: AppColor.primaryGreen.withValues(
+                              alpha: 0.08,
+                            ),
+                            blurRadius: 12,
                             offset: const Offset(0, 2),
                           ),
                         ],
+                        border: Border.all(
+                          color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                          width: 1,
+                        ),
                       ),
                       child: Material(
                         color: Colors.transparent,
@@ -210,52 +211,94 @@ class _ReciterListPageState extends State<ReciterListPage> {
                             padding: const EdgeInsets.all(20),
                             child: Row(
                               children: [
-                                // Reciter icon
+                                // Reciter icon container (consistent with settings page)
                                 Container(
-                                  width: 56,
-                                  height: 56,
+                                  width: 48,
+                                  height: 48,
                                   decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? AppColor.primaryGreen
-                                        : AppColor.primaryGreen.withValues(
-                                            alpha: 0.1,
-                                          ),
+                                    color: AppColor.primaryGreen.withValues(
+                                      alpha: 0.1,
+                                    ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Icon(
                                     Icons.person,
-                                    color: isSelected
-                                        ? AppColor.pureWhite
-                                        : AppColor.primaryGreen,
-                                    size: 28,
+                                    color: AppColor.primaryGreen,
+                                    size: 24,
                                   ),
                                 ),
 
                                 const SizedBox(width: 16),
 
-                                // Reciter info
+                                // Reciter info (consistent content structure)
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      // English name (title)
                                       Text(
                                         reciter.name,
                                         style: GoogleFonts.amiri(
-                                          fontSize: 18,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w600,
                                           color: isDark
                                               ? AppColor.pureWhite
                                               : AppColor.charcoal,
                                         ),
                                       ),
+
                                       const SizedBox(height: 4),
+
+                                      // Arabic name (subtitle)
                                       Text(
                                         reciter.arabicName,
                                         style: GoogleFonts.amiri(
-                                          fontSize: 16,
+                                          fontSize: 12,
                                           color: AppColor.mediumGray,
-                                          height: 1.4,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 8),
+
+                                      // Status badge
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: isSelected
+                                              ? AppColor.primaryGreen
+                                                    .withValues(alpha: 0.1)
+                                              : AppColor.mediumGray.withValues(
+                                                  alpha: 0.1,
+                                                ),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? AppColor.primaryGreen
+                                                      .withValues(alpha: 0.2)
+                                                : AppColor.mediumGray
+                                                      .withValues(alpha: 0.2),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          isSelected
+                                              ? 'Default Reciter'
+                                              : 'Available',
+                                          style: GoogleFonts.amiri(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w500,
+                                            color: isSelected
+                                                ? AppColor.primaryGreen
+                                                : AppColor.mediumGray,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
@@ -264,7 +307,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
 
                                 const SizedBox(width: 12),
 
-                                // Selection indicator or navigation icon
+                                // Selection action (consistent with settings page)
                                 GestureDetector(
                                   onTap: () {
                                     // Select this reciter when tapping the selection area
@@ -286,38 +329,25 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.all(8),
-                                    child: isSelected
-                                        ? Container(
-                                            padding: const EdgeInsets.all(6),
-                                            decoration: BoxDecoration(
-                                              color: AppColor.primaryGreen,
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? AppColor.primaryGreen.withValues(
+                                              alpha: 0.1,
+                                            )
+                                          : AppColor.mediumGray.withValues(
+                                              alpha: 0.1,
                                             ),
-                                            child: Icon(
-                                              Icons.check,
-                                              color: AppColor.pureWhite,
-                                              size: 16,
-                                            ),
-                                          )
-                                        : Column(
-                                            children: [
-                                              Icon(
-                                                Icons.radio_button_unchecked,
-                                                color: AppColor.primaryGreen,
-                                                size: 20,
-                                              ),
-                                              const SizedBox(height: 2),
-                                              Text(
-                                                'Select',
-                                                style: GoogleFonts.amiri(
-                                                  fontSize: 10,
-                                                  color: AppColor.mediumGray,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ],
-                                          ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      isSelected
+                                          ? Icons.check_circle
+                                          : Icons.radio_button_unchecked,
+                                      color: isSelected
+                                          ? AppColor.primaryGreen
+                                          : AppColor.mediumGray,
+                                      size: 20,
+                                    ),
                                   ),
                                 ),
                               ],

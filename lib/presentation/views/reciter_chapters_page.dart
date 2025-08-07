@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quran/quran.dart' as quran;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/config/theme/app_color.dart';
+import '../../core/services/audio_player_service.dart';
 import '../../domain/entities/reciter.dart';
 import '../blocs/reciter_chapters_bloc.dart';
 import '../cubits/audio_management_cubit.dart';
@@ -171,30 +171,15 @@ class _ReciterChaptersContent extends StatelessWidget {
         }
 
         if (state is ReciterChaptersLoaded) {
-          return FutureBuilder<quran.Translation?>(
-            future: _loadTranslation(),
-            builder: (context, translationSnapshot) {
-              final translation = translationSnapshot.data;
+          final translation = context
+              .read<QuranSettingsCubit>()
+              .currentTranslation;
 
-              return _buildChaptersList(context, isDark, state, translation);
-            },
-          );
+          return _buildChaptersList(context, isDark, state, translation);
         }
-
         return const SizedBox.shrink();
       },
     );
-  }
-
-  Future<quran.Translation?> _loadTranslation() async {
-    final prefs = await SharedPreferences.getInstance();
-    final translationId = prefs.getString('selected_translation_id');
-    if (translationId != null) {
-      // For now, return null and use English by default
-      // TODO: Implement proper translation loading when available
-      return null;
-    }
-    return null;
   }
 
   Widget _buildChaptersList(
@@ -452,26 +437,73 @@ class _ChapterCard extends StatelessWidget {
                 }
 
                 if (isDownloaded) {
-                  // Play button
-                  return IconButton(
-                    onPressed: () {
-                      // Load ayah audios and play surah playlist
-                      context.read<AudioManagementCubit>().loadAyahAudios(
-                        reciter.id,
-                        surahNumber,
-                      );
-                      context.read<AudioManagementCubit>().playSurahPlaylist(
-                        reciter.id,
-                        surahNumber,
-                        surahName: getSurahDisplayName(surahNumber),
-                        startAyahIndex: 0,
+                  // Play/Stop button with stream builder to monitor player state
+                  return StreamBuilder<AudioPlayerState>(
+                    stream: context
+                        .read<AudioManagementCubit>()
+                        .audioPlayerService
+                        .playerState,
+                    builder: (context, playerStateSnapshot) {
+                      return StreamBuilder<PlayingAudioInfo?>(
+                        stream: context
+                            .read<AudioManagementCubit>()
+                            .audioPlayerService
+                            .currentAudio,
+                        builder: (context, currentAudioSnapshot) {
+                          final playerState =
+                              playerStateSnapshot.data ??
+                              AudioPlayerState.stopped;
+                          final currentAudio = currentAudioSnapshot.data;
+                          final audioPlayerService = context
+                              .read<AudioManagementCubit>()
+                              .audioPlayerService;
+
+                          // Check if this specific surah is currently playing
+                          final isThisSurahPlaying =
+                              currentAudio != null &&
+                              currentAudio.surahNumber == surahNumber &&
+                              currentAudio.reciterId == reciter.id &&
+                              audioPlayerService.isPlayingPlaylist;
+
+                          final isPlaying =
+                              isThisSurahPlaying &&
+                              (playerState == AudioPlayerState.playing ||
+                                  playerState == AudioPlayerState.loading);
+
+                          return IconButton(
+                            onPressed: () async {
+                              if (isThisSurahPlaying &&
+                                  playerState == AudioPlayerState.playing) {
+                                // Stop the current playback
+                                await audioPlayerService.stop();
+                              } else {
+                                // Load ayah audios and play surah playlist
+                                context
+                                    .read<AudioManagementCubit>()
+                                    .loadAyahAudios(reciter.id, surahNumber);
+                                context
+                                    .read<AudioManagementCubit>()
+                                    .playSurahPlaylist(
+                                      reciter.id,
+                                      surahNumber,
+                                      surahName: getSurahDisplayName(
+                                        surahNumber,
+                                      ),
+                                      startAyahIndex: 0,
+                                    );
+                              }
+                            },
+                            icon: Icon(
+                              isPlaying
+                                  ? Icons.stop_circle
+                                  : Icons.play_circle_filled,
+                              color: AppColor.primaryGreen,
+                              size: 32,
+                            ),
+                          );
+                        },
                       );
                     },
-                    icon: Icon(
-                      Icons.play_circle_filled,
-                      color: AppColor.primaryGreen,
-                      size: 32,
-                    ),
                   );
                 }
 
