@@ -186,4 +186,71 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get audioNotAvailable =>
       'Audio non disponible. Veuillez d\'abord télécharger la sourate.';
+
+  @override
+  String get checkInternetConnection =>
+      'Vérifiez votre connexion Internet et réessayez';
+
+  @override
+  String get connectionTimeout =>
+      'Délai de connexion dépassé. Veuillez réessayer';
+
+  @override
+  String get audioFileNotFound => 'Fichier audio introuvable sur le serveur';
+
+  @override
+  String get accessDeniedToAudio => 'Accès refusé au fichier audio';
+
+  @override
+  String get notEnoughStorage => 'Espace de stockage insuffisant';
+
+  @override
+  String get downloadFailed => 'Échec du téléchargement. Veuillez réessayer';
+
+  @override
+  String surahsDownloaded(int count) {
+    return '$count/114 Sourates téléchargées';
+  }
+
+  @override
+  String get downloaded => 'Téléchargée';
+
+  @override
+  String get notDownloaded => 'Non téléchargée';
+
+  @override
+  String get downloading => 'Téléchargement...';
+
+  @override
+  String downloadedSuccessfully(String surahName) {
+    return '$surahName téléchargée avec succès';
+  }
+
+  @override
+  String downloadFailedWithError(String error) {
+    return 'Échec du téléchargement : $error';
+  }
+
+  @override
+  String get tryAgain => 'Réessayer';
+
+  @override
+  String errorCheckingDownloadStatus(String error) {
+    return 'Erreur lors de la vérification du statut de téléchargement : $error';
+  }
+
+  @override
+  String get checkFailed => 'Vérification échouée';
+
+  @override
+  String get downloadToPlay => 'Télécharger pour lire';
+
+  @override
+  String get pauseSurah => 'Mettre en pause la Sourate';
+
+  @override
+  String get resumeSurah => 'Reprendre la Sourate';
+
+  @override
+  String get playSurah => 'Lire la Sourate';
 }

@@ -185,4 +185,70 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get audioNotAvailable =>
       'Audio not available. Please download the surah first.';
+
+  @override
+  String get checkInternetConnection =>
+      'Check your internet connection and try again';
+
+  @override
+  String get connectionTimeout => 'Connection timeout. Please try again';
+
+  @override
+  String get audioFileNotFound => 'Audio file not found on server';
+
+  @override
+  String get accessDeniedToAudio => 'Access denied to audio file';
+
+  @override
+  String get notEnoughStorage => 'Not enough storage space available';
+
+  @override
+  String get downloadFailed => 'Download failed. Please try again';
+
+  @override
+  String surahsDownloaded(int count) {
+    return '$count/114 Surahs Downloaded';
+  }
+
+  @override
+  String get downloaded => 'Downloaded';
+
+  @override
+  String get notDownloaded => 'Not downloaded';
+
+  @override
+  String get downloading => 'Downloading...';
+
+  @override
+  String downloadedSuccessfully(String surahName) {
+    return '$surahName downloaded successfully';
+  }
+
+  @override
+  String downloadFailedWithError(String error) {
+    return 'Download failed: $error';
+  }
+
+  @override
+  String get tryAgain => 'Try Again';
+
+  @override
+  String errorCheckingDownloadStatus(String error) {
+    return 'Error checking download status: $error';
+  }
+
+  @override
+  String get checkFailed => 'Check failed';
+
+  @override
+  String get downloadToPlay => 'Download to play';
+
+  @override
+  String get pauseSurah => 'Pause Surah';
+
+  @override
+  String get resumeSurah => 'Resume Surah';
+
+  @override
+  String get playSurah => 'Play Surah';
 }

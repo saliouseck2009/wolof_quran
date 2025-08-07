@@ -441,6 +441,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Audio not available. Please download the surah first.'**
   String get audioNotAvailable;
+
+  /// Error message for connection issues
+  ///
+  /// In en, this message translates to:
+  /// **'Check your internet connection and try again'**
+  String get checkInternetConnection;
+
+  /// Error message for timeout issues
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timeout. Please try again'**
+  String get connectionTimeout;
+
+  /// Error message when audio file is not found
+  ///
+  /// In en, this message translates to:
+  /// **'Audio file not found on server'**
+  String get audioFileNotFound;
+
+  /// Error message for access denied
+  ///
+  /// In en, this message translates to:
+  /// **'Access denied to audio file'**
+  String get accessDeniedToAudio;
+
+  /// Error message for insufficient storage
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough storage space available'**
+  String get notEnoughStorage;
+
+  /// Generic download failure message
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed. Please try again'**
+  String get downloadFailed;
+
+  /// Status text showing downloaded surahs count
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/114 Surahs Downloaded'**
+  String surahsDownloaded(int count);
+
+  /// Status text for downloaded content
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded'**
+  String get downloaded;
+
+  /// Status text for not downloaded content
+  ///
+  /// In en, this message translates to:
+  /// **'Not downloaded'**
+  String get notDownloaded;
+
+  /// Status text during download
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading...'**
+  String get downloading;
+
+  /// Success message after download completion
+  ///
+  /// In en, this message translates to:
+  /// **'{surahName} downloaded successfully'**
+  String downloadedSuccessfully(String surahName);
+
+  /// Download failure message with specific error
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed: {error}'**
+  String downloadFailedWithError(String error);
+
+  /// Button text to retry an action
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get tryAgain;
+
+  /// Error message when checking download status fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error checking download status: {error}'**
+  String errorCheckingDownloadStatus(String error);
+
+  /// Generic check failure message
+  ///
+  /// In en, this message translates to:
+  /// **'Check failed'**
+  String get checkFailed;
+
+  /// Button text to download content before playing
+  ///
+  /// In en, this message translates to:
+  /// **'Download to play'**
+  String get downloadToPlay;
+
+  /// Button text to pause surah playback
+  ///
+  /// In en, this message translates to:
+  /// **'Pause Surah'**
+  String get pauseSurah;
+
+  /// Button text to resume surah playback
+  ///
+  /// In en, this message translates to:
+  /// **'Resume Surah'**
+  String get resumeSurah;
+
+  /// Button text to play surah
+  ///
+  /// In en, this message translates to:
+  /// **'Play Surah'**
+  String get playSurah;
 }
 
 class _AppLocalizationsDelegate

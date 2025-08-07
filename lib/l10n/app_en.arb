@@ -243,5 +243,105 @@
   "audioNotAvailable": "Audio not available. Please download the surah first.",
   "@audioNotAvailable": {
     "description": "Message shown when audio is not downloaded"
+  },
+  "checkInternetConnection": "Check your internet connection and try again",
+  "@checkInternetConnection": {
+    "description": "Error message for connection issues"
+  },
+  "connectionTimeout": "Connection timeout. Please try again",
+  "@connectionTimeout": {
+    "description": "Error message for timeout issues"
+  },
+  "audioFileNotFound": "Audio file not found on server",
+  "@audioFileNotFound": {
+    "description": "Error message when audio file is not found"
+  },
+  "accessDeniedToAudio": "Access denied to audio file",
+  "@accessDeniedToAudio": {
+    "description": "Error message for access denied"
+  },
+  "notEnoughStorage": "Not enough storage space available",
+  "@notEnoughStorage": {
+    "description": "Error message for insufficient storage"
+  },
+  "downloadFailed": "Download failed. Please try again",
+  "@downloadFailed": {
+    "description": "Generic download failure message"
+  },
+  "surahsDownloaded": "{count}/114 Surahs Downloaded",
+  "@surahsDownloaded": {
+    "description": "Status text showing downloaded surahs count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of downloaded surahs"
+      }
+    }
+  },
+  "downloaded": "Downloaded",
+  "@downloaded": {
+    "description": "Status text for downloaded content"
+  },
+  "notDownloaded": "Not downloaded",
+  "@notDownloaded": {
+    "description": "Status text for not downloaded content"
+  },
+  "downloading": "Downloading...",
+  "@downloading": {
+    "description": "Status text during download"
+  },
+  "downloadedSuccessfully": "{surahName} downloaded successfully",
+  "@downloadedSuccessfully": {
+    "description": "Success message after download completion",
+    "placeholders": {
+      "surahName": {
+        "type": "String",
+        "description": "Name of the downloaded surah"
+      }
+    }
+  },
+  "downloadFailedWithError": "Download failed: {error}",
+  "@downloadFailedWithError": {
+    "description": "Download failure message with specific error",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "description": "The specific error message"
+      }
+    }
+  },
+  "tryAgain": "Try Again",
+  "@tryAgain": {
+    "description": "Button text to retry an action"
+  },
+  "errorCheckingDownloadStatus": "Error checking download status: {error}",
+  "@errorCheckingDownloadStatus": {
+    "description": "Error message when checking download status fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "description": "The specific error message"
+      }
+    }
+  },
+  "checkFailed": "Check failed",
+  "@checkFailed": {
+    "description": "Generic check failure message"
+  },
+  "downloadToPlay": "Download to play",
+  "@downloadToPlay": {
+    "description": "Button text to download content before playing"
+  },
+  "pauseSurah": "Pause Surah",
+  "@pauseSurah": {
+    "description": "Button text to pause surah playback"
+  },
+  "resumeSurah": "Resume Surah",
+  "@resumeSurah": {
+    "description": "Button text to resume surah playback"
+  },
+  "playSurah": "Play Surah",
+  "@playSurah": {
+    "description": "Button text to play surah"
   }
 }

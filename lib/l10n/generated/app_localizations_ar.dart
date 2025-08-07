@@ -184,4 +184,70 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get audioNotAvailable => 'الصوت غير متوفر. يرجى تحميل السورة أولاً.';
+
+  @override
+  String get checkInternetConnection =>
+      'تحقق من اتصالك بالإنترنت وحاول مرة أخرى';
+
+  @override
+  String get connectionTimeout => 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى';
+
+  @override
+  String get audioFileNotFound => 'لم يتم العثور على ملف الصوت على الخادم';
+
+  @override
+  String get accessDeniedToAudio => 'تم رفض الوصول إلى ملف الصوت';
+
+  @override
+  String get notEnoughStorage => 'مساحة التخزين غير كافية';
+
+  @override
+  String get downloadFailed => 'فشل التحميل. يرجى المحاولة مرة أخرى';
+
+  @override
+  String surahsDownloaded(int count) {
+    return '$count/114 سورة محملة';
+  }
+
+  @override
+  String get downloaded => 'محملة';
+
+  @override
+  String get notDownloaded => 'غير محملة';
+
+  @override
+  String get downloading => 'جاري التحميل...';
+
+  @override
+  String downloadedSuccessfully(String surahName) {
+    return 'تم تحميل $surahName بنجاح';
+  }
+
+  @override
+  String downloadFailedWithError(String error) {
+    return 'فشل التحميل: $error';
+  }
+
+  @override
+  String get tryAgain => 'حاول مرة أخرى';
+
+  @override
+  String errorCheckingDownloadStatus(String error) {
+    return 'خطأ في فحص حالة التحميل: $error';
+  }
+
+  @override
+  String get checkFailed => 'فشل الفحص';
+
+  @override
+  String get downloadToPlay => 'تحميل للتشغيل';
+
+  @override
+  String get pauseSurah => 'إيقاف مؤقت للسورة';
+
+  @override
+  String get resumeSurah => 'استئناف السورة';
+
+  @override
+  String get playSurah => 'تشغيل السورة';
 }

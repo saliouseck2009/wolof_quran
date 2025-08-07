@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../l10n/generated/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quran/quran.dart' as quran;
 
@@ -112,28 +113,29 @@ class _ReciterChaptersContent extends StatelessWidget {
     return '$arabicName - ${quran.getSurahNameEnglish(surahNumber)}';
   }
 
-  String _getFormattedErrorMessage(String error) {
+  String _getFormattedErrorMessage(String error, AppLocalizations localizations) {
     if (error.contains('SocketException') || error.contains('connection')) {
-      return 'Check your internet connection and try again';
+      return localizations.checkInternetConnection;
     }
     if (error.contains('timeout') || error.contains('Timeout')) {
-      return 'Connection timeout. Please try again';
+      return localizations.connectionTimeout;
     }
     if (error.contains('404') || error.contains('not found')) {
-      return 'Audio file not found on server';
+      return localizations.audioFileNotFound;
     }
     if (error.contains('403') || error.contains('forbidden')) {
-      return 'Access denied to audio file';
+      return localizations.accessDeniedToAudio;
     }
     if (error.contains('storage') || error.contains('space')) {
-      return 'Not enough storage space available';
+      return localizations.notEnoughStorage;
     }
-    return 'Download failed. Please try again';
+    return localizations.downloadFailed;
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final localizations = AppLocalizations.of(context)!;
 
     return BlocBuilder<ReciterChaptersBloc, ReciterChaptersState>(
       builder: (context, state) {
@@ -157,7 +159,7 @@ class _ReciterChaptersContent extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Text(
-                    _getFormattedErrorMessage(state.message),
+                    _getFormattedErrorMessage(state.message, localizations),
                     textAlign: TextAlign.center,
                     style: GoogleFonts.amiri(
                       fontSize: 16,
@@ -175,7 +177,7 @@ class _ReciterChaptersContent extends StatelessWidget {
               .read<QuranSettingsCubit>()
               .currentTranslation;
 
-          return _buildChaptersList(context, isDark, state, translation);
+          return _buildChaptersList(context, isDark, state, translation, localizations);
         }
         return const SizedBox.shrink();
       },
@@ -187,6 +189,7 @@ class _ReciterChaptersContent extends StatelessWidget {
     bool isDark,
     ReciterChaptersLoaded state,
     quran.Translation? translation,
+    AppLocalizations localizations,
   ) {
     return Column(
       children: [
@@ -203,7 +206,7 @@ class _ReciterChaptersContent extends StatelessWidget {
               Icon(Icons.download_done, color: AppColor.primaryGreen, size: 20),
               const SizedBox(width: 8),
               Text(
-                '${state.downloadedSurahNumbers.length}/114 Surahs Downloaded',
+                localizations.surahsDownloaded(state.downloadedSurahNumbers.length),
                 style: GoogleFonts.amiri(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -232,7 +235,7 @@ class _ReciterChaptersContent extends StatelessWidget {
               isDownloaded: isDownloaded,
               getSurahDisplayName: (number) =>
                   _getSurahDisplayName(number, translation),
-              getFormattedErrorMessage: _getFormattedErrorMessage,
+              localizations: localizations,
               onDownloadComplete: () {
                 // Refresh the downloaded surahs when download completes
                 context.read<ReciterChaptersBloc>().add(
@@ -254,7 +257,7 @@ class _ChapterCard extends StatelessWidget {
   final bool isDark;
   final bool isDownloaded;
   final String Function(int) getSurahDisplayName;
-  final String Function(String) getFormattedErrorMessage;
+  final AppLocalizations localizations;
   final VoidCallback onDownloadComplete;
 
   const _ChapterCard({
@@ -264,9 +267,28 @@ class _ChapterCard extends StatelessWidget {
     required this.isDark,
     required this.isDownloaded,
     required this.getSurahDisplayName,
-    required this.getFormattedErrorMessage,
+    required this.localizations,
     required this.onDownloadComplete,
   });
+
+  String _getFormattedErrorMessage(String error) {
+    if (error.contains('SocketException') || error.contains('connection')) {
+      return localizations.checkInternetConnection;
+    }
+    if (error.contains('timeout') || error.contains('Timeout')) {
+      return localizations.connectionTimeout;
+    }
+    if (error.contains('404') || error.contains('not found')) {
+      return localizations.audioFileNotFound;
+    }
+    if (error.contains('403') || error.contains('forbidden')) {
+      return localizations.accessDeniedToAudio;
+    }
+    if (error.contains('storage') || error.contains('space')) {
+      return localizations.notEnoughStorage;
+    }
+    return localizations.downloadFailed;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -326,14 +348,14 @@ class _ChapterCard extends StatelessWidget {
                   BlocBuilder<AudioManagementCubit, AudioManagementState>(
                     builder: (context, currentState) {
                       String statusText = isDownloaded
-                          ? 'Downloaded'
-                          : 'Not downloaded';
+                          ? localizations.downloaded
+                          : localizations.notDownloaded;
 
                       if (currentState is AudioDownloading &&
                           currentState.reciterId == reciter.id &&
                           currentState.surahNumber == surahNumber) {
                         statusText =
-                            'Downloading ${(currentState.progress * 100).toInt()}%';
+                            '${localizations.downloading.replaceAll('...', '')} ${(currentState.progress * 100).toInt()}%';
                       }
 
                       return Text(
@@ -372,7 +394,7 @@ class _ChapterCard extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        '${getSurahDisplayName(surahNumber)} downloaded successfully',
+                        localizations.downloadedSuccessfully(getSurahDisplayName(surahNumber)),
                       ),
                       backgroundColor: AppColor.success,
                       duration: const Duration(seconds: 2),
@@ -382,7 +404,7 @@ class _ChapterCard extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Download failed: ${getFormattedErrorMessage(currentState.message)}',
+                        localizations.downloadFailedWithError(_getFormattedErrorMessage(currentState.message)),
                       ),
                       backgroundColor: AppColor.error,
                       duration: const Duration(seconds: 3),
