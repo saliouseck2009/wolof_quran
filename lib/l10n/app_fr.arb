@@ -67,5 +67,8 @@
   "downloadToPlay": "Télécharger pour lire",
   "pauseSurah": "Mettre en pause la Sourate",
   "resumeSurah": "Reprendre la Sourate",
-  "playSurah": "Lire la Sourate"
+  "playSurah": "Lire la Sourate",
+  "arabicAndTranslation": "Arabe et Traduction",
+  "arabicOnly": "Arabe Seulement",
+  "translationOnly": "Traduction Seulement"
 }

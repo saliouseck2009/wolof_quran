@@ -149,14 +149,18 @@ class SurahDetailContent extends StatelessWidget {
         // Modern App Bar with Surah Info
         SurahDetailAppBar(state: state),
 
-        // Basmala (except for Surah At-Tawbah)
-        if (surahNumber != 9) const SurahBasmalaWidget(),
+        // Basmala (except for Surah At-Tawbah) - only show if Arabic is visible
+        if (surahNumber != 9 &&
+            (state.displayMode == AyahDisplayMode.both ||
+                state.displayMode == AyahDisplayMode.arabicOnly))
+          const SurahBasmalaWidget(),
 
         // List of Ayahs
         SurahAyahsList(
           surahNumber: surahNumber,
           ayahs: state.ayahs,
           translationSource: state.translationSource,
+          displayMode: state.displayMode,
         ),
 
         // Bottom padding
@@ -191,6 +195,100 @@ class SurahDetailAppBar extends StatelessWidget {
         ),
       ),
       actions: [
+        // Display Mode Toggle Button
+        PopupMenuButton<AyahDisplayMode>(
+          icon: Icon(
+            _getDisplayModeIcon(state.displayMode),
+            color: AppColor.pureWhite,
+          ),
+          color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+          onSelected: (mode) {
+            context.read<SurahDetailCubit>().changeDisplayMode(mode);
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: AyahDisplayMode.both,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.view_headline,
+                    color: state.displayMode == AyahDisplayMode.both
+                        ? AppColor.primaryGreen
+                        : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    localizations.arabicAndTranslation,
+                    style: GoogleFonts.amiri(
+                      color: state.displayMode == AyahDisplayMode.both
+                          ? AppColor.primaryGreen
+                          : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                      fontWeight: state.displayMode == AyahDisplayMode.both
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: AyahDisplayMode.arabicOnly,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.format_textdirection_r_to_l,
+                    color: state.displayMode == AyahDisplayMode.arabicOnly
+                        ? AppColor.primaryGreen
+                        : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    localizations.arabicOnly,
+                    style: GoogleFonts.amiri(
+                      color: state.displayMode == AyahDisplayMode.arabicOnly
+                          ? AppColor.primaryGreen
+                          : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                      fontWeight:
+                          state.displayMode == AyahDisplayMode.arabicOnly
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: AyahDisplayMode.translationOnly,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.translate,
+                    color: state.displayMode == AyahDisplayMode.translationOnly
+                        ? AppColor.primaryGreen
+                        : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    localizations.translationOnly,
+                    style: GoogleFonts.amiri(
+                      color:
+                          state.displayMode == AyahDisplayMode.translationOnly
+                          ? AppColor.primaryGreen
+                          : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                      fontWeight:
+                          state.displayMode == AyahDisplayMode.translationOnly
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         IconButton(
           icon: Icon(Icons.settings, color: AppColor.pureWhite),
           onPressed: () async {
@@ -232,6 +330,17 @@ class SurahDetailAppBar extends StatelessWidget {
       backgroundColor: isDark ? AppColor.charcoal : AppColor.primaryGreen,
       foregroundColor: AppColor.pureWhite,
     );
+  }
+
+  IconData _getDisplayModeIcon(AyahDisplayMode mode) {
+    switch (mode) {
+      case AyahDisplayMode.both:
+        return Icons.view_headline;
+      case AyahDisplayMode.arabicOnly:
+        return Icons.format_textdirection_r_to_l;
+      case AyahDisplayMode.translationOnly:
+        return Icons.translate;
+    }
   }
 }
 
@@ -412,12 +521,14 @@ class SurahAyahsList extends StatelessWidget {
   final int surahNumber;
   final List<AyahData> ayahs;
   final String translationSource;
+  final AyahDisplayMode displayMode;
 
   const SurahAyahsList({
     super.key,
     required this.surahNumber,
     required this.ayahs,
     required this.translationSource,
+    required this.displayMode,
   });
 
   @override
@@ -430,6 +541,7 @@ class SurahAyahsList extends StatelessWidget {
           arabicText: ayah.arabicText,
           translationSource: translationSource,
           translation: ayah.translation,
+          displayMode: displayMode,
           actions: [
             AyahPlayButton(
               surahNumber: surahNumber,

@@ -555,6 +555,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Play Surah'**
   String get playSurah;
+
+  /// Display mode showing both Arabic and translation
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic & Translation'**
+  String get arabicAndTranslation;
+
+  /// Display mode showing only Arabic text
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Only'**
+  String get arabicOnly;
+
+  /// Display mode showing only translation
+  ///
+  /// In en, this message translates to:
+  /// **'Translation Only'**
+  String get translationOnly;
 }
 
 class _AppLocalizationsDelegate

@@ -250,4 +250,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get playSurah => 'تشغيل السورة';
+
+  @override
+  String get arabicAndTranslation => 'العربية والترجمة';
+
+  @override
+  String get arabicOnly => 'العربية فقط';
+
+  @override
+  String get translationOnly => 'الترجمة فقط';
 }

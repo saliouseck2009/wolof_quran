@@ -3,6 +3,13 @@ import 'package:quran/quran.dart' as quran;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'quran_settings_cubit.dart';
 
+// Enum for display modes
+enum AyahDisplayMode {
+  both, // Show both Arabic and translation (current default)
+  arabicOnly, // Show only Arabic text
+  translationOnly, // Show only translation
+}
+
 // State classes
 abstract class SurahDetailState {}
 
@@ -18,6 +25,7 @@ class SurahDetailLoaded extends SurahDetailState {
   final int versesCount;
   final List<AyahData> ayahs;
   final String translationSource;
+  final AyahDisplayMode displayMode;
 
   SurahDetailLoaded({
     required this.surahNumber,
@@ -27,7 +35,31 @@ class SurahDetailLoaded extends SurahDetailState {
     required this.versesCount,
     required this.ayahs,
     required this.translationSource,
+    this.displayMode = AyahDisplayMode.both,
   });
+
+  // Add copyWith method to support display mode changes
+  SurahDetailLoaded copyWith({
+    int? surahNumber,
+    String? surahNameArabic,
+    String? surahNameEnglish,
+    String? surahNameTranslated,
+    int? versesCount,
+    List<AyahData>? ayahs,
+    String? translationSource,
+    AyahDisplayMode? displayMode,
+  }) {
+    return SurahDetailLoaded(
+      surahNumber: surahNumber ?? this.surahNumber,
+      surahNameArabic: surahNameArabic ?? this.surahNameArabic,
+      surahNameEnglish: surahNameEnglish ?? this.surahNameEnglish,
+      surahNameTranslated: surahNameTranslated ?? this.surahNameTranslated,
+      versesCount: versesCount ?? this.versesCount,
+      ayahs: ayahs ?? this.ayahs,
+      translationSource: translationSource ?? this.translationSource,
+      displayMode: displayMode ?? this.displayMode,
+    );
+  }
 }
 
 class SurahDetailError extends SurahDetailState {
@@ -125,6 +157,14 @@ class SurahDetailCubit extends Cubit<SurahDetailState> {
       );
     } catch (e) {
       emit(SurahDetailError('Failed to load Surah: ${e.toString()}'));
+    }
+  }
+
+  // Method to change display mode
+  void changeDisplayMode(AyahDisplayMode displayMode) {
+    final currentState = state;
+    if (currentState is SurahDetailLoaded) {
+      emit(currentState.copyWith(displayMode: displayMode));
     }
   }
 }

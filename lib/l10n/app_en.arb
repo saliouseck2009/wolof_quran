@@ -343,5 +343,17 @@
   "playSurah": "Play Surah",
   "@playSurah": {
     "description": "Button text to play surah"
+  },
+  "arabicAndTranslation": "Arabic & Translation",
+  "@arabicAndTranslation": {
+    "description": "Display mode showing both Arabic and translation"
+  },
+  "arabicOnly": "Arabic Only",
+  "@arabicOnly": {
+    "description": "Display mode showing only Arabic text"
+  },
+  "translationOnly": "Translation Only",
+  "@translationOnly": {
+    "description": "Display mode showing only translation"
   }
 }

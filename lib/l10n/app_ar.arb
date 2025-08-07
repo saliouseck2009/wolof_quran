@@ -59,5 +59,8 @@
   "downloadToPlay": "تحميل للتشغيل",
   "pauseSurah": "إيقاف مؤقت للسورة",
   "resumeSurah": "استئناف السورة",
-  "playSurah": "تشغيل السورة"
+  "playSurah": "تشغيل السورة",
+  "arabicAndTranslation": "العربية والترجمة",
+  "arabicOnly": "العربية فقط",
+  "translationOnly": "الترجمة فقط"
 }
