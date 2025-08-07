@@ -355,5 +355,25 @@
   "translationOnly": "Translation Only",
   "@translationOnly": {
     "description": "Display mode showing only translation"
+  },
+  "fontSettings": "Font Settings",
+  "@fontSettings": {
+    "description": "Font settings section title"
+  },
+  "ayahFontSize": "Ayah Font Size",
+  "@ayahFontSize": {
+    "description": "Setting for ayah font size"
+  },
+  "fontSizeDescription": "Adjust the size of Arabic text in verses",
+  "@fontSizeDescription": {
+    "description": "Description for font size setting"
+  },
+  "small": "Small",
+  "@small": {
+    "description": "Small font size label"
+  },
+  "large": "Large",
+  "@large": {
+    "description": "Large font size label"
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/surah_detail_cubit.dart';
+import '../cubits/quran_settings_cubit.dart';
 
 /// A card to show one Ayah (verse) of the Quran:
 ///  • Top row: a little pill with the verse number + action icons (play, bookmark…)
@@ -26,6 +28,9 @@ class AyahCard extends StatelessWidget {
   /// The display mode for showing Arabic, translation, or both
   final AyahDisplayMode displayMode;
 
+  /// The font size for Arabic text
+  final double? fontSize;
+
   const AyahCard({
     super.key,
     required this.verseNumber,
@@ -34,6 +39,7 @@ class AyahCard extends StatelessWidget {
     required this.translation,
     this.actions = const [],
     this.displayMode = AyahDisplayMode.both,
+    this.fontSize,
   });
 
   @override
@@ -92,16 +98,34 @@ class AyahCard extends StatelessWidget {
             // Show Arabic text only if mode is both or arabicOnly
             if (displayMode == AyahDisplayMode.both ||
                 displayMode == AyahDisplayMode.arabicOnly)
-              Text(
-                arabicText,
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.rtl,
-                style: GoogleFonts.amiriQuran(
-                  fontSize: displayMode == AyahDisplayMode.arabicOnly ? 32 : 28,
-                  height: 1.8,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).textTheme.titleLarge?.color,
-                ),
+              BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
+                builder: (context, settingsState) {
+                  // Get font size from settings or use passed parameter or default
+                  double arabicFontSize = 28.0; // default
+                  if (fontSize != null) {
+                    arabicFontSize = fontSize!;
+                  } else if (settingsState is QuranSettingsLoaded) {
+                    arabicFontSize = settingsState.ayahFontSize;
+                  }
+
+                  // Adjust font size based on display mode
+                  if (displayMode == AyahDisplayMode.arabicOnly) {
+                    arabicFontSize +=
+                        4; // Make it slightly larger for Arabic-only mode
+                  }
+
+                  return Text(
+                    arabicText,
+                    textAlign: TextAlign.center,
+                    textDirection: TextDirection.rtl,
+                    style: GoogleFonts.amiriQuran(
+                      fontSize: arabicFontSize,
+                      height: 1.8,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
+                    ),
+                  );
+                },
               ),
 
             // Add separator between Arabic and translation when both are shown

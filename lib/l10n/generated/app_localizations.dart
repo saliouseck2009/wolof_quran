@@ -573,6 +573,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Translation Only'**
   String get translationOnly;
+
+  /// Font settings section title
+  ///
+  /// In en, this message translates to:
+  /// **'Font Settings'**
+  String get fontSettings;
+
+  /// Setting for ayah font size
+  ///
+  /// In en, this message translates to:
+  /// **'Ayah Font Size'**
+  String get ayahFontSize;
+
+  /// Description for font size setting
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust the size of Arabic text in verses'**
+  String get fontSizeDescription;
+
+  /// Small font size label
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get small;
+
+  /// Large font size label
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get large;
 }
 
 class _AppLocalizationsDelegate

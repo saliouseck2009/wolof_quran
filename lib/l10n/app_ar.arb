@@ -62,5 +62,10 @@
   "playSurah": "تشغيل السورة",
   "arabicAndTranslation": "العربية والترجمة",
   "arabicOnly": "العربية فقط",
-  "translationOnly": "الترجمة فقط"
+  "translationOnly": "الترجمة فقط",
+  "fontSettings": "إعدادات الخط",
+  "ayahFontSize": "حجم خط الآيات",
+  "fontSizeDescription": "تعديل حجم النص العربي في الآيات",
+  "small": "صغير",
+  "large": "كبير"
 }

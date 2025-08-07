@@ -49,12 +49,9 @@ class _QuranSettingsView extends StatelessWidget {
       ),
       body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
         builder: (context, state) {
-
           if (state is! QuranSettingsLoaded) {
             return const Center(child: CircularProgressIndicator());
           }
-
-        
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -156,6 +153,19 @@ class _QuranSettingsView extends StatelessWidget {
           value: currentTranslationOption?.displayName ?? 'Unknown',
           isDark: isDark,
           onTap: () => _showTranslationSelector(context, state, localizations),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Font Settings Menu Item
+        _buildSettingsMenuItem(
+          context: context,
+          icon: Icons.format_size,
+          title: localizations.fontSettings,
+          subtitle: localizations.ayahFontSize,
+          value: '${state.ayahFontSize.toInt()}pt',
+          isDark: isDark,
+          onTap: () => _showFontSizeSelector(context, state, localizations),
         ),
 
         const SizedBox(height: 16),
@@ -337,6 +347,30 @@ class _QuranSettingsView extends StatelessWidget {
           duration: const Duration(seconds: 2),
         ),
       );
+      Navigator.pop(context, true);
+    }
+  }
+
+  void _showFontSizeSelector(
+    BuildContext context,
+    QuranSettingsLoaded state,
+    AppLocalizations localizations,
+  ) async {
+    final result = await showModalBottomSheet<double?>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (modalContext) => _FontSizeSelectorModal(
+        currentFontSize: state.ayahFontSize,
+        localizations: localizations,
+        onFontSizeChanged: (fontSize) {
+          context.read<QuranSettingsCubit>().updateAyahFontSize(fontSize);
+        },
+      ),
+    );
+
+    // If font size was changed, return true to parent
+    if (result != null && context.mounted) {
       Navigator.pop(context, true);
     }
   }
@@ -525,6 +559,207 @@ class _TranslationSelectorModal extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _FontSizeSelectorModal extends StatefulWidget {
+  final double currentFontSize;
+  final AppLocalizations localizations;
+  final Function(double fontSize) onFontSizeChanged;
+
+  const _FontSizeSelectorModal({
+    required this.currentFontSize,
+    required this.localizations,
+    required this.onFontSizeChanged,
+  });
+
+  @override
+  State<_FontSizeSelectorModal> createState() => _FontSizeSelectorModalState();
+}
+
+class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
+  late double _currentFontSize;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentFontSize = widget.currentFontSize;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColor.mediumGray,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Title
+            Text(
+              widget.localizations.fontSettings,
+              style: GoogleFonts.amiri(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+              ),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 8),
+
+            // Description
+            Text(
+              widget.localizations.fontSizeDescription,
+              style: GoogleFonts.amiri(
+                fontSize: 14,
+                color: AppColor.mediumGray,
+              ),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 32),
+
+            // Preview Text
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColor.lightGray.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColor.primaryGreen.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+                style: GoogleFonts.amiriQuran(
+                  fontSize: _currentFontSize,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+                  height: 1.8,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Font Size Slider
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.localizations.small,
+                      style: GoogleFonts.amiri(
+                        fontSize: 12,
+                        color: AppColor.mediumGray,
+                      ),
+                    ),
+                    Text(
+                      '${_currentFontSize.toInt()}pt',
+                      style: GoogleFonts.amiri(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.primaryGreen,
+                      ),
+                    ),
+                    Text(
+                      widget.localizations.large,
+                      style: GoogleFonts.amiri(
+                        fontSize: 12,
+                        color: AppColor.mediumGray,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: AppColor.primaryGreen,
+                    inactiveTrackColor: AppColor.mediumGray.withValues(
+                      alpha: 0.3,
+                    ),
+                    thumbColor: AppColor.primaryGreen,
+                    overlayColor: AppColor.primaryGreen.withValues(alpha: 0.2),
+                    trackHeight: 4.0,
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 8,
+                    ),
+                  ),
+                  child: Slider(
+                    value: _currentFontSize,
+                    min: QuranSettingsCubit.minFontSize,
+                    max: QuranSettingsCubit.maxFontSize,
+                    divisions:
+                        ((QuranSettingsCubit.maxFontSize -
+                                    QuranSettingsCubit.minFontSize) /
+                                2)
+                            .round(),
+                    onChanged: (value) {
+                      setState(() {
+                        _currentFontSize = value;
+                      });
+                      widget.onFontSizeChanged(value);
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 32),
+
+            // Close Button
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, _currentFontSize),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColor.primaryGreen,
+                foregroundColor: AppColor.pureWhite,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                widget.localizations.close,
+                style: GoogleFonts.amiri(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

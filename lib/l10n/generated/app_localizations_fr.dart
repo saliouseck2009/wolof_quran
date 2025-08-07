@@ -262,4 +262,20 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get translationOnly => 'Traduction Seulement';
+
+  @override
+  String get fontSettings => 'Paramètres de Police';
+
+  @override
+  String get ayahFontSize => 'Taille de Police des Versets';
+
+  @override
+  String get fontSizeDescription =>
+      'Ajuster la taille du texte arabe dans les versets';
+
+  @override
+  String get small => 'Petit';
+
+  @override
+  String get large => 'Grand';
 }

@@ -11,19 +11,23 @@ class QuranSettingsInitial extends QuranSettingsState {}
 class QuranSettingsLoaded extends QuranSettingsState {
   final quran.Translation selectedTranslation;
   final Reciter? selectedReciter;
+  final double ayahFontSize;
 
   QuranSettingsLoaded({
     required this.selectedTranslation,
     this.selectedReciter,
+    this.ayahFontSize = 28.0, // Default font size
   });
 
   QuranSettingsLoaded copyWith({
     quran.Translation? selectedTranslation,
     Reciter? selectedReciter,
+    double? ayahFontSize,
   }) {
     return QuranSettingsLoaded(
       selectedTranslation: selectedTranslation ?? this.selectedTranslation,
       selectedReciter: selectedReciter ?? this.selectedReciter,
+      ayahFontSize: ayahFontSize ?? this.ayahFontSize,
     );
   }
 }
@@ -45,6 +49,12 @@ class TranslationOption {
 class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   static const String _translationKey = 'selected_quran_translation';
   static const String _reciterKey = 'selected_reciter_id';
+  static const String _ayahFontSizeKey = 'ayah_font_size';
+
+  // Font size constraints
+  static const double minFontSize = 16.0;
+  static const double maxFontSize = 40.0;
+  static const double defaultFontSize = 28.0;
 
   QuranSettingsCubit() : super(QuranSettingsInitial());
 
@@ -65,6 +75,15 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
       return currentState.selectedReciter;
     }
     return null;
+  }
+
+  // Getter for easy access to current ayah font size
+  double get currentAyahFontSize {
+    final currentState = state;
+    if (currentState is QuranSettingsLoaded) {
+      return currentState.ayahFontSize;
+    }
+    return defaultFontSize;
   }
 
   // Available translations based on the README
@@ -162,6 +181,11 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         selectedTranslation = quran.Translation.frHamidullah;
       }
 
+      // Load font size, default to 28.0 if not found
+      final savedFontSize =
+          prefs.getDouble(_ayahFontSizeKey) ?? defaultFontSize;
+      final ayahFontSize = savedFontSize.clamp(minFontSize, maxFontSize);
+
       // Check if we have a saved reciter ID, if not set imamsarr as default
       final savedReciterId = prefs.getString(_reciterKey);
       if (savedReciterId == null) {
@@ -174,6 +198,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         QuranSettingsLoaded(
           selectedTranslation: selectedTranslation,
           selectedReciter: null,
+          ayahFontSize: ayahFontSize,
         ),
       );
 
@@ -184,6 +209,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         QuranSettingsLoaded(
           selectedTranslation: quran.Translation.frHamidullah,
           selectedReciter: null,
+          ayahFontSize: defaultFontSize,
         ),
       );
 
@@ -259,6 +285,30 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         } else {
           emit(QuranSettingsLoaded(selectedTranslation: translation));
         }
+      }
+    } catch (e) {
+      // Handle error silently or emit error state if needed
+    }
+  }
+
+  void updateAyahFontSize(double fontSize) async {
+    try {
+      // Clamp the font size to valid range
+      final clampedFontSize = fontSize.clamp(minFontSize, maxFontSize);
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble(_ayahFontSizeKey, clampedFontSize);
+
+      final currentState = state;
+      if (currentState is QuranSettingsLoaded) {
+        emit(currentState.copyWith(ayahFontSize: clampedFontSize));
+      } else {
+        emit(
+          QuranSettingsLoaded(
+            selectedTranslation: quran.Translation.frHamidullah,
+            ayahFontSize: clampedFontSize,
+          ),
+        );
       }
     } catch (e) {
       // Handle error silently or emit error state if needed

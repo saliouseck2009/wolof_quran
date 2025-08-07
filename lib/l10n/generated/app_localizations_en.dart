@@ -260,4 +260,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get translationOnly => 'Translation Only';
+
+  @override
+  String get fontSettings => 'Font Settings';
+
+  @override
+  String get ayahFontSize => 'Ayah Font Size';
+
+  @override
+  String get fontSizeDescription => 'Adjust the size of Arabic text in verses';
+
+  @override
+  String get small => 'Small';
+
+  @override
+  String get large => 'Large';
 }

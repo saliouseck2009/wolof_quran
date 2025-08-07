@@ -70,5 +70,10 @@
   "playSurah": "Lire la Sourate",
   "arabicAndTranslation": "Arabe et Traduction",
   "arabicOnly": "Arabe Seulement",
-  "translationOnly": "Traduction Seulement"
+  "translationOnly": "Traduction Seulement",
+  "fontSettings": "Paramètres de Police",
+  "ayahFontSize": "Taille de Police des Versets",
+  "fontSizeDescription": "Ajuster la taille du texte arabe dans les versets",
+  "small": "Petit",
+  "large": "Grand"
 }

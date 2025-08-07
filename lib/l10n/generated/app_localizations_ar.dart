@@ -259,4 +259,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get translationOnly => 'الترجمة فقط';
+
+  @override
+  String get fontSettings => 'إعدادات الخط';
+
+  @override
+  String get ayahFontSize => 'حجم خط الآيات';
+
+  @override
+  String get fontSizeDescription => 'تعديل حجم النص العربي في الآيات';
+
+  @override
+  String get small => 'صغير';
+
+  @override
+  String get large => 'كبير';
 }
