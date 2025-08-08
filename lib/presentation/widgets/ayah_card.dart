@@ -458,7 +458,7 @@ class _AyahShareModalState extends State<AyahShareModal> {
               _selectedDisplayMode == AyahDisplayMode.translationOnly)
             Text(
               widget.translation,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.justify,
               style: const TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 16,
