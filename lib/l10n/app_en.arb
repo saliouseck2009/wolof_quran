@@ -375,5 +375,25 @@
   "large": "Large",
   "@large": {
     "description": "Large font size label"
+  },
+  "shareAyah": "Share Ayah",
+  "@shareAyah": {
+    "description": "Share ayah button text"
+  },
+  "customizeAndShare": "Customize & Share",
+  "@customizeAndShare": {
+    "description": "Modal title for customizing ayah before sharing"
+  },
+  "backgroundStyle": "Background Style",
+  "@backgroundStyle": {
+    "description": "Background color selection section title"
+  },
+  "displayStyle": "Display Style",
+  "@displayStyle": {
+    "description": "Display mode selection section title"
+  },
+  "shareImage": "Share Image",
+  "@shareImage": {
+    "description": "Final share button text"
   }
 }

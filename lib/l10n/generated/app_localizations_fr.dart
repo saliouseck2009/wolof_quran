@@ -278,4 +278,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get large => 'Grand';
+
+  @override
+  String get shareAyah => 'Partager le Verset';
+
+  @override
+  String get customizeAndShare => 'Personnaliser et Partager';
+
+  @override
+  String get backgroundStyle => 'Style d\'Arrière-plan';
+
+  @override
+  String get displayStyle => 'Style d\'Affichage';
+
+  @override
+  String get shareImage => 'Partager l\'Image';
 }

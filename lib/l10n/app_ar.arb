@@ -67,5 +67,10 @@
   "ayahFontSize": "حجم خط الآيات",
   "fontSizeDescription": "تعديل حجم النص العربي في الآيات",
   "small": "صغير",
-  "large": "كبير"
+  "large": "كبير",
+  "shareAyah": "مشاركة الآية",
+  "customizeAndShare": "تخصيص ومشاركة",
+  "backgroundStyle": "نمط الخلفية",
+  "displayStyle": "نمط العرض",
+  "shareImage": "مشاركة الصورة"
 }

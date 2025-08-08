@@ -75,5 +75,10 @@
   "ayahFontSize": "Taille de Police des Versets",
   "fontSizeDescription": "Ajuster la taille du texte arabe dans les versets",
   "small": "Petit",
-  "large": "Grand"
+  "large": "Grand",
+  "shareAyah": "Partager le Verset",
+  "customizeAndShare": "Personnaliser et Partager",
+  "backgroundStyle": "Style d'Arrière-plan",
+  "displayStyle": "Style d'Affichage",
+  "shareImage": "Partager l'Image"
 }

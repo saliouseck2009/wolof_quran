@@ -603,6 +603,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Large'**
   String get large;
+
+  /// Share ayah button text
+  ///
+  /// In en, this message translates to:
+  /// **'Share Ayah'**
+  String get shareAyah;
+
+  /// Modal title for customizing ayah before sharing
+  ///
+  /// In en, this message translates to:
+  /// **'Customize & Share'**
+  String get customizeAndShare;
+
+  /// Background color selection section title
+  ///
+  /// In en, this message translates to:
+  /// **'Background Style'**
+  String get backgroundStyle;
+
+  /// Display mode selection section title
+  ///
+  /// In en, this message translates to:
+  /// **'Display Style'**
+  String get displayStyle;
+
+  /// Final share button text
+  ///
+  /// In en, this message translates to:
+  /// **'Share Image'**
+  String get shareImage;
 }
 
 class _AppLocalizationsDelegate

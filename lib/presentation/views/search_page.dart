@@ -362,6 +362,8 @@ class _SearchBodyState extends State<_SearchBody> {
                       arabicText: result.arabicText,
                       translationSource: state.translationSource,
                       translation: result.translation,
+                      surahNumber: result.surahNumber,
+                      surahName: result.surahName,
                       actions: [
                         AyahPlayButton(
                           surahNumber: result.surahNumber,

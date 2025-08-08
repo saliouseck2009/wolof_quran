@@ -549,6 +549,8 @@ class SurahAyahsList extends StatelessWidget {
           translationSource: translationSource,
           translation: ayah.translation,
           displayMode: displayMode,
+          surahNumber: surahNumber,
+          surahName: quran.getSurahName(surahNumber),
           actions: [
             AyahPlayButton(
               surahNumber: surahNumber,

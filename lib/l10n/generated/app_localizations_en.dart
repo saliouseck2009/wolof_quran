@@ -275,4 +275,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get large => 'Large';
+
+  @override
+  String get shareAyah => 'Share Ayah';
+
+  @override
+  String get customizeAndShare => 'Customize & Share';
+
+  @override
+  String get backgroundStyle => 'Background Style';
+
+  @override
+  String get displayStyle => 'Display Style';
+
+  @override
+  String get shareImage => 'Share Image';
 }

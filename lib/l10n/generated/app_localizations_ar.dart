@@ -274,4 +274,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get large => 'كبير';
+
+  @override
+  String get shareAyah => 'مشاركة الآية';
+
+  @override
+  String get customizeAndShare => 'تخصيص ومشاركة';
+
+  @override
+  String get backgroundStyle => 'نمط الخلفية';
+
+  @override
+  String get displayStyle => 'نمط العرض';
+
+  @override
+  String get shareImage => 'مشاركة الصورة';
 }
