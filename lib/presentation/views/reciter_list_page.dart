@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/config/theme/app_color.dart';
 import '../cubits/reciter_cubit.dart';
@@ -44,7 +43,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
           children: [
             Text(
               'Available Reciters', // TODO: Add to localizations
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Hafs',
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: isDark ? AppColor.pureWhite : AppColor.charcoal,
@@ -52,7 +52,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
             ),
             Text(
               'Tap card to browse • Tap select button to choose default',
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Hafs',
                 fontSize: 12,
                 color: AppColor.mediumGray,
               ),
@@ -84,7 +85,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                   const SizedBox(height: 16),
                   Text(
                     'Error Loading Reciters', // TODO: Add to localizations
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: isDark ? AppColor.pureWhite : AppColor.charcoal,
@@ -93,7 +95,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                   const SizedBox(height: 8),
                   Text(
                     reciterState.message,
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
                       fontSize: 14,
                       color: AppColor.mediumGray,
                     ),
@@ -117,7 +120,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     ),
                     child: Text(
                       'Retry', // TODO: Add to localizations
-                      style: GoogleFonts.amiri(
+                      style: TextStyle(
+                        fontFamily: 'Hafs',
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -142,7 +146,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     const SizedBox(height: 16),
                     Text(
                       'No Reciters Available', // TODO: Add to localizations
-                      style: GoogleFonts.amiri(
+                      style: TextStyle(
+                        fontFamily: 'Hafs',
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: isDark ? AppColor.pureWhite : AppColor.charcoal,
@@ -151,7 +156,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     const SizedBox(height: 8),
                     Text(
                       'Check back later for available reciters', // TODO: Add to localizations
-                      style: GoogleFonts.amiri(
+                      style: TextStyle(
+                        fontFamily: 'Hafs',
                         fontSize: 14,
                         color: AppColor.mediumGray,
                       ),
@@ -239,7 +245,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                       // English name (title)
                                       Text(
                                         reciter.name,
-                                        style: GoogleFonts.amiri(
+                                        style: TextStyle(
+                                          fontFamily: 'Hafs',
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
                                           color: isDark
@@ -253,7 +260,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                       // Arabic name (subtitle)
                                       Text(
                                         reciter.arabicName,
-                                        style: GoogleFonts.amiri(
+                                        style: TextStyle(
+                                          fontFamily: 'Hafs',
                                           fontSize: 12,
                                           color: AppColor.mediumGray,
                                         ),
@@ -290,7 +298,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                           isSelected
                                               ? 'Default Reciter'
                                               : 'Available',
-                                          style: GoogleFonts.amiri(
+                                          style: TextStyle(
+                                            fontFamily: 'Hafs',
                                             fontSize: 11,
                                             fontWeight: FontWeight.w500,
                                             color: isSelected
@@ -320,7 +329,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                       SnackBar(
                                         content: Text(
                                           'Selected ${reciter.name} as default reciter',
-                                          style: GoogleFonts.amiri(),
+                                          style: TextStyle(fontFamily: 'Hafs'),
                                         ),
                                         backgroundColor: AppColor.primaryGreen,
                                         duration: const Duration(seconds: 2),

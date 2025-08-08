@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
-import 'package:google_fonts/google_fonts.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../../core/helpers/revelation_place_enum.dart';
@@ -188,7 +187,8 @@ class SurahDetailAppBar extends StatelessWidget {
       elevation: 2,
       title: Text(
         state.surahNameTranslated,
-        style: GoogleFonts.amiri(
+        style: TextStyle(
+          fontFamily: 'Hafs',
           fontWeight: FontWeight.w600,
           color: AppColor.pureWhite,
           fontSize: 18,
@@ -220,7 +220,8 @@ class SurahDetailAppBar extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     localizations.arabicAndTranslation,
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
                       color: state.displayMode == AyahDisplayMode.both
                           ? AppColor.primaryGreen
                           : (isDark ? AppColor.pureWhite : AppColor.darkGray),
@@ -246,7 +247,8 @@ class SurahDetailAppBar extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     localizations.arabicOnly,
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
                       color: state.displayMode == AyahDisplayMode.arabicOnly
                           ? AppColor.primaryGreen
                           : (isDark ? AppColor.pureWhite : AppColor.darkGray),
@@ -273,7 +275,8 @@ class SurahDetailAppBar extends StatelessWidget {
                   const SizedBox(width: 12),
                   Text(
                     localizations.translationOnly,
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
                       color:
                           state.displayMode == AyahDisplayMode.translationOnly
                           ? AppColor.primaryGreen
@@ -364,7 +367,8 @@ class SurahHeaderContent extends StatelessWidget {
         // Arabic name
         Text(
           state.surahNameArabic,
-          style: GoogleFonts.amiriQuran(
+          style: TextStyle(
+            fontFamily: 'Hafs',
             fontSize: 32,
             fontWeight: FontWeight.w700,
             color: AppColor.pureWhite,
@@ -378,7 +382,8 @@ class SurahHeaderContent extends StatelessWidget {
         // Translated name
         Text(
           state.surahNameTranslated,
-          style: GoogleFonts.amiri(
+          style: TextStyle(
+            fontFamily: 'Hafs',
             fontSize: 20,
             fontWeight: FontWeight.w500,
             color: AppColor.pureWhite.withValues(alpha: 0.9),
@@ -465,7 +470,8 @@ class SurahInfoChip extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             label,
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+              fontFamily: 'Hafs',
               color: AppColor.pureWhite,
               fontWeight: FontWeight.w500,
               fontSize: 12,
@@ -505,7 +511,8 @@ class SurahBasmalaWidget extends StatelessWidget {
           quran.basmala,
           textAlign: TextAlign.center,
           textDirection: TextDirection.rtl,
-          style: GoogleFonts.amiriQuran(
+          style: TextStyle(
+            fontFamily: 'Hafs',
             fontSize: 24,
             fontWeight: FontWeight.w600,
             color: AppColor.primaryGreen,
@@ -665,7 +672,8 @@ class SurahPlayButton extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         'Check failed',
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
                           color: AppColor.pureWhite.withValues(alpha: 0.7),
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
@@ -716,7 +724,8 @@ class SurahPlayButton extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 '$surahName downloaded successfully',
-                                style: GoogleFonts.amiri(
+                                style: TextStyle(
+                                  fontFamily: 'Hafs',
                                   color: AppColor.pureWhite,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -748,7 +757,8 @@ class SurahPlayButton extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 'Download failed: ${currentState.message}',
-                                style: GoogleFonts.amiri(
+                                style: TextStyle(
+                                  fontFamily: 'Hafs',
                                   color: AppColor.pureWhite,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -809,7 +819,8 @@ class SurahPlayButton extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               'Downloading... ${(currentState.progress * 100).toInt()}%',
-                              style: GoogleFonts.amiri(
+                              style: TextStyle(
+                                fontFamily: 'Hafs',
                                 fontWeight: FontWeight.w600,
                                 color: AppColor.pureWhite.withValues(
                                   alpha: 0.9,
@@ -841,7 +852,8 @@ class SurahPlayButton extends StatelessWidget {
                       ),
                       label: Text(
                         'Download to play',
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
                           fontWeight: FontWeight.w600,
                           color: AppColor.pureWhite.withValues(alpha: 0.9),
                         ),
@@ -975,7 +987,8 @@ class SurahPlayButton extends StatelessWidget {
                                     : isPaused
                                     ? 'Resume Surah'
                                     : 'Play Surah',
-                                style: GoogleFonts.amiri(
+                                style: TextStyle(
+                                  fontFamily: 'Hafs',
                                   fontWeight: FontWeight.w600,
                                   color: isThisSurahPlaying
                                       ? AppColor.accent

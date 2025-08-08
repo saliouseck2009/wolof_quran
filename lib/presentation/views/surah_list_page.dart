@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
@@ -55,7 +54,7 @@ class _SurahListView extends StatelessWidget {
                     : AppColor.primaryGreen.withValues(alpha: 0.3),
                 title: Text(
                   localizations.surahs,
-                  style: GoogleFonts.amiri(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: AppColor.pureWhite,
                     fontSize: 18,
@@ -233,7 +232,7 @@ class _SurahListView extends StatelessWidget {
                   child: Center(
                     child: Text(
                       surahNumber.toString(),
-                      style: GoogleFonts.amiri(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: AppColor.pureWhite,
@@ -294,7 +293,8 @@ class _SurahListView extends StatelessWidget {
                 // Arabic name on the right
                 Text(
                   surahNameArabic,
-                  style: GoogleFonts.amiriQuran(
+                  style: TextStyle(
+                    fontFamily: 'Hafs',
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppColor.primaryGreen,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:quran/quran.dart' as quran;
 
 import '../../core/config/theme/app_color.dart';
@@ -73,7 +72,8 @@ class ReciterChaptersPage extends StatelessWidget {
                         const SizedBox(height: 16),
                         Text(
                           reciter.name,
-                          style: GoogleFonts.amiri(
+                          style: TextStyle(
+                            fontFamily: 'Hafs',
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: AppColor.pureWhite,
@@ -113,7 +113,10 @@ class _ReciterChaptersContent extends StatelessWidget {
     return '$arabicName - ${quran.getSurahNameEnglish(surahNumber)}';
   }
 
-  String _getFormattedErrorMessage(String error, AppLocalizations localizations) {
+  String _getFormattedErrorMessage(
+    String error,
+    AppLocalizations localizations,
+  ) {
     if (error.contains('SocketException') || error.contains('connection')) {
       return localizations.checkInternetConnection;
     }
@@ -161,7 +164,8 @@ class _ReciterChaptersContent extends StatelessWidget {
                   child: Text(
                     _getFormattedErrorMessage(state.message, localizations),
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -177,7 +181,13 @@ class _ReciterChaptersContent extends StatelessWidget {
               .read<QuranSettingsCubit>()
               .currentTranslation;
 
-          return _buildChaptersList(context, isDark, state, translation, localizations);
+          return _buildChaptersList(
+            context,
+            isDark,
+            state,
+            translation,
+            localizations,
+          );
         }
         return const SizedBox.shrink();
       },
@@ -206,8 +216,11 @@ class _ReciterChaptersContent extends StatelessWidget {
               Icon(Icons.download_done, color: AppColor.primaryGreen, size: 20),
               const SizedBox(width: 8),
               Text(
-                localizations.surahsDownloaded(state.downloadedSurahNumbers.length),
-                style: GoogleFonts.amiri(
+                localizations.surahsDownloaded(
+                  state.downloadedSurahNumbers.length,
+                ),
+                style: TextStyle(
+                  fontFamily: 'Hafs',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColor.primaryGreen,
@@ -320,7 +333,8 @@ class _ChapterCard extends StatelessWidget {
               child: Center(
                 child: Text(
                   '$surahNumber',
-                  style: GoogleFonts.amiri(
+                  style: TextStyle(
+                    fontFamily: 'Hafs',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: AppColor.primaryGreen,
@@ -338,7 +352,8 @@ class _ChapterCard extends StatelessWidget {
                 children: [
                   Text(
                     getSurahDisplayName(surahNumber),
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: isDark ? AppColor.pureWhite : AppColor.charcoal,
@@ -360,7 +375,8 @@ class _ChapterCard extends StatelessWidget {
 
                       return Text(
                         statusText,
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
                           fontSize: 14,
                           color: isDownloaded
                               ? AppColor.success
@@ -394,7 +410,9 @@ class _ChapterCard extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        localizations.downloadedSuccessfully(getSurahDisplayName(surahNumber)),
+                        localizations.downloadedSuccessfully(
+                          getSurahDisplayName(surahNumber),
+                        ),
                       ),
                       backgroundColor: AppColor.success,
                       duration: const Duration(seconds: 2),
@@ -404,7 +422,9 @@ class _ChapterCard extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        localizations.downloadFailedWithError(_getFormattedErrorMessage(currentState.message)),
+                        localizations.downloadFailedWithError(
+                          _getFormattedErrorMessage(currentState.message),
+                        ),
                       ),
                       backgroundColor: AppColor.error,
                       duration: const Duration(seconds: 3),
@@ -438,7 +458,8 @@ class _ChapterCard extends StatelessWidget {
                           ),
                           Text(
                             '${(currentState.progress * 100).toInt()}%',
-                            style: GoogleFonts.amiri(
+                            style: TextStyle(
+                              fontFamily: 'Hafs',
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: AppColor.primaryGreen,
@@ -449,7 +470,8 @@ class _ChapterCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         'Downloading...',
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
                           fontSize: 10,
                           color: AppColor.primaryGreen,
                         ),

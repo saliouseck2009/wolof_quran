@@ -43,7 +43,7 @@ dependencies:
   dio: ^5.8.0+1
   shared_preferences: ^2.2.2
   quran: ^1.3.3
-  google_fonts: ^6.1.0
+  # google_fonts: ^6.1.0
   just_audio: ^0.9.40
   path_provider: ^2.1.4
   archive: ^3.6.1
@@ -90,11 +90,11 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
+  fonts:
+    - family: Hafs
+      fonts:
+        - asset: fonts/KfgqpcHafsUthmanicScriptRegular-1jGEe.ttf
+        - asset: fonts/KfgqpcHafsUthmanicScriptRegular-nARZ1.ttf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

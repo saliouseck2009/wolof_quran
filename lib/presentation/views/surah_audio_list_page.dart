@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/config/theme/app_color.dart';
 import '../../core/utils/toast_service.dart';
 import '../../domain/repositories/download_repository.dart';
@@ -55,7 +54,8 @@ class _SurahAudioListView extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Audio Downloads', // TODO: Add to localizations
-          style: GoogleFonts.amiri(
+          style: TextStyle(
+            fontFamily: 'Hafs',
             fontWeight: FontWeight.w600,
             color: AppColor.pureWhite,
             fontSize: 18,
@@ -161,7 +161,8 @@ class _SurahAudioListView extends StatelessWidget {
                             children: [
                               Text(
                                 selectedReciter.name,
-                                style: GoogleFonts.amiri(
+                                style: TextStyle(
+                                  fontFamily: 'Hafs',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: isDark
@@ -171,7 +172,8 @@ class _SurahAudioListView extends StatelessWidget {
                               ),
                               Text(
                                 selectedReciter.arabicName,
-                                style: GoogleFonts.amiri(
+                                style: TextStyle(
+                                  fontFamily: 'Hafs',
                                   fontSize: 14,
                                   color: AppColor.mediumGray,
                                 ),
@@ -295,7 +297,8 @@ class _SurahAudioListView extends StatelessWidget {
                     child: Center(
                       child: Text(
                         surahNumber.toString(),
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: AppColor.primaryGreen,
@@ -316,7 +319,8 @@ class _SurahAudioListView extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 surahNameTranslated,
-                                style: GoogleFonts.amiri(
+                                style: TextStyle(
+                                  fontFamily: 'Hafs',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: isDark
@@ -327,7 +331,8 @@ class _SurahAudioListView extends StatelessWidget {
                             ),
                             Text(
                               surahNameArabic,
-                              style: GoogleFonts.amiri(
+                              style: TextStyle(
+                                fontFamily: 'Hafs',
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
                                 color: AppColor.primaryGreen,
@@ -338,7 +343,8 @@ class _SurahAudioListView extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           '$versesCount ayahs', // TODO: Add to localizations
-                          style: GoogleFonts.amiri(
+                          style: TextStyle(
+                            fontFamily: 'Hafs',
                             fontSize: 13,
                             color: AppColor.mediumGray,
                           ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/surah_detail_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
@@ -77,7 +76,8 @@ class AyahCard extends StatelessWidget {
                   ),
                   child: Text(
                     verseNumber.toString(),
-                    style: GoogleFonts.amiri(
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
                       color: AppColor.pureWhite,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -116,9 +116,12 @@ class AyahCard extends StatelessWidget {
 
                   return Text(
                     arabicText,
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.justify,
+
                     textDirection: TextDirection.rtl,
-                    style: GoogleFonts.amiriQuran(
+
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
                       fontSize: arabicFontSize,
                       height: 1.8,
                       fontWeight: FontWeight.w500,
@@ -167,7 +170,9 @@ class AyahCard extends StatelessWidget {
                     // Translation Label
                     Text(
                       translationSource,
-                      style: GoogleFonts.amiri(
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(
+                        fontFamily: 'Hafs',
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppColor.primaryGreen,
@@ -180,6 +185,7 @@ class AyahCard extends StatelessWidget {
                     // Translation Text
                     Text(
                       translation,
+                      textAlign: TextAlign.justify,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: displayMode == AyahDisplayMode.translationOnly
                             ? 18

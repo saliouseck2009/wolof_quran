@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/search_cubit.dart';
@@ -44,7 +43,8 @@ class SearchView extends StatelessWidget {
         ),
         title: Text(
           localizations.searchQuran,
-          style: GoogleFonts.amiri(
+          style: TextStyle(
+            fontFamily: 'Hafs',
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: isDark ? AppColor.pureWhite : AppColor.charcoal,
@@ -105,13 +105,17 @@ class _SearchBodyState extends State<_SearchBody> {
           child: TextField(
             controller: _searchController,
             focusNode: _searchFocusNode,
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+              fontFamily: 'Hafs',
               fontSize: 16,
               color: isDark ? AppColor.pureWhite : AppColor.charcoal,
             ),
             decoration: InputDecoration(
               hintText: localizations.enterWordsToSearch,
-              hintStyle: GoogleFonts.amiri(color: AppColor.mediumGray),
+              hintStyle: TextStyle(
+                fontFamily: 'Hafs',
+                color: AppColor.mediumGray,
+              ),
               prefixIcon: Icon(Icons.search, color: AppColor.primaryGreen),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
@@ -151,7 +155,8 @@ class _SearchBodyState extends State<_SearchBody> {
               ),
               child: Text(
                 localizations.search,
-                style: GoogleFonts.amiri(
+                style: TextStyle(
+                  fontFamily: 'Hafs',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -199,7 +204,8 @@ class _SearchBodyState extends State<_SearchBody> {
           const SizedBox(height: 16),
           Text(
             localizations.searchTheQuran,
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+              fontFamily: 'Hafs',
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: AppColor.mediumGray,
@@ -208,7 +214,11 @@ class _SearchBodyState extends State<_SearchBody> {
           const SizedBox(height: 8),
           Text(
             localizations.enterWordsToFindVerses,
-            style: GoogleFonts.amiri(fontSize: 14, color: AppColor.mediumGray),
+            style: TextStyle(
+              fontFamily: 'Hafs',
+              fontSize: 14,
+              color: AppColor.mediumGray,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -225,7 +235,8 @@ class _SearchBodyState extends State<_SearchBody> {
           const SizedBox(height: 16),
           Text(
             localizations.searchError,
-            style: GoogleFonts.amiri(
+            style: TextStyle(
+              fontFamily: 'Hafs',
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: AppColor.error,
@@ -234,7 +245,11 @@ class _SearchBodyState extends State<_SearchBody> {
           const SizedBox(height: 8),
           Text(
             message,
-            style: GoogleFonts.amiri(fontSize: 14, color: AppColor.mediumGray),
+            style: TextStyle(
+              fontFamily: 'Hafs',
+              fontSize: 14,
+              color: AppColor.mediumGray,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -255,7 +270,8 @@ class _SearchBodyState extends State<_SearchBody> {
             const SizedBox(height: 16),
             Text(
               localizations.noResultsFound,
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Hafs',
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: AppColor.mediumGray,
@@ -264,7 +280,8 @@ class _SearchBodyState extends State<_SearchBody> {
             const SizedBox(height: 8),
             Text(
               localizations.tryDifferentSearchTerms,
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Hafs',
                 fontSize: 14,
                 color: AppColor.mediumGray,
               ),
@@ -286,7 +303,8 @@ class _SearchBodyState extends State<_SearchBody> {
                   state.totalOccurrences,
                   state.results.length,
                 ),
-                style: GoogleFonts.amiri(
+                style: TextStyle(
+                  fontFamily: 'Hafs',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: AppColor.primaryGreen,
@@ -327,7 +345,8 @@ class _SearchBodyState extends State<_SearchBody> {
                       ),
                       child: Text(
                         '${result.surahNumber}. ${result.surahName}',
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: AppColor.primaryGreen,

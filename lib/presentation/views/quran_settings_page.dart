@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/quran_settings_cubit.dart';
@@ -37,7 +36,8 @@ class _QuranSettingsView extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           localizations.quranSettings,
-          style: GoogleFonts.amiri(
+          style: TextStyle(
+            fontFamily: 'Hafs',
             fontWeight: FontWeight.w600,
             color: AppColor.pureWhite,
             fontSize: 18,
@@ -96,7 +96,8 @@ class _QuranSettingsView extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(
                         localizations.quranSettings,
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                           color: AppColor.primaryGreen,
@@ -245,7 +246,8 @@ class _QuranSettingsView extends StatelessWidget {
                       // Title
                       Text(
                         title,
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: isDark
@@ -259,7 +261,8 @@ class _QuranSettingsView extends StatelessWidget {
                       // Subtitle
                       Text(
                         subtitle,
-                        style: GoogleFonts.amiri(
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
                           fontSize: 12,
                           color: AppColor.mediumGray,
                         ),
@@ -283,7 +286,8 @@ class _QuranSettingsView extends StatelessWidget {
                         ),
                         child: Text(
                           value,
-                          style: GoogleFonts.amiri(
+                          style: TextStyle(
+                            fontFamily: 'Hafs',
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
                             color: AppColor.primaryGreen,
@@ -421,7 +425,8 @@ class _TranslationSelectorModal extends StatelessWidget {
                   children: [
                     Text(
                       localizations.selectTranslation,
-                      style: GoogleFonts.amiri(
+                      style: TextStyle(
+                        fontFamily: 'Hafs',
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: AppColor.primaryGreen,
@@ -620,7 +625,8 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
             // Title
             Text(
               widget.localizations.fontSettings,
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Hafs',
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: isDark ? AppColor.pureWhite : AppColor.darkGray,
@@ -633,7 +639,8 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
             // Description
             Text(
               widget.localizations.fontSizeDescription,
-              style: GoogleFonts.amiri(
+              style: TextStyle(
+                fontFamily: 'Hafs',
                 fontSize: 14,
                 color: AppColor.mediumGray,
               ),
@@ -657,7 +664,8 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
                 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
-                style: GoogleFonts.amiriQuran(
+                style: TextStyle(
+                  fontFamily: 'Hafs',
                   fontSize: _currentFontSize,
                   fontWeight: FontWeight.w500,
                   color: isDark ? AppColor.pureWhite : AppColor.darkGray,
@@ -676,14 +684,16 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
                   children: [
                     Text(
                       widget.localizations.small,
-                      style: GoogleFonts.amiri(
+                      style: TextStyle(
+                        fontFamily: 'Hafs',
                         fontSize: 12,
                         color: AppColor.mediumGray,
                       ),
                     ),
                     Text(
                       '${_currentFontSize.toInt()}pt',
-                      style: GoogleFonts.amiri(
+                      style: TextStyle(
+                        fontFamily: 'Hafs',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColor.primaryGreen,
@@ -691,7 +701,8 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
                     ),
                     Text(
                       widget.localizations.large,
-                      style: GoogleFonts.amiri(
+                      style: TextStyle(
+                        fontFamily: 'Hafs',
                         fontSize: 12,
                         color: AppColor.mediumGray,
                       ),
@@ -750,14 +761,15 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
               ),
               child: Text(
                 widget.localizations.close,
-                style: GoogleFonts.amiri(
+                style: TextStyle(
+                  fontFamily: 'Hafs',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 32),
           ],
         ),
       ),
