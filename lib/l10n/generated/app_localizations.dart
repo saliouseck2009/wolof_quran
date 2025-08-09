@@ -633,6 +633,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Share Image'**
   String get shareImage;
+
+  /// Confirmation message when bookmark is added
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark added'**
+  String get bookmarkAdded;
+
+  /// Confirmation message when bookmark is removed
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark removed'**
+  String get bookmarkRemoved;
+
+  /// Description for empty bookmarks state
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark your favorite verses to access them easily'**
+  String get noBookmarksDescription;
+
+  /// Button to clear all bookmarks
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get clearAllBookmarks;
+
+  /// Confirmation dialog title for clearing bookmarks
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all bookmarks?'**
+  String get confirmClearBookmarks;
+
+  /// Warning message for clearing bookmarks
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone.'**
+  String get clearBookmarksMessage;
+
+  /// Clear button text
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
 }
 
 class _AppLocalizationsDelegate

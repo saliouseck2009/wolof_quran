@@ -72,5 +72,12 @@
   "customizeAndShare": "تخصيص ومشاركة",
   "backgroundStyle": "نمط الخلفية",
   "displayStyle": "نمط العرض",
-  "shareImage": "مشاركة الصورة"
+  "shareImage": "مشاركة الصورة",
+  "bookmarkAdded": "تم إضافة الإشارة المرجعية",
+  "bookmarkRemoved": "تم حذف الإشارة المرجعية",
+  "noBookmarksDescription": "ضع إشارة مرجعية على آياتك المفضلة للوصول إليها بسهولة",
+  "clearAllBookmarks": "مسح الكل",
+  "confirmClearBookmarks": "مسح جميع الإشارات المرجعية؟",
+  "clearBookmarksMessage": "لا يمكن التراجع عن هذا الإجراء.",
+  "clear": "مسح"
 }

@@ -10,9 +10,11 @@ import 'data/datasources/database_helper.dart';
 import 'data/repositories/reciter_repository_impl.dart';
 import 'data/repositories/audio_repository_impl.dart';
 import 'data/repositories/download_repository_impl.dart';
+import 'data/repositories/bookmark_repository_impl.dart';
 import 'domain/repositories/reciter_repository.dart';
 import 'domain/repositories/audio_repository.dart';
 import 'domain/repositories/download_repository.dart';
+import 'domain/repositories/bookmark_repository.dart';
 
 // Use Cases
 import 'domain/usecases/get_reciters_usecase.dart';
@@ -56,6 +58,9 @@ Future<void> setupDependencies() async {
   );
   locator.registerLazySingleton<DownloadRepository>(
     () => DownloadRepositoryImpl(locator<DatabaseHelper>()),
+  );
+  locator.registerLazySingleton<BookmarkRepository>(
+    () => BookmarkRepositoryImpl(locator<DatabaseHelper>()),
   );
 
   // Use Cases

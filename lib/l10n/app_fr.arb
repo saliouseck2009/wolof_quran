@@ -80,5 +80,12 @@
   "customizeAndShare": "Personnaliser et Partager",
   "backgroundStyle": "Style d'Arrière-plan",
   "displayStyle": "Style d'Affichage",
-  "shareImage": "Partager l'Image"
+  "shareImage": "Partager l'Image",
+  "bookmarkAdded": "Marque-page ajouté",
+  "bookmarkRemoved": "Marque-page supprimé",
+  "noBookmarksDescription": "Marquez vos versets préférés pour y accéder facilement",
+  "clearAllBookmarks": "Tout effacer",
+  "confirmClearBookmarks": "Effacer tous les marque-pages ?",
+  "clearBookmarksMessage": "Cette action ne peut pas être annulée.",
+  "clear": "Effacer"
 }

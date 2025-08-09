@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
+import 'package:wolof_quran/domain/repositories/bookmark_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../../core/helpers/revelation_place_enum.dart';
 import '../../core/services/audio_player_service.dart';
+import '../../domain/entities/bookmark.dart';
 import '../cubits/surah_detail_cubit.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
+import '../cubits/bookmark_cubit.dart';
 import '../blocs/surah_download_status_bloc.dart';
 import '../widgets/ayah_card.dart';
 import '../widgets/ayah_play_button.dart';
@@ -22,8 +25,16 @@ class SurahDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => SurahDetailCubit()..loadSurah(surahNumber),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => SurahDetailCubit()..loadSurah(surahNumber),
+        ),
+        BlocProvider(
+          create: (context) =>
+              BookmarkCubit(locator<BookmarkRepository>())..loadBookmarks(),
+        ),
+      ],
       child: SurahDetailView(surahNumber: surahNumber),
     );
   }
@@ -558,9 +569,33 @@ class SurahAyahsList extends StatelessWidget {
               surahName: quran.getSurahName(surahNumber),
             ),
             IconButton(
-              icon: Icon(Icons.bookmark_border, color: AppColor.mediumGray),
+              icon: BlocBuilder<BookmarkCubit, BookmarkState>(
+                builder: (context, bookmarkState) {
+                  final isBookmarked = context
+                      .read<BookmarkCubit>()
+                      .isBookmarked(surahNumber, ayah.verseNumber);
+
+                  return Icon(
+                    isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                    color: isBookmarked
+                        ? AppColor.primaryGreen
+                        : AppColor.mediumGray,
+                  );
+                },
+              ),
               onPressed: () {
-                // TODO: Implement bookmark functionality
+                final bookmarkCubit = context.read<BookmarkCubit>();
+                final bookmark = BookmarkedAyah(
+                  surahNumber: surahNumber,
+                  verseNumber: ayah.verseNumber,
+                  surahName: quran.getSurahName(surahNumber),
+                  arabicText: ayah.arabicText,
+                  translation: ayah.translation,
+                  translationSource: translationSource,
+                  createdAt: DateTime.now(),
+                );
+
+                bookmarkCubit.toggleBookmark(bookmark);
               },
             ),
           ],

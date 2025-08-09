@@ -293,4 +293,26 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get shareImage => 'Partager l\'Image';
+
+  @override
+  String get bookmarkAdded => 'Marque-page ajouté';
+
+  @override
+  String get bookmarkRemoved => 'Marque-page supprimé';
+
+  @override
+  String get noBookmarksDescription =>
+      'Marquez vos versets préférés pour y accéder facilement';
+
+  @override
+  String get clearAllBookmarks => 'Tout effacer';
+
+  @override
+  String get confirmClearBookmarks => 'Effacer tous les marque-pages ?';
+
+  @override
+  String get clearBookmarksMessage => 'Cette action ne peut pas être annulée.';
+
+  @override
+  String get clear => 'Effacer';
 }

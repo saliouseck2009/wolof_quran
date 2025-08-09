@@ -395,5 +395,33 @@
   "shareImage": "Share Image",
   "@shareImage": {
     "description": "Final share button text"
+  },
+  "bookmarkAdded": "Bookmark added",
+  "@bookmarkAdded": {
+    "description": "Confirmation message when bookmark is added"
+  },
+  "bookmarkRemoved": "Bookmark removed",
+  "@bookmarkRemoved": {
+    "description": "Confirmation message when bookmark is removed"
+  },
+  "noBookmarksDescription": "Bookmark your favorite verses to access them easily",
+  "@noBookmarksDescription": {
+    "description": "Description for empty bookmarks state"
+  },
+  "clearAllBookmarks": "Clear All",
+  "@clearAllBookmarks": {
+    "description": "Button to clear all bookmarks"
+  },
+  "confirmClearBookmarks": "Clear all bookmarks?",
+  "@confirmClearBookmarks": {
+    "description": "Confirmation dialog title for clearing bookmarks"
+  },
+  "clearBookmarksMessage": "This action cannot be undone.",
+  "@clearBookmarksMessage": {
+    "description": "Warning message for clearing bookmarks"
+  },
+  "clear": "Clear",
+  "@clear": {
+    "description": "Clear button text"
   }
 }

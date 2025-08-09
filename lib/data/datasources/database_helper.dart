@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart';
 import '../models/downloaded_surah.dart';
+import '../../domain/entities/bookmark.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -21,7 +22,12 @@ class DatabaseHelper {
       final dbPath = await getDatabasesPath();
       final path = join(dbPath, 'quran_downloads.db');
 
-      return await openDatabase(path, version: 1, onCreate: _createTables);
+      return await openDatabase(
+        path,
+        version: 2,
+        onCreate: _createTables,
+        onUpgrade: _onUpgrade,
+      );
     } catch (e) {
       // If sqflite is not available, throw a more descriptive error
       if (e is MissingPluginException) {
@@ -45,6 +51,38 @@ class DatabaseHelper {
         UNIQUE(reciter_id, surah_number)
       )
     ''');
+
+    await db.execute('''
+      CREATE TABLE bookmarks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        surah_number INTEGER NOT NULL,
+        verse_number INTEGER NOT NULL,
+        surah_name TEXT NOT NULL,
+        arabic_text TEXT NOT NULL,
+        translation TEXT NOT NULL,
+        translation_source TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        UNIQUE(surah_number, verse_number)
+      )
+    ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        CREATE TABLE bookmarks (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          surah_number INTEGER NOT NULL,
+          verse_number INTEGER NOT NULL,
+          surah_name TEXT NOT NULL,
+          arabic_text TEXT NOT NULL,
+          translation TEXT NOT NULL,
+          translation_source TEXT NOT NULL,
+          created_at INTEGER NOT NULL,
+          UNIQUE(surah_number, verse_number)
+        )
+      ''');
+    }
   }
 
   // Insert downloaded surah
@@ -144,5 +182,70 @@ class DatabaseHelper {
       };
     }
     return {'total': 0, 'completed': 0};
+  }
+
+  // Bookmark operations
+  Future<int> insertBookmark(BookmarkedAyah bookmark) async {
+    final db = await database;
+    return await db.insert('bookmarks', {
+      'surah_number': bookmark.surahNumber,
+      'verse_number': bookmark.verseNumber,
+      'surah_name': bookmark.surahName,
+      'arabic_text': bookmark.arabicText,
+      'translation': bookmark.translation,
+      'translation_source': bookmark.translationSource,
+      'created_at': bookmark.createdAt.millisecondsSinceEpoch,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<bool> isBookmarked(int surahNumber, int verseNumber) async {
+    final db = await database;
+    final result = await db.query(
+      'bookmarks',
+      where: 'surah_number = ? AND verse_number = ?',
+      whereArgs: [surahNumber, verseNumber],
+    );
+    return result.isNotEmpty;
+  }
+
+  Future<int> deleteBookmark(int surahNumber, int verseNumber) async {
+    final db = await database;
+    return await db.delete(
+      'bookmarks',
+      where: 'surah_number = ? AND verse_number = ?',
+      whereArgs: [surahNumber, verseNumber],
+    );
+  }
+
+  Future<List<BookmarkedAyah>> getAllBookmarks() async {
+    final db = await database;
+    final result = await db.query('bookmarks', orderBy: 'created_at DESC');
+
+    return result
+        .map(
+          (map) => BookmarkedAyah(
+            surahNumber: map['surah_number'] as int,
+            verseNumber: map['verse_number'] as int,
+            surahName: map['surah_name'] as String,
+            arabicText: map['arabic_text'] as String,
+            translation: map['translation'] as String,
+            translationSource: map['translation_source'] as String,
+            createdAt: DateTime.fromMillisecondsSinceEpoch(
+              map['created_at'] as int,
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  Future<int> clearAllBookmarks() async {
+    final db = await database;
+    return await db.delete('bookmarks');
+  }
+
+  Future<int> getBookmarkCount() async {
+    final db = await database;
+    final result = await db.rawQuery('SELECT COUNT(*) as count FROM bookmarks');
+    return result.first['count'] as int;
   }
 }

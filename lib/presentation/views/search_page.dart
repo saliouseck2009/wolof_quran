@@ -3,8 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/search_cubit.dart';
+import '../cubits/bookmark_cubit.dart' as bookmark_cubit;
 import '../widgets/ayah_card.dart';
 import '../widgets/ayah_play_button.dart';
+import '../widgets/bookmarks_tab.dart';
+import '../../service_locator.dart';
+import '../../domain/repositories/bookmark_repository.dart';
 
 class SearchPage extends StatelessWidget {
   static const String routeName = "/search";
@@ -13,8 +17,15 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => SearchCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => SearchCubit()),
+        BlocProvider(
+          create: (context) =>
+              bookmark_cubit.BookmarkCubit(locator<BookmarkRepository>())
+                ..loadBookmarks(),
+        ),
+      ],
       child: const SearchView(),
     );
   }
@@ -28,31 +39,58 @@ class SearchView extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: isDark ? AppColor.charcoal : AppColor.offWhite,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: isDark ? AppColor.charcoal : AppColor.offWhite,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+            ),
+            onPressed: () => Navigator.pop(context),
           ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          localizations.searchQuran,
-          style: TextStyle(
-            fontFamily: 'Hafs',
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+          title: Text(
+            localizations.searchInQuran,
+            style: TextStyle(
+              fontFamily: 'Hafs',
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+            ),
+          ),
+          centerTitle: true,
+          bottom: TabBar(
+            indicatorColor: AppColor.primaryGreen,
+            labelColor: AppColor.primaryGreen,
+            unselectedLabelColor: isDark
+                ? AppColor.pureWhite
+                : AppColor.charcoal,
+            labelStyle: const TextStyle(
+              fontFamily: 'Hafs',
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontFamily: 'Hafs',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+            tabs: [
+              Tab(icon: const Icon(Icons.search), text: localizations.search),
+              Tab(
+                icon: const Icon(Icons.bookmark),
+                text: localizations.bookmarks,
+              ),
+            ],
           ),
         ),
-        centerTitle: true,
+        body: TabBarView(children: [const _SearchBody(), const BookmarksTab()]),
       ),
-      body: const _SearchBody(),
     );
   }
 }

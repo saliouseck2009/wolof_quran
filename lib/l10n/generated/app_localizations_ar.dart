@@ -289,4 +289,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get shareImage => 'مشاركة الصورة';
+
+  @override
+  String get bookmarkAdded => 'تم إضافة الإشارة المرجعية';
+
+  @override
+  String get bookmarkRemoved => 'تم حذف الإشارة المرجعية';
+
+  @override
+  String get noBookmarksDescription =>
+      'ضع إشارة مرجعية على آياتك المفضلة للوصول إليها بسهولة';
+
+  @override
+  String get clearAllBookmarks => 'مسح الكل';
+
+  @override
+  String get confirmClearBookmarks => 'مسح جميع الإشارات المرجعية؟';
+
+  @override
+  String get clearBookmarksMessage => 'لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get clear => 'مسح';
 }

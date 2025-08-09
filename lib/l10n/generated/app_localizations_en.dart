@@ -290,4 +290,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareImage => 'Share Image';
+
+  @override
+  String get bookmarkAdded => 'Bookmark added';
+
+  @override
+  String get bookmarkRemoved => 'Bookmark removed';
+
+  @override
+  String get noBookmarksDescription =>
+      'Bookmark your favorite verses to access them easily';
+
+  @override
+  String get clearAllBookmarks => 'Clear All';
+
+  @override
+  String get confirmClearBookmarks => 'Clear all bookmarks?';
+
+  @override
+  String get clearBookmarksMessage => 'This action cannot be undone.';
+
+  @override
+  String get clear => 'Clear';
 }

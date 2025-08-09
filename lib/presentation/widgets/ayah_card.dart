@@ -10,8 +10,10 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../core/config/theme/app_color.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../domain/entities/bookmark.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
+import '../cubits/bookmark_cubit.dart';
 
 /// A card to show one Ayah (verse) of the Quran:
 ///  • Top row: a little pill with the verse number + action icons (play, bookmark…)
