@@ -12,8 +12,9 @@ import '../../domain/repositories/bookmark_repository.dart';
 
 class SearchPage extends StatelessWidget {
   static const String routeName = "/search";
+  final int initialTab;
 
-  const SearchPage({super.key});
+  const SearchPage({super.key, this.initialTab = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +27,15 @@ class SearchPage extends StatelessWidget {
                 ..loadBookmarks(),
         ),
       ],
-      child: const SearchView(),
+      child: SearchView(initialTab: initialTab),
     );
   }
 }
 
 class SearchView extends StatelessWidget {
-  const SearchView({super.key});
+  final int initialTab;
+
+  const SearchView({super.key, this.initialTab = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +44,7 @@ class SearchView extends StatelessWidget {
 
     return DefaultTabController(
       length: 2,
+      initialIndex: initialTab,
       child: Scaffold(
         backgroundColor: isDark ? AppColor.charcoal : AppColor.offWhite,
         appBar: AppBar(

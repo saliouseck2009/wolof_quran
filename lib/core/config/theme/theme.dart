@@ -111,6 +111,7 @@ class MaterialTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: lightScheme(),
+      fontFamily: 'Poppins',
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,
@@ -132,6 +133,7 @@ class MaterialTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: darkScheme(),
+      fontFamily: 'Poppins',
       appBarTheme: const AppBarTheme(
         elevation: 0,
         centerTitle: true,

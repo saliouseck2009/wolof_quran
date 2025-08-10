@@ -34,6 +34,11 @@ class AppRoutes {
         return _materialRoute(view: SurahAudioListPage(), settings: settings);
       case '/search':
         return _materialRoute(view: SearchPage(), settings: settings);
+      case '/bookmarks':
+        return _materialRoute(
+          view: SearchPage(initialTab: 1),
+          settings: settings,
+        );
       case '/reciter-list':
         return _materialRoute(view: ReciterListPage(), settings: settings);
       case '/reciter-chapters':

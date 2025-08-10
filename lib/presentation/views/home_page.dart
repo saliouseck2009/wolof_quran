@@ -1,5 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/presentation/cubits/daily_inspiration_cubit.dart';
@@ -7,6 +14,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/bookmark_cubit.dart';
+import '../cubits/surah_detail_cubit.dart';
 import '../../domain/entities/bookmark.dart';
 import '../../domain/repositories/bookmark_repository.dart';
 import '../../service_locator.dart';
@@ -503,7 +511,7 @@ Widget _buildInspirationCard(
                     Text(
                       'Daily Inspiration',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: isDark ? AppColor.pureWhite : AppColor.charcoal,
                         fontFamily: 'Hafs',
@@ -531,7 +539,27 @@ Widget _buildInspirationCard(
                     size: 24.0,
                     color: AppColor.primaryGreen,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
+                  // Share button
+                  IconButton(
+                    onPressed: () {
+                      _showDailyInspirationShareModal(
+                        context,
+                        state.verseNumber,
+                        state.arabicText,
+                        state.translation,
+                        _getTranslationSourceName(state.currentTranslation),
+                        state.surahName,
+                        state.surahNumber,
+                      );
+                    },
+                    icon: Icon(
+                      Icons.share,
+                      color: AppColor.primaryGreen,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
                   // Refresh button
                   IconButton(
                     onPressed: () {
@@ -633,7 +661,6 @@ Widget _buildInspirationCard(
             // Action buttons when expanded
             Row(
               children: [
-                const SizedBox(width: 12),
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
@@ -851,7 +878,7 @@ Widget _buildMainActionsGrid(
               title: 'Bookmarks',
               subtitle: 'Saved Ayahs',
               color: Colors.orange,
-              onTap: () => Navigator.pushNamed(context, '/search'),
+              onTap: () => Navigator.pushNamed(context, '/bookmarks'),
               isDark: isDark,
             ),
           ),
@@ -889,5 +916,536 @@ String _getTranslationSourceName(quran.Translation translation) {
       return 'Chinese';
     default:
       return 'Translation';
+  }
+}
+
+void _showDailyInspirationShareModal(
+  BuildContext context,
+  int verseNumber,
+  String arabicText,
+  String translation,
+  String translationSource,
+  String surahName,
+  int surahNumber,
+) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => DailyInspirationShareModal(
+      verseNumber: verseNumber,
+      arabicText: arabicText,
+      translation: translation,
+      translationSource: translationSource,
+      surahName: surahName,
+      surahNumber: surahNumber,
+    ),
+  );
+}
+
+class DailyInspirationShareModal extends StatefulWidget {
+  final int verseNumber;
+  final String arabicText;
+  final String translation;
+  final String translationSource;
+  final String surahName;
+  final int surahNumber;
+
+  const DailyInspirationShareModal({
+    super.key,
+    required this.verseNumber,
+    required this.arabicText,
+    required this.translation,
+    required this.translationSource,
+    required this.surahName,
+    required this.surahNumber,
+  });
+
+  @override
+  State<DailyInspirationShareModal> createState() =>
+      _DailyInspirationShareModalState();
+}
+
+class _DailyInspirationShareModalState
+    extends State<DailyInspirationShareModal> {
+  final GlobalKey _captureKey = GlobalKey();
+
+  // Customization options
+  Color _selectedBackgroundColor = AppColor.primaryGreen;
+  AyahDisplayMode _selectedDisplayMode = AyahDisplayMode.both;
+
+  // Available background colors
+  final List<Color> _backgroundColors = [
+    AppColor.primaryGreen,
+    AppColor.charcoal,
+    const Color(0xFF2E3440), // Nord dark
+    const Color(0xFF3B4252), // Nord darker
+    const Color(0xFF5D4037), // Brown
+    const Color(0xFF37474F), // Blue Grey
+    const Color(0xFF424242), // Grey
+    const Color(0xFF1A237E), // Indigo
+    const Color(0xFF4A148C), // Purple
+    const Color(0xFF0D47A1), // Blue
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.9,
+      decoration: BoxDecoration(
+        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColor.mediumGray,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Share Daily Inspiration',
+                  style: TextStyle(
+                    fontFamily: 'Hafs',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(
+                    Icons.close,
+                    color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Preview Card
+                  RepaintBoundary(key: _captureKey, child: _buildPreviewCard()),
+
+                  const SizedBox(height: 32),
+
+                  // Background Style Section
+                  _buildSectionTitle('Background Style'),
+                  const SizedBox(height: 16),
+                  _buildBackgroundColorSelector(),
+
+                  const SizedBox(height: 32),
+
+                  // Display Style Section
+                  _buildSectionTitle('Display Style'),
+                  const SizedBox(height: 16),
+                  _buildDisplayModeSelector(localizations),
+
+                  const SizedBox(height: 32),
+
+                  // Share Button
+                  ElevatedButton.icon(
+                    onPressed: _shareImage,
+                    icon: const Icon(Icons.share, color: AppColor.pureWhite),
+                    label: Text(
+                      'Share Image',
+                      style: const TextStyle(
+                        fontFamily: 'Hafs',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColor.pureWhite,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColor.primaryGreen,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Text(
+      title,
+      style: TextStyle(
+        fontFamily: 'Hafs',
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+      ),
+    );
+  }
+
+  Widget _buildPreviewCard() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: _selectedBackgroundColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Daily Inspiration Header
+          Container(
+            margin: const EdgeInsets.only(bottom: 24),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.auto_stories_outlined,
+                  color: AppColor.pureWhite,
+                  size: 32,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Daily Inspiration',
+                  style: TextStyle(
+                    fontFamily: 'Hafs',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.pureWhite.withValues(alpha: 0.9),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Arabic text
+          if (_selectedDisplayMode == AyahDisplayMode.both ||
+              _selectedDisplayMode == AyahDisplayMode.arabicOnly)
+            Text(
+              widget.arabicText,
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
+              style: const TextStyle(
+                fontFamily: 'Hafs',
+                fontSize: 30,
+                fontWeight: FontWeight.w500,
+                color: AppColor.pureWhite,
+                height: 1.8,
+              ),
+            ),
+
+          // Separator
+          if (_selectedDisplayMode == AyahDisplayMode.both)
+            Container(
+              width: 60,
+              height: 2,
+              margin: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                color: AppColor.pureWhite.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
+
+          // Translation text
+          if (_selectedDisplayMode == AyahDisplayMode.both ||
+              _selectedDisplayMode == AyahDisplayMode.translationOnly)
+            Text(
+              widget.translation,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: 'Hafs',
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: AppColor.pureWhite,
+                height: 1.5,
+              ),
+            ),
+
+          const SizedBox(height: 20),
+
+          // Surah name
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColor.pureWhite.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              widget.surahName,
+              style: const TextStyle(
+                fontFamily: 'Hafs',
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColor.pureWhite,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 32),
+
+          // Bottom row with surah info and app name
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Left side: Surah and Ayah numbers
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColor.pureWhite.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '${widget.surahNumber}:${widget.verseNumber}',
+                  style: const TextStyle(
+                    fontFamily: 'Hafs',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.pureWhite,
+                  ),
+                ),
+              ),
+
+              // Right side: App name
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColor.pureWhite.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Text(
+                  'Wolof-Quran',
+                  style: TextStyle(
+                    fontFamily: 'Hafs',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppColor.pureWhite,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackgroundColorSelector() {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: _backgroundColors.map((color) {
+        final isSelected = color == _selectedBackgroundColor;
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedBackgroundColor = color;
+            });
+          },
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? AppColor.pureWhite : Colors.transparent,
+                width: 3,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: isSelected
+                ? const Icon(Icons.check, color: AppColor.pureWhite, size: 20)
+                : null,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildDisplayModeSelector(AppLocalizations localizations) {
+    final modes = [
+      (
+        AyahDisplayMode.both,
+        localizations.arabicAndTranslation,
+        Icons.view_headline,
+      ),
+      (
+        AyahDisplayMode.arabicOnly,
+        localizations.arabicOnly,
+        Icons.format_textdirection_r_to_l,
+      ),
+      (
+        AyahDisplayMode.translationOnly,
+        localizations.translationOnly,
+        Icons.translate,
+      ),
+    ];
+
+    return Column(
+      children: modes.map((modeData) {
+        final mode = modeData.$1;
+        final label = modeData.$2;
+        final icon = modeData.$3;
+        final isSelected = mode == _selectedDisplayMode;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedDisplayMode = mode;
+            });
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColor.primaryGreen.withValues(alpha: 0.1)
+                  : (isDark
+                        ? AppColor.charcoal.withValues(alpha: 0.5)
+                        : AppColor.lightGray.withValues(alpha: 0.3)),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isSelected ? AppColor.primaryGreen : Colors.transparent,
+                width: 2,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected
+                      ? AppColor.primaryGreen
+                      : AppColor.mediumGray,
+                  size: 24,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontFamily: 'Hafs',
+                      fontSize: 16,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? AppColor.primaryGreen
+                          : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                    ),
+                  ),
+                ),
+                if (isSelected)
+                  Icon(
+                    Icons.check_circle,
+                    color: AppColor.primaryGreen,
+                    size: 20,
+                  ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Future<void> _shareImage() async {
+    try {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(color: AppColor.primaryGreen),
+        ),
+      );
+
+      // Capture the widget as an image
+      final RenderRepaintBoundary boundary =
+          _captureKey.currentContext!.findRenderObject()!
+              as RenderRepaintBoundary;
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+      final Uint8List uint8List = byteData!.buffer.asUint8List();
+
+      // Save to temporary file
+      final tempDir = await getTemporaryDirectory();
+      final file = File(
+        '${tempDir.path}/daily_inspiration_${widget.surahNumber}_${widget.verseNumber}.png',
+      );
+      await file.writeAsBytes(uint8List);
+
+      // Hide loading dialog
+      if (mounted) Navigator.pop(context);
+
+      // Share the file
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text:
+            'Daily Inspiration - ${widget.surahName} - Verse ${widget.verseNumber}',
+      );
+
+      // Close modal
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      // Hide loading dialog if still showing
+      if (mounted) Navigator.pop(context);
+
+      // Show error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error sharing image: $e'),
+            backgroundColor: AppColor.error,
+          ),
+        );
+      }
+    }
   }
 }

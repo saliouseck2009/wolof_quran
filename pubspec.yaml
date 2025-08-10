@@ -96,7 +96,11 @@ flutter:
       fonts:
         - asset: fonts/KfgqpcHafsUthmanicScriptRegular-1jGEe.ttf
         - asset: fonts/KfgqpcHafsUthmanicScriptRegular-nARZ1.ttf
-  #         style: italic
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-Regular.ttf
+        - asset: fonts/Poppins-Bold.ttf
+          weight: 700
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf
