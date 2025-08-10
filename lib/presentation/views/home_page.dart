@@ -59,6 +59,7 @@ class HomePage extends StatelessWidget {
         ],
         child: Scaffold(
           body: Container(
+            height: double.infinity,
             decoration: BoxDecoration(
               gradient: isDark
                   ? LinearGradient(
@@ -71,10 +72,12 @@ class HomePage extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         AppColor.primaryGreen,
-                        AppColor.primaryGreen.withValues(alpha: 0.8),
-                        AppColor.offWhite,
+                        AppColor.primaryGreen.withValues(alpha: 0.9),
+                        // AppColor.offWhite,
                       ],
-                      stops: const [0.0, 0.6, 1.0],
+                      // stops: const [
+                      //   0.0, 0.6, // 1.0 ,
+                      // ],
                     ),
             ),
             child: SafeArea(
