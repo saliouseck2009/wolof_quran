@@ -20,36 +20,38 @@ class ReciterChaptersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentGreen = isDark
+        ? const Color(0xFF4CAF50)
+        : AppColor.primaryGreen;
     return BlocProvider(
       create: (context) => ReciterChaptersBloc(
         getDownloadedSurahsUseCase: locator<GetDownloadedSurahsUseCase>(),
       )..add(LoadReciterChapters(reciter)),
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: isDark
+            ? AppColor.darkSurface
+            : Theme.of(context).colorScheme.surface,
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
               expandedHeight: 200,
               floating: false,
               pinned: true,
-              backgroundColor: isDark
-                  ? AppColor.charcoal
-                  : AppColor.primaryGreen,
+              backgroundColor: isDark ? AppColor.darkSurfaceHigh : accentGreen,
               foregroundColor: AppColor.pureWhite,
               surfaceTintColor: Colors.transparent,
               shadowColor: isDark
-                  ? AppColor.charcoal.withValues(alpha: 0.3)
-                  : AppColor.primaryGreen.withValues(alpha: 0.3),
+                  ? Colors.black.withValues(alpha: 0.4)
+                  : accentGreen.withValues(alpha: 0.3),
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        AppColor.primaryGreen.withValues(alpha: 0.8),
-                        AppColor.primaryGreen,
-                      ],
+                      colors: isDark
+                          ? [AppColor.darkSurfaceHigh, AppColor.darkSurface]
+                          : [accentGreen.withValues(alpha: 0.85), accentGreen],
                     ),
                   ),
                   child: Center(
@@ -60,8 +62,12 @@ class ReciterChaptersPage extends StatelessWidget {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: AppColor.pureWhite.withValues(alpha: 0.2),
+                            color: Colors.white.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.25),
+                              width: 1,
+                            ),
                           ),
                           child: Icon(
                             Icons.person,
@@ -87,7 +93,12 @@ class ReciterChaptersPage extends StatelessWidget {
               ),
             ),
             SliverToBoxAdapter(
-              child: _ReciterChaptersContent(reciter: reciter),
+              child: _ReciterChaptersContent(
+                reciter: reciter,
+                accentGreen: accentGreen,
+                darkSurfaceHigh: AppColor.darkSurfaceHigh,
+                darkSurface: AppColor.darkSurface,
+              ),
             ),
           ],
         ),
@@ -98,8 +109,16 @@ class ReciterChaptersPage extends StatelessWidget {
 
 class _ReciterChaptersContent extends StatelessWidget {
   final Reciter reciter;
+  final Color accentGreen;
+  final Color darkSurfaceHigh;
+  final Color darkSurface;
 
-  const _ReciterChaptersContent({required this.reciter});
+  const _ReciterChaptersContent({
+    required this.reciter,
+    required this.accentGreen,
+    required this.darkSurfaceHigh,
+    required this.darkSurface,
+  });
 
   String _getSurahDisplayName(int surahNumber, quran.Translation? translation) {
     final arabicName = quran.getSurahNameArabic(surahNumber);
@@ -145,9 +164,7 @@ class _ReciterChaptersContent extends StatelessWidget {
         if (state is ReciterChaptersLoading) {
           return SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
-            child: const Center(
-              child: CircularProgressIndicator(color: AppColor.primaryGreen),
-            ),
+            child: Center(child: CircularProgressIndicator(color: accentGreen)),
           );
         }
 
@@ -208,12 +225,16 @@ class _ReciterChaptersContent extends StatelessWidget {
           margin: const EdgeInsets.all(16),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColor.primaryGreen.withValues(alpha: 0.1),
+            color: accentGreen.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: accentGreen.withValues(alpha: 0.25),
+              width: 1,
+            ),
           ),
           child: Row(
             children: [
-              Icon(Icons.download_done, color: AppColor.primaryGreen, size: 20),
+              Icon(Icons.download_done, color: accentGreen, size: 20),
               const SizedBox(width: 8),
               Text(
                 localizations.surahsDownloaded(
@@ -223,7 +244,7 @@ class _ReciterChaptersContent extends StatelessWidget {
                   fontFamily: 'Hafs',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppColor.primaryGreen,
+                  color: accentGreen,
                 ),
               ),
             ],
@@ -246,11 +267,12 @@ class _ReciterChaptersContent extends StatelessWidget {
               translation: translation,
               isDark: isDark,
               isDownloaded: isDownloaded,
+              accentGreen: accentGreen,
+              darkSurfaceHigh: darkSurfaceHigh,
               getSurahDisplayName: (number) =>
                   _getSurahDisplayName(number, translation),
               localizations: localizations,
               onDownloadComplete: () {
-                // Refresh the downloaded surahs when download completes
                 context.read<ReciterChaptersBloc>().add(
                   RefreshDownloadedSurahs(reciter.id),
                 );
@@ -269,6 +291,8 @@ class _ChapterCard extends StatelessWidget {
   final quran.Translation? translation;
   final bool isDark;
   final bool isDownloaded;
+  final Color accentGreen;
+  final Color darkSurfaceHigh;
   final String Function(int) getSurahDisplayName;
   final AppLocalizations localizations;
   final VoidCallback onDownloadComplete;
@@ -279,6 +303,8 @@ class _ChapterCard extends StatelessWidget {
     required this.translation,
     required this.isDark,
     required this.isDownloaded,
+    required this.accentGreen,
+    required this.darkSurfaceHigh,
     required this.getSurahDisplayName,
     required this.localizations,
     required this.onDownloadComplete,
@@ -308,15 +334,19 @@ class _ChapterCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        color: isDark ? darkSurfaceHigh : AppColor.pureWhite,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColor.primaryGreen.withValues(alpha: 0.08),
-            blurRadius: 8,
+            color: accentGreen.withValues(alpha: 0.07),
+            blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
+        border: Border.all(
+          color: accentGreen.withValues(alpha: 0.12),
+          width: 1,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -327,7 +357,7 @@ class _ChapterCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                color: accentGreen.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
@@ -337,7 +367,7 @@ class _ChapterCard extends StatelessWidget {
                     fontFamily: 'Hafs',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColor.primaryGreen,
+                    color: accentGreen,
                   ),
                 ),
               ),
@@ -394,7 +424,6 @@ class _ChapterCard extends StatelessWidget {
             // Action button and listener
             BlocConsumer<AudioManagementCubit, AudioManagementState>(
               listenWhen: (previous, current) {
-                // Listen when download completes or fails for this specific surah
                 if (previous is AudioDownloading &&
                     previous.reciterId == reciter.id &&
                     previous.surahNumber == surahNumber) {
@@ -404,7 +433,6 @@ class _ChapterCard extends StatelessWidget {
                 return false;
               },
               listener: (context, currentState) {
-                // Notify parent when download completes
                 if (currentState is AudioManagementLoaded) {
                   onDownloadComplete();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -433,11 +461,9 @@ class _ChapterCard extends StatelessWidget {
                 }
               },
               builder: (context, currentState) {
-                // Check if currently downloading this specific surah
                 if (currentState is AudioDownloading &&
                     currentState.reciterId == reciter.id &&
                     currentState.surahNumber == surahNumber) {
-                  // Show progress indicator with percentage
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -450,9 +476,9 @@ class _ChapterCard extends StatelessWidget {
                             child: CircularProgressIndicator(
                               value: currentState.progress,
                               strokeWidth: 3,
-                              color: AppColor.primaryGreen,
-                              backgroundColor: AppColor.primaryGreen.withValues(
-                                alpha: 0.2,
+                              color: accentGreen,
+                              backgroundColor: accentGreen.withValues(
+                                alpha: 0.25,
                               ),
                             ),
                           ),
@@ -462,7 +488,7 @@ class _ChapterCard extends StatelessWidget {
                               fontFamily: 'Hafs',
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
-                              color: AppColor.primaryGreen,
+                              color: accentGreen,
                             ),
                           ),
                         ],
@@ -473,7 +499,7 @@ class _ChapterCard extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Hafs',
                           fontSize: 10,
-                          color: AppColor.primaryGreen,
+                          color: accentGreen,
                         ),
                       ),
                     ],
@@ -481,7 +507,6 @@ class _ChapterCard extends StatelessWidget {
                 }
 
                 if (isDownloaded) {
-                  // Play/Stop button with stream builder to monitor player state
                   return StreamBuilder<AudioPlayerState>(
                     stream: context
                         .read<AudioManagementCubit>()
@@ -502,7 +527,6 @@ class _ChapterCard extends StatelessWidget {
                               .read<AudioManagementCubit>()
                               .audioPlayerService;
 
-                          // Check if this specific surah is currently playing
                           final isThisSurahPlaying =
                               currentAudio != null &&
                               currentAudio.surahNumber == surahNumber &&
@@ -518,10 +542,8 @@ class _ChapterCard extends StatelessWidget {
                             onPressed: () async {
                               if (isThisSurahPlaying &&
                                   playerState == AudioPlayerState.playing) {
-                                // Stop the current playback
                                 await audioPlayerService.stop();
                               } else {
-                                // Load ayah audios and play surah playlist
                                 context
                                     .read<AudioManagementCubit>()
                                     .loadAyahAudios(reciter.id, surahNumber);
@@ -541,7 +563,7 @@ class _ChapterCard extends StatelessWidget {
                               isPlaying
                                   ? Icons.stop_circle
                                   : Icons.play_circle_filled,
-                              color: AppColor.primaryGreen,
+                              color: accentGreen,
                               size: 32,
                             ),
                           );
@@ -551,7 +573,6 @@ class _ChapterCard extends StatelessWidget {
                   );
                 }
 
-                // Download button
                 return IconButton(
                   onPressed: () {
                     context.read<AudioManagementCubit>().downloadSurahAudio(
@@ -559,11 +580,7 @@ class _ChapterCard extends StatelessWidget {
                       surahNumber,
                     );
                   },
-                  icon: Icon(
-                    Icons.download,
-                    color: AppColor.primaryGreen,
-                    size: 32,
-                  ),
+                  icon: Icon(Icons.download, color: accentGreen, size: 32),
                 );
               },
             ),

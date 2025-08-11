@@ -31,6 +31,9 @@ class _QuranSettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentGreen = isDark
+        ? const Color(0xFF4CAF50)
+        : AppColor.primaryGreen;
 
     return Scaffold(
       appBar: AppBar(
@@ -43,92 +46,108 @@ class _QuranSettingsView extends StatelessWidget {
             fontSize: 18,
           ),
         ),
-        backgroundColor: isDark ? AppColor.charcoal : AppColor.primaryGreen,
+        backgroundColor: isDark ? AppColor.darkSurfaceHigh : accentGreen,
         foregroundColor: AppColor.pureWhite,
         elevation: 2,
       ),
-      body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
-        builder: (context, state) {
-          if (state is! QuranSettingsLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Container(
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: isDark
+              ? LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColor.darkBackdropTop,
+                    AppColor.darkBackdropBottom,
+                  ],
+                )
+              : null,
+          color: isDark ? null : Theme.of(context).scaffoldBackgroundColor,
+        ),
+        child: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
+          builder: (context, state) {
+            if (state is! QuranSettingsLoaded) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header section
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: isDark
-                        ? LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColor.charcoal.withValues(alpha: 0.3),
-                              AppColor.darkGray.withValues(alpha: 0.3),
-                            ],
-                          )
-                        : LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColor.primaryGreen.withValues(alpha: 0.1),
-                              AppColor.gold.withValues(alpha: 0.1),
-                            ],
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header section
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: isDark
+                          ? LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppColor.darkBackdropTop,
+                                AppColor.darkBackdropBottom,
+                              ],
+                            )
+                          : LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                AppColor.primaryGreen.withValues(alpha: 0.1),
+                                AppColor.gold.withValues(alpha: 0.1),
+                              ],
+                            ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: AppColor.primaryGreen.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(Icons.settings, size: 48, color: accentGreen),
+                        const SizedBox(height: 12),
+                        Text(
+                          localizations.quranSettings,
+                          style: TextStyle(
+                            fontFamily: 'Hafs',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: accentGreen,
                           ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColor.primaryGreen.withValues(alpha: 0.2),
-                      width: 1,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Customize your Quran reading experience',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: AppColor.translationText),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.settings,
-                        size: 48,
-                        color: AppColor.primaryGreen,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        localizations.quranSettings,
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: AppColor.primaryGreen,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Customize your Quran reading experience',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColor.translationText,
-                        ),
-                      ),
-                    ],
+
+                  const SizedBox(height: 24),
+
+                  // Settings Menu Items
+                  _buildSettingsMenuItems(
+                    context,
+                    state,
+                    localizations,
+                    accentGreen,
                   ),
-                ),
 
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                // Settings Menu Items
-                _buildSettingsMenuItems(context, state, localizations),
-
-                const SizedBox(height: 24),
-
-                // Future settings sections can be added here
-                // Example: Audio settings, font size, etc.
-                const SizedBox(height: 32),
-              ],
-            ),
-          );
-        },
+                  // Future settings sections can be added here
+                  // Example: Audio settings, font size, etc.
+                  const SizedBox(height: 32),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -137,6 +156,7 @@ class _QuranSettingsView extends StatelessWidget {
     BuildContext context,
     QuranSettingsLoaded state,
     AppLocalizations localizations,
+    Color accentGreen,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final currentTranslationOption = QuranSettingsCubit.getTranslationOption(
@@ -153,6 +173,7 @@ class _QuranSettingsView extends StatelessWidget {
           subtitle: localizations.currentTranslation,
           value: currentTranslationOption?.displayName ?? 'Unknown',
           isDark: isDark,
+          accentGreen: accentGreen,
           onTap: () => _showTranslationSelector(context, state, localizations),
         ),
 
@@ -166,6 +187,7 @@ class _QuranSettingsView extends StatelessWidget {
           subtitle: localizations.ayahFontSize,
           value: '${state.ayahFontSize.toInt()}pt',
           isDark: isDark,
+          accentGreen: accentGreen,
           onTap: () => _showFontSizeSelector(context, state, localizations),
         ),
 
@@ -179,6 +201,7 @@ class _QuranSettingsView extends StatelessWidget {
           subtitle: 'Manage reciters and download audio',
           value: 'View available reciters',
           isDark: isDark,
+          accentGreen: accentGreen,
           onTap: () {
             Navigator.pushNamed(context, '/reciter-list');
           },
@@ -195,23 +218,28 @@ class _QuranSettingsView extends StatelessWidget {
     required String subtitle,
     required String value,
     required bool isDark,
+    required Color accentGreen,
     required VoidCallback onTap,
     bool showArrow = false,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
-        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        color: isDark ? AppColor.darkSurface : AppColor.pureWhite,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColor.primaryGreen.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.35)
+                : AppColor.primaryGreen.withValues(alpha: 0.08),
+            blurRadius: isDark ? 18 : 12,
+            offset: Offset(0, isDark ? 6 : 2),
           ),
         ],
         border: Border.all(
-          color: AppColor.primaryGreen.withValues(alpha: 0.1),
+          color: isDark
+              ? AppColor.darkDivider
+              : AppColor.primaryGreen.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -233,7 +261,7 @@ class _QuranSettingsView extends StatelessWidget {
                     color: AppColor.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: AppColor.primaryGreen, size: 24),
+                  child: Icon(icon, color: accentGreen, size: 24),
                 ),
 
                 const SizedBox(width: 16),
@@ -277,10 +305,10 @@ class _QuranSettingsView extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                          color: accentGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: AppColor.primaryGreen.withValues(alpha: 0.2),
+                            color: accentGreen.withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
@@ -290,7 +318,7 @@ class _QuranSettingsView extends StatelessWidget {
                             fontFamily: 'Hafs',
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
-                            color: AppColor.primaryGreen,
+                            color: accentGreen,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -306,12 +334,12 @@ class _QuranSettingsView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                    color: accentGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     showArrow ? Icons.arrow_forward_ios : Icons.edit,
-                    color: AppColor.primaryGreen,
+                    color: accentGreen,
                     size: 16,
                   ),
                 ),
@@ -328,6 +356,9 @@ class _QuranSettingsView extends StatelessWidget {
     QuranSettingsLoaded state,
     AppLocalizations localizations,
   ) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentGreen = isDark ? AppColor.accentGreen : AppColor.primaryGreen;
+
     final result = await showModalBottomSheet<TranslationOption?>(
       context: context,
       isScrollControlled: true,
@@ -347,7 +378,7 @@ class _QuranSettingsView extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(localizations.translationUpdated(result.language)),
-          backgroundColor: AppColor.primaryGreen,
+          backgroundColor: accentGreen,
           duration: const Duration(seconds: 2),
         ),
       );
@@ -393,9 +424,13 @@ class _TranslationSelectorModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentGreen = isDark ? AppColor.accentGreen : AppColor.primaryGreen;
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: isDark
+            ? AppColor.darkSurface
+            : Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: DraggableScrollableSheet(
@@ -426,10 +461,9 @@ class _TranslationSelectorModal extends StatelessWidget {
                     Text(
                       localizations.selectTranslation,
                       style: TextStyle(
-                        fontFamily: 'Hafs',
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.primaryGreen,
+                        color: accentGreen,
                       ),
                     ),
                     IconButton(
@@ -457,14 +491,12 @@ class _TranslationSelectorModal extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? AppColor.primaryGreen.withValues(alpha: 0.1)
+                            ? accentGreen.withValues(alpha: 0.1)
                             : Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(12),
                         border: isSelected
                             ? Border.all(
-                                color: AppColor.primaryGreen.withValues(
-                                  alpha: 0.3,
-                                ),
+                                color: accentGreen.withValues(alpha: 0.3),
                                 width: 1,
                               )
                             : null,
@@ -489,7 +521,7 @@ class _TranslationSelectorModal extends StatelessWidget {
                                   height: 40,
                                   decoration: BoxDecoration(
                                     color: isSelected
-                                        ? AppColor.primaryGreen
+                                        ? accentGreen
                                         : AppColor.lightGray,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -541,7 +573,7 @@ class _TranslationSelectorModal extends StatelessWidget {
                                 if (isSelected)
                                   Icon(
                                     Icons.radio_button_checked,
-                                    color: AppColor.primaryGreen,
+                                    color: accentGreen,
                                     size: 20,
                                   )
                                 else
@@ -599,7 +631,7 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        color: isDark ? AppColor.darkSurface : AppColor.pureWhite,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Padding(

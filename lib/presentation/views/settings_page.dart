@@ -17,6 +17,7 @@ class SettingsPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? AppColor.darkBackdropTop : AppColor.pureWhite,
       appBar: AppBar(
         title: Text(
           localizations.settings,
@@ -26,7 +27,9 @@ class SettingsPage extends StatelessWidget {
             fontSize: 18,
           ),
         ),
-        backgroundColor: isDark ? AppColor.charcoal : AppColor.primaryGreen,
+        backgroundColor: isDark
+            ? AppColor.darkSurface.withValues(alpha: 0.7)
+            : AppColor.primaryGreen,
         foregroundColor: AppColor.pureWhite,
         elevation: 2,
       ),
@@ -45,8 +48,8 @@ class SettingsPage extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          AppColor.darkGray.withValues(alpha: 0.8),
-                          AppColor.charcoal.withValues(alpha: 0.9),
+                          AppColor.darkSurface.withValues(alpha: 0.8),
+                          AppColor.darkSurface.withValues(alpha: 0.9),
                         ],
                       )
                     : LinearGradient(
@@ -179,7 +182,7 @@ class SettingsPage extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
-        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        color: isDark ? AppColor.darkSurface : AppColor.pureWhite,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -208,10 +211,18 @@ class SettingsPage extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                    color: isDark
+                        ? AppColor.accentGreen.withValues(alpha: 0.1)
+                        : AppColor.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: AppColor.primaryGreen, size: 24),
+                  child: Icon(
+                    icon,
+                    color: isDark
+                        ? AppColor.accentGreen
+                        : AppColor.primaryGreen,
+                    size: 24,
+                  ),
                 ),
 
                 const SizedBox(width: 16),
@@ -254,17 +265,23 @@ class SettingsPage extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                          color: isDark
+                              ? AppColor.accentGreen.withValues(alpha: 0.1)
+                              : AppColor.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColor.primaryGreen.withValues(alpha: 0.2),
+                            color: isDark
+                                ? AppColor.accentGreen.withValues(alpha: 0.1)
+                                : AppColor.primaryGreen.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
                           value,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
-                                color: AppColor.primaryGreen,
+                                color: isDark
+                                    ? AppColor.accentGreen
+                                    : AppColor.primaryGreen,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
@@ -279,12 +296,16 @@ class SettingsPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                    color: isDark
+                        ? AppColor.accentGreen.withValues(alpha: 0.1)
+                        : AppColor.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     showArrow ? Icons.arrow_forward_ios : Icons.edit,
-                    color: AppColor.primaryGreen,
+                    color: isDark
+                        ? AppColor.accentGreen
+                        : AppColor.primaryGreen,
                     size: 16,
                   ),
                 ),

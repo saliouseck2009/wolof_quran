@@ -65,7 +65,10 @@ class HomePage extends StatelessWidget {
                   ? LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [AppColor.charcoal, AppColor.darkGray],
+                      colors: [
+                        AppColor.darkBackdropTop,
+                        AppColor.darkBackdropBottom,
+                      ],
                     )
                   : LinearGradient(
                       begin: Alignment.topCenter,
@@ -73,11 +76,7 @@ class HomePage extends StatelessWidget {
                       colors: [
                         AppColor.primaryGreen,
                         AppColor.primaryGreen.withValues(alpha: 0.9),
-                        // AppColor.offWhite,
                       ],
-                      // stops: const [
-                      //   0.0, 0.6, // 1.0 ,
-                      // ],
                     ),
             ),
             child: SafeArea(
@@ -135,6 +134,7 @@ Widget _buildModernActionCard(
   required VoidCallback onTap,
   required bool isDark,
 }) {
+  final accentGreen = isDark ? const Color(0xFF4CAF50) : AppColor.primaryGreen;
   return Material(
     color: Colors.transparent,
     child: InkWell(
@@ -144,21 +144,21 @@ Widget _buildModernActionCard(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isDark
-              ? AppColor.pureWhite.withValues(alpha: 0.1)
+              ? AppColor.darkSurface
               : AppColor.pureWhite.withValues(alpha: 0.95),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isDark
-                ? AppColor.pureWhite.withValues(alpha: 0.1)
+                ? AppColor.darkDivider
                 : AppColor.lightGray.withValues(alpha: 0.5),
           ),
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withValues(alpha: 0.2)
+                  ? Colors.black.withValues(alpha: 0.35)
                   : color.withValues(alpha: 0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -168,10 +168,10 @@ Widget _buildModernActionCard(
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
+                color: (isDark ? accentGreen : color).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, size: 24, color: color),
+              child: Icon(icon, size: 24, color: isDark ? accentGreen : color),
             ),
             const SizedBox(height: 16),
             Text(
@@ -191,7 +191,7 @@ Widget _buildModernActionCard(
               style: TextStyle(
                 fontSize: 12,
                 color: isDark
-                    ? AppColor.mediumGray
+                    ? AppColor.pureWhite.withValues(alpha: 0.55)
                     : AppColor.mediumGray.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,
               ),
@@ -272,30 +272,31 @@ Widget _buildDailyInspirationCard(
 }
 
 Widget _buildLoadingCard(bool isDark) {
+  final accentGreen = isDark ? const Color(0xFF4CAF50) : AppColor.primaryGreen;
   return Container(
     width: double.infinity,
     padding: const EdgeInsets.all(24),
     decoration: BoxDecoration(
       color: isDark
-          ? AppColor.pureWhite.withValues(alpha: 0.1)
+          ? AppColor.darkSurfaceHigh
           : AppColor.pureWhite.withValues(alpha: 0.95),
       borderRadius: BorderRadius.circular(24),
       boxShadow: [
         BoxShadow(
           color: isDark
-              ? Colors.black.withValues(alpha: 0.3)
+              ? Colors.black.withValues(alpha: 0.4)
               : AppColor.primaryGreen.withValues(alpha: 0.1),
-          blurRadius: 20,
-          offset: const Offset(0, 8),
+          blurRadius: 24,
+          offset: const Offset(0, 10),
         ),
       ],
-      border: isDark
-          ? Border.all(color: AppColor.pureWhite.withValues(alpha: 0.2))
-          : null,
+      border: Border.all(
+        color: isDark ? AppColor.darkDivider : Colors.transparent,
+      ),
     ),
     child: Column(
       children: [
-        CircularProgressIndicator(color: AppColor.primaryGreen),
+        CircularProgressIndicator(color: accentGreen),
         const SizedBox(height: 16),
         Text(
           'Loading daily inspiration...',
@@ -315,6 +316,7 @@ Widget _buildInitialCard(
   AppLocalizations localizations,
   bool isDark,
 ) {
+  final accentGreen = isDark ? const Color(0xFF4CAF50) : AppColor.primaryGreen;
   return GestureDetector(
     onTap: () {
       final settingsCubit = context.read<QuranSettingsCubit>();
@@ -330,21 +332,21 @@ Widget _buildInitialCard(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColor.pureWhite.withValues(alpha: 0.1)
+            ? AppColor.darkSurfaceHigh
             : AppColor.pureWhite.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.3)
+                ? Colors.black.withValues(alpha: 0.45)
                 : AppColor.primaryGreen.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
           ),
         ],
-        border: isDark
-            ? Border.all(color: AppColor.pureWhite.withValues(alpha: 0.2))
-            : null,
+        border: Border.all(
+          color: isDark ? AppColor.darkDivider : Colors.transparent,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,15 +358,12 @@ Widget _buildInitialCard(
                 height: 60,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      AppColor.primaryGreen,
-                      AppColor.primaryGreen.withValues(alpha: 0.8),
-                    ],
+                    colors: [accentGreen, accentGreen.withValues(alpha: 0.8)],
                   ),
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColor.primaryGreen.withValues(alpha: 0.3),
+                      color: accentGreen.withValues(alpha: 0.35),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -395,7 +394,7 @@ Widget _buildInitialCard(
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.primaryGreen,
+                        color: accentGreen,
                         fontFamily: 'Hafs',
                       ),
                     ),
@@ -422,20 +421,19 @@ Widget _buildInitialCard(
                 'Tap anywhere to start',
                 style: TextStyle(
                   fontSize: 12,
-                  color: AppColor.primaryGreen,
+                  color: accentGreen,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               Row(
                 children: [
-                  // Disabled play button (no ayah loaded yet)
                   Icon(
                     Icons.play_disabled,
                     color: AppColor.mediumGray,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Icon(Icons.touch_app, color: AppColor.primaryGreen, size: 20),
+                  Icon(Icons.touch_app, color: accentGreen, size: 20),
                 ],
               ),
             ],
@@ -452,6 +450,7 @@ Widget _buildInspirationCard(
   bool isDark,
   DailyInspirationLoaded state,
 ) {
+  final accentGreen = isDark ? const Color(0xFF4CAF50) : AppColor.primaryGreen;
   return GestureDetector(
     onTap: () => context.read<DailyInspirationCubit>().toggleExpansion(),
     child: Container(
@@ -459,21 +458,21 @@ Widget _buildInspirationCard(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColor.pureWhite.withValues(alpha: 0.1)
+            ? AppColor.darkSurfaceHigh
             : AppColor.pureWhite.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.3)
+                ? Colors.black.withValues(alpha: 0.45)
                 : AppColor.primaryGreen.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
           ),
         ],
-        border: isDark
-            ? Border.all(color: AppColor.pureWhite.withValues(alpha: 0.2))
-            : null,
+        border: Border.all(
+          color: isDark ? AppColor.darkDivider : Colors.transparent,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -486,15 +485,12 @@ Widget _buildInspirationCard(
                 height: 60,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      AppColor.primaryGreen,
-                      AppColor.primaryGreen.withValues(alpha: 0.8),
-                    ],
+                    colors: [accentGreen, accentGreen.withValues(alpha: 0.8)],
                   ),
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColor.primaryGreen.withValues(alpha: 0.3),
+                      color: accentGreen.withValues(alpha: 0.35),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -525,7 +521,7 @@ Widget _buildInspirationCard(
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.primaryGreen,
+                        color: accentGreen,
                         fontFamily: 'Hafs',
                       ),
                     ),
@@ -540,7 +536,7 @@ Widget _buildInspirationCard(
                     ayahNumber: state.verseNumber,
                     surahName: state.surahName,
                     size: 24.0,
-                    color: AppColor.primaryGreen,
+                    color: accentGreen,
                   ),
                   const SizedBox(width: 4),
                   // Share button
@@ -556,11 +552,7 @@ Widget _buildInspirationCard(
                         state.surahNumber,
                       );
                     },
-                    icon: Icon(
-                      Icons.share,
-                      color: AppColor.primaryGreen,
-                      size: 24,
-                    ),
+                    icon: Icon(Icons.share, color: accentGreen, size: 24),
                   ),
                   const SizedBox(width: 4),
                   // Refresh button
@@ -576,20 +568,13 @@ Widget _buildInspirationCard(
                         currentTranslation,
                       );
                     },
-                    icon: Icon(
-                      Icons.refresh,
-                      color: AppColor.primaryGreen,
-                      size: 24,
-                    ),
+                    icon: Icon(Icons.refresh, color: accentGreen, size: 24),
                   ),
                 ],
               ),
             ],
           ),
-
           const SizedBox(height: 20),
-
-          // Ayah info with improved layout
           Row(
             children: [
               Container(
@@ -598,27 +583,24 @@ Widget _buildInspirationCard(
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                  color: isDark
+                      ? accentGreen.withValues(alpha: 0.18)
+                      : accentGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColor.primaryGreen.withValues(alpha: 0.3),
-                  ),
+                  border: Border.all(color: accentGreen.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   '${state.surahName} - Ayah ${state.verseNumber}',
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColor.primaryGreen,
+                    color: accentGreen,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 16),
-
-          // Translation text (main content)
           Text(
             state.isExpanded || state.translation.length <= 150
                 ? state.translation
@@ -630,9 +612,7 @@ Widget _buildInspirationCard(
               fontWeight: FontWeight.w500,
             ),
           ),
-
           const SizedBox(height: 16),
-
           // Arabic text (shown when expanded)
           if (state.isExpanded) ...[
             Container(
@@ -640,11 +620,13 @@ Widget _buildInspirationCard(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isDark
-                    ? AppColor.darkGray.withValues(alpha: 0.3)
-                    : AppColor.primaryGreen.withValues(alpha: 0.05),
+                    ? AppColor.darkSubtle
+                    : accentGreen.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColor.primaryGreen.withValues(alpha: 0.2),
+                  color: isDark
+                      ? AppColor.darkDivider
+                      : accentGreen.withValues(alpha: 0.2),
                 ),
               ),
               child: Text(
@@ -660,8 +642,6 @@ Widget _buildInspirationCard(
               ),
             ),
             const SizedBox(height: 20),
-
-            // Action buttons when expanded
             Row(
               children: [
                 Expanded(
@@ -673,11 +653,11 @@ Widget _buildInspirationCard(
                         arguments: state.surahNumber,
                       );
                     },
-                    icon: Icon(Icons.open_in_new, size: 16),
-                    label: Text('Open Surah'),
+                    icon: const Icon(Icons.open_in_new, size: 16),
+                    label: const Text('Open Surah'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColor.primaryGreen,
-                      side: BorderSide(color: AppColor.primaryGreen),
+                      foregroundColor: accentGreen,
+                      side: BorderSide(color: accentGreen),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -717,13 +697,13 @@ Widget _buildInspirationCard(
                         ),
                         label: Text(isBookmarked ? 'Bookmarked' : 'Bookmark'),
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: AppColor.primaryGreen),
+                          side: BorderSide(color: accentGreen),
                           backgroundColor: isBookmarked
-                              ? AppColor.primaryGreen
+                              ? accentGreen
                               : Colors.transparent,
                           foregroundColor: isBookmarked
                               ? AppColor.pureWhite
-                              : AppColor.primaryGreen,
+                              : accentGreen,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -743,11 +723,11 @@ Widget _buildInspirationCard(
                   'Tap to read Arabic & more',
                   style: TextStyle(
                     fontSize: 12,
-                    color: AppColor.primaryGreen,
+                    color: accentGreen,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                Icon(Icons.expand_more, color: AppColor.primaryGreen, size: 20),
+                Icon(Icons.expand_more, color: accentGreen, size: 20),
               ],
             ),
           ],
@@ -768,7 +748,7 @@ Widget _buildErrorCard(
     padding: const EdgeInsets.all(24),
     decoration: BoxDecoration(
       color: isDark
-          ? Colors.red.withValues(alpha: 0.2)
+          ? Colors.red.withValues(alpha: 0.22)
           : Colors.red.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(24),
       border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
@@ -999,7 +979,7 @@ class _DailyInspirationShareModalState
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
-        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        color: isDark ? AppColor.darkSurface : AppColor.pureWhite,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -1010,7 +990,9 @@ class _DailyInspirationShareModalState
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: AppColor.mediumGray,
+              color: isDark
+                  ? AppColor.pureWhite.withValues(alpha: 0.3)
+                  : AppColor.mediumGray,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -1070,9 +1052,9 @@ class _DailyInspirationShareModalState
                   ElevatedButton.icon(
                     onPressed: _shareImage,
                     icon: const Icon(Icons.share, color: AppColor.pureWhite),
-                    label: Text(
+                    label: const Text(
                       'Share Image',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Hafs',
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -1335,6 +1317,9 @@ class _DailyInspirationShareModalState
         final icon = modeData.$3;
         final isSelected = mode == _selectedDisplayMode;
         final isDark = Theme.of(context).brightness == Brightness.dark;
+        final accentGreen = isDark
+            ? const Color(0xFF4CAF50)
+            : AppColor.primaryGreen;
 
         return GestureDetector(
           onTap: () {
@@ -1347,13 +1332,13 @@ class _DailyInspirationShareModalState
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isSelected
-                  ? AppColor.primaryGreen.withValues(alpha: 0.1)
+                  ? accentGreen.withValues(alpha: 0.12)
                   : (isDark
-                        ? AppColor.charcoal.withValues(alpha: 0.5)
+                        ? AppColor.darkSubtle
                         : AppColor.lightGray.withValues(alpha: 0.3)),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected ? AppColor.primaryGreen : Colors.transparent,
+                color: isSelected ? accentGreen : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -1361,9 +1346,7 @@ class _DailyInspirationShareModalState
               children: [
                 Icon(
                   icon,
-                  color: isSelected
-                      ? AppColor.primaryGreen
-                      : AppColor.mediumGray,
+                  color: isSelected ? accentGreen : AppColor.mediumGray,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -1377,17 +1360,13 @@ class _DailyInspirationShareModalState
                           ? FontWeight.w600
                           : FontWeight.w500,
                       color: isSelected
-                          ? AppColor.primaryGreen
+                          ? accentGreen
                           : (isDark ? AppColor.pureWhite : AppColor.darkGray),
                     ),
                   ),
                 ),
                 if (isSelected)
-                  Icon(
-                    Icons.check_circle,
-                    color: AppColor.primaryGreen,
-                    size: 20,
-                  ),
+                  Icon(Icons.check_circle, color: accentGreen, size: 20),
               ],
             ),
           ),

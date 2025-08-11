@@ -25,9 +25,20 @@ class _ReciterListPageState extends State<ReciterListPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // New accent + dark surfaces for improved contrast
+    final accentGreen = isDark
+        ? const Color(0xFF4CAF50)
+        : AppColor.primaryGreen;
+    // Updated to match HomePage dark surfaces
+    final darkSurface = const Color(
+      0xFF1F252B,
+    ); // matches _darkSurface in HomePage
+    final darkSurfaceHigh = const Color(
+      0xFF263038,
+    ); // matches _darkSurfaceHigh in HomePage
 
     return Scaffold(
-      backgroundColor: isDark ? AppColor.charcoal : AppColor.offWhite,
+      backgroundColor: isDark ? darkSurface : AppColor.offWhite,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -50,7 +61,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                 color: isDark ? AppColor.pureWhite : AppColor.charcoal,
               ),
             ),
-            Text(
+            const SizedBox(height: 2),
+            const Text(
               'Tap card to browse • Tap select button to choose default',
               style: TextStyle(
                 fontFamily: 'Hafs',
@@ -81,7 +93,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
                   Text(
                     'Error Loading Reciters', // TODO: Add to localizations
@@ -95,7 +107,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                   const SizedBox(height: 8),
                   Text(
                     reciterState.message,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Hafs',
                       fontSize: 14,
                       color: AppColor.mediumGray,
@@ -108,7 +120,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                       context.read<ReciterCubit>().loadReciters();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColor.primaryGreen,
+                      backgroundColor: accentGreen,
                       foregroundColor: AppColor.pureWhite,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
@@ -118,7 +130,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Retry', // TODO: Add to localizations
                       style: TextStyle(
                         fontFamily: 'Hafs',
@@ -138,7 +150,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.library_music_outlined,
                       size: 64,
                       color: AppColor.mediumGray,
@@ -154,7 +166,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    const Text(
                       'Check back later for available reciters', // TODO: Add to localizations
                       style: TextStyle(
                         fontFamily: 'Hafs',
@@ -184,19 +196,17 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+                        color: isDark ? darkSurfaceHigh : AppColor.pureWhite,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColor.primaryGreen.withValues(
-                              alpha: 0.08,
-                            ),
+                            color: accentGreen.withValues(alpha: 0.08),
                             blurRadius: 12,
                             offset: const Offset(0, 2),
                           ),
                         ],
                         border: Border.all(
-                          color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                          color: accentGreen.withValues(alpha: 0.12),
                           width: 1,
                         ),
                       ),
@@ -222,14 +232,12 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                   width: 48,
                                   height: 48,
                                   decoration: BoxDecoration(
-                                    color: AppColor.primaryGreen.withValues(
-                                      alpha: 0.1,
-                                    ),
+                                    color: accentGreen.withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Icon(
                                     Icons.person,
-                                    color: AppColor.primaryGreen,
+                                    color: accentGreen,
                                     size: 24,
                                   ),
                                 ),
@@ -260,7 +268,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                       // Arabic name (subtitle)
                                       Text(
                                         reciter.arabicName,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontFamily: 'Hafs',
                                           fontSize: 12,
                                           color: AppColor.mediumGray,
@@ -277,18 +285,20 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: isSelected
-                                              ? AppColor.primaryGreen
-                                                    .withValues(alpha: 0.1)
+                                              ? accentGreen.withValues(
+                                                  alpha: 0.15,
+                                                )
                                               : AppColor.mediumGray.withValues(
-                                                  alpha: 0.1,
+                                                  alpha: 0.12,
                                                 ),
                                           borderRadius: BorderRadius.circular(
                                             20,
                                           ),
                                           border: Border.all(
                                             color: isSelected
-                                                ? AppColor.primaryGreen
-                                                      .withValues(alpha: 0.2)
+                                                ? accentGreen.withValues(
+                                                    alpha: 0.25,
+                                                  )
                                                 : AppColor.mediumGray
                                                       .withValues(alpha: 0.2),
                                             width: 1,
@@ -303,7 +313,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                             fontSize: 11,
                                             fontWeight: FontWeight.w500,
                                             color: isSelected
-                                                ? AppColor.primaryGreen
+                                                ? accentGreen
                                                 : AppColor.mediumGray,
                                           ),
                                           maxLines: 1,
@@ -329,9 +339,11 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                       SnackBar(
                                         content: Text(
                                           'Selected ${reciter.name} as default reciter',
-                                          style: TextStyle(fontFamily: 'Hafs'),
+                                          style: const TextStyle(
+                                            fontFamily: 'Hafs',
+                                          ),
                                         ),
-                                        backgroundColor: AppColor.primaryGreen,
+                                        backgroundColor: accentGreen,
                                         duration: const Duration(seconds: 2),
                                       ),
                                     );
@@ -340,11 +352,9 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
                                       color: isSelected
-                                          ? AppColor.primaryGreen.withValues(
-                                              alpha: 0.1,
-                                            )
+                                          ? accentGreen.withValues(alpha: 0.15)
                                           : AppColor.mediumGray.withValues(
-                                              alpha: 0.1,
+                                              alpha: 0.12,
                                             ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
@@ -353,7 +363,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                           ? Icons.check_circle
                                           : Icons.radio_button_unchecked,
                                       color: isSelected
-                                          ? AppColor.primaryGreen
+                                          ? accentGreen
                                           : AppColor.mediumGray,
                                       size: 20,
                                     ),
@@ -377,3 +387,6 @@ class _ReciterListPageState extends State<ReciterListPage> {
     );
   }
 }
+
+// Helper constant to avoid const removal of dynamic reciter.arabicName in compressed edit
+const String reciterArabicPlaceholder = '';

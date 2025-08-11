@@ -41,6 +41,9 @@ class SearchView extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentGreen = isDark
+        ? const Color(0xFF4CAF50)
+        : AppColor.primaryGreen;
 
     return DefaultTabController(
       length: 2,
@@ -69,10 +72,10 @@ class SearchView extends StatelessWidget {
           ),
           centerTitle: true,
           bottom: TabBar(
-            indicatorColor: AppColor.primaryGreen,
-            labelColor: AppColor.primaryGreen,
+            indicatorColor: accentGreen,
+            labelColor: accentGreen,
             unselectedLabelColor: isDark
-                ? AppColor.pureWhite
+                ? AppColor.pureWhite.withValues(alpha: 0.75)
                 : AppColor.charcoal,
             labelStyle: const TextStyle(
               fontFamily: 'Hafs',
@@ -127,6 +130,9 @@ class _SearchBodyState extends State<_SearchBody> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentGreen = isDark
+        ? const Color(0xFF4CAF50)
+        : AppColor.primaryGreen;
 
     return Column(
       children: [
@@ -134,13 +140,20 @@ class _SearchBodyState extends State<_SearchBody> {
         Container(
           margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDark ? AppColor.darkGray : AppColor.pureWhite,
+            color: isDark ? AppColor.darkSurfaceHigh : AppColor.pureWhite,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFF364148)
+                  : AppColor.lightGray.withValues(alpha: 0.4),
+            ),
             boxShadow: [
               BoxShadow(
-                color: AppColor.primaryGreen.withValues(alpha: 0.08),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+                color: isDark
+                    ? Colors.black.withValues(alpha: 0.35)
+                    : accentGreen.withValues(alpha: 0.08),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -158,7 +171,7 @@ class _SearchBodyState extends State<_SearchBody> {
                 fontFamily: 'Hafs',
                 color: AppColor.mediumGray,
               ),
-              prefixIcon: Icon(Icons.search, color: AppColor.primaryGreen),
+              prefixIcon: Icon(Icons.search, color: accentGreen),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: Icon(Icons.clear, color: AppColor.mediumGray),
@@ -188,7 +201,7 @@ class _SearchBodyState extends State<_SearchBody> {
             child: ElevatedButton(
               onPressed: () => _performSearch(_searchController.text),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.primaryGreen,
+                backgroundColor: accentGreen,
                 foregroundColor: AppColor.pureWhite,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -303,6 +316,11 @@ class _SearchBodyState extends State<_SearchBody> {
     AppLocalizations localizations,
     SearchLoaded state,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentGreen = isDark
+        ? const Color(0xFF4CAF50)
+        : AppColor.primaryGreen;
+
     if (state.results.isEmpty) {
       return Center(
         child: Column(
@@ -378,10 +396,10 @@ class _SearchBodyState extends State<_SearchBody> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                        color: accentGreen.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: AppColor.primaryGreen.withValues(alpha: 0.3),
+                          color: accentGreen.withValues(alpha: 0.3),
                           width: 1,
                         ),
                       ),
@@ -391,7 +409,7 @@ class _SearchBodyState extends State<_SearchBody> {
                           fontFamily: 'Hafs',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColor.primaryGreen,
+                          color: accentGreen,
                         ),
                       ),
                     ),
