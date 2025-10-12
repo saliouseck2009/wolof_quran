@@ -8,12 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../core/config/theme/app_color.dart';
+import '../../core/config/theme/app_gradients.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../domain/entities/bookmark.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
-import '../cubits/bookmark_cubit.dart';
 
 /// A card to show one Ayah (verse) of the Quran:
 ///  • Top row: a little pill with the verse number + action icons (play, bookmark…)
@@ -60,16 +58,26 @@ class AyahCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(
+            alpha: isDark ? 0.25 : 0.3,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColor.primaryGreen.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+            color: colorScheme.shadow.withValues(alpha: isDark ? 0.45 : 0.12),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -78,89 +86,64 @@ class AyahCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ─── Top Row: verse pill + actions ──────────────────────────
             Row(
               children: [
-                // the little "pill" with the verse number
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    gradient: AppColor.primaryGradient,
+                    gradient: AppGradients.primary(colorScheme),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     verseNumber.toString(),
-                    style: TextStyle(
+                    style: textTheme.labelLarge?.copyWith(
                       fontFamily: 'Hafs',
-                      color: AppColor.pureWhite,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
-
                 const Spacer(),
-
-                // action icons
                 ...actions,
-
-                // Share button
                 IconButton(
-                  icon: Icon(
-                    Icons.share,
-                    color: AppColor.primaryGreen,
-                    size: 20,
-                  ),
+                  icon: Icon(Icons.share, color: colorScheme.primary, size: 20),
                   onPressed: () => _showShareModal(context),
                   tooltip:
                       AppLocalizations.of(context)?.shareAyah ?? 'Share Ayah',
                 ),
               ],
             ),
-
             const SizedBox(height: 24),
-
-            // ─── Arabic Text ─────────────────────────────────────────────
-            // Show Arabic text only if mode is both or arabicOnly
             if (displayMode == AyahDisplayMode.both ||
                 displayMode == AyahDisplayMode.arabicOnly)
               BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
                 builder: (context, settingsState) {
-                  // Get font size from settings or use passed parameter or default
-                  double arabicFontSize = 28.0; // default
+                  double arabicFontSize = 28.0;
                   if (fontSize != null) {
                     arabicFontSize = fontSize!;
                   } else if (settingsState is QuranSettingsLoaded) {
                     arabicFontSize = settingsState.ayahFontSize;
                   }
-
-                  // Adjust font size based on display mode
                   if (displayMode == AyahDisplayMode.arabicOnly) {
-                    arabicFontSize +=
-                        4; // Make it slightly larger for Arabic-only mode
+                    arabicFontSize += 4;
                   }
-
                   return Text(
                     arabicText,
                     textAlign: TextAlign.justify,
-
                     textDirection: TextDirection.rtl,
-
                     style: TextStyle(
                       fontFamily: 'Hafs',
                       fontSize: arabicFontSize,
                       height: 1.8,
                       fontWeight: FontWeight.w500,
-                      color: Theme.of(context).textTheme.titleLarge?.color,
+                      color: colorScheme.onSurface,
                     ),
                   );
                 },
               ),
-
-            // Add separator between Arabic and translation when both are shown
             if (displayMode == AyahDisplayMode.both) const SizedBox(height: 24),
             if (displayMode == AyahDisplayMode.both)
               Container(
@@ -170,57 +153,46 @@ class AyahCard extends StatelessWidget {
                   gradient: LinearGradient(
                     colors: [
                       Colors.transparent,
-                      AppColor.primaryGreen.withValues(alpha: 0.3),
+                      colorScheme.primary.withValues(alpha: 0.3),
                       Colors.transparent,
                     ],
                   ),
                 ),
               ),
-
-            // Add spacing for translation-only mode or after separator
             if (displayMode == AyahDisplayMode.translationOnly ||
                 displayMode == AyahDisplayMode.both)
               const SizedBox(height: 24),
-
-            // ─── Translation Section ─────────────────────────────────────
-            // Show translation only if mode is both or translationOnly
             if ((displayMode == AyahDisplayMode.both ||
                     displayMode == AyahDisplayMode.translationOnly) &&
                 translation.isNotEmpty)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColor.lightGray.withValues(alpha: 0.3),
+                  color: colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Translation Label
                     Text(
                       translationSource,
                       textAlign: TextAlign.justify,
-                      style: TextStyle(
+                      style: textTheme.labelLarge?.copyWith(
                         fontFamily: 'Hafs',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColor.primaryGreen,
                         letterSpacing: 0.5,
+                        color: colorScheme.primary,
                       ),
                     ),
-
                     const SizedBox(height: 8),
-
-                    // Translation Text
                     Text(
                       translation,
                       textAlign: TextAlign.justify,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: textTheme.bodyMedium?.copyWith(
                         fontSize: displayMode == AyahDisplayMode.translationOnly
                             ? 18
                             : 16,
                         height: 1.5,
-                        color: AppColor.translationText,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -275,48 +247,74 @@ class _AyahShareModalState extends State<AyahShareModal> {
   final GlobalKey _captureKey = GlobalKey();
 
   // Customization options
-  Color _selectedBackgroundColor = AppColor.primaryGreen;
+  late Color _selectedBackgroundColor;
   AyahDisplayMode _selectedDisplayMode = AyahDisplayMode.both;
 
   // Available background colors
-  final List<Color> _backgroundColors = [
-    AppColor.primaryGreen,
-    AppColor.charcoal,
-    const Color(0xFF2E3440), // Nord dark
-    const Color(0xFF3B4252), // Nord darker
-    const Color(0xFF5D4037), // Brown
-    const Color(0xFF37474F), // Blue Grey
-    const Color(0xFF424242), // Grey
-    const Color(0xFF1A237E), // Indigo
-    const Color(0xFF4A148C), // Purple
-    const Color(0xFF0D47A1), // Blue
-  ];
+  late List<Color> _backgroundColors;
+  bool _didConfigureTheme = false;
+
+  Color get _selectedForeground {
+    final brightness = ThemeData.estimateBrightnessForColor(
+      _selectedBackgroundColor,
+    );
+    return brightness == Brightness.dark ? Colors.white : Colors.black87;
+  }
+
+  Color get _selectedForegroundMuted =>
+      _selectedForeground.withValues(alpha: 0.72);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didConfigureTheme) return;
+    final colorScheme = Theme.of(context).colorScheme;
+    _selectedBackgroundColor = colorScheme.primary;
+    _backgroundColors = <Color>{
+      colorScheme.primary,
+      colorScheme.primaryContainer,
+      colorScheme.secondary,
+      colorScheme.secondaryContainer,
+      colorScheme.tertiary,
+      colorScheme.tertiaryContainer,
+      colorScheme.surface,
+      colorScheme.surfaceContainerHighest,
+      colorScheme.inverseSurface,
+      colorScheme.error,
+    }.toList();
+    _didConfigureTheme = true;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     final localizations = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = colorScheme.brightness == Brightness.dark;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
-        color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+        color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(
+            alpha: isDark ? 0.35 : 0.2,
+          ),
+        ),
       ),
       child: Column(
         children: [
-          // Handle bar
           Container(
             width: 40,
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: AppColor.mediumGray,
+              color: colorScheme.outlineVariant.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Row(
@@ -324,64 +322,48 @@ class _AyahShareModalState extends State<AyahShareModal> {
               children: [
                 Text(
                   localizations.customizeAndShare,
-                  style: TextStyle(
+                  style: textTheme.titleMedium?.copyWith(
                     fontFamily: 'Hafs',
-                    fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(
-                    Icons.close,
-                    color: isDark ? AppColor.pureWhite : AppColor.darkGray,
-                  ),
+                  icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
           ),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Preview Card
                   RepaintBoundary(key: _captureKey, child: _buildPreviewCard()),
-
                   const SizedBox(height: 32),
-
-                  // Background Style Section
                   _buildSectionTitle(localizations.backgroundStyle),
                   const SizedBox(height: 16),
                   _buildBackgroundColorSelector(),
-
                   const SizedBox(height: 32),
-
-                  // Display Style Section
                   _buildSectionTitle(localizations.displayStyle),
                   const SizedBox(height: 16),
                   _buildDisplayModeSelector(localizations),
-
                   const SizedBox(height: 32),
-
-                  // Share Button
                   ElevatedButton.icon(
                     onPressed: _shareImage,
-                    icon: const Icon(Icons.share, color: AppColor.pureWhite),
+                    icon: Icon(Icons.share, color: colorScheme.onPrimary),
                     label: Text(
                       localizations.shareImage,
-                      style: const TextStyle(
+                      style: textTheme.titleSmall?.copyWith(
                         fontFamily: 'Hafs',
-                        fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.pureWhite,
+                        color: colorScheme.onPrimary,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColor.primaryGreen,
+                      backgroundColor: colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -399,19 +381,21 @@ class _AyahShareModalState extends State<AyahShareModal> {
   }
 
   Widget _buildSectionTitle(String title) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
     return Text(
       title,
-      style: TextStyle(
+      style: theme.textTheme.titleSmall?.copyWith(
         fontFamily: 'Hafs',
-        fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+        color: theme.colorScheme.onSurface,
       ),
     );
   }
 
   Widget _buildPreviewCard() {
+    final onBackground = _selectedForeground;
+    final onBackgroundMuted = _selectedForegroundMuted;
+
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -434,11 +418,11 @@ class _AyahShareModalState extends State<AyahShareModal> {
               widget.arabicText,
               textAlign: TextAlign.justify,
               textDirection: TextDirection.rtl,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 30,
                 fontWeight: FontWeight.w500,
-                color: AppColor.pureWhite,
+                color: onBackground,
                 height: 1.8,
               ),
             ),
@@ -450,7 +434,7 @@ class _AyahShareModalState extends State<AyahShareModal> {
               height: 2,
               margin: const EdgeInsets.symmetric(vertical: 20),
               decoration: BoxDecoration(
-                color: AppColor.pureWhite.withValues(alpha: 0.5),
+                color: onBackgroundMuted,
                 borderRadius: BorderRadius.circular(1),
               ),
             ),
@@ -461,11 +445,11 @@ class _AyahShareModalState extends State<AyahShareModal> {
             Text(
               widget.translation,
               textAlign: TextAlign.justify,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                color: AppColor.pureWhite,
+                color: onBackground,
                 height: 1.5,
               ),
             ),
@@ -476,16 +460,16 @@ class _AyahShareModalState extends State<AyahShareModal> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColor.pureWhite.withValues(alpha: 0.2),
+              color: onBackgroundMuted.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               widget.surahName,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: AppColor.pureWhite,
+                color: onBackground,
                 letterSpacing: 0.3,
               ),
             ),
@@ -504,16 +488,16 @@ class _AyahShareModalState extends State<AyahShareModal> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColor.pureWhite.withValues(alpha: 0.15),
+                  color: onBackgroundMuted.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   '${widget.surahNumber}:${widget.verseNumber}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Hafs',
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColor.pureWhite,
+                    color: onBackground,
                   ),
                 ),
               ),
@@ -525,16 +509,16 @@ class _AyahShareModalState extends State<AyahShareModal> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColor.pureWhite.withValues(alpha: 0.15),
+                  color: onBackgroundMuted.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Text(
+                child: Text(
                   'Wolof-Quran',
                   style: TextStyle(
                     fontFamily: 'Hafs',
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: AppColor.pureWhite,
+                    color: onBackground,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -552,6 +536,10 @@ class _AyahShareModalState extends State<AyahShareModal> {
       runSpacing: 12,
       children: _backgroundColors.map((color) {
         final isSelected = color == _selectedBackgroundColor;
+        final onColor =
+            ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+            ? Colors.white
+            : Colors.black87;
         return GestureDetector(
           onTap: () {
             setState(() {
@@ -565,7 +553,7 @@ class _AyahShareModalState extends State<AyahShareModal> {
               color: color,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isSelected ? AppColor.pureWhite : Colors.transparent,
+                color: isSelected ? onColor : Colors.transparent,
                 width: 3,
               ),
               boxShadow: [
@@ -577,7 +565,7 @@ class _AyahShareModalState extends State<AyahShareModal> {
               ],
             ),
             child: isSelected
-                ? const Icon(Icons.check, color: AppColor.pureWhite, size: 20)
+                ? Icon(Icons.check, color: onColor, size: 20)
                 : null,
           ),
         );
@@ -586,6 +574,10 @@ class _AyahShareModalState extends State<AyahShareModal> {
   }
 
   Widget _buildDisplayModeSelector(AppLocalizations localizations) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+
     final modes = [
       (
         AyahDisplayMode.both,
@@ -610,7 +602,6 @@ class _AyahShareModalState extends State<AyahShareModal> {
         final label = modeData.$2;
         final icon = modeData.$3;
         final isSelected = mode == _selectedDisplayMode;
-        final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return GestureDetector(
           onTap: () {
@@ -623,13 +614,15 @@ class _AyahShareModalState extends State<AyahShareModal> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isSelected
-                  ? AppColor.primaryGreen.withValues(alpha: 0.1)
-                  : (isDark
-                        ? AppColor.charcoal.withValues(alpha: 0.5)
-                        : AppColor.lightGray.withValues(alpha: 0.3)),
+                  ? colorScheme.primary.withValues(alpha: 0.14)
+                  : colorScheme.surfaceContainerHigh.withValues(
+                      alpha: isDark ? 0.35 : 0.6,
+                    ),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected ? AppColor.primaryGreen : Colors.transparent,
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.outlineVariant.withValues(alpha: 0.3),
                 width: 2,
               ),
             ),
@@ -638,8 +631,8 @@ class _AyahShareModalState extends State<AyahShareModal> {
                 Icon(
                   icon,
                   color: isSelected
-                      ? AppColor.primaryGreen
-                      : AppColor.mediumGray,
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -653,15 +646,15 @@ class _AyahShareModalState extends State<AyahShareModal> {
                           ? FontWeight.w600
                           : FontWeight.w500,
                       color: isSelected
-                          ? AppColor.primaryGreen
-                          : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                          ? colorScheme.primary
+                          : colorScheme.onSurface,
                     ),
                   ),
                 ),
                 if (isSelected)
                   Icon(
                     Icons.check_circle,
-                    color: AppColor.primaryGreen,
+                    color: colorScheme.primary,
                     size: 20,
                   ),
               ],
@@ -673,13 +666,15 @@ class _AyahShareModalState extends State<AyahShareModal> {
   }
 
   Future<void> _shareImage() async {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     try {
       // Show loading
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(color: AppColor.primaryGreen),
+        builder: (context) => Center(
+          child: CircularProgressIndicator(color: colorScheme.primary),
         ),
       );
 
@@ -701,7 +696,8 @@ class _AyahShareModalState extends State<AyahShareModal> {
       await file.writeAsBytes(uint8List);
 
       // Hide loading dialog
-      if (mounted) Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.pop(context);
 
       // Share the file
       await Share.shareXFiles([
@@ -709,16 +705,22 @@ class _AyahShareModalState extends State<AyahShareModal> {
       ], text: '${widget.surahName} - Verse ${widget.verseNumber}');
 
       // Close modal
-      if (mounted) Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.pop(context);
     } catch (e) {
       // Hide loading dialog if still showing
       if (mounted) Navigator.pop(context);
 
-      // Show error
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error sharing image: $e'),
-          backgroundColor: AppColor.error,
+          content: Text(
+            'Error sharing image: $e',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onError,
+            ),
+          ),
+          backgroundColor: colorScheme.error,
         ),
       );
     }

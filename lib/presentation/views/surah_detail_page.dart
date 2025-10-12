@@ -4,6 +4,7 @@ import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/domain/repositories/bookmark_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
+import '../../core/config/theme/app_gradients.dart';
 import '../../core/helpers/revelation_place_enum.dart';
 import '../../core/services/audio_player_service.dart';
 import '../../domain/entities/bookmark.dart';
@@ -188,7 +189,9 @@ class SurahDetailAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+          final theme = Theme.of(context);
+          final colorScheme = theme.colorScheme;
+          final isDark = theme.brightness == Brightness.dark;
     final revelationType = quran.getPlaceOfRevelation(state.surahNumber);
 
     return SliverAppBar(
@@ -327,7 +330,7 @@ class SurahDetailAppBar extends StatelessWidget {
                     end: Alignment.bottomRight,
                     colors: [AppColor.charcoal, AppColor.darkGray],
                   )
-                : AppColor.primaryGradient,
+                : AppGradients.primary(colorScheme),
           ),
           child: SafeArea(
             child: Padding(

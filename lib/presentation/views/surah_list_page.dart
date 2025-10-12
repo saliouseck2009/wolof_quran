@@ -4,6 +4,7 @@ import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
+import '../../core/config/theme/app_gradients.dart';
 import '../cubits/surah_list_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 
@@ -27,7 +28,9 @@ class _SurahListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       body: BlocBuilder<SurahListCubit, SurahListState>(
@@ -87,7 +90,7 @@ class _SurahListView extends StatelessWidget {
                               end: Alignment.bottomRight,
                               colors: [AppColor.charcoal, AppColor.darkGray],
                             )
-                          : AppColor.primaryGradient,
+                          : AppGradients.primary(colorScheme),
                     ),
                     child: SafeArea(
                       child: Padding(
@@ -226,7 +229,9 @@ class _SurahListView extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    gradient: AppColor.primaryGradient,
+                    gradient: AppGradients.primary(
+                      Theme.of(context).colorScheme,
+                    ),
                     shape: BoxShape.circle,
                   ),
                   child: Center(

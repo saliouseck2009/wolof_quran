@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../core/config/theme/app_color.dart';
 import '../../core/services/audio_player_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
@@ -27,7 +26,9 @@ class AyahPlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = this.color ?? AppColor.primaryGreen;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final resolvedColor = color ?? colorScheme.primary;
 
     return BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
       builder: (context, settingsState) {
@@ -37,7 +38,7 @@ class AyahPlayButton extends StatelessWidget {
           return Icon(
             Icons.play_disabled,
             size: size,
-            color: AppColor.mediumGray,
+            color: colorScheme.onSurfaceVariant,
           );
         }
 
@@ -57,14 +58,21 @@ class AyahPlayButton extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.download_outlined,
-                        color: AppColor.pureWhite,
+                        color: colorScheme.onErrorContainer,
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(localizations.audioNotAvailable)),
+                      Expanded(
+                        child: Text(
+                          localizations.audioNotAvailable,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onErrorContainer,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  backgroundColor: AppColor.primaryGreen,
+                  backgroundColor: colorScheme.errorContainer,
                   duration: const Duration(seconds: 3),
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
@@ -118,15 +126,15 @@ class AyahPlayButton extends StatelessWidget {
                           ? Icon(
                               iconData,
                               color: isThisAyahPlaying
-                                  ? AppColor.primaryGreen
-                                  : color,
+                                  ? colorScheme.primary
+                                  : resolvedColor,
                               size: size,
                             )
                           : Icon(
                               iconData,
                               color: isThisAyahPlaying
-                                  ? AppColor.primaryGreen
-                                  : color,
+                                  ? colorScheme.primary
+                                  : resolvedColor,
                               size: size,
                             ),
                       onPressed: () =>

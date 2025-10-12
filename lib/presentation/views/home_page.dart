@@ -11,7 +11,6 @@ import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/presentation/cubits/daily_inspiration_cubit.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../core/config/theme/app_color.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/bookmark_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
@@ -28,7 +27,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return MultiBlocProvider(
       providers: [
@@ -43,10 +42,17 @@ class HomePage extends StatelessWidget {
           BlocListener<AudioManagementCubit, AudioManagementState>(
             listener: (context, audioState) {
               if (audioState is AudioManagementError) {
+                final theme = Theme.of(context);
+                final colorScheme = theme.colorScheme;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(audioState.message),
-                    backgroundColor: AppColor.error,
+                    content: Text(
+                      audioState.message,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onError,
+                      ),
+                    ),
+                    backgroundColor: colorScheme.error,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -58,27 +64,21 @@ class HomePage extends StatelessWidget {
           ),
         ],
         child: Scaffold(
+          backgroundColor: colorScheme.surface,
           body: Container(
             height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: isDark
-                  ? LinearGradient(
+            decoration: colorScheme.brightness == Brightness.dark
+                ? BoxDecoration(
+                    gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        AppColor.darkBackdropTop,
-                        AppColor.darkBackdropBottom,
-                      ],
-                    )
-                  : LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColor.primaryGreen,
-                        AppColor.primaryGreen.withValues(alpha: 0.9),
+                        colorScheme.surfaceContainerLowest,
+                        colorScheme.surfaceDim,
                       ],
                     ),
-            ),
+                  )
+                : null, // No gradient for light theme
             child: SafeArea(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -88,15 +88,11 @@ class HomePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Header Section
-                      _buildHeader(context, localizations, isDark),
+                      _buildHeader(context, localizations),
                       const SizedBox(height: 32),
 
                       // Daily Inspiration Card (merged greeting + random ayah)
-                      _buildDailyInspirationCard(
-                        context,
-                        localizations,
-                        isDark,
-                      ),
+                      _buildDailyInspirationCard(context, localizations),
                       const SizedBox(height: 32),
 
                       // Quick Actions Title
@@ -105,14 +101,14 @@ class HomePage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
-                          color: AppColor.pureWhite,
+                          color: colorScheme.onSurface,
                           fontFamily: 'Hafs',
                         ),
                       ),
                       const SizedBox(height: 16),
 
                       // Main Actions Grid
-                      _buildMainActionsGrid(context, localizations, isDark),
+                      _buildMainActionsGrid(context, localizations),
                     ],
                   ),
                 ),
@@ -130,11 +126,9 @@ Widget _buildModernActionCard(
   required IconData icon,
   required String title,
   required String subtitle,
-  required Color color,
   required VoidCallback onTap,
-  required bool isDark,
 }) {
-  final accentGreen = isDark ? const Color(0xFF4CAF50) : AppColor.primaryGreen;
+  final colorScheme = Theme.of(context).colorScheme;
   return Material(
     color: Colors.transparent,
     child: InkWell(
@@ -143,20 +137,12 @@ Widget _buildModernActionCard(
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark
-              ? AppColor.darkSurface
-              : AppColor.pureWhite.withValues(alpha: 0.95),
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isDark
-                ? AppColor.darkDivider
-                : AppColor.lightGray.withValues(alpha: 0.5),
-          ),
+          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
           boxShadow: [
             BoxShadow(
-              color: isDark
-                  ? Colors.black.withValues(alpha: 0.35)
-                  : color.withValues(alpha: 0.1),
+              color: colorScheme.shadow.withValues(alpha: 0.1),
               blurRadius: 18,
               offset: const Offset(0, 6),
             ),
@@ -168,10 +154,10 @@ Widget _buildModernActionCard(
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: (isDark ? accentGreen : color).withValues(alpha: 0.12),
+                color: colorScheme.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, size: 24, color: isDark ? accentGreen : color),
+              child: Icon(icon, size: 24, color: colorScheme.primary),
             ),
             const SizedBox(height: 16),
             Text(
@@ -179,7 +165,7 @@ Widget _buildModernActionCard(
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+                color: colorScheme.onSurface,
                 fontFamily: 'Hafs',
               ),
               maxLines: 1,
@@ -190,9 +176,7 @@ Widget _buildModernActionCard(
               subtitle,
               style: TextStyle(
                 fontSize: 12,
-                color: isDark
-                    ? AppColor.pureWhite.withValues(alpha: 0.55)
-                    : AppColor.mediumGray.withValues(alpha: 0.8),
+                color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
               maxLines: 1,
@@ -205,11 +189,9 @@ Widget _buildModernActionCard(
   );
 }
 
-Widget _buildHeader(
-  BuildContext context,
-  AppLocalizations localizations,
-  bool isDark,
-) {
+Widget _buildHeader(BuildContext context, AppLocalizations localizations) {
+  final colorScheme = Theme.of(context).colorScheme;
+
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
@@ -221,7 +203,7 @@ Widget _buildHeader(
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: isDark ? AppColor.pureWhite : AppColor.pureWhite,
+              color: colorScheme.onSurface,
               fontFamily: 'Hafs',
             ),
           ),
@@ -230,9 +212,7 @@ Widget _buildHeader(
             localizations.welcome,
             style: TextStyle(
               fontSize: 14,
-              color: isDark
-                  ? AppColor.pureWhite.withValues(alpha: 0.8)
-                  : AppColor.pureWhite.withValues(alpha: 0.9),
+              color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -244,7 +224,7 @@ Widget _buildHeader(
         },
         icon: Icon(
           Icons.settings_outlined,
-          color: isDark ? AppColor.pureWhite : AppColor.pureWhite,
+          color: colorScheme.onSurface,
           size: 24,
         ),
       ),
@@ -255,54 +235,48 @@ Widget _buildHeader(
 Widget _buildDailyInspirationCard(
   BuildContext context,
   AppLocalizations localizations,
-  bool isDark,
 ) {
   return BlocBuilder<DailyInspirationCubit, DailyInspirationState>(
     builder: (context, state) {
       if (state is DailyInspirationLoading) {
-        return _buildLoadingCard(isDark);
+        return _buildLoadingCard(context);
       } else if (state is DailyInspirationLoaded) {
-        return _buildInspirationCard(context, localizations, isDark, state);
+        return _buildInspirationCard(context, localizations, state);
       } else if (state is DailyInspirationError) {
-        return _buildErrorCard(context, localizations, isDark, state.message);
+        return _buildErrorCard(context, localizations, state.message);
       }
-      return _buildInitialCard(context, localizations, isDark);
+      return _buildInitialCard(context, localizations);
     },
   );
 }
 
-Widget _buildLoadingCard(bool isDark) {
-  final accentGreen = isDark ? const Color(0xFF4CAF50) : AppColor.primaryGreen;
+Widget _buildLoadingCard(BuildContext context) {
+  final colorScheme = Theme.of(context).colorScheme;
   return Container(
     width: double.infinity,
     padding: const EdgeInsets.all(24),
     decoration: BoxDecoration(
-      color: isDark
-          ? AppColor.darkSurfaceHigh
-          : AppColor.pureWhite.withValues(alpha: 0.95),
+      color: colorScheme
+          .surfaceContainer, // darkSurfaceHigh in dark, light surface in light
       borderRadius: BorderRadius.circular(24),
       boxShadow: [
         BoxShadow(
-          color: isDark
-              ? Colors.black.withValues(alpha: 0.4)
-              : AppColor.primaryGreen.withValues(alpha: 0.1),
+          color: colorScheme.shadow.withValues(alpha: 0.1),
           blurRadius: 24,
           offset: const Offset(0, 10),
         ),
       ],
-      border: Border.all(
-        color: isDark ? AppColor.darkDivider : Colors.transparent,
-      ),
+      border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
     ),
     child: Column(
       children: [
-        CircularProgressIndicator(color: accentGreen),
+        CircularProgressIndicator(color: colorScheme.primary),
         const SizedBox(height: 16),
         Text(
           'Loading daily inspiration...',
           style: TextStyle(
             fontSize: 16,
-            color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+            color: colorScheme.onSurface,
             fontFamily: 'Hafs',
           ),
         ),
@@ -311,12 +285,9 @@ Widget _buildLoadingCard(bool isDark) {
   );
 }
 
-Widget _buildInitialCard(
-  BuildContext context,
-  AppLocalizations localizations,
-  bool isDark,
-) {
-  final accentGreen = isDark ? const Color(0xFF4CAF50) : AppColor.primaryGreen;
+Widget _buildInitialCard(BuildContext context, AppLocalizations localizations) {
+  final colorScheme = Theme.of(context).colorScheme;
+  final accentGreen = colorScheme.primary;
   return GestureDetector(
     onTap: () {
       final settingsCubit = context.read<QuranSettingsCubit>();
@@ -331,22 +302,16 @@ Widget _buildInitialCard(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColor.darkSurfaceHigh
-            : AppColor.pureWhite.withValues(alpha: 0.95),
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.45)
-                : AppColor.primaryGreen.withValues(alpha: 0.1),
+            color: colorScheme.shadow.withValues(alpha: 0.2),
             blurRadius: 28,
             offset: const Offset(0, 12),
           ),
         ],
-        border: Border.all(
-          color: isDark ? AppColor.darkDivider : Colors.transparent,
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,7 +337,7 @@ Widget _buildInitialCard(
                 child: Icon(
                   Icons.auto_stories_outlined,
                   size: 30,
-                  color: AppColor.pureWhite,
+                  color: colorScheme.onPrimary,
                 ),
               ),
               const SizedBox(width: 16),
@@ -385,7 +350,7 @@ Widget _buildInitialCard(
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+                        color: colorScheme.onSurface,
                         fontFamily: 'Hafs',
                       ),
                     ),
@@ -408,7 +373,7 @@ Widget _buildInitialCard(
             'Tap to get your daily verse from the Quran',
             style: TextStyle(
               fontSize: 16,
-              color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+              color: colorScheme.onSurfaceVariant,
               height: 1.6,
               fontWeight: FontWeight.w500,
             ),
@@ -429,7 +394,7 @@ Widget _buildInitialCard(
                 children: [
                   Icon(
                     Icons.play_disabled,
-                    color: AppColor.mediumGray,
+                    color: colorScheme.onSurfaceVariant,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -447,32 +412,26 @@ Widget _buildInitialCard(
 Widget _buildInspirationCard(
   BuildContext context,
   AppLocalizations localizations,
-  bool isDark,
   DailyInspirationLoaded state,
 ) {
-  final accentGreen = isDark ? const Color(0xFF4CAF50) : AppColor.primaryGreen;
+  final colorScheme = Theme.of(context).colorScheme;
+  final accentGreen = colorScheme.primary;
   return GestureDetector(
     onTap: () => context.read<DailyInspirationCubit>().toggleExpansion(),
     child: Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColor.darkSurfaceHigh
-            : AppColor.pureWhite.withValues(alpha: 0.95),
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.45)
-                : AppColor.primaryGreen.withValues(alpha: 0.1),
+            color: colorScheme.shadow.withValues(alpha: 0.2),
             blurRadius: 28,
             offset: const Offset(0, 12),
           ),
         ],
-        border: Border.all(
-          color: isDark ? AppColor.darkDivider : Colors.transparent,
-        ),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -499,7 +458,7 @@ Widget _buildInspirationCard(
                 child: Icon(
                   Icons.auto_stories_outlined,
                   size: 30,
-                  color: AppColor.pureWhite,
+                  color: colorScheme.onPrimary,
                 ),
               ),
               const SizedBox(width: 16),
@@ -512,7 +471,7 @@ Widget _buildInspirationCard(
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+                        color: colorScheme.onSurface,
                         fontFamily: 'Hafs',
                       ),
                     ),
@@ -583,17 +542,17 @@ Widget _buildInspirationCard(
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? accentGreen.withValues(alpha: 0.18)
-                      : accentGreen.withValues(alpha: 0.1),
+                  color: colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: accentGreen.withValues(alpha: 0.4)),
+                  border: Border.all(
+                    color: colorScheme.primary.withValues(alpha: 0.4),
+                  ),
                 ),
                 child: Text(
                   '${state.surahName} - Ayah ${state.verseNumber}',
                   style: TextStyle(
                     fontSize: 14,
-                    color: accentGreen,
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -607,7 +566,7 @@ Widget _buildInspirationCard(
                 : '${state.translation.substring(0, 150)}...',
             style: TextStyle(
               fontSize: state.isExpanded ? 18 : 16,
-              color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+              color: colorScheme.onSurface,
               height: 1.6,
               fontWeight: FontWeight.w500,
             ),
@@ -619,22 +578,16 @@ Widget _buildInspirationCard(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColor.darkSubtle
-                    : accentGreen.withValues(alpha: 0.05),
+                color: accentGreen.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isDark
-                      ? AppColor.darkDivider
-                      : accentGreen.withValues(alpha: 0.2),
-                ),
+                border: Border.all(color: accentGreen.withValues(alpha: 0.2)),
               ),
               child: Text(
                 state.arabicText,
                 style: TextStyle(
                   fontSize: 20,
                   fontFamily: 'Hafs',
-                  color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+                  color: colorScheme.onSurface,
                   height: 1.8,
                   fontWeight: FontWeight.w500,
                 ),
@@ -702,7 +655,7 @@ Widget _buildInspirationCard(
                               ? accentGreen
                               : Colors.transparent,
                           foregroundColor: isBookmarked
-                              ? AppColor.pureWhite
+                              ? colorScheme.onPrimary
                               : accentGreen,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -740,32 +693,30 @@ Widget _buildInspirationCard(
 Widget _buildErrorCard(
   BuildContext context,
   AppLocalizations localizations,
-  bool isDark,
   String errorMessage,
 ) {
+  final colorScheme = Theme.of(context).colorScheme;
   return Container(
     width: double.infinity,
     padding: const EdgeInsets.all(24),
     decoration: BoxDecoration(
-      color: isDark
-          ? Colors.red.withValues(alpha: 0.22)
-          : Colors.red.withValues(alpha: 0.1),
+      color: colorScheme.errorContainer,
       borderRadius: BorderRadius.circular(24),
-      border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+      border: Border.all(color: colorScheme.error.withValues(alpha: 0.3)),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(Icons.error_outline, color: Colors.red, size: 24),
+            Icon(Icons.error_outline, color: colorScheme.error, size: 24),
             const SizedBox(width: 12),
             Text(
               'Daily Inspiration',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+                color: colorScheme.onErrorContainer,
                 fontFamily: 'Hafs',
               ),
             ),
@@ -776,7 +727,7 @@ Widget _buildErrorCard(
           errorMessage,
           style: TextStyle(
             fontSize: 14,
-            color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+            color: colorScheme.onErrorContainer,
             fontFamily: 'Hafs',
           ),
         ),
@@ -796,8 +747,8 @@ Widget _buildErrorCard(
           icon: Icon(Icons.refresh),
           label: Text('Try Again'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColor.primaryGreen,
-            foregroundColor: AppColor.pureWhite,
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
           ),
         ),
       ],
@@ -808,7 +759,6 @@ Widget _buildErrorCard(
 Widget _buildMainActionsGrid(
   BuildContext context,
   AppLocalizations localizations,
-  bool isDark,
 ) {
   return Column(
     children: [
@@ -820,9 +770,7 @@ Widget _buildMainActionsGrid(
               icon: Icons.menu_book_outlined,
               title: localizations.quran,
               subtitle: 'Read Surahs',
-              color: AppColor.primaryGreen,
               onTap: () => Navigator.pushNamed(context, '/surahs'),
-              isDark: isDark,
             ),
           ),
           const SizedBox(width: 16),
@@ -832,9 +780,7 @@ Widget _buildMainActionsGrid(
               icon: Icons.headphones_outlined,
               title: localizations.recitation,
               subtitle: 'Listen Audio',
-              color: Colors.blue,
               onTap: () => Navigator.pushNamed(context, '/surah-audio-list'),
-              isDark: isDark,
             ),
           ),
         ],
@@ -848,9 +794,7 @@ Widget _buildMainActionsGrid(
               icon: Icons.search_outlined,
               title: localizations.search,
               subtitle: 'Find Verses',
-              color: Colors.purple,
               onTap: () => Navigator.pushNamed(context, '/search'),
-              isDark: isDark,
             ),
           ),
           const SizedBox(width: 16),
@@ -860,9 +804,7 @@ Widget _buildMainActionsGrid(
               icon: Icons.bookmark_outline,
               title: 'Bookmarks',
               subtitle: 'Saved Ayahs',
-              color: Colors.orange,
               onTap: () => Navigator.pushNamed(context, '/bookmarks'),
-              isDark: isDark,
             ),
           ),
         ],
@@ -954,50 +896,74 @@ class _DailyInspirationShareModalState
   final GlobalKey _captureKey = GlobalKey();
 
   // Customization options
-  Color _selectedBackgroundColor = AppColor.primaryGreen;
+  late Color _selectedBackgroundColor;
   AyahDisplayMode _selectedDisplayMode = AyahDisplayMode.both;
 
   // Available background colors
-  final List<Color> _backgroundColors = [
-    AppColor.primaryGreen,
-    AppColor.charcoal,
-    const Color(0xFF2E3440), // Nord dark
-    const Color(0xFF3B4252), // Nord darker
-    const Color(0xFF5D4037), // Brown
-    const Color(0xFF37474F), // Blue Grey
-    const Color(0xFF424242), // Grey
-    const Color(0xFF1A237E), // Indigo
-    const Color(0xFF4A148C), // Purple
-    const Color(0xFF0D47A1), // Blue
-  ];
+  late List<Color> _backgroundColors;
+  bool _didConfigureTheme = false;
+
+  Color get _selectedForeground {
+    final brightness = ThemeData.estimateBrightnessForColor(
+      _selectedBackgroundColor,
+    );
+    return brightness == Brightness.dark ? Colors.white : Colors.black87;
+  }
+
+  Color get _selectedForegroundMuted =>
+      _selectedForeground.withValues(alpha: 0.72);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didConfigureTheme) return;
+    final colorScheme = Theme.of(context).colorScheme;
+    _selectedBackgroundColor = colorScheme.primary;
+    _backgroundColors = <Color>{
+      colorScheme.primary,
+      colorScheme.primaryContainer,
+      colorScheme.secondary,
+      colorScheme.secondaryContainer,
+      colorScheme.tertiary,
+      colorScheme.tertiaryContainer,
+      colorScheme.surface,
+      colorScheme.surfaceContainerHighest,
+      colorScheme.inverseSurface,
+      colorScheme.error,
+    }.toList();
+    _didConfigureTheme = true;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     final localizations = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = colorScheme.brightness == Brightness.dark;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       decoration: BoxDecoration(
-        color: isDark ? AppColor.darkSurface : AppColor.pureWhite,
+        color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(
+            alpha: isDark ? 0.35 : 0.2,
+          ),
+        ),
       ),
       child: Column(
         children: [
-          // Handle bar
           Container(
             width: 40,
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppColor.pureWhite.withValues(alpha: 0.3)
-                  : AppColor.mediumGray,
+              color: colorScheme.outlineVariant.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Row(
@@ -1005,64 +971,48 @@ class _DailyInspirationShareModalState
               children: [
                 Text(
                   'Share Daily Inspiration',
-                  style: TextStyle(
+                  style: textTheme.titleMedium?.copyWith(
                     fontFamily: 'Hafs',
-                    fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(
-                    Icons.close,
-                    color: isDark ? AppColor.pureWhite : AppColor.darkGray,
-                  ),
+                  icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
           ),
-
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Preview Card
                   RepaintBoundary(key: _captureKey, child: _buildPreviewCard()),
-
                   const SizedBox(height: 32),
-
-                  // Background Style Section
                   _buildSectionTitle('Background Style'),
                   const SizedBox(height: 16),
                   _buildBackgroundColorSelector(),
-
                   const SizedBox(height: 32),
-
-                  // Display Style Section
                   _buildSectionTitle('Display Style'),
                   const SizedBox(height: 16),
                   _buildDisplayModeSelector(localizations),
-
                   const SizedBox(height: 32),
-
-                  // Share Button
                   ElevatedButton.icon(
                     onPressed: _shareImage,
-                    icon: const Icon(Icons.share, color: AppColor.pureWhite),
-                    label: const Text(
+                    icon: Icon(Icons.share, color: colorScheme.onPrimary),
+                    label: Text(
                       'Share Image',
-                      style: TextStyle(
+                      style: textTheme.titleSmall?.copyWith(
                         fontFamily: 'Hafs',
-                        fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColor.pureWhite,
+                        color: colorScheme.onPrimary,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColor.primaryGreen,
+                      backgroundColor: colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -1080,19 +1030,21 @@ class _DailyInspirationShareModalState
   }
 
   Widget _buildSectionTitle(String title) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
     return Text(
       title,
-      style: TextStyle(
+      style: theme.textTheme.titleSmall?.copyWith(
         fontFamily: 'Hafs',
-        fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+        color: theme.colorScheme.onSurface,
       ),
     );
   }
 
   Widget _buildPreviewCard() {
+    final onBackground = _selectedForeground;
+    final onBackgroundMuted = _selectedForegroundMuted;
+
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -1100,147 +1052,131 @@ class _DailyInspirationShareModalState
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Column(
         children: [
-          // Daily Inspiration Header
           Container(
             margin: const EdgeInsets.only(bottom: 24),
             child: Column(
               children: [
                 Icon(
                   Icons.auto_stories_outlined,
-                  color: AppColor.pureWhite,
-                  size: 32,
+                  color: onBackground,
+                  size: 36,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Daily Inspiration',
                   style: TextStyle(
                     fontFamily: 'Hafs',
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColor.pureWhite.withValues(alpha: 0.9),
+                    color: onBackground,
                     letterSpacing: 0.5,
                   ),
                 ),
               ],
             ),
           ),
-
-          // Arabic text
           if (_selectedDisplayMode == AyahDisplayMode.both ||
               _selectedDisplayMode == AyahDisplayMode.arabicOnly)
             Text(
               widget.arabicText,
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 30,
                 fontWeight: FontWeight.w500,
-                color: AppColor.pureWhite,
+                color: onBackground,
                 height: 1.8,
               ),
             ),
-
-          // Separator
           if (_selectedDisplayMode == AyahDisplayMode.both)
             Container(
               width: 60,
               height: 2,
               margin: const EdgeInsets.symmetric(vertical: 20),
               decoration: BoxDecoration(
-                color: AppColor.pureWhite.withValues(alpha: 0.5),
+                color: onBackgroundMuted,
                 borderRadius: BorderRadius.circular(1),
               ),
             ),
-
-          // Translation text
           if (_selectedDisplayMode == AyahDisplayMode.both ||
               _selectedDisplayMode == AyahDisplayMode.translationOnly)
             Text(
               widget.translation,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                color: AppColor.pureWhite,
+                color: onBackground,
                 height: 1.5,
               ),
             ),
-
           const SizedBox(height: 20),
-
-          // Surah name
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColor.pureWhite.withValues(alpha: 0.2),
+              color: onBackgroundMuted.withValues(alpha: 0.35),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               widget.surahName,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: AppColor.pureWhite,
+                color: onBackground,
                 letterSpacing: 0.3,
               ),
             ),
           ),
-
           const SizedBox(height: 32),
-
-          // Bottom row with surah info and app name
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Left side: Surah and Ayah numbers
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColor.pureWhite.withValues(alpha: 0.15),
+                  color: onBackgroundMuted.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   '${widget.surahNumber}:${widget.verseNumber}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Hafs',
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColor.pureWhite,
+                    color: onBackground,
                   ),
                 ),
               ),
-
-              // Right side: App name
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColor.pureWhite.withValues(alpha: 0.15),
+                  color: onBackgroundMuted.withValues(alpha: 0.35),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Text(
+                child: Text(
                   'Wolof-Quran',
                   style: TextStyle(
                     fontFamily: 'Hafs',
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color: AppColor.pureWhite,
+                    color: onBackground,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -1258,6 +1194,10 @@ class _DailyInspirationShareModalState
       runSpacing: 12,
       children: _backgroundColors.map((color) {
         final isSelected = color == _selectedBackgroundColor;
+        final onColor =
+            ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+            ? Colors.white
+            : Colors.black87;
         return GestureDetector(
           onTap: () {
             setState(() {
@@ -1271,7 +1211,7 @@ class _DailyInspirationShareModalState
               color: color,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isSelected ? AppColor.pureWhite : Colors.transparent,
+                color: isSelected ? onColor : Colors.transparent,
                 width: 3,
               ),
               boxShadow: [
@@ -1283,7 +1223,7 @@ class _DailyInspirationShareModalState
               ],
             ),
             child: isSelected
-                ? const Icon(Icons.check, color: AppColor.pureWhite, size: 20)
+                ? Icon(Icons.check, color: onColor, size: 20)
                 : null,
           ),
         );
@@ -1292,6 +1232,10 @@ class _DailyInspirationShareModalState
   }
 
   Widget _buildDisplayModeSelector(AppLocalizations localizations) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+
     final modes = [
       (
         AyahDisplayMode.both,
@@ -1316,10 +1260,6 @@ class _DailyInspirationShareModalState
         final label = modeData.$2;
         final icon = modeData.$3;
         final isSelected = mode == _selectedDisplayMode;
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        final accentGreen = isDark
-            ? const Color(0xFF4CAF50)
-            : AppColor.primaryGreen;
 
         return GestureDetector(
           onTap: () {
@@ -1332,13 +1272,15 @@ class _DailyInspirationShareModalState
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: isSelected
-                  ? accentGreen.withValues(alpha: 0.12)
-                  : (isDark
-                        ? AppColor.darkSubtle
-                        : AppColor.lightGray.withValues(alpha: 0.3)),
+                  ? colorScheme.primary.withValues(alpha: 0.14)
+                  : colorScheme.surfaceContainerHigh.withValues(
+                      alpha: isDark ? 0.35 : 0.6,
+                    ),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected ? accentGreen : Colors.transparent,
+                color: isSelected
+                    ? colorScheme.primary
+                    : colorScheme.outlineVariant.withValues(alpha: 0.3),
                 width: 2,
               ),
             ),
@@ -1346,7 +1288,9 @@ class _DailyInspirationShareModalState
               children: [
                 Icon(
                   icon,
-                  color: isSelected ? accentGreen : AppColor.mediumGray,
+                  color: isSelected
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
                   size: 24,
                 ),
                 const SizedBox(width: 12),
@@ -1360,13 +1304,17 @@ class _DailyInspirationShareModalState
                           ? FontWeight.w600
                           : FontWeight.w500,
                       color: isSelected
-                          ? accentGreen
-                          : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                          ? colorScheme.primary
+                          : colorScheme.onSurface,
                     ),
                   ),
                 ),
                 if (isSelected)
-                  Icon(Icons.check_circle, color: accentGreen, size: 20),
+                  Icon(
+                    Icons.check_circle,
+                    color: colorScheme.primary,
+                    size: 20,
+                  ),
               ],
             ),
           ),
@@ -1376,13 +1324,15 @@ class _DailyInspirationShareModalState
   }
 
   Future<void> _shareImage() async {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     try {
       // Show loading
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(color: AppColor.primaryGreen),
+        builder: (context) => Center(
+          child: CircularProgressIndicator(color: colorScheme.primary),
         ),
       );
 
@@ -1404,7 +1354,8 @@ class _DailyInspirationShareModalState
       await file.writeAsBytes(uint8List);
 
       // Hide loading dialog
-      if (mounted) Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.pop(context);
 
       // Share the file
       await Share.shareXFiles(
@@ -1414,20 +1365,25 @@ class _DailyInspirationShareModalState
       );
 
       // Close modal
-      if (mounted) Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.pop(context);
     } catch (e) {
       // Hide loading dialog if still showing
       if (mounted) Navigator.pop(context);
 
       // Show error
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error sharing image: $e'),
-            backgroundColor: AppColor.error,
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error sharing image: $e',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onError,
+            ),
           ),
-        );
-      }
+          backgroundColor: colorScheme.error,
+        ),
+      );
     }
   }
 }

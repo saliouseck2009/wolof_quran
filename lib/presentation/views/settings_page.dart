@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
+import '../../core/config/theme/app_gradients.dart';
 import '../../core/config/localization/localization_service.dart';
 import '../cubits/language_cubit.dart';
 import '../cubits/theme_cubit.dart';
@@ -14,23 +15,28 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColor.darkBackdropTop : AppColor.pureWhite,
+      backgroundColor: colorScheme.brightness == Brightness.dark
+          ? colorScheme
+                .surfaceContainerLowest // AppColor.darkBackdropTop equivalent
+          : AppColor.pureWhite, // Keep existing light background
       appBar: AppBar(
         title: Text(
           localizations.settings,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: AppColor.pureWhite,
+            color: colorScheme.onPrimary,
             fontSize: 18,
           ),
         ),
-        backgroundColor: isDark
-            ? AppColor.darkSurface.withValues(alpha: 0.7)
-            : AppColor.primaryGreen,
-        foregroundColor: AppColor.pureWhite,
+        backgroundColor: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surfaceContainer.withValues(
+                alpha: 0.7,
+              ) // AppColor.darkSurface equivalent
+            : colorScheme.primary, // AppColor.primaryGreen equivalent
+        foregroundColor: colorScheme.onPrimary,
         elevation: 2,
       ),
       body: SingleChildScrollView(
@@ -43,39 +49,39 @@ class SettingsPage extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: isDark
+                gradient: colorScheme.brightness == Brightness.dark
                     ? LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          AppColor.darkSurface.withValues(alpha: 0.8),
-                          AppColor.darkSurface.withValues(alpha: 0.9),
+                          colorScheme.surfaceContainer.withValues(alpha: 0.8),
+                          colorScheme.surfaceContainer.withValues(alpha: 0.9),
                         ],
                       )
                     : LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          AppColor.primaryGreen.withValues(alpha: 0.1),
-                          AppColor.lightMint.withValues(alpha: 0.2),
+                          colorScheme.primary.withValues(alpha: 0.1),
+                          colorScheme.primaryContainer.withValues(alpha: 0.2),
                         ],
                       ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppColor.primaryGreen.withValues(alpha: 0.2),
+                  color: colorScheme.primary.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
               child: Column(
                 children: [
-                  Icon(Icons.settings, size: 48, color: AppColor.primaryGreen),
+                  Icon(Icons.settings, size: 48, color: colorScheme.primary),
                   const SizedBox(height: 12),
                   Text(
                     localizations.settings,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
-                      color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -83,9 +89,7 @@ class SettingsPage extends StatelessWidget {
                     'Personnalisez votre expérience de lecture',
                     style: TextStyle(
                       fontSize: 14,
-                      color: isDark
-                          ? AppColor.lightGray
-                          : AppColor.translationText,
+                      color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.center,
@@ -97,7 +101,7 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Settings Menu Items
-            _buildSettingsMenuItems(context, localizations, isDark),
+            _buildSettingsMenuItems(context, localizations),
 
             const SizedBox(height: 32),
           ],
@@ -109,7 +113,6 @@ class SettingsPage extends StatelessWidget {
   Widget _buildSettingsMenuItems(
     BuildContext context,
     AppLocalizations localizations,
-    bool isDark,
   ) {
     return Column(
       children: [
@@ -120,7 +123,6 @@ class SettingsPage extends StatelessWidget {
           title: localizations.language,
           subtitle: 'Changer la langue de l\'application',
           value: 'Français',
-          isDark: isDark,
           onTap: () => _showLanguageSelector(context, localizations),
         ),
 
@@ -133,7 +135,6 @@ class SettingsPage extends StatelessWidget {
           title: localizations.theme,
           subtitle: 'Choisir le thème de l\'application',
           value: _getCurrentThemeName(context, localizations),
-          isDark: isDark,
           onTap: () => _showThemeSelector(context, localizations),
         ),
 
@@ -146,7 +147,6 @@ class SettingsPage extends StatelessWidget {
           title: 'Paramètres Coran',
           subtitle: 'Traductions, récitateurs et audio',
           value: 'Gérer les préférences',
-          isDark: isDark,
           onTap: () {
             Navigator.pushNamed(context, '/quran-settings');
           },
@@ -162,7 +162,6 @@ class SettingsPage extends StatelessWidget {
           title: 'À propos',
           subtitle: 'Version de l\'application et support',
           value: 'Version 1.0.0',
-          isDark: isDark,
           onTap: () => _showAboutDialog(context),
         ),
       ],
@@ -175,24 +174,25 @@ class SettingsPage extends StatelessWidget {
     required String title,
     required String subtitle,
     required String value,
-    required bool isDark,
     required VoidCallback onTap,
     bool showArrow = false,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
-        color: isDark ? AppColor.darkSurface : AppColor.pureWhite,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColor.primaryGreen.withValues(alpha: 0.08),
+            color: colorScheme.primary.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
         ],
         border: Border.all(
-          color: AppColor.primaryGreen.withValues(alpha: 0.1),
+          color: colorScheme.primary.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -211,18 +211,10 @@ class SettingsPage extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColor.accentGreen.withValues(alpha: 0.1)
-                        : AppColor.primaryGreen.withValues(alpha: 0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    icon,
-                    color: isDark
-                        ? AppColor.accentGreen
-                        : AppColor.primaryGreen,
-                    size: 24,
-                  ),
+                  child: Icon(icon, color: colorScheme.primary, size: 24),
                 ),
 
                 const SizedBox(width: 16),
@@ -238,9 +230,7 @@ class SettingsPage extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? AppColor.pureWhite
-                                  : AppColor.charcoal,
+                              color: colorScheme.onSurface,
                             ),
                       ),
 
@@ -250,9 +240,7 @@ class SettingsPage extends StatelessWidget {
                       Text(
                         subtitle,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isDark
-                              ? AppColor.lightGray
-                              : AppColor.translationText,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
 
@@ -265,23 +253,17 @@ class SettingsPage extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColor.accentGreen.withValues(alpha: 0.1)
-                              : AppColor.primaryGreen.withValues(alpha: 0.1),
+                          color: colorScheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: isDark
-                                ? AppColor.accentGreen.withValues(alpha: 0.1)
-                                : AppColor.primaryGreen.withValues(alpha: 0.2),
+                            color: colorScheme.primary.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
                           value,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
-                                color: isDark
-                                    ? AppColor.accentGreen
-                                    : AppColor.primaryGreen,
+                                color: colorScheme.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
@@ -296,16 +278,12 @@ class SettingsPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColor.accentGreen.withValues(alpha: 0.1)
-                        : AppColor.primaryGreen.withValues(alpha: 0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     showArrow ? Icons.arrow_forward_ios : Icons.edit,
-                    color: isDark
-                        ? AppColor.accentGreen
-                        : AppColor.primaryGreen,
+                    color: colorScheme.primary,
                     size: 16,
                   ),
                 ),
@@ -665,6 +643,7 @@ class SettingsPage extends StatelessWidget {
 
   void _showAboutDialog(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
@@ -676,7 +655,7 @@ class SettingsPage extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: AppColor.primaryGradient,
+                gradient: AppGradients.primary(colorScheme),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
