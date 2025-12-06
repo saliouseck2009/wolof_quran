@@ -4,7 +4,7 @@ import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/domain/repositories/bookmark_repository.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
-import '../../core/config/theme/app_gradients.dart';
+
 import '../../core/helpers/revelation_place_enum.dart';
 import '../../core/services/audio_player_service.dart';
 import '../../domain/entities/bookmark.dart';
@@ -99,13 +99,13 @@ class SurahDetailErrorWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: AppColor.translationText),
+          Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
           const SizedBox(height: 16),
           Text(
             message,
             style: Theme.of(
               context,
-            ).textTheme.titleMedium?.copyWith(color: AppColor.translationText),
+            ).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.error),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
@@ -191,7 +191,6 @@ class SurahDetailAppBar extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
           final theme = Theme.of(context);
           final colorScheme = theme.colorScheme;
-          final isDark = theme.brightness == Brightness.dark;
     final revelationType = quran.getPlaceOfRevelation(state.surahNumber);
 
     return SliverAppBar(
@@ -199,12 +198,14 @@ class SurahDetailAppBar extends StatelessWidget {
       floating: false,
       pinned: true,
       elevation: 2,
+      backgroundColor: colorScheme.primary,
+      iconTheme: IconThemeData(color: colorScheme.onPrimary),
       title: Text(
         state.surahNameTranslated,
         style: TextStyle(
           fontFamily: 'Hafs',
           fontWeight: FontWeight.w600,
-          color: AppColor.pureWhite,
+          color: colorScheme.onPrimary,
           fontSize: 18,
         ),
       ),
@@ -213,9 +214,9 @@ class SurahDetailAppBar extends StatelessWidget {
         PopupMenuButton<AyahDisplayMode>(
           icon: Icon(
             _getDisplayModeIcon(state.displayMode),
-            color: AppColor.pureWhite,
+            color: colorScheme.onPrimary,
           ),
-          color: isDark ? AppColor.charcoal : AppColor.pureWhite,
+          color: colorScheme.surface,
           onSelected: (mode) {
             context.read<SurahDetailCubit>().changeDisplayMode(mode);
           },
@@ -227,8 +228,8 @@ class SurahDetailAppBar extends StatelessWidget {
                   Icon(
                     Icons.view_headline,
                     color: state.displayMode == AyahDisplayMode.both
-                        ? AppColor.primaryGreen
-                        : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                        ? colorScheme.primary
+                        : colorScheme.onSurface,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -237,8 +238,8 @@ class SurahDetailAppBar extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Hafs',
                       color: state.displayMode == AyahDisplayMode.both
-                          ? AppColor.primaryGreen
-                          : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                          ? colorScheme.primary
+                          : colorScheme.onSurface,
                       fontWeight: state.displayMode == AyahDisplayMode.both
                           ? FontWeight.w600
                           : FontWeight.w500,
@@ -254,8 +255,8 @@ class SurahDetailAppBar extends StatelessWidget {
                   Icon(
                     Icons.format_textdirection_r_to_l,
                     color: state.displayMode == AyahDisplayMode.arabicOnly
-                        ? AppColor.primaryGreen
-                        : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                        ? colorScheme.primary
+                        : colorScheme.onSurface,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -264,8 +265,8 @@ class SurahDetailAppBar extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Hafs',
                       color: state.displayMode == AyahDisplayMode.arabicOnly
-                          ? AppColor.primaryGreen
-                          : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                          ? colorScheme.primary
+                          : colorScheme.onSurface,
                       fontWeight:
                           state.displayMode == AyahDisplayMode.arabicOnly
                           ? FontWeight.w600
@@ -282,8 +283,8 @@ class SurahDetailAppBar extends StatelessWidget {
                   Icon(
                     Icons.translate,
                     color: state.displayMode == AyahDisplayMode.translationOnly
-                        ? AppColor.primaryGreen
-                        : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                        ? colorScheme.primary
+                        : colorScheme.onSurface,
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -293,8 +294,8 @@ class SurahDetailAppBar extends StatelessWidget {
                       fontFamily: 'Hafs',
                       color:
                           state.displayMode == AyahDisplayMode.translationOnly
-                          ? AppColor.primaryGreen
-                          : (isDark ? AppColor.pureWhite : AppColor.darkGray),
+                          ? colorScheme.primary
+                          : colorScheme.onSurface,
                       fontWeight:
                           state.displayMode == AyahDisplayMode.translationOnly
                           ? FontWeight.w600
@@ -307,7 +308,7 @@ class SurahDetailAppBar extends StatelessWidget {
           ],
         ),
         IconButton(
-          icon: Icon(Icons.settings, color: AppColor.pureWhite),
+          icon: Icon(Icons.settings, color: colorScheme.onPrimary),
           onPressed: () async {
             final result = await Navigator.pushNamed(
               context,
@@ -324,13 +325,7 @@ class SurahDetailAppBar extends StatelessWidget {
         titlePadding: EdgeInsets.zero,
         background: Container(
           decoration: BoxDecoration(
-            gradient: isDark
-                ? LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppColor.charcoal, AppColor.darkGray],
-                  )
-                : AppGradients.primary(colorScheme),
+            color: colorScheme.primary,
           ),
           child: SafeArea(
             child: Padding(
@@ -344,8 +339,6 @@ class SurahDetailAppBar extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: isDark ? AppColor.charcoal : AppColor.primaryGreen,
-      foregroundColor: AppColor.pureWhite,
     );
   }
 
@@ -385,7 +378,7 @@ class SurahHeaderContent extends StatelessWidget {
             fontFamily: 'Hafs',
             fontSize: 32,
             fontWeight: FontWeight.w700,
-            color: AppColor.pureWhite,
+            color: Colors.white,
           ),
           textAlign: TextAlign.center,
           textDirection: TextDirection.rtl,
@@ -400,7 +393,7 @@ class SurahHeaderContent extends StatelessWidget {
             fontFamily: 'Hafs',
             fontSize: 20,
             fontWeight: FontWeight.w500,
-            color: AppColor.pureWhite.withValues(alpha: 0.9),
+            color: Colors.white.withValues(alpha: 0.9),
           ),
         ),
 
@@ -474,19 +467,19 @@ class SurahInfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColor.pureWhite.withValues(alpha: 0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColor.pureWhite),
+          Icon(icon, size: 14, color: Colors.white),
           const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
               fontFamily: 'Hafs',
-              color: AppColor.pureWhite,
+              color: Colors.white,
               fontWeight: FontWeight.w500,
               fontSize: 12,
             ),
@@ -502,22 +495,16 @@ class SurahBasmalaWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColor.primaryGreen.withValues(alpha: 0.1),
-              AppColor.gold.withValues(alpha: 0.1),
-            ],
-          ),
+          color: colorScheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppColor.primaryGreen.withValues(alpha: 0.2),
+            color: colorScheme.primary.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -529,7 +516,7 @@ class SurahBasmalaWidget extends StatelessWidget {
             fontFamily: 'Hafs',
             fontSize: 24,
             fontWeight: FontWeight.w600,
-            color: AppColor.primaryGreen,
+            color: colorScheme.primary,
             height: 1.8,
           ),
         ),
@@ -554,6 +541,7 @@ class SurahAyahsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return SliverList(
       delegate: SliverChildBuilderDelegate((context, index) {
         final ayah = ayahs[index];
@@ -581,8 +569,8 @@ class SurahAyahsList extends StatelessWidget {
                   return Icon(
                     isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                     color: isBookmarked
-                        ? AppColor.primaryGreen
-                        : AppColor.mediumGray,
+                        ? colorScheme.primary
+                        : colorScheme.outline,
                   );
                 },
               ),
@@ -655,7 +643,7 @@ class SurahPlayButton extends StatelessWidget {
                   content: Text(
                     'Error checking download status: ${downloadStatusState.message}',
                   ),
-                  backgroundColor: AppColor.error,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 ),
               );
             }
@@ -669,17 +657,17 @@ class SurahPlayButton extends StatelessWidget {
                   width: 140,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: AppColor.pureWhite.withValues(alpha: 0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(25),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: SizedBox(
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColor.pureWhite,
+                          Theme.of(context).colorScheme.onPrimary,
                         ),
                       ),
                     ),
@@ -698,7 +686,7 @@ class SurahPlayButton extends StatelessWidget {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColor.pureWhite.withValues(alpha: 0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Row(
@@ -706,7 +694,7 @@ class SurahPlayButton extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.error_outline,
-                        color: AppColor.pureWhite.withValues(alpha: 0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         size: 16,
                       ),
                       const SizedBox(width: 6),
@@ -714,7 +702,7 @@ class SurahPlayButton extends StatelessWidget {
                         'Check failed',
                         style: TextStyle(
                           fontFamily: 'Hafs',
-                          color: AppColor.pureWhite.withValues(alpha: 0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
                         ),
@@ -757,7 +745,7 @@ class SurahPlayButton extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.download_done,
-                              color: AppColor.pureWhite,
+                              color: Colors.white,
                               size: 20,
                             ),
                             const SizedBox(width: 8),
@@ -766,14 +754,14 @@ class SurahPlayButton extends StatelessWidget {
                                 '$surahName downloaded successfully',
                                 style: TextStyle(
                                   fontFamily: 'Hafs',
-                                  color: AppColor.pureWhite,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        backgroundColor: AppColor.success,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         duration: const Duration(seconds: 2),
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
@@ -790,7 +778,7 @@ class SurahPlayButton extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.error_outline,
-                              color: AppColor.pureWhite,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               size: 20,
                             ),
                             const SizedBox(width: 8),
@@ -799,14 +787,14 @@ class SurahPlayButton extends StatelessWidget {
                                 'Download failed: ${currentState.message}',
                                 style: TextStyle(
                                   fontFamily: 'Hafs',
-                                  color: AppColor.pureWhite,
+                                  color: Theme.of(context).colorScheme.onPrimary,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        backgroundColor: AppColor.error,
+                        backgroundColor: Theme.of(context).colorScheme.error,
                         duration: const Duration(seconds: 3),
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
@@ -834,10 +822,10 @@ class SurahPlayButton extends StatelessWidget {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColor.pureWhite.withValues(alpha: 0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(25),
                           border: Border.all(
-                            color: AppColor.pureWhite.withValues(alpha: 0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
@@ -850,8 +838,8 @@ class SurahPlayButton extends StatelessWidget {
                               child: CircularProgressIndicator(
                                 value: currentState.progress,
                                 strokeWidth: 2,
-                                color: AppColor.pureWhite,
-                                backgroundColor: AppColor.pureWhite.withValues(
+                                color: Colors.white,
+                                backgroundColor: Colors.white.withValues(
                                   alpha: 0.3,
                                 ),
                               ),
@@ -862,7 +850,7 @@ class SurahPlayButton extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Hafs',
                                 fontWeight: FontWeight.w600,
-                                color: AppColor.pureWhite.withValues(
+                                color: Colors.white.withValues(
                                   alpha: 0.9,
                                 ),
                                 fontSize: 12,
@@ -887,7 +875,7 @@ class SurahPlayButton extends StatelessWidget {
                       },
                       icon: Icon(
                         Icons.download_outlined,
-                        color: AppColor.pureWhite.withValues(alpha: 0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                         size: 20,
                       ),
                       label: Text(
@@ -895,14 +883,14 @@ class SurahPlayButton extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Hafs',
                           fontWeight: FontWeight.w600,
-                          color: AppColor.pureWhite.withValues(alpha: 0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColor.pureWhite.withValues(
+                        backgroundColor: Colors.white.withValues(
                           alpha: 0.2,
                         ),
-                        foregroundColor: AppColor.pureWhite.withValues(
+                        foregroundColor: Colors.white.withValues(
                           alpha: 0.9,
                         ),
                         elevation: 0,
@@ -913,7 +901,7 @@ class SurahPlayButton extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
                           side: BorderSide(
-                            color: AppColor.pureWhite.withValues(alpha: 0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 1,
                           ),
                         ),
@@ -1017,8 +1005,8 @@ class SurahPlayButton extends StatelessWidget {
                                     ? Icons.pause_circle_filled
                                     : Icons.play_circle_filled,
                                 color: isThisSurahPlaying
-                                    ? AppColor.accent
-                                    : AppColor.primaryGreen,
+                                    ? Theme.of(context).colorScheme.secondary
+                                    : Theme.of(context).colorScheme.primary,
                                 size: 20,
                               ),
                               label: Text(
@@ -1031,15 +1019,15 @@ class SurahPlayButton extends StatelessWidget {
                                   fontFamily: 'Hafs',
                                   fontWeight: FontWeight.w600,
                                   color: isThisSurahPlaying
-                                      ? AppColor.accent
-                                      : AppColor.primaryGreen,
+                                      ? Theme.of(context).colorScheme.secondary
+                                      : Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColor.pureWhite,
                                 foregroundColor: isThisSurahPlaying
-                                    ? AppColor.accent
-                                    : AppColor.primaryGreen,
+                                    ? Theme.of(context).colorScheme.secondary
+                                    : Theme.of(context).colorScheme.primary,
                                 elevation: isThisSurahPlaying ? 4 : 0,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20,
@@ -1049,7 +1037,7 @@ class SurahPlayButton extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(25),
                                   side: isThisSurahPlaying
                                       ? BorderSide(
-                                          color: AppColor.accent,
+                                          color: Theme.of(context).colorScheme.secondary,
                                           width: 2,
                                         )
                                       : BorderSide.none,

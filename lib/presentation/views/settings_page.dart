@@ -19,9 +19,8 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.brightness == Brightness.dark
-          ? colorScheme
-                .surfaceContainerLowest // AppColor.darkBackdropTop equivalent
-          : AppColor.pureWhite, // Keep existing light background
+          ? colorScheme.surfaceContainerLowest
+          : colorScheme.surface,
       appBar: AppBar(
         title: Text(
           localizations.settings,
@@ -32,11 +31,9 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? colorScheme.surfaceContainer.withValues(
-                alpha: 0.7,
-              ) // AppColor.darkSurface equivalent
-            : colorScheme.primary, // AppColor.primaryGreen equivalent
-        foregroundColor: colorScheme.onPrimary,
+            ? colorScheme.surfaceContainer.withValues(alpha: 0.7)
+            : colorScheme.primary,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 2,
       ),
       body: SingleChildScrollView(
@@ -184,15 +181,19 @@ class SettingsPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.primary.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: colorScheme.brightness == Brightness.dark
+            ? [
+                BoxShadow(
+                  color: colorScheme.primary.withValues(alpha: 0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
         border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.1),
+          color: colorScheme.primary.withValues(
+            alpha: colorScheme.brightness == Brightness.dark ? 0.1 : 0.15,
+          ),
           width: 1,
         ),
       ),
@@ -334,6 +335,7 @@ class SettingsPage extends StatelessWidget {
     BuildContext context,
     AppLocalizations localizations,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
@@ -355,7 +357,7 @@ class SettingsPage extends StatelessWidget {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppColor.mediumGray,
+                      color: colorScheme.outline,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -371,12 +373,12 @@ class SettingsPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
-                            color: AppColor.primaryGreen,
+                            color: colorScheme.primary,
                           ),
                         ),
                         IconButton(
                           onPressed: () => Navigator.pop(context),
-                          icon: Icon(Icons.close, color: AppColor.mediumGray),
+                          icon: Icon(Icons.close, color: colorScheme.outline),
                         ),
                       ],
                     ),
@@ -400,13 +402,13 @@ class SettingsPage extends StatelessWidget {
                           margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppColor.primaryGreen.withValues(alpha: 0.1)
+                                ? colorScheme.primary.withValues(alpha: 0.1)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isSelected
-                                  ? AppColor.primaryGreen
-                                  : AppColor.lightGray.withValues(alpha: 0.3),
+                                  ? colorScheme.primary
+                                  : colorScheme.outlineVariant.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Material(
@@ -430,19 +432,19 @@ class SettingsPage extends StatelessWidget {
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: isSelected
-                                            ? AppColor.primaryGreen
+                                            ? colorScheme.primary
                                             : Colors.transparent,
                                         border: Border.all(
                                           color: isSelected
-                                              ? AppColor.primaryGreen
-                                              : AppColor.mediumGray,
+                                              ? colorScheme.primary
+                                              : colorScheme.outline,
                                         ),
                                       ),
                                       child: isSelected
                                           ? Icon(
                                               Icons.check,
                                               size: 8,
-                                              color: AppColor.pureWhite,
+                                              color: colorScheme.onPrimary,
                                             )
                                           : null,
                                     ),
@@ -455,7 +457,7 @@ class SettingsPage extends StatelessWidget {
                                               ? FontWeight.w600
                                               : FontWeight.normal,
                                           color: isSelected
-                                              ? AppColor.primaryGreen
+                                              ? colorScheme.primary
                                               : null,
                                         ),
                                       ),
@@ -482,6 +484,7 @@ class SettingsPage extends StatelessWidget {
     BuildContext context,
     AppLocalizations localizations,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
@@ -509,7 +512,7 @@ class SettingsPage extends StatelessWidget {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppColor.mediumGray,
+                      color: colorScheme.outline,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -525,12 +528,12 @@ class SettingsPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
-                            color: AppColor.primaryGreen,
+                            color: colorScheme.primary,
                           ),
                         ),
                         IconButton(
                           onPressed: () => Navigator.pop(context),
-                          icon: Icon(Icons.close, color: AppColor.mediumGray),
+                          icon: Icon(Icons.close, color: colorScheme.outline),
                         ),
                       ],
                     ),
@@ -557,13 +560,13 @@ class SettingsPage extends StatelessWidget {
                           margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppColor.primaryGreen.withValues(alpha: 0.1)
+                                ? colorScheme.primary.withValues(alpha: 0.1)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isSelected
-                                  ? AppColor.primaryGreen
-                                  : AppColor.lightGray.withValues(alpha: 0.3),
+                                  ? colorScheme.primary
+                                  : colorScheme.outlineVariant.withValues(alpha: 0.3),
                             ),
                           ),
                           child: Material(
@@ -614,13 +617,13 @@ class SettingsPage extends StatelessWidget {
                                         width: 24,
                                         height: 24,
                                         decoration: BoxDecoration(
-                                          color: AppColor.primaryGreen,
+                                          color: colorScheme.primary,
                                           shape: BoxShape.circle,
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.check,
                                           size: 16,
-                                          color: AppColor.pureWhite,
+                                          color: colorScheme.onPrimary,
                                         ),
                                       ),
                                   ],
@@ -658,9 +661,9 @@ class SettingsPage extends StatelessWidget {
                 gradient: AppGradients.primary(colorScheme),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.menu_book_rounded,
-                color: AppColor.pureWhite,
+                color: colorScheme.onPrimary,
                 size: 24,
               ),
             ),
@@ -678,7 +681,7 @@ class SettingsPage extends StatelessWidget {
                   Text(
                     "Version 1.0.0",
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColor.translationText,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -698,14 +701,14 @@ class SettingsPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColor.primaryGreen.withValues(alpha: 0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.info_outline,
-                    color: AppColor.primaryGreen,
+                    color: colorScheme.primary,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -713,7 +716,7 @@ class SettingsPage extends StatelessWidget {
                     child: Text(
                       "Développé avec ❤️ pour la communauté musulmane",
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColor.primaryGreen,
+                        color: colorScheme.primary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -729,7 +732,7 @@ class SettingsPage extends StatelessWidget {
             child: Text(
               "Fermer",
               style: TextStyle(
-                color: AppColor.primaryGreen,
+                color: colorScheme.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),

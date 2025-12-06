@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../core/config/theme/app_color.dart';
 import '../cubits/search_cubit.dart';
 import '../cubits/bookmark_cubit.dart' as bookmark_cubit;
 import '../widgets/ayah_card.dart';
@@ -43,13 +42,13 @@ class SearchView extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentGreen = isDark
         ? const Color(0xFF4CAF50)
-        : AppColor.primaryGreen;
+        : Theme.of(context).colorScheme.primary;
 
     return DefaultTabController(
       length: 2,
       initialIndex: initialTab,
       child: Scaffold(
-        backgroundColor: isDark ? AppColor.charcoal : AppColor.offWhite,
+        backgroundColor: isDark ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -57,7 +56,7 @@ class SearchView extends StatelessWidget {
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back_ios,
-              color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+              color: isDark ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface,
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -67,7 +66,7 @@ class SearchView extends StatelessWidget {
               fontFamily: 'Hafs',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+              color: isDark ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface,
             ),
           ),
           centerTitle: true,
@@ -75,8 +74,8 @@ class SearchView extends StatelessWidget {
             indicatorColor: accentGreen,
             labelColor: accentGreen,
             unselectedLabelColor: isDark
-                ? AppColor.pureWhite.withValues(alpha: 0.75)
-                : AppColor.charcoal,
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75)
+                : Theme.of(context).colorScheme.onSurface,
             labelStyle: const TextStyle(
               fontFamily: 'Hafs',
               fontSize: 16,
@@ -132,7 +131,7 @@ class _SearchBodyState extends State<_SearchBody> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentGreen = isDark
         ? const Color(0xFF4CAF50)
-        : AppColor.primaryGreen;
+        : Theme.of(context).colorScheme.primary;
 
     return Column(
       children: [
@@ -140,22 +139,22 @@ class _SearchBodyState extends State<_SearchBody> {
         Container(
           margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDark ? AppColor.darkSurfaceHigh : AppColor.pureWhite,
+            color: isDark ? Theme.of(context).colorScheme.surfaceContainer : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark
                   ? const Color(0xFF364148)
-                  : AppColor.lightGray.withValues(alpha: 0.4),
+                  : Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.4),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: isDark
-                    ? Colors.black.withValues(alpha: 0.35)
-                    : accentGreen.withValues(alpha: 0.08),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
-              ),
-            ],
+            boxShadow: isDark
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.35),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                : null,
           ),
           child: TextField(
             controller: _searchController,
@@ -163,18 +162,18 @@ class _SearchBodyState extends State<_SearchBody> {
             style: TextStyle(
               fontFamily: 'Hafs',
               fontSize: 16,
-              color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+              color: isDark ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface,
             ),
             decoration: InputDecoration(
               hintText: localizations.enterWordsToSearch,
               hintStyle: TextStyle(
                 fontFamily: 'Hafs',
-                color: AppColor.mediumGray,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               prefixIcon: Icon(Icons.search, color: accentGreen),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
-                      icon: Icon(Icons.clear, color: AppColor.mediumGray),
+                      icon: Icon(Icons.clear, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       onPressed: () {
                         _searchController.clear();
                         context.read<SearchCubit>().clearSearch();
@@ -202,7 +201,7 @@ class _SearchBodyState extends State<_SearchBody> {
               onPressed: () => _performSearch(_searchController.text),
               style: ElevatedButton.styleFrom(
                 backgroundColor: accentGreen,
-                foregroundColor: AppColor.pureWhite,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -255,7 +254,7 @@ class _SearchBodyState extends State<_SearchBody> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search, size: 64, color: AppColor.mediumGray),
+          Icon(Icons.search, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
           const SizedBox(height: 16),
           Text(
             localizations.searchTheQuran,
@@ -263,7 +262,7 @@ class _SearchBodyState extends State<_SearchBody> {
               fontFamily: 'Hafs',
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: AppColor.mediumGray,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
@@ -272,7 +271,7 @@ class _SearchBodyState extends State<_SearchBody> {
             style: TextStyle(
               fontFamily: 'Hafs',
               fontSize: 14,
-              color: AppColor.mediumGray,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -286,7 +285,7 @@ class _SearchBodyState extends State<_SearchBody> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: AppColor.error),
+          Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
           const SizedBox(height: 16),
           Text(
             localizations.searchError,
@@ -294,7 +293,7 @@ class _SearchBodyState extends State<_SearchBody> {
               fontFamily: 'Hafs',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppColor.error,
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
           const SizedBox(height: 8),
@@ -303,7 +302,7 @@ class _SearchBodyState extends State<_SearchBody> {
             style: TextStyle(
               fontFamily: 'Hafs',
               fontSize: 14,
-              color: AppColor.mediumGray,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -319,14 +318,14 @@ class _SearchBodyState extends State<_SearchBody> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentGreen = isDark
         ? const Color(0xFF4CAF50)
-        : AppColor.primaryGreen;
+        : Theme.of(context).colorScheme.primary;
 
     if (state.results.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 64, color: AppColor.mediumGray),
+            Icon(Icons.search_off, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
             const SizedBox(height: 16),
             Text(
               localizations.noResultsFound,
@@ -334,7 +333,7 @@ class _SearchBodyState extends State<_SearchBody> {
                 fontFamily: 'Hafs',
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: AppColor.mediumGray,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
@@ -343,7 +342,7 @@ class _SearchBodyState extends State<_SearchBody> {
               style: TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 14,
-                color: AppColor.mediumGray,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -367,7 +366,7 @@ class _SearchBodyState extends State<_SearchBody> {
                   fontFamily: 'Hafs',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColor.primaryGreen,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -433,7 +432,7 @@ class _SearchBodyState extends State<_SearchBody> {
                         IconButton(
                           icon: Icon(
                             Icons.open_in_new,
-                            color: AppColor.mediumGray,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           onPressed: () {
                             Navigator.pushNamed(

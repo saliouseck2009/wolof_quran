@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../core/config/theme/app_color.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/reciter_cubit.dart';
 import '../../service_locator.dart';
@@ -33,129 +32,113 @@ class _QuranSettingsView extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: colorScheme.brightness == Brightness.dark
+          ? colorScheme.surfaceContainerLowest
+          : colorScheme.surface,
       appBar: AppBar(
         title: Text(
           localizations.quranSettings,
           style: TextStyle(
-            fontFamily: 'Hafs',
             fontWeight: FontWeight.w600,
             color: colorScheme.onPrimary,
             fontSize: 18,
           ),
         ),
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? colorScheme
-                  .surfaceContainerHigh // AppColor.darkSurfaceHigh equivalent
-            : colorScheme.primary, // AppColor.primaryGreen equivalent
-        foregroundColor: colorScheme.onPrimary,
+            ? colorScheme.surfaceContainer.withValues(alpha: 0.7)
+            : colorScheme.primary,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 2,
       ),
-      body: Container(
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: colorScheme.brightness == Brightness.dark
-              ? LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    colorScheme
-                        .surfaceContainerLowest, // AppColor.darkBackdropTop
-                    colorScheme.surfaceDim, // AppColor.darkBackdropBottom
-                  ],
-                )
-              : null,
-          color: colorScheme.brightness == Brightness.dark
-              ? null
-              : colorScheme.surface,
-        ),
-        child: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
-          builder: (context, state) {
-            if (state is! QuranSettingsLoaded) {
-              return const Center(child: CircularProgressIndicator());
-            }
+      body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
+        builder: (context, state) {
+          if (state is! QuranSettingsLoaded) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header section
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: colorScheme.brightness == Brightness.dark
-                          ? LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                colorScheme
-                                    .surfaceContainerLowest, // AppColor.darkBackdropTop
-                                colorScheme
-                                    .surfaceDim, // AppColor.darkBackdropBottom
-                              ],
-                            )
-                          : LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                colorScheme.primary.withValues(
-                                  alpha: 0.1,
-                                ), // AppColor.primaryGreen
-                                colorScheme.secondary.withValues(
-                                  alpha: 0.1,
-                                ), // AppColor.gold
-                              ],
-                            ),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: colorScheme.primary.withValues(alpha: 0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.settings,
-                          size: 48,
-                          color: colorScheme.primary,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          localizations.quranSettings,
-                          style: TextStyle(
-                            fontFamily: 'Hafs',
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: colorScheme.primary,
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header section
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: colorScheme.brightness == Brightness.dark
+                        ? LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              colorScheme.surfaceContainer.withValues(
+                                alpha: 0.8,
+                              ),
+                              colorScheme.surfaceContainer.withValues(
+                                alpha: 0.9,
+                              ),
+                            ],
+                          )
+                        : LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              colorScheme.primary.withValues(alpha: 0.1),
+                              colorScheme.primaryContainer.withValues(
+                                alpha: 0.2,
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Customize your Quran reading experience',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(color: colorScheme.onSurfaceVariant),
-                        ),
-                      ],
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.primary.withValues(alpha: 0.2),
+                      width: 1,
                     ),
                   ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.settings,
+                        size: 48,
+                        color: colorScheme.primary,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        localizations.quranSettings,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Customize your Quran reading experience',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                  // Settings Menu Items
-                  _buildSettingsMenuItems(context, state, localizations),
+                // Settings Menu Items
+                _buildSettingsMenuItems(context, state, localizations),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-                  // Future settings sections can be added here
-                  // Example: Audio settings, font size, etc.
-                  const SizedBox(height: 32),
-                ],
-              ),
-            );
-          },
-        ),
+                // Future settings sections can be added here
+                // Example: Audio settings, font size, etc.
+                const SizedBox(height: 32),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -227,15 +210,19 @@ class _QuranSettingsView extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: colorScheme.brightness == Brightness.dark
+            ? [
+                BoxShadow(
+                  color: colorScheme.primary.withValues(alpha: 0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
         border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.2),
+          color: colorScheme.primary.withValues(
+            alpha: colorScheme.brightness == Brightness.dark ? 0.1 : 0.15,
+          ),
           width: 1,
         ),
       ),
@@ -270,12 +257,11 @@ class _QuranSettingsView extends StatelessWidget {
                       // Title
                       Text(
                         title,
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface,
+                            ),
                       ),
 
                       const SizedBox(height: 4),
@@ -283,9 +269,7 @@ class _QuranSettingsView extends StatelessWidget {
                       // Subtitle
                       Text(
                         subtitle,
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontSize: 12,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -296,24 +280,22 @@ class _QuranSettingsView extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
-                          vertical: 6,
+                          vertical: 4,
                         ),
                         decoration: BoxDecoration(
                           color: colorScheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: colorScheme.primary.withValues(alpha: 0.2),
-                            width: 1,
                           ),
                         ),
                         child: Text(
                           value,
-                          style: TextStyle(
-                            fontFamily: 'Hafs',
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: colorScheme.primary,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -351,7 +333,9 @@ class _QuranSettingsView extends StatelessWidget {
     AppLocalizations localizations,
   ) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentGreen = isDark ? AppColor.accentGreen : AppColor.primaryGreen;
+    final accentGreen = isDark
+        ? Theme.of(context).colorScheme.secondary
+        : Theme.of(context).colorScheme.primary;
 
     final result = await showModalBottomSheet<TranslationOption?>(
       context: context,
@@ -418,13 +402,10 @@ class _TranslationSelectorModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentGreen = isDark ? AppColor.accentGreen : AppColor.primaryGreen;
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColor.darkSurface
-            : Theme.of(context).scaffoldBackgroundColor,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: DraggableScrollableSheet(
@@ -441,7 +422,7 @@ class _TranslationSelectorModal extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColor.mediumGray,
+                  color: colorScheme.outline,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -457,12 +438,12 @@ class _TranslationSelectorModal extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: accentGreen,
+                        color: colorScheme.primary,
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: Icon(Icons.close, color: AppColor.mediumGray),
+                      icon: Icon(Icons.close, color: colorScheme.outline),
                     ),
                   ],
                 ),
@@ -485,15 +466,16 @@ class _TranslationSelectorModal extends StatelessWidget {
                       margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? accentGreen.withValues(alpha: 0.1)
-                            : Theme.of(context).cardColor,
+                            ? colorScheme.primary.withValues(alpha: 0.1)
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(12),
-                        border: isSelected
-                            ? Border.all(
-                                color: accentGreen.withValues(alpha: 0.3),
-                                width: 1,
-                              )
-                            : null,
+                        border: Border.all(
+                          color: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.outlineVariant.withValues(
+                                  alpha: 0.3,
+                                ),
+                        ),
                       ),
                       child: Material(
                         color: Colors.transparent,
@@ -511,21 +493,26 @@ class _TranslationSelectorModal extends StatelessWidget {
                             child: Row(
                               children: [
                                 Container(
-                                  width: 40,
-                                  height: 40,
+                                  width: 12,
+                                  height: 12,
                                   decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
                                     color: isSelected
-                                        ? accentGreen
-                                        : AppColor.lightGray,
-                                    borderRadius: BorderRadius.circular(8),
+                                        ? colorScheme.primary
+                                        : Colors.transparent,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? colorScheme.primary
+                                          : colorScheme.outline,
+                                    ),
                                   ),
-                                  child: Icon(
-                                    isSelected ? Icons.check : Icons.language,
-                                    color: isSelected
-                                        ? AppColor.pureWhite
-                                        : AppColor.mediumGray,
-                                    size: 20,
-                                  ),
+                                  child: isSelected
+                                      ? Icon(
+                                          Icons.check,
+                                          size: 8,
+                                          color: colorScheme.onPrimary,
+                                        )
+                                      : null,
                                 ),
 
                                 const SizedBox(width: 16),
@@ -537,45 +524,18 @@ class _TranslationSelectorModal extends StatelessWidget {
                                     children: [
                                       Text(
                                         option.displayName,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleSmall
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w500,
-                                              color: isSelected
-                                                  ? AppColor.primaryGreen
-                                                  : Theme.of(context)
-                                                        .textTheme
-                                                        .titleSmall
-                                                        ?.color,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        option.language,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: AppColor.translationText,
-                                            ),
+                                        style: TextStyle(
+                                          fontWeight: isSelected
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                          color: isSelected
+                                              ? colorScheme.primary
+                                              : null,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-
-                                if (isSelected)
-                                  Icon(
-                                    Icons.radio_button_checked,
-                                    color: accentGreen,
-                                    size: 20,
-                                  )
-                                else
-                                  Icon(
-                                    Icons.radio_button_unchecked,
-                                    color: AppColor.mediumGray,
-                                    size: 20,
-                                  ),
                               ],
                             ),
                           ),
@@ -621,11 +581,11 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColor.darkSurface : AppColor.pureWhite,
+        color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Padding(
@@ -640,7 +600,7 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColor.mediumGray,
+                  color: colorScheme.outline,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -652,10 +612,9 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
             Text(
               widget.localizations.fontSettings,
               style: TextStyle(
-                fontFamily: 'Hafs',
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.primary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -665,10 +624,8 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
             // Description
             Text(
               widget.localizations.fontSizeDescription,
-              style: TextStyle(
-                fontFamily: 'Hafs',
-                fontSize: 14,
-                color: AppColor.mediumGray,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -679,11 +636,10 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColor.lightGray.withValues(alpha: 0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColor.primaryGreen.withValues(alpha: 0.2),
-                  width: 1,
+                  color: colorScheme.primary.withValues(alpha: 0.2),
                 ),
               ),
               child: Text(
@@ -694,7 +650,7 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
                   fontFamily: 'Hafs',
                   fontSize: _currentFontSize,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? AppColor.pureWhite : AppColor.darkGray,
+                  color: colorScheme.onSurface,
                   height: 1.8,
                 ),
               ),
@@ -710,27 +666,21 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
                   children: [
                     Text(
                       widget.localizations.small,
-                      style: TextStyle(
-                        fontFamily: 'Hafs',
-                        fontSize: 12,
-                        color: AppColor.mediumGray,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     Text(
                       '${_currentFontSize.toInt()}pt',
-                      style: TextStyle(
-                        fontFamily: 'Hafs',
-                        fontSize: 14,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColor.primaryGreen,
+                        color: colorScheme.primary,
                       ),
                     ),
                     Text(
                       widget.localizations.large,
-                      style: TextStyle(
-                        fontFamily: 'Hafs',
-                        fontSize: 12,
-                        color: AppColor.mediumGray,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -740,12 +690,12 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
 
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: AppColor.primaryGreen,
-                    inactiveTrackColor: AppColor.mediumGray.withValues(
+                    activeTrackColor: colorScheme.primary,
+                    inactiveTrackColor: colorScheme.onSurfaceVariant.withValues(
                       alpha: 0.3,
                     ),
-                    thumbColor: AppColor.primaryGreen,
-                    overlayColor: AppColor.primaryGreen.withValues(alpha: 0.2),
+                    thumbColor: colorScheme.primary,
+                    overlayColor: colorScheme.primary.withValues(alpha: 0.2),
                     trackHeight: 4.0,
                     thumbShape: const RoundSliderThumbShape(
                       enabledThumbRadius: 8,
@@ -777,8 +727,8 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
             ElevatedButton(
               onPressed: () => Navigator.pop(context, _currentFontSize),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.primaryGreen,
-                foregroundColor: AppColor.pureWhite,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -787,11 +737,9 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
               ),
               child: Text(
                 widget.localizations.close,
-                style: TextStyle(
-                  fontFamily: 'Hafs',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
 

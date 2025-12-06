@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../core/config/theme/app_color.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/bookmark_cubit.dart';
 import '../widgets/ayah_card.dart';
@@ -25,7 +24,7 @@ class BookmarksTab extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 64, color: AppColor.error),
+                Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
                 const SizedBox(height: 16),
                 Text(
                   'Error loading bookmarks',
@@ -33,7 +32,7 @@ class BookmarksTab extends StatelessWidget {
                     fontFamily: 'Hafs',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColor.error,
+                    color: Theme.of(context).colorScheme.error,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -42,7 +41,7 @@ class BookmarksTab extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Hafs',
                     fontSize: 14,
-                    color: AppColor.mediumGray,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -53,7 +52,7 @@ class BookmarksTab extends StatelessWidget {
 
         if (state is BookmarkLoaded) {
           if (state.bookmarks.isEmpty) {
-            return _buildEmptyState(localizations);
+            return _buildEmptyState(context, localizations);
           }
 
           return Column(
@@ -71,7 +70,7 @@ class BookmarksTab extends StatelessWidget {
                           fontFamily: 'Hafs',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppColor.primaryGreen,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       TextButton(
@@ -81,7 +80,7 @@ class BookmarksTab extends StatelessWidget {
                           localizations.clearAllBookmarks,
                           style: TextStyle(
                             fontFamily: 'Hafs',
-                            color: AppColor.error,
+                            color: Theme.of(context).colorScheme.error,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -112,12 +111,12 @@ class BookmarksTab extends StatelessWidget {
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColor.primaryGreen.withValues(
+                              color: Theme.of(context).colorScheme.primary.withValues(
                                 alpha: 0.1,
                               ),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: AppColor.primaryGreen.withValues(
+                                color: Theme.of(context).colorScheme.primary.withValues(
                                   alpha: 0.3,
                                 ),
                                 width: 1,
@@ -129,7 +128,7 @@ class BookmarksTab extends StatelessWidget {
                                 fontFamily: 'Hafs',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: AppColor.primaryGreen,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                             ),
                           ),
@@ -154,7 +153,7 @@ class BookmarksTab extends StatelessWidget {
                               IconButton(
                                 icon: Icon(
                                   Icons.bookmark,
-                                  color: AppColor.primaryGreen,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                                 onPressed: () {
                                   context.read<BookmarkCubit>().removeBookmark(
@@ -167,7 +166,7 @@ class BookmarksTab extends StatelessWidget {
                                         localizations.bookmarkRemoved,
                                       ),
                                       duration: const Duration(seconds: 1),
-                                      backgroundColor: AppColor.primaryGreen,
+                                      backgroundColor: Theme.of(context).colorScheme.primary,
                                     ),
                                   );
                                 },
@@ -175,7 +174,7 @@ class BookmarksTab extends StatelessWidget {
                               IconButton(
                                 icon: Icon(
                                   Icons.open_in_new,
-                                  color: AppColor.mediumGray,
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 ),
                                 onPressed: () {
                                   Navigator.pushNamed(
@@ -202,12 +201,12 @@ class BookmarksTab extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(AppLocalizations localizations) {
+  Widget _buildEmptyState(BuildContext context, AppLocalizations localizations) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.bookmark_border, size: 64, color: AppColor.mediumGray),
+          Icon(Icons.bookmark_border, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
           const SizedBox(height: 16),
           Text(
             'No Bookmarks', // Use hardcoded text since noBookmarks key doesn't exist
@@ -215,7 +214,7 @@ class BookmarksTab extends StatelessWidget {
               fontFamily: 'Hafs',
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: AppColor.mediumGray,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
@@ -226,7 +225,7 @@ class BookmarksTab extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 14,
-                color: AppColor.mediumGray,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -259,7 +258,7 @@ class BookmarksTab extends StatelessWidget {
                 localizations.cancel,
                 style: TextStyle(
                   fontFamily: 'Hafs',
-                  color: AppColor.mediumGray,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
@@ -270,7 +269,7 @@ class BookmarksTab extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('All bookmarks cleared'),
-                    backgroundColor: AppColor.primaryGreen,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                 );
               },
@@ -278,7 +277,7 @@ class BookmarksTab extends StatelessWidget {
                 localizations.clear,
                 style: TextStyle(
                   fontFamily: 'Hafs',
-                  color: AppColor.error,
+                  color: Theme.of(context).colorScheme.error,
                   fontWeight: FontWeight.w600,
                 ),
               ),

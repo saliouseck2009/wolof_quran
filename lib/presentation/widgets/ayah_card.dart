@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../core/config/theme/app_gradients.dart';
+
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
@@ -94,7 +94,7 @@ class AyahCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    gradient: AppGradients.primary(colorScheme),
+                    color: colorScheme.primary,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -150,13 +150,7 @@ class AyahCard extends StatelessWidget {
                 height: 1,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      colorScheme.primary.withValues(alpha: 0.3),
-                      Colors.transparent,
-                    ],
-                  ),
+                  color: colorScheme.primary.withValues(alpha: 0.3),
                 ),
               ),
             if (displayMode == AyahDisplayMode.translationOnly ||
@@ -403,7 +397,7 @@ class _AyahShareModalState extends State<AyahShareModal> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -558,7 +552,7 @@ class _AyahShareModalState extends State<AyahShareModal> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),

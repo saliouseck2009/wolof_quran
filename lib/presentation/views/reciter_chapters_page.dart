@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:quran/quran.dart' as quran;
 
-import '../../core/config/theme/app_color.dart';
 import '../../core/services/audio_player_service.dart';
 import '../../domain/entities/reciter.dart';
 import '../blocs/reciter_chapters_bloc.dart';
@@ -22,14 +21,14 @@ class ReciterChaptersPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentGreen = isDark
         ? const Color(0xFF4CAF50)
-        : AppColor.primaryGreen;
+        : Theme.of(context).colorScheme.primary;
     return BlocProvider(
       create: (context) => ReciterChaptersBloc(
         getDownloadedSurahsUseCase: locator<GetDownloadedSurahsUseCase>(),
       )..add(LoadReciterChapters(reciter)),
       child: Scaffold(
         backgroundColor: isDark
-            ? AppColor.darkSurface
+            ? Theme.of(context).colorScheme.surface
             : Theme.of(context).colorScheme.surface,
         body: CustomScrollView(
           slivers: [
@@ -37,8 +36,8 @@ class ReciterChaptersPage extends StatelessWidget {
               expandedHeight: 200,
               floating: false,
               pinned: true,
-              backgroundColor: isDark ? AppColor.darkSurfaceHigh : accentGreen,
-              foregroundColor: AppColor.pureWhite,
+              backgroundColor: isDark ? Theme.of(context).colorScheme.surfaceContainer : accentGreen,
+              iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
               surfaceTintColor: Colors.transparent,
               shadowColor: isDark
                   ? Colors.black.withValues(alpha: 0.4)
@@ -50,7 +49,7 @@ class ReciterChaptersPage extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: isDark
-                          ? [AppColor.darkSurfaceHigh, AppColor.darkSurface]
+                          ? [Theme.of(context).colorScheme.surfaceContainer, Theme.of(context).colorScheme.surface]
                           : [accentGreen.withValues(alpha: 0.85), accentGreen],
                     ),
                   ),
@@ -72,7 +71,7 @@ class ReciterChaptersPage extends StatelessWidget {
                           child: Icon(
                             Icons.person,
                             size: 40,
-                            color: AppColor.pureWhite,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -82,7 +81,7 @@ class ReciterChaptersPage extends StatelessWidget {
                             fontFamily: 'Hafs',
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: AppColor.pureWhite,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -96,8 +95,8 @@ class ReciterChaptersPage extends StatelessWidget {
               child: _ReciterChaptersContent(
                 reciter: reciter,
                 accentGreen: accentGreen,
-                darkSurfaceHigh: AppColor.darkSurfaceHigh,
-                darkSurface: AppColor.darkSurface,
+                darkSurfaceHigh: Theme.of(context).colorScheme.surfaceContainer,
+                darkSurface: Theme.of(context).colorScheme.surface,
               ),
             ),
           ],
@@ -174,7 +173,7 @@ class _ReciterChaptersContent extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 64, color: AppColor.error),
+                Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -334,17 +333,21 @@ class _ChapterCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark ? darkSurfaceHigh : AppColor.pureWhite,
+        color: isDark ? darkSurfaceHigh : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: accentGreen.withValues(alpha: 0.07),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: isDark
+            ? [
+                BoxShadow(
+                  color: accentGreen.withValues(alpha: 0.07),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
         border: Border.all(
-          color: accentGreen.withValues(alpha: 0.12),
+          color: accentGreen.withValues(
+            alpha: isDark ? 0.12 : 0.15,
+          ),
           width: 1,
         ),
       ),
@@ -386,7 +389,7 @@ class _ChapterCard extends StatelessWidget {
                       fontFamily: 'Hafs',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+                      color: isDark ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -409,8 +412,8 @@ class _ChapterCard extends StatelessWidget {
                           fontFamily: 'Hafs',
                           fontSize: 14,
                           color: isDownloaded
-                              ? AppColor.success
-                              : AppColor.mediumGray,
+                              ? Colors.green
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       );
                     },
@@ -442,7 +445,7 @@ class _ChapterCard extends StatelessWidget {
                           getSurahDisplayName(surahNumber),
                         ),
                       ),
-                      backgroundColor: AppColor.success,
+                      backgroundColor: Colors.green,
                       duration: const Duration(seconds: 2),
                     ),
                   );
@@ -454,7 +457,7 @@ class _ChapterCard extends StatelessWidget {
                           _getFormattedErrorMessage(currentState.message),
                         ),
                       ),
-                      backgroundColor: AppColor.error,
+                      backgroundColor: Theme.of(context).colorScheme.error,
                       duration: const Duration(seconds: 3),
                     ),
                   );

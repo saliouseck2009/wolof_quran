@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
-import '../../core/config/theme/app_color.dart';
 import '../../core/utils/toast_service.dart';
 import '../../domain/repositories/download_repository.dart';
 import '../cubits/reciter_cubit.dart';
@@ -48,24 +47,26 @@ class _SurahAudioListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentGreen = isDark
-        ? const Color(0xFF4CAF50)
-        : AppColor.primaryGreen;
+    final colorScheme = Theme.of(context).colorScheme;
+    final accentGreen = colorScheme.primary;
 
     return Scaffold(
+      backgroundColor: colorScheme.brightness == Brightness.dark
+          ? colorScheme.surfaceContainerLowest
+          : colorScheme.surface,
       appBar: AppBar(
         title: Text(
           'Audio Downloads', // TODO: Add to localizations
           style: TextStyle(
-            fontFamily: 'Hafs',
             fontWeight: FontWeight.w600,
-            color: AppColor.pureWhite,
+            color: colorScheme.onPrimary,
             fontSize: 18,
           ),
         ),
-        backgroundColor: isDark ? AppColor.darkBackdropTop : accentGreen,
-        foregroundColor: AppColor.pureWhite,
+        backgroundColor: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surfaceContainer.withValues(alpha: 0.7)
+            : colorScheme.primary,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 2,
       ),
       body: BlocListener<AudioManagementCubit, AudioManagementState>(
@@ -85,11 +86,11 @@ class _SurahAudioListView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 64, color: Colors.red),
+                    Icon(Icons.error_outline, size: 64, color: colorScheme.error),
                     const SizedBox(height: 16),
                     Text(
                       reciterState.message,
-                      style: const TextStyle(color: Colors.red),
+                      style: TextStyle(color: colorScheme.error),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -108,13 +109,13 @@ class _SurahAudioListView extends StatelessWidget {
                       Icon(
                         Icons.person_off,
                         size: 64,
-                        color: AppColor.mediumGray,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'No reciter selected', // TODO: Add to localizations
                         style: TextStyle(
-                          color: AppColor.mediumGray,
+                          color: colorScheme.onSurfaceVariant,
                           fontSize: 16,
                         ),
                       ),
@@ -140,17 +141,28 @@ class _SurahAudioListView extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? AppColor.darkSurfaceHigh
-                          : AppColor.pureWhite,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: accentGreen.withValues(alpha: 0.1),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      gradient: colorScheme.brightness == Brightness.dark
+                          ? LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                colorScheme.surfaceContainer.withValues(alpha: 0.8),
+                                colorScheme.surfaceContainer.withValues(alpha: 0.9),
+                              ],
+                            )
+                          : LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                colorScheme.primary.withValues(alpha: 0.1),
+                                colorScheme.primaryContainer.withValues(alpha: 0.2),
+                              ],
+                            ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: colorScheme.primary.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -170,9 +182,7 @@ class _SurahAudioListView extends StatelessWidget {
                                   fontFamily: 'Hafs',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: isDark
-                                      ? AppColor.pureWhite
-                                      : AppColor.charcoal,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                               Text(
@@ -180,7 +190,7 @@ class _SurahAudioListView extends StatelessWidget {
                                 style: TextStyle(
                                   fontFamily: 'Hafs',
                                   fontSize: 14,
-                                  color: AppColor.mediumGray,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
@@ -238,10 +248,8 @@ class _SurahAudioListView extends StatelessWidget {
     String reciterId,
     AudioManagementState audioState,
   ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentGreen = isDark
-        ? const Color(0xFF4CAF50)
-        : AppColor.primaryGreen;
+    final colorScheme = Theme.of(context).colorScheme;
+    final accentGreen = colorScheme.primary;
     final surahNameArabic = quran.getSurahNameArabic(surahNumber);
     final surahNameTranslated = QuranSettingsCubit.getSurahNameInTranslation(
       surahNumber,
@@ -268,15 +276,23 @@ class _SurahAudioListView extends StatelessWidget {
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: isDark ? AppColor.darkSurface : AppColor.pureWhite,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: accentGreen.withValues(alpha: 0.08),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+            color: colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: colorScheme.brightness == Brightness.dark
+                ? [
+                    BoxShadow(
+                      color: colorScheme.primary.withValues(alpha: 0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+            border: Border.all(
+              color: colorScheme.primary.withValues(
+                alpha: colorScheme.brightness == Brightness.dark ? 0.1 : 0.15,
               ),
-            ],
+              width: 1,
+            ),
           ),
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
@@ -331,9 +347,7 @@ class _SurahAudioListView extends StatelessWidget {
                                   fontFamily: 'Hafs',
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: isDark
-                                      ? AppColor.pureWhite
-                                      : AppColor.charcoal,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -354,7 +368,7 @@ class _SurahAudioListView extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: 'Hafs',
                             fontSize: 13,
-                            color: AppColor.mediumGray,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -375,7 +389,7 @@ class _SurahAudioListView extends StatelessWidget {
                             value: downloadProgress,
                             strokeWidth: 2,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColor.primaryGreen,
+                              colorScheme.primary,
                             ),
                           ),
                           Text(
@@ -394,7 +408,7 @@ class _SurahAudioListView extends StatelessWidget {
                         isDownloaded
                             ? Icons.play_circle_filled
                             : Icons.download,
-                        color: isDownloaded ? accentGreen : AppColor.mediumGray,
+                        color: isDownloaded ? accentGreen : colorScheme.onSurfaceVariant,
                         size: 32,
                       ),
                       onPressed: () {

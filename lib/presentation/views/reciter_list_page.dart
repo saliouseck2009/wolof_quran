@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../core/config/theme/app_color.dart';
 import '../cubits/reciter_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 
@@ -24,55 +23,27 @@ class _ReciterListPageState extends State<ReciterListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    // New accent + dark surfaces for improved contrast
-    final accentGreen = isDark
-        ? const Color(0xFF4CAF50)
-        : AppColor.primaryGreen;
-    // Updated to match HomePage dark surfaces
-    final darkSurface = const Color(
-      0xFF1F252B,
-    ); // matches _darkSurface in HomePage
-    final darkSurfaceHigh = const Color(
-      0xFF263038,
-    ); // matches _darkSurfaceHigh in HomePage
+    final colorScheme = Theme.of(context).colorScheme;
+    final accentGreen = colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: isDark ? darkSurface : AppColor.offWhite,
+      backgroundColor: colorScheme.brightness == Brightness.dark
+          ? colorScheme.surfaceContainerLowest
+          : colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+        title: Text(
+          'Available Reciters', // TODO: Add to localizations
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onPrimary,
+            fontSize: 18,
           ),
-          onPressed: () => Navigator.pop(context),
         ),
-        title: Column(
-          children: [
-            Text(
-              'Available Reciters', // TODO: Add to localizations
-              style: TextStyle(
-                fontFamily: 'Hafs',
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: isDark ? AppColor.pureWhite : AppColor.charcoal,
-              ),
-            ),
-            const SizedBox(height: 2),
-            const Text(
-              'Tap card to browse • Tap select button to choose default',
-              style: TextStyle(
-                fontFamily: 'Hafs',
-                fontSize: 12,
-                color: AppColor.mediumGray,
-              ),
-            ),
-          ],
-        ),
-        centerTitle: true,
+        backgroundColor: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surfaceContainer.withValues(alpha: 0.7)
+            : colorScheme.primary,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+        elevation: 2,
       ),
       body: BlocConsumer<ReciterCubit, ReciterState>(
         listener: (context, reciterState) {
@@ -93,24 +64,20 @@ class _ReciterListPageState extends State<ReciterListPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  Icon(Icons.error_outline, size: 64, color: colorScheme.error),
                   const SizedBox(height: 16),
                   Text(
                     'Error Loading Reciters', // TODO: Add to localizations
-                    style: TextStyle(
-                      fontFamily: 'Hafs',
-                      fontSize: 18,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     reciterState.message,
-                    style: const TextStyle(
-                      fontFamily: 'Hafs',
-                      fontSize: 14,
-                      color: AppColor.mediumGray,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -121,7 +88,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: accentGreen,
-                      foregroundColor: AppColor.pureWhite,
+                      foregroundColor: colorScheme.onPrimary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -130,11 +97,9 @@ class _ReciterListPageState extends State<ReciterListPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Retry', // TODO: Add to localizations
-                      style: TextStyle(
-                        fontFamily: 'Hafs',
-                        fontSize: 16,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -150,28 +115,24 @@ class _ReciterListPageState extends State<ReciterListPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.library_music_outlined,
                       size: 64,
-                      color: AppColor.mediumGray,
+                      color: colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(height: 16),
                     Text(
                       'No Reciters Available', // TODO: Add to localizations
-                      style: TextStyle(
-                        fontFamily: 'Hafs',
-                        fontSize: 18,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColor.pureWhite : AppColor.charcoal,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Check back later for available reciters', // TODO: Add to localizations
-                      style: TextStyle(
-                        fontFamily: 'Hafs',
-                        fontSize: 14,
-                        color: AppColor.mediumGray,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -186,30 +147,97 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     ? settingsState.selectedReciter
                     : null;
 
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: reciterState.reciters.length,
-                  itemBuilder: (context, index) {
-                    final reciter = reciterState.reciters[index];
-                    final isSelected = selectedReciter?.id == reciter.id;
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: isDark ? darkSurfaceHigh : AppColor.pureWhite,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: accentGreen.withValues(alpha: 0.08),
-                            blurRadius: 12,
-                            offset: const Offset(0, 2),
+                return CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            gradient: colorScheme.brightness == Brightness.dark
+                                ? LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      colorScheme.surfaceContainer.withValues(alpha: 0.8),
+                                      colorScheme.surfaceContainer.withValues(alpha: 0.9),
+                                    ],
+                                  )
+                                : LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      colorScheme.primary.withValues(alpha: 0.1),
+                                      colorScheme.primaryContainer.withValues(alpha: 0.2),
+                                    ],
+                                  ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: colorScheme.primary.withValues(alpha: 0.2),
+                              width: 1,
+                            ),
                           ),
-                        ],
-                        border: Border.all(
-                          color: accentGreen.withValues(alpha: 0.12),
-                          width: 1,
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.record_voice_over,
+                                size: 48,
+                                color: colorScheme.primary,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'Select Reciter',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w700,
+                                  color: colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Tap card to browse • Tap select button to choose default',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final reciter = reciterState.reciters[index];
+                          final isSelected = selectedReciter?.id == reciter.id;
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: colorScheme.surfaceContainer,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: colorScheme.brightness == Brightness.dark
+                                    ? [
+                                        BoxShadow(
+                                          color: colorScheme.primary.withValues(alpha: 0.08),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ]
+                                    : null,
+                                border: Border.all(
+                                  color: colorScheme.primary.withValues(
+                                    alpha: colorScheme.brightness == Brightness.dark ? 0.1 : 0.15,
+                                  ),
+                                  width: 1,
+                                ),
+                              ),
                       child: Material(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(16),
@@ -253,13 +281,9 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                       // English name (title)
                                       Text(
                                         reciter.name,
-                                        style: TextStyle(
-                                          fontFamily: 'Hafs',
-                                          fontSize: 16,
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.w600,
-                                          color: isDark
-                                              ? AppColor.pureWhite
-                                              : AppColor.charcoal,
+                                          color: colorScheme.onSurface,
                                         ),
                                       ),
 
@@ -268,10 +292,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                       // Arabic name (subtitle)
                                       Text(
                                         reciter.arabicName,
-                                        style: const TextStyle(
-                                          fontFamily: 'Hafs',
-                                          fontSize: 12,
-                                          color: AppColor.mediumGray,
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                          color: colorScheme.onSurfaceVariant,
                                         ),
                                       ),
 
@@ -288,7 +310,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                               ? accentGreen.withValues(
                                                   alpha: 0.15,
                                                 )
-                                              : AppColor.mediumGray.withValues(
+                                              : colorScheme.onSurfaceVariant.withValues(
                                                   alpha: 0.12,
                                                 ),
                                           borderRadius: BorderRadius.circular(
@@ -299,7 +321,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                                 ? accentGreen.withValues(
                                                     alpha: 0.25,
                                                   )
-                                                : AppColor.mediumGray
+                                                : colorScheme.onSurfaceVariant
                                                       .withValues(alpha: 0.2),
                                             width: 1,
                                           ),
@@ -308,13 +330,11 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                           isSelected
                                               ? 'Default Reciter'
                                               : 'Available',
-                                          style: TextStyle(
-                                            fontFamily: 'Hafs',
-                                            fontSize: 11,
+                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                             fontWeight: FontWeight.w500,
                                             color: isSelected
                                                 ? accentGreen
-                                                : AppColor.mediumGray,
+                                                : colorScheme.onSurfaceVariant,
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -339,9 +359,6 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                       SnackBar(
                                         content: Text(
                                           'Selected ${reciter.name} as default reciter',
-                                          style: const TextStyle(
-                                            fontFamily: 'Hafs',
-                                          ),
                                         ),
                                         backgroundColor: accentGreen,
                                         duration: const Duration(seconds: 2),
@@ -353,7 +370,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? accentGreen.withValues(alpha: 0.15)
-                                          : AppColor.mediumGray.withValues(
+                                          : colorScheme.onSurfaceVariant.withValues(
                                               alpha: 0.12,
                                             ),
                                       borderRadius: BorderRadius.circular(8),
@@ -364,7 +381,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                           : Icons.radio_button_unchecked,
                                       color: isSelected
                                           ? accentGreen
-                                          : AppColor.mediumGray,
+                                          : colorScheme.onSurfaceVariant,
                                       size: 20,
                                     ),
                                   ),
@@ -374,8 +391,13 @@ class _ReciterListPageState extends State<ReciterListPage> {
                           ),
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  );
+                },
+                        childCount: reciterState.reciters.length,
+                      ),
+                    ),
+                  ],
                 );
               },
             );

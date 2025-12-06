@@ -140,13 +140,15 @@ Widget _buildModernActionCard(
           color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.shadow.withValues(alpha: 0.1),
-              blurRadius: 18,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          boxShadow: colorScheme.brightness == Brightness.dark
+              ? [
+                  BoxShadow(
+                    color: colorScheme.shadow.withValues(alpha: 0.1),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,33 +193,41 @@ Widget _buildModernActionCard(
 
 Widget _buildHeader(BuildContext context, AppLocalizations localizations) {
   final colorScheme = Theme.of(context).colorScheme;
+  final accentGreen = colorScheme.primary;
 
   return Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      Row(
         children: [
-          Text(
-            'السلام عليكم',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: colorScheme.onSurface,
-              fontFamily: 'Hafs',
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            localizations.welcome,
-            style: TextStyle(
-              fontSize: 14,
-              color: colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w500,
-            ),
+          AppIcon(accentGreen: accentGreen, colorScheme: colorScheme),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'السلام عليكم',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurface,
+                  fontFamily: 'Hafs',
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                localizations.welcome,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ],
       ),
+
       IconButton(
         onPressed: () {
           Navigator.pushNamed(context, '/settings');
@@ -259,13 +269,15 @@ Widget _buildLoadingCard(BuildContext context) {
       color: colorScheme
           .surfaceContainer, // darkSurfaceHigh in dark, light surface in light
       borderRadius: BorderRadius.circular(24),
-      boxShadow: [
-        BoxShadow(
-          color: colorScheme.shadow.withValues(alpha: 0.1),
-          blurRadius: 24,
-          offset: const Offset(0, 10),
-        ),
-      ],
+      boxShadow: colorScheme.brightness == Brightness.dark
+          ? [
+              BoxShadow(
+                color: colorScheme.shadow.withValues(alpha: 0.1),
+                blurRadius: 24,
+                offset: const Offset(0, 10),
+              ),
+            ]
+          : null,
       border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
     ),
     child: Column(
@@ -304,13 +316,15 @@ Widget _buildInitialCard(BuildContext context, AppLocalizations localizations) {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.2),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
-          ),
-        ],
+        boxShadow: colorScheme.brightness == Brightness.dark
+            ? [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.2),
+                  blurRadius: 28,
+                  offset: const Offset(0, 12),
+                ),
+              ]
+            : null,
         border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Column(
@@ -318,28 +332,7 @@ Widget _buildInitialCard(BuildContext context, AppLocalizations localizations) {
         children: [
           Row(
             children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [accentGreen, accentGreen.withValues(alpha: 0.8)],
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: accentGreen.withValues(alpha: 0.35),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.auto_stories_outlined,
-                  size: 30,
-                  color: colorScheme.onPrimary,
-                ),
-              ),
+              AppIcon(accentGreen: accentGreen, colorScheme: colorScheme),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -409,6 +402,49 @@ Widget _buildInitialCard(BuildContext context, AppLocalizations localizations) {
   );
 }
 
+class AppIcon extends StatelessWidget {
+  final double width;
+  final double height;
+  const AppIcon({
+    super.key,
+    required this.accentGreen,
+    required this.colorScheme,
+    this.width = 60,
+    this.height = 60,
+  });
+
+  final ui.Color accentGreen;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [accentGreen, accentGreen.withValues(alpha: 0.8)],
+        ),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: colorScheme.brightness == Brightness.dark
+            ? [
+                BoxShadow(
+                  color: accentGreen.withValues(alpha: 0.35),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
+      ),
+      child: Icon(
+        Icons.auto_stories_outlined,
+        size: 30,
+        color: colorScheme.onPrimary,
+      ),
+    );
+  }
+}
+
 Widget _buildInspirationCard(
   BuildContext context,
   AppLocalizations localizations,
@@ -420,120 +456,25 @@ Widget _buildInspirationCard(
     onTap: () => context.read<DailyInspirationCubit>().toggleExpansion(),
     child: Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.2),
-            blurRadius: 28,
-            offset: const Offset(0, 12),
-          ),
-        ],
+        boxShadow: colorScheme.brightness == Brightness.dark
+            ? [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.2),
+                  blurRadius: 28,
+                  offset: const Offset(0, 12),
+                ),
+              ]
+            : null,
         border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header with Islamic logo and title
-          Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [accentGreen, accentGreen.withValues(alpha: 0.8)],
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: accentGreen.withValues(alpha: 0.35),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.auto_stories_outlined,
-                  size: 30,
-                  color: colorScheme.onPrimary,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Daily Inspiration',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurface,
-                        fontFamily: 'Hafs',
-                      ),
-                    ),
-                    Text(
-                      'القرآن الكريم',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: accentGreen,
-                        fontFamily: 'Hafs',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                children: [
-                  // Play button for the current ayah
-                  AyahPlayButton(
-                    surahNumber: state.surahNumber,
-                    ayahNumber: state.verseNumber,
-                    surahName: state.surahName,
-                    size: 24.0,
-                    color: accentGreen,
-                  ),
-                  const SizedBox(width: 4),
-                  // Share button
-                  IconButton(
-                    onPressed: () {
-                      _showDailyInspirationShareModal(
-                        context,
-                        state.verseNumber,
-                        state.arabicText,
-                        state.translation,
-                        _getTranslationSourceName(state.currentTranslation),
-                        state.surahName,
-                        state.surahNumber,
-                      );
-                    },
-                    icon: Icon(Icons.share, color: accentGreen, size: 24),
-                  ),
-                  const SizedBox(width: 4),
-                  // Refresh button
-                  IconButton(
-                    onPressed: () {
-                      final settingsCubit = context.read<QuranSettingsCubit>();
-                      final currentTranslation =
-                          settingsCubit.state is QuranSettingsLoaded
-                          ? (settingsCubit.state as QuranSettingsLoaded)
-                                .selectedTranslation
-                          : quran.Translation.enSaheeh;
-                      context.read<DailyInspirationCubit>().refreshAyah(
-                        currentTranslation,
-                      );
-                    },
-                    icon: Icon(Icons.refresh, color: accentGreen, size: 24),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
           Row(
             children: [
               Container(
@@ -548,24 +489,97 @@ Widget _buildInspirationCard(
                     color: colorScheme.primary.withValues(alpha: 0.4),
                   ),
                 ),
-                child: Text(
-                  '${state.surahName} - Ayah ${state.verseNumber}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w600,
+                child: Flexible(
+                  child: Text(
+                    '${state.surahName} - Ayah ${state.verseNumber}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
+                ),
+              ),
+              const SizedBox(width: 8),
+
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    AyahPlayButton(
+                      surahNumber: state.surahNumber,
+                      ayahNumber: state.verseNumber,
+                      surahName: state.surahName,
+                      size: 18.0,
+                      color: accentGreen,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _showDailyInspirationShareModal(
+                          context,
+                          state.verseNumber,
+                          state.arabicText,
+                          state.translation,
+                          _getTranslationSourceName(state.currentTranslation),
+                          state.surahName,
+                          state.surahNumber,
+                        );
+                      },
+                      icon: Icon(Icons.share, color: accentGreen, size: 18),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        final settingsCubit = context
+                            .read<QuranSettingsCubit>();
+                        final currentTranslation =
+                            settingsCubit.state is QuranSettingsLoaded
+                            ? (settingsCubit.state as QuranSettingsLoaded)
+                                  .selectedTranslation
+                            : quran.Translation.enSaheeh;
+                        context.read<DailyInspirationCubit>().refreshAyah(
+                          currentTranslation,
+                        );
+                      },
+                      icon: Icon(Icons.refresh, color: accentGreen, size: 18),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 20),
+          // Row(
+          //   children: [
+          //     Container(
+          //       padding: const EdgeInsets.symmetric(
+          //         horizontal: 12,
+          //         vertical: 6,
+          //       ),
+          //       decoration: BoxDecoration(
+          //         color: colorScheme.primary.withValues(alpha: 0.1),
+          //         borderRadius: BorderRadius.circular(12),
+          //         border: Border.all(
+          //           color: colorScheme.primary.withValues(alpha: 0.4),
+          //         ),
+          //       ),
+          //       child: Text(
+          //         '${state.surahName} - Ayah ${state.verseNumber}',
+          //         style: TextStyle(
+          //           fontSize: 12,
+          //           color: colorScheme.primary,
+          //           fontWeight: FontWeight.w600,
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
           const SizedBox(height: 16),
           Text(
             state.isExpanded || state.translation.length <= 150
                 ? state.translation
                 : '${state.translation.substring(0, 150)}...',
             style: TextStyle(
-              fontSize: state.isExpanded ? 18 : 16,
+              fontSize: state.isExpanded ? 14 : 12,
               color: colorScheme.onSurface,
               height: 1.6,
               fontWeight: FontWeight.w500,
@@ -607,8 +621,12 @@ Widget _buildInspirationCard(
                       );
                     },
                     icon: const Icon(Icons.open_in_new, size: 16),
-                    label: const Text('Open Surah'),
+                    label: const Text(
+                      'Open Surah',
+                      style: TextStyle(fontSize: 11),
+                    ),
                     style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       foregroundColor: accentGreen,
                       side: BorderSide(color: accentGreen),
                       shape: RoundedRectangleBorder(
@@ -648,8 +666,12 @@ Widget _buildInspirationCard(
                               : Icons.bookmark_outline,
                           size: 16,
                         ),
-                        label: Text(isBookmarked ? 'Bookmarked' : 'Bookmark'),
+                        label: Text(
+                          isBookmarked ? 'Bookmarked' : 'Bookmark',
+                          style: TextStyle(fontSize: 11),
+                        ),
                         style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           side: BorderSide(color: accentGreen),
                           backgroundColor: isBookmarked
                               ? accentGreen
@@ -1050,13 +1072,15 @@ class _DailyInspirationShareModalState
       decoration: BoxDecoration(
         color: _selectedBackgroundColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        boxShadow: Theme.of(context).brightness == Brightness.dark
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.12),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : null,
       ),
       child: Column(
         children: [
@@ -1214,13 +1238,15 @@ class _DailyInspirationShareModalState
                 color: isSelected ? onColor : Colors.transparent,
                 width: 3,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              boxShadow: Theme.of(context).brightness == Brightness.dark
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
             ),
             child: isSelected
                 ? Icon(Icons.check, color: onColor, size: 20)

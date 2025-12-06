@@ -3,8 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../core/config/theme/app_color.dart';
-import '../../core/config/theme/app_gradients.dart';
+
 import '../cubits/surah_list_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 
@@ -28,9 +27,7 @@ class _SurahListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: BlocBuilder<SurahListCubit, SurahListState>(
@@ -47,25 +44,22 @@ class _SurahListView extends StatelessWidget {
                 floating: false,
                 pinned: true,
                 elevation: 2,
-                backgroundColor: isDark
-                    ? AppColor.charcoal
-                    : AppColor.primaryGreen,
-                foregroundColor: AppColor.pureWhite,
+                backgroundColor: colorScheme.primary,
+                iconTheme: IconThemeData(color: colorScheme.onPrimary),
                 surfaceTintColor: Colors.transparent,
-                shadowColor: isDark
-                    ? AppColor.charcoal.withValues(alpha: 0.3)
-                    : AppColor.primaryGreen.withValues(alpha: 0.3),
+
+                shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
                 title: Text(
                   localizations.surahs,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: AppColor.pureWhite,
+                    color: colorScheme.onPrimary,
                     fontSize: 18,
                   ),
                 ),
                 actions: [
                   IconButton(
-                    icon: Icon(Icons.settings, color: AppColor.pureWhite),
+                    icon: Icon(Icons.settings, color: colorScheme.onPrimary),
                     onPressed: () async {
                       final result = await Navigator.pushNamed(
                         context,
@@ -83,15 +77,7 @@ class _SurahListView extends StatelessWidget {
                 flexibleSpace: FlexibleSpaceBar(
                   titlePadding: EdgeInsets.zero,
                   background: Container(
-                    decoration: BoxDecoration(
-                      gradient: isDark
-                          ? LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [AppColor.charcoal, AppColor.darkGray],
-                            )
-                          : AppGradients.primary(colorScheme),
-                    ),
+                    decoration: BoxDecoration(color: colorScheme.primary),
                     child: SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -108,7 +94,6 @@ class _SurahListView extends StatelessWidget {
                   ),
                 ),
               ),
-
               // Surah List
               state.filteredSurahs.isEmpty && state.isSearching
                   ? _buildNoResults(context)
@@ -135,18 +120,21 @@ class _SurahListView extends StatelessWidget {
 
   Widget _buildSearchBar(BuildContext context, SurahListLoaded state) {
     final localizations = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColor.pureWhite,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AppColor.charcoal.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: colorScheme.brightness == Brightness.dark
+            ? [
+                BoxShadow(
+                  color: colorScheme.shadow.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
       ),
       child: TextField(
         onChanged: (value) {
@@ -155,11 +143,11 @@ class _SurahListView extends StatelessWidget {
         style: Theme.of(context).textTheme.bodyMedium,
         decoration: InputDecoration(
           hintText: localizations.searchSurah,
-          hintStyle: TextStyle(color: AppColor.translationText),
-          prefixIcon: Icon(Icons.search, color: AppColor.primaryGreen),
+          hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+          prefixIcon: Icon(Icons.search, color: colorScheme.primary),
           suffixIcon: state.searchQuery.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.clear, color: AppColor.translationText),
+                  icon: Icon(Icons.clear, color: colorScheme.onSurfaceVariant),
                   onPressed: () {
                     context.read<SurahListCubit>().clearSearch();
                   },
@@ -174,7 +162,7 @@ class _SurahListView extends StatelessWidget {
             vertical: 12,
           ),
           filled: true,
-          fillColor: AppColor.pureWhite,
+          fillColor: colorScheme.surface,
         ),
       ),
     );
@@ -186,6 +174,7 @@ class _SurahListView extends StatelessWidget {
     SurahListLoaded state,
   ) {
     final localizations = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     final surahNameArabic = quran.getSurahNameArabic(surahNumber);
     final surahNameTranslated = QuranSettingsCubit.getSurahNameInTranslation(
@@ -200,13 +189,21 @@ class _SurahListView extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColor.primaryGreen.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: colorScheme.brightness == Brightness.dark
+            ? [
+                BoxShadow(
+                  color: colorScheme.primary.withValues(alpha: 0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
+        border: colorScheme.brightness == Brightness.light
+            ? Border.all(
+                color: colorScheme.primary.withValues(alpha: 0.15),
+                width: 1,
+              )
+            : null,
       ),
       child: Material(
         color: Colors.transparent,
@@ -229,10 +226,8 @@ class _SurahListView extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    gradient: AppGradients.primary(
-                      Theme.of(context).colorScheme,
-                    ),
-                    shape: BoxShape.circle,
+                    color: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
                     child: Text(
@@ -240,7 +235,7 @@ class _SurahListView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: AppColor.pureWhite,
+                        color: colorScheme.onPrimary,
                       ),
                     ),
                   ),
@@ -259,7 +254,7 @@ class _SurahListView extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(
                               fontWeight: FontWeight.w500,
-                              color: AppColor.primaryGreen,
+                              color: colorScheme.primary,
                             ),
                       ),
 
@@ -272,7 +267,7 @@ class _SurahListView extends StatelessWidget {
                             context,
                             '$versesCount ${localizations.verses}',
                             Icons.format_list_numbered,
-                            AppColor.accent,
+                            colorScheme.secondary,
                           ),
                           const SizedBox(width: 4),
                           _buildInfoChip(
@@ -284,8 +279,8 @@ class _SurahListView extends StatelessWidget {
                                 ? Icons.location_on
                                 : Icons.location_city,
                             revelationType == RevelationPlaceEnum.meccan
-                                ? AppColor.gold
-                                : AppColor.primaryGreen,
+                                ? colorScheme.secondary
+                                : colorScheme.primary,
                           ),
                         ],
                       ),
@@ -302,7 +297,7 @@ class _SurahListView extends StatelessWidget {
                     fontFamily: 'Hafs',
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: AppColor.primaryGreen,
+                    color: colorScheme.primary,
                   ),
                   textAlign: TextAlign.right,
                   textDirection: TextDirection.rtl,
@@ -347,6 +342,7 @@ class _SurahListView extends StatelessWidget {
 
   Widget _buildNoResults(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return SliverFillRemaining(
       child: Center(
@@ -357,13 +353,13 @@ class _SurahListView extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColor.lightGray,
+                color: colorScheme.surfaceContainerHighest,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.search_off,
                 size: 40,
-                color: AppColor.mediumGray,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 24),
@@ -371,15 +367,15 @@ class _SurahListView extends StatelessWidget {
               localizations.noSurahFound,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColor.translationText,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               localizations.tryDifferentSearch,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColor.mediumGray),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
