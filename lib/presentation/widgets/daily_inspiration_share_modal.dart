@@ -235,78 +235,22 @@ class _DailyInspirationShareModalState
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.auto_stories_outlined,
-                    color: onBackground,
-                    size: 36,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    Constants.appName,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: onBackground,
-                    ),
-                  ),
-                ],
+              margin: const EdgeInsets.only(bottom: 2),
+              child: Icon(
+                Icons.auto_stories_outlined,
+                color: onBackground,
+                size: 36,
               ),
             ),
             const SizedBox(height: 4),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (showArabic)
-                    Expanded(
-                      flex: showTranslation ? 6 : 11,
-                      child: _AdaptiveText(
-                        text: widget.arabicText,
-                        textAlign: TextAlign.justify,
-                        textDirection: TextDirection.rtl,
-                        minFontSize: 16,
-                        maxFontSize: 32,
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontSize: 30,
-                          fontWeight: FontWeight.w500,
-                          color: onBackground,
-                          height: 1.6,
-                        ),
-                      ),
-                    ),
-                  if (showArabic && showTranslation)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Container(
-                        width: 60,
-                        height: 2,
-                        decoration: BoxDecoration(
-                          color: onBackgroundMuted,
-                          borderRadius: BorderRadius.circular(1),
-                        ),
-                      ),
-                    ),
-                  if (showTranslation)
-                    Expanded(
-                      flex: showArabic ? 5 : 11,
-                      child: _AdaptiveText(
-                        text: widget.translation,
-                        textAlign: TextAlign.justify,
-                        minFontSize: 12,
-                        maxFontSize: 18,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: onBackground,
-                          height: 1.45,
-                        ),
-                      ),
-                    ),
-                ],
+              child: _AyahTexts(
+                showArabic: showArabic,
+                showTranslation: showTranslation,
+                arabicText: widget.arabicText,
+                translationText: widget.translation,
+                onBackground: onBackground,
+                onBackgroundMuted: onBackgroundMuted,
               ),
             ),
             const SizedBox(height: 8),
@@ -636,6 +580,195 @@ class _AdaptiveText extends StatelessWidget {
                 : TextOverflow.fade,
             softWrap: true,
           ),
+        );
+      },
+    );
+  }
+}
+
+class _AyahTexts extends StatelessWidget {
+  const _AyahTexts({
+    required this.showArabic,
+    required this.showTranslation,
+    required this.arabicText,
+    required this.translationText,
+    required this.onBackground,
+    required this.onBackgroundMuted,
+  });
+
+  final bool showArabic;
+  final bool showTranslation;
+  final String arabicText;
+  final String translationText;
+  final Color onBackground;
+  final Color onBackgroundMuted;
+
+  double _measureHeight({
+    required String text,
+    required TextStyle style,
+    required double fontSize,
+    required double maxWidth,
+    required TextAlign textAlign,
+    required TextDirection textDirection,
+    required double textScale,
+  }) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: style.copyWith(fontSize: fontSize),
+      ),
+      textAlign: textAlign,
+      textDirection: textDirection,
+      textScaleFactor: textScale,
+      maxLines: null,
+    )..layout(maxWidth: maxWidth);
+    return painter.size.height;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!showArabic && !showTranslation) {
+      return const SizedBox.shrink();
+    }
+
+    final textScale = MediaQuery.textScaleFactorOf(context);
+    final baseDirection = Directionality.of(context);
+
+    final arabicStyle = TextStyle(
+      fontFamily: 'Hafs',
+      fontSize: 30,
+      fontWeight: FontWeight.w800,
+      color: onBackground,
+      height: 1.6,
+    );
+    final translationStyle = TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      color: onBackground,
+    );
+
+    // Slightly lower minimum for Arabic so translation can always fit.
+    const arabicMinFont = 12.0;
+    const arabicMaxFont = 32.0;
+    const translationMinFont = 9.0;
+    const translationMaxFont = 18.0;
+
+    if (!showArabic || !showTranslation) {
+      final isArabicOnly = showArabic && !showTranslation;
+      return _AdaptiveText(
+        text: isArabicOnly ? arabicText : translationText,
+        textAlign: TextAlign.justify,
+        textDirection: isArabicOnly ? TextDirection.rtl : baseDirection,
+        minFontSize: isArabicOnly ? 16 : translationMinFont,
+        maxFontSize: isArabicOnly ? arabicMaxFont : translationMaxFont,
+        style: isArabicOnly ? arabicStyle : translationStyle,
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.maxWidth;
+        final dividerSpace = 26.0; // divider + its padding
+        final maxHeight = (constraints.maxHeight - dividerSpace)
+            .clamp(0.0, double.infinity)
+            .toDouble();
+
+        var arabicFont = arabicMaxFont;
+        var translationFont = translationMaxFont;
+
+        double arabicHeight() => _measureHeight(
+          text: arabicText,
+          style: arabicStyle,
+          fontSize: arabicFont,
+          maxWidth: maxWidth,
+          textAlign: TextAlign.justify,
+          textDirection: TextDirection.rtl,
+          textScale: textScale,
+        );
+
+        double translationHeight() => _measureHeight(
+          text: translationText,
+          style: translationStyle,
+          fontSize: translationFont,
+          maxWidth: maxWidth,
+          textAlign: TextAlign.justify,
+          textDirection: baseDirection,
+          textScale: textScale,
+        );
+
+        var currentArabicHeight = arabicHeight();
+        var currentTranslationHeight = translationHeight();
+
+        // Reduce Arabic font first to guarantee translation visibility, then shrink translation if needed.
+        while ((currentArabicHeight + currentTranslationHeight) > maxHeight &&
+            (arabicFont > arabicMinFont ||
+                translationFont > translationMinFont)) {
+          if (arabicFont > arabicMinFont) {
+            arabicFont = (arabicFont - 0.5).clamp(arabicMinFont, arabicMaxFont);
+          } else if (translationFont > translationMinFont) {
+            translationFont = (translationFont - 0.5).clamp(
+              translationMinFont,
+              translationMaxFont,
+            );
+          } else {
+            break;
+          }
+          currentArabicHeight = arabicHeight();
+          currentTranslationHeight = translationHeight();
+        }
+
+        final totalTextHeight = currentArabicHeight + currentTranslationHeight;
+        if (totalTextHeight > maxHeight && maxHeight > 0) {
+          final ratio = maxHeight / totalTextHeight;
+          arabicFont = (arabicFont * ratio).clamp(9.0, arabicMaxFont);
+          translationFont = (translationFont * ratio).clamp(
+            9.0,
+            translationMaxFont,
+          );
+          currentArabicHeight = arabicHeight();
+          currentTranslationHeight = translationHeight();
+        }
+
+        final remainingSpace =
+            constraints.maxHeight -
+            (currentArabicHeight + currentTranslationHeight + dividerSpace);
+        final extraSpacerHeight = remainingSpace > 0 ? remainingSpace : 0.0;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: currentArabicHeight,
+              child: Text(
+                arabicText,
+                textAlign: TextAlign.justify,
+                textDirection: TextDirection.rtl,
+                style: arabicStyle.copyWith(fontSize: arabicFont),
+                softWrap: true,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Container(
+                width: 60,
+                height: 2,
+                decoration: BoxDecoration(
+                  color: onBackgroundMuted,
+                  borderRadius: BorderRadius.circular(1),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: currentTranslationHeight,
+              child: Text(
+                translationText,
+                textAlign: TextAlign.justify,
+                style: translationStyle.copyWith(fontSize: translationFont),
+                softWrap: true,
+              ),
+            ),
+            if (extraSpacerHeight > 0) SizedBox(height: extraSpacerHeight),
+          ],
         );
       },
     );
