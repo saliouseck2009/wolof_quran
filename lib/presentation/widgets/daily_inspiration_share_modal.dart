@@ -207,125 +207,152 @@ class _DailyInspirationShareModalState
   Widget _buildPreviewCard() {
     final onBackground = _selectedForeground;
     final onBackgroundMuted = _selectedForegroundMuted;
+    final showArabic =
+        _selectedDisplayMode == AyahDisplayMode.both ||
+        _selectedDisplayMode == AyahDisplayMode.arabicOnly;
+    final showTranslation =
+        _selectedDisplayMode == AyahDisplayMode.both ||
+        _selectedDisplayMode == AyahDisplayMode.translationOnly;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _selectedBackgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: Theme.of(context).brightness == Brightness.dark
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.12),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
-                ),
-              ]
-            : null,
-      ),
-      child: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.auto_stories_outlined,
-                  color: onBackground,
-                  size: 36,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  Constants.appName,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+    return AspectRatio(
+      aspectRatio: 9 / 16,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _selectedBackgroundColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: Theme.of(context).brightness == Brightness.dark
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.auto_stories_outlined,
                     color: onBackground,
+                    size: 36,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    Constants.appName,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: onBackground,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 4),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (showArabic)
+                    Expanded(
+                      flex: showTranslation ? 6 : 11,
+                      child: _AdaptiveText(
+                        text: widget.arabicText,
+                        textAlign: TextAlign.justify,
+                        textDirection: TextDirection.rtl,
+                        minFontSize: 16,
+                        maxFontSize: 32,
+                        style: TextStyle(
+                          fontFamily: 'Hafs',
+                          fontSize: 30,
+                          fontWeight: FontWeight.w500,
+                          color: onBackground,
+                          height: 1.6,
+                        ),
+                      ),
+                    ),
+                  if (showArabic && showTranslation)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Container(
+                        width: 60,
+                        height: 2,
+                        decoration: BoxDecoration(
+                          color: onBackgroundMuted,
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
+                    ),
+                  if (showTranslation)
+                    Expanded(
+                      flex: showArabic ? 5 : 11,
+                      child: _AdaptiveText(
+                        text: widget.translation,
+                        textAlign: TextAlign.justify,
+                        minFontSize: 12,
+                        maxFontSize: 18,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: onBackground,
+                          height: 1.45,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: onBackgroundMuted.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    '${widget.surahName} ${widget.surahNumber}:${widget.verseNumber}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: onBackground,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: onBackgroundMuted.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    Constants.appName,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: onBackground,
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-          if (_selectedDisplayMode == AyahDisplayMode.both ||
-              _selectedDisplayMode == AyahDisplayMode.arabicOnly)
-            Text(
-              widget.arabicText,
-              textAlign: TextAlign.justify,
-              textDirection: TextDirection.rtl,
-              style: TextStyle(
-                fontFamily: 'Hafs',
-                fontSize: 30,
-                fontWeight: FontWeight.w500,
-                color: onBackground,
-
-                height: 1.6,
-              ),
-            ),
-          if (_selectedDisplayMode == AyahDisplayMode.both)
-            Container(
-              width: 60,
-              height: 2,
-              margin: const EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(
-                color: onBackgroundMuted,
-                borderRadius: BorderRadius.circular(1),
-              ),
-            ),
-          if (_selectedDisplayMode == AyahDisplayMode.both ||
-              _selectedDisplayMode == AyahDisplayMode.translationOnly)
-            Text(
-              widget.translation,
-              textAlign: TextAlign.justify,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: onBackground,
-              ),
-            ),
-          const SizedBox(height: 16),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: onBackgroundMuted.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  '${widget.surahName} ${widget.surahNumber}:${widget.verseNumber}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: onBackground,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: onBackgroundMuted.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  Constants.appName,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: onBackground,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -528,5 +555,89 @@ class _DailyInspirationShareModalState
         ),
       );
     }
+  }
+}
+
+class _AdaptiveText extends StatelessWidget {
+  const _AdaptiveText({
+    required this.text,
+    required this.style,
+    required this.minFontSize,
+    required this.maxFontSize,
+    this.textAlign = TextAlign.start,
+    this.textDirection,
+    this.maxLines,
+  });
+
+  final String text;
+  final TextStyle style;
+  final double minFontSize;
+  final double maxFontSize;
+  final TextAlign textAlign;
+  final TextDirection? textDirection;
+  final int? maxLines;
+
+  double _calculateFontSize(BoxConstraints constraints, BuildContext context) {
+    final availableWidth = constraints.maxWidth.isFinite
+        ? constraints.maxWidth
+        : MediaQuery.sizeOf(context).width;
+    final availableHeight = constraints.maxHeight.isFinite
+        ? constraints.maxHeight
+        : double.infinity;
+
+    var low = minFontSize;
+    var high = maxFontSize;
+    var best = low;
+    final direction = textDirection ?? Directionality.of(context);
+    final scale = MediaQuery.textScaleFactorOf(context);
+
+    while (high - low > 0.5) {
+      final mid = (low + high) / 2;
+      final painter = TextPainter(
+        text: TextSpan(
+          text: text,
+          style: style.copyWith(fontSize: mid),
+        ),
+        textAlign: textAlign,
+        textDirection: direction,
+        textScaleFactor: scale,
+        maxLines: maxLines,
+      );
+      painter.layout(maxWidth: availableWidth);
+      final exceedsHeight =
+          availableHeight.isFinite && painter.height > availableHeight;
+      final exceedsLines = painter.didExceedMaxLines;
+      if (exceedsHeight || exceedsLines) {
+        high = mid;
+      } else {
+        best = mid;
+        low = mid;
+      }
+    }
+
+    return best.clamp(minFontSize, maxFontSize);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final fittedFontSize = _calculateFontSize(constraints, context);
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Text(
+            text,
+            textAlign: textAlign,
+            textDirection: textDirection,
+            style: style.copyWith(fontSize: fittedFontSize),
+            maxLines: maxLines,
+            overflow: maxLines != null
+                ? TextOverflow.ellipsis
+                : TextOverflow.fade,
+            softWrap: true,
+          ),
+        );
+      },
+    );
   }
 }
