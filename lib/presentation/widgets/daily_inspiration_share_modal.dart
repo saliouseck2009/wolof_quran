@@ -234,46 +234,29 @@ class _DailyInspirationShareModalState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              margin: const EdgeInsets.only(bottom: 2),
-              child: Icon(
-                Icons.auto_stories_outlined,
-                color: onBackground,
-                size: 36,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Expanded(
-              child: _AyahTexts(
-                showArabic: showArabic,
-                showTranslation: showTranslation,
-                arabicText: widget.arabicText,
-                translationText: widget.translation,
-                onBackground: onBackground,
-                onBackgroundMuted: onBackgroundMuted,
-              ),
-            ),
-            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: onBackgroundMuted.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    '${widget.surahName} ${widget.surahNumber}:${widget.verseNumber}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: onBackground,
+                Row(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 2),
+                      child: Icon(
+                        Icons.auto_stories_outlined,
+                        color: onBackground,
+                        size: 36,
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${widget.surahName} (${widget.surahNumber}): ${widget.verseNumber}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: onBackground,
+                      ),
+                    ),
+                  ],
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -295,6 +278,18 @@ class _DailyInspirationShareModalState
                 ),
               ],
             ),
+            const SizedBox(height: 4),
+            Expanded(
+              child: _AyahTexts(
+                showArabic: showArabic,
+                showTranslation: showTranslation,
+                arabicText: widget.arabicText,
+                translationText: widget.translation,
+                onBackground: onBackground,
+                onBackgroundMuted: onBackgroundMuted,
+              ),
+            ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
@@ -521,52 +516,14 @@ class _AdaptiveText extends StatelessWidget {
   final TextDirection? textDirection;
   final int? maxLines;
 
-  double _calculateFontSize(BoxConstraints constraints, BuildContext context) {
-    final availableWidth = constraints.maxWidth.isFinite
-        ? constraints.maxWidth
-        : MediaQuery.sizeOf(context).width;
-    final availableHeight = constraints.maxHeight.isFinite
-        ? constraints.maxHeight
-        : double.infinity;
-
-    var low = minFontSize;
-    var high = maxFontSize;
-    var best = low;
-    final direction = textDirection ?? Directionality.of(context);
-    final scale = MediaQuery.textScaleFactorOf(context);
-
-    while (high - low > 0.5) {
-      final mid = (low + high) / 2;
-      final painter = TextPainter(
-        text: TextSpan(
-          text: text,
-          style: style.copyWith(fontSize: mid),
-        ),
-        textAlign: textAlign,
-        textDirection: direction,
-        textScaleFactor: scale,
-        maxLines: maxLines,
-      );
-      painter.layout(maxWidth: availableWidth);
-      final exceedsHeight =
-          availableHeight.isFinite && painter.height > availableHeight;
-      final exceedsLines = painter.didExceedMaxLines;
-      if (exceedsHeight || exceedsLines) {
-        high = mid;
-      } else {
-        best = mid;
-        low = mid;
-      }
-    }
-
-    return best.clamp(minFontSize, maxFontSize);
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final fittedFontSize = _calculateFontSize(constraints, context);
+        final fittedFontSize = _calculateFontSize(
+          constraints,
+          context,
+        ).clamp(4.0, maxFontSize);
         return Align(
           alignment: Alignment.topCenter,
           child: Text(
@@ -583,6 +540,61 @@ class _AdaptiveText extends StatelessWidget {
         );
       },
     );
+  }
+
+  double _calculateFontSize(BoxConstraints constraints, BuildContext context) {
+    final availableWidth = constraints.maxWidth.isFinite
+        ? constraints.maxWidth
+        : MediaQuery.sizeOf(context).width;
+    final availableHeight = constraints.maxHeight.isFinite
+        ? constraints.maxHeight
+        : double.infinity;
+
+    final direction = textDirection ?? Directionality.of(context);
+    final scale = MediaQuery.textScaleFactorOf(context);
+
+    double measure(double size) {
+      final painter = TextPainter(
+        text: TextSpan(
+          text: text,
+          style: style.copyWith(fontSize: size),
+        ),
+        textAlign: textAlign,
+        textDirection: direction,
+        textScaleFactor: scale,
+        maxLines: maxLines,
+      )..layout(maxWidth: availableWidth);
+      return painter.height;
+    }
+
+    double search(double low, double high) {
+      var best = low;
+      while (high - low > 0.3) {
+        final mid = (low + high) / 2;
+        final height = measure(mid);
+        final exceedsHeight =
+            availableHeight.isFinite && height > availableHeight;
+        if (exceedsHeight) {
+          high = mid;
+        } else {
+          best = mid;
+          low = mid;
+        }
+      }
+      return best;
+    }
+
+    // Try to stay above the preferred minimum first.
+    final preferredFit = search(minFontSize, maxFontSize);
+    final preferredHeight = measure(preferredFit);
+    if (!(availableHeight.isFinite && preferredHeight > availableHeight)) {
+      return preferredFit;
+    }
+
+    // Fallback: allow going below the preferred min down to a safe floor.
+    final floorMin = minFontSize > 6.0 ? 6.0 : minFontSize;
+    final fallbackFit = search(floorMin, minFontSize);
+    return fallbackFit;
   }
 }
 
@@ -633,25 +645,32 @@ class _AyahTexts extends StatelessWidget {
 
     final textScale = MediaQuery.textScaleFactorOf(context);
     final baseDirection = Directionality.of(context);
+    const dividerHeight = 2.0;
+    const dividerPadding = 12.0;
+    const dividerSpace = dividerHeight + dividerPadding * 2;
 
     final arabicStyle = TextStyle(
       fontFamily: 'Hafs',
       fontSize: 30,
-      fontWeight: FontWeight.w800,
+      fontWeight: FontWeight.w400,
       color: onBackground,
-      height: 1.6,
+      height: 1.45,
+      letterSpacing: 0.3,
     );
     final translationStyle = TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w500,
       color: onBackground,
+      height: 1.32,
+      letterSpacing: 0.3,
     );
 
     // Slightly lower minimum for Arabic so translation can always fit.
-    const arabicMinFont = 12.0;
+    const arabicMinFont = 7.0;
     const arabicMaxFont = 32.0;
-    const translationMinFont = 9.0;
+    const translationMinFont = 6.0;
     const translationMaxFont = 18.0;
+    const absoluteFloor = 6.0; // Hard floor to always fit everything.
 
     if (!showArabic || !showTranslation) {
       final isArabicOnly = showArabic && !showTranslation;
@@ -659,7 +678,7 @@ class _AyahTexts extends StatelessWidget {
         text: isArabicOnly ? arabicText : translationText,
         textAlign: TextAlign.justify,
         textDirection: isArabicOnly ? TextDirection.rtl : baseDirection,
-        minFontSize: isArabicOnly ? 16 : translationMinFont,
+        minFontSize: isArabicOnly ? arabicMinFont : translationMinFont,
         maxFontSize: isArabicOnly ? arabicMaxFont : translationMaxFont,
         style: isArabicOnly ? arabicStyle : translationStyle,
       );
@@ -668,15 +687,86 @@ class _AyahTexts extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = constraints.maxWidth;
-        final dividerSpace = 26.0; // divider + its padding
         final maxHeight = (constraints.maxHeight - dividerSpace)
             .clamp(0.0, double.infinity)
             .toDouble();
 
-        var arabicFont = arabicMaxFont;
-        var translationFont = translationMaxFont;
+        double measureTotal(double aSize, double tSize) {
+          final aHeight = _measureHeight(
+            text: arabicText,
+            style: arabicStyle,
+            fontSize: aSize,
+            maxWidth: maxWidth,
+            textAlign: TextAlign.justify,
+            textDirection: TextDirection.rtl,
+            textScale: textScale,
+          );
+          final tHeight = _measureHeight(
+            text: translationText,
+            style: translationStyle,
+            fontSize: tSize,
+            maxWidth: maxWidth,
+            textAlign: TextAlign.justify,
+            textDirection: baseDirection,
+            textScale: textScale,
+          );
+          return aHeight + tHeight;
+        }
 
-        double arabicHeight() => _measureHeight(
+        double arabicFont = arabicMinFont;
+        double translationFont = translationMinFont;
+
+        double low = 0.0;
+        double high = 1.0;
+        for (var i = 0; i < 26; i++) {
+          final mid = (low + high) / 2;
+          final candidateArabic = (arabicMaxFont * mid).clamp(
+            arabicMinFont,
+            arabicMaxFont,
+          );
+          final candidateTranslation = (translationMaxFont * mid).clamp(
+            translationMinFont,
+            translationMaxFont,
+          );
+          final total = measureTotal(candidateArabic, candidateTranslation);
+          if (total <= maxHeight) {
+            arabicFont = candidateArabic;
+            translationFont = candidateTranslation;
+            low = mid;
+          } else {
+            high = mid;
+          }
+        }
+
+        // Fallback: if even the minimums don't fit, scale both further down together.
+        final minTotal = measureTotal(arabicMinFont, translationMinFont);
+        if (minTotal > maxHeight && maxHeight > 0) {
+          final squeeze = (maxHeight / minTotal).clamp(0.3, 1.0);
+          arabicFont = (arabicMinFont * squeeze).clamp(
+            absoluteFloor,
+            arabicMaxFont,
+          );
+          translationFont = (translationMinFont * squeeze).clamp(
+            absoluteFloor,
+            translationMaxFont,
+          );
+        }
+
+        // Last safeguard if rounding still causes an overflow.
+        final totalAfterFallback = measureTotal(arabicFont, translationFont);
+        if (totalAfterFallback > maxHeight && maxHeight > 0) {
+          final factor = (maxHeight / totalAfterFallback).clamp(0.1, 1.0);
+          arabicFont = (arabicFont * factor).clamp(
+            absoluteFloor,
+            arabicMaxFont,
+          );
+          translationFont = (translationFont * factor).clamp(
+            absoluteFloor,
+            translationMaxFont,
+          );
+        }
+
+        final currentArabicHeight = _measureHeight(
           text: arabicText,
           style: arabicStyle,
           fontSize: arabicFont,
@@ -685,8 +775,7 @@ class _AyahTexts extends StatelessWidget {
           textDirection: TextDirection.rtl,
           textScale: textScale,
         );
-
-        double translationHeight() => _measureHeight(
+        final currentTranslationHeight = _measureHeight(
           text: translationText,
           style: translationStyle,
           fontSize: translationFont,
@@ -695,39 +784,6 @@ class _AyahTexts extends StatelessWidget {
           textDirection: baseDirection,
           textScale: textScale,
         );
-
-        var currentArabicHeight = arabicHeight();
-        var currentTranslationHeight = translationHeight();
-
-        // Reduce Arabic font first to guarantee translation visibility, then shrink translation if needed.
-        while ((currentArabicHeight + currentTranslationHeight) > maxHeight &&
-            (arabicFont > arabicMinFont ||
-                translationFont > translationMinFont)) {
-          if (arabicFont > arabicMinFont) {
-            arabicFont = (arabicFont - 0.5).clamp(arabicMinFont, arabicMaxFont);
-          } else if (translationFont > translationMinFont) {
-            translationFont = (translationFont - 0.5).clamp(
-              translationMinFont,
-              translationMaxFont,
-            );
-          } else {
-            break;
-          }
-          currentArabicHeight = arabicHeight();
-          currentTranslationHeight = translationHeight();
-        }
-
-        final totalTextHeight = currentArabicHeight + currentTranslationHeight;
-        if (totalTextHeight > maxHeight && maxHeight > 0) {
-          final ratio = maxHeight / totalTextHeight;
-          arabicFont = (arabicFont * ratio).clamp(9.0, arabicMaxFont);
-          translationFont = (translationFont * ratio).clamp(
-            9.0,
-            translationMaxFont,
-          );
-          currentArabicHeight = arabicHeight();
-          currentTranslationHeight = translationHeight();
-        }
 
         final remainingSpace =
             constraints.maxHeight -
@@ -748,10 +804,10 @@ class _AyahTexts extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: dividerPadding),
               child: Container(
                 width: 60,
-                height: 2,
+                height: dividerHeight,
                 decoration: BoxDecoration(
                   color: onBackgroundMuted,
                   borderRadius: BorderRadius.circular(1),
