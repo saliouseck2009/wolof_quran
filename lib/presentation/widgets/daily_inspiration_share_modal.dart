@@ -6,13 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:wolof_quran/core/utils/constants/constants.dart';
 import '../../l10n/generated/app_localizations.dart';
-
-enum AyahDisplayMode {
-  both,
-  arabicOnly,
-  translationOnly,
-}
+import '../cubits/surah_detail_cubit.dart';
 
 void showDailyInspirationShareModal(
   BuildContext context,
@@ -113,7 +109,7 @@ class _DailyInspirationShareModalState
     final isDark = colorScheme.brightness == Brightness.dark;
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.9,
+      height: double.infinity,
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -135,14 +131,13 @@ class _DailyInspirationShareModalState
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Share Daily Inspiration',
+                  'Share Ayah ',
                   style: textTheme.titleMedium?.copyWith(
-                    fontFamily: 'Hafs',
                     fontWeight: FontWeight.w700,
                     color: colorScheme.onSurface,
                   ),
@@ -156,7 +151,7 @@ class _DailyInspirationShareModalState
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 64),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -176,8 +171,7 @@ class _DailyInspirationShareModalState
                     label: Text(
                       'Share Image',
                       style: textTheme.titleSmall?.copyWith(
-                        fontFamily: 'Hafs',
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w400,
                         color: colorScheme.onPrimary,
                       ),
                     ),
@@ -204,7 +198,6 @@ class _DailyInspirationShareModalState
     return Text(
       title,
       style: theme.textTheme.titleSmall?.copyWith(
-        fontFamily: 'Hafs',
         fontWeight: FontWeight.w600,
         color: theme.colorScheme.onSurface,
       ),
@@ -216,7 +209,7 @@ class _DailyInspirationShareModalState
     final onBackgroundMuted = _selectedForegroundMuted;
 
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: _selectedBackgroundColor,
         borderRadius: BorderRadius.circular(16),
@@ -233,7 +226,7 @@ class _DailyInspirationShareModalState
       child: Column(
         children: [
           Container(
-            margin: const EdgeInsets.only(bottom: 24),
+            margin: const EdgeInsets.only(bottom: 8),
             child: Column(
               children: [
                 Icon(
@@ -241,15 +234,13 @@ class _DailyInspirationShareModalState
                   color: onBackground,
                   size: 36,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Text(
-                  'Daily Inspiration',
+                  Constants.appName,
                   style: TextStyle(
-                    fontFamily: 'Hafs',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: onBackground,
-                    letterSpacing: 0.5,
                   ),
                 ),
               ],
@@ -259,14 +250,15 @@ class _DailyInspirationShareModalState
               _selectedDisplayMode == AyahDisplayMode.arabicOnly)
             Text(
               widget.arabicText,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.justify,
               textDirection: TextDirection.rtl,
               style: TextStyle(
                 fontFamily: 'Hafs',
                 fontSize: 30,
                 fontWeight: FontWeight.w500,
                 color: onBackground,
-                height: 1.8,
+
+                height: 1.6,
               ),
             ),
           if (_selectedDisplayMode == AyahDisplayMode.both)
@@ -283,51 +275,31 @@ class _DailyInspirationShareModalState
               _selectedDisplayMode == AyahDisplayMode.translationOnly)
             Text(
               widget.translation,
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.justify,
               style: TextStyle(
-                fontFamily: 'Hafs',
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: onBackground,
-                height: 1.5,
-              ),
-            ),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: onBackgroundMuted.withValues(alpha: 0.35),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              widget.surahName,
-              style: TextStyle(
-                fontFamily: 'Hafs',
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: onBackground,
-                letterSpacing: 0.3,
               ),
             ),
-          ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 6,
+                  vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: onBackgroundMuted.withValues(alpha: 0.35),
+                  color: onBackgroundMuted.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  '${widget.surahNumber}:${widget.verseNumber}',
+                  '${widget.surahName} ${widget.surahNumber}:${widget.verseNumber}',
                   style: TextStyle(
-                    fontFamily: 'Hafs',
-                    fontSize: 13,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: onBackground,
                   ),
@@ -336,20 +308,18 @@ class _DailyInspirationShareModalState
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 6,
+                  vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: onBackgroundMuted.withValues(alpha: 0.35),
+                  color: onBackgroundMuted.withValues(alpha: 0.25),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  'Wolof-Quran',
+                  Constants.appName,
                   style: TextStyle(
-                    fontFamily: 'Hafs',
                     fontSize: 11,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: onBackground,
-                    letterSpacing: 0.5,
                   ),
                 ),
               ),
@@ -472,7 +442,6 @@ class _DailyInspirationShareModalState
                   child: Text(
                     label,
                     style: TextStyle(
-                      fontFamily: 'Hafs',
                       fontSize: 16,
                       fontWeight: isSelected
                           ? FontWeight.w600

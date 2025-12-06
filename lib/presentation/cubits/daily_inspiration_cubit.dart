@@ -7,6 +7,9 @@ import 'package:quran/quran.dart' as quran;
 class DailyInspirationCubit extends Cubit<DailyInspirationState> {
   DailyInspirationCubit() : super(DailyInspirationInitial());
 
+  // Store the expansion state to preserve it during refresh
+  bool _wasExpanded = false;
+
   void generateRandomAyah(quran.Translation currentTranslation) {
     emit(DailyInspirationLoading());
 
@@ -44,6 +47,9 @@ class DailyInspirationCubit extends Cubit<DailyInspirationState> {
           isExpanded: false,
         ),
       );
+
+      // Reset the saved expansion state after initial load
+      _wasExpanded = false;
     } catch (e) {
       emit(DailyInspirationError('Failed to load ayah: $e'));
     }
@@ -52,12 +58,58 @@ class DailyInspirationCubit extends Cubit<DailyInspirationState> {
   void toggleExpansion() {
     final currentState = state;
     if (currentState is DailyInspirationLoaded) {
-      emit(currentState.copyWith(isExpanded: !currentState.isExpanded));
+      final newExpandedState = !currentState.isExpanded;
+      emit(currentState.copyWith(isExpanded: newExpandedState));
+      _wasExpanded = newExpandedState;
     }
   }
 
   void refreshAyah(quran.Translation currentTranslation) {
-    generateRandomAyah(currentTranslation);
+    // Save current expansion state before refreshing
+    final currentState = state;
+    if (currentState is DailyInspirationLoaded) {
+      _wasExpanded = currentState.isExpanded;
+    }
+
+    emit(DailyInspirationLoading());
+
+    try {
+      final random = Random();
+
+      // Generate random surah (1-114)
+      final surahNumber = random.nextInt(114) + 1;
+
+      // Get verse count for the surah
+      final verseCount = quran.getVerseCount(surahNumber);
+
+      // Generate random verse (1 to verseCount)
+      final verseNumber = random.nextInt(verseCount) + 1;
+
+      // Get ayah data
+      final arabicText = quran.getVerse(surahNumber, verseNumber);
+      final surahName = quran.getSurahName(surahNumber);
+
+      // Get translation based on current settings
+      final translation = quran.getVerseTranslation(
+        surahNumber,
+        verseNumber,
+        translation: currentTranslation,
+      );
+
+      emit(
+        DailyInspirationLoaded(
+          surahNumber: surahNumber,
+          verseNumber: verseNumber,
+          arabicText: arabicText,
+          translation: translation,
+          surahName: surahName,
+          currentTranslation: currentTranslation,
+          isExpanded: _wasExpanded, // Preserve the expansion state
+        ),
+      );
+    } catch (e) {
+      emit(DailyInspirationError('Failed to load ayah: $e'));
+    }
   }
 }
 

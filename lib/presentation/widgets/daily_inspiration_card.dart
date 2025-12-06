@@ -67,7 +67,10 @@ class DailyInspirationCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInitialCard(BuildContext context, AppLocalizations localizations) {
+  Widget _buildInitialCard(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final accentGreen = colorScheme.primary;
     return GestureDetector(
@@ -201,27 +204,30 @@ class DailyInspirationCard extends StatelessWidget {
           children: [
             // Header with Islamic logo and title
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: colorScheme.primary.withValues(alpha: 0.4),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
                     ),
-                  ),
-                  child: Flexible(
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: colorScheme.primary.withValues(alpha: 0.4),
+                      ),
+                    ),
                     child: Text(
-                      '${state.surahName} - Ayah ${state.verseNumber}',
+                      '${state.surahName} : ${state.verseNumber}',
                       style: TextStyle(
                         fontSize: 12,
                         color: colorScheme.primary,
                         fontWeight: FontWeight.w600,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
@@ -269,8 +275,7 @@ class DailyInspirationCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Text(
               state.isExpanded || state.translation.length <= 150
                   ? state.translation
@@ -454,7 +459,8 @@ class DailyInspirationCard extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: () {
               final settingsCubit = context.read<QuranSettingsCubit>();
-              final currentTranslation = settingsCubit.state.selectedTranslation;
+              final currentTranslation =
+                  settingsCubit.state.selectedTranslation;
               context.read<DailyInspirationCubit>().generateRandomAyah(
                 currentTranslation,
               );
