@@ -139,8 +139,7 @@ class SurahDetailContent extends StatelessWidget {
     final quranSettingsCubit = context.read<QuranSettingsCubit>();
     final quranSettingsState = quranSettingsCubit.state;
 
-    if (quranSettingsState is QuranSettingsLoaded &&
-        quranSettingsState.selectedReciter != null) {
+    if (quranSettingsState.selectedReciter != null) {
       audioManagementCubit.loadAyahAudios(
         quranSettingsState.selectedReciter!.id,
         surahNumber,
@@ -610,8 +609,7 @@ class SurahPlayButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
       builder: (context, quranSettingsState) {
-        if (quranSettingsState is! QuranSettingsLoaded ||
-            quranSettingsState.selectedReciter == null) {
+        if (quranSettingsState.selectedReciter == null) {
           return const SizedBox.shrink();
         }
 

@@ -3,28 +3,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quran/quran.dart' as quran;
 import '../../domain/entities/reciter.dart';
 
-// State classes
-abstract class QuranSettingsState {}
-
-class QuranSettingsInitial extends QuranSettingsState {}
-
-class QuranSettingsLoaded extends QuranSettingsState {
+// Single State class with default values
+class QuranSettingsState {
   final quran.Translation selectedTranslation;
   final Reciter? selectedReciter;
   final double ayahFontSize;
 
-  QuranSettingsLoaded({
-    required this.selectedTranslation,
+  const QuranSettingsState({
+    this.selectedTranslation = quran.Translation.frHamidullah,
     this.selectedReciter,
-    this.ayahFontSize = 28.0, // Default font size
+    this.ayahFontSize = 28.0,
   });
 
-  QuranSettingsLoaded copyWith({
+  QuranSettingsState copyWith({
     quran.Translation? selectedTranslation,
     Reciter? selectedReciter,
     double? ayahFontSize,
   }) {
-    return QuranSettingsLoaded(
+    return QuranSettingsState(
       selectedTranslation: selectedTranslation ?? this.selectedTranslation,
       selectedReciter: selectedReciter ?? this.selectedReciter,
       ayahFontSize: ayahFontSize ?? this.ayahFontSize,
@@ -56,35 +52,13 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   static const double maxFontSize = 40.0;
   static const double defaultFontSize = 28.0;
 
-  QuranSettingsCubit() : super(QuranSettingsInitial());
+  QuranSettingsCubit() : super(const QuranSettingsState());
 
-  // Getter for easy access to current translation
-  quran.Translation get currentTranslation {
-    final currentState = state;
-    if (currentState is QuranSettingsLoaded) {
-      return currentState.selectedTranslation;
-    }
-    // Return default translation if state is not loaded
-    return quran.Translation.frHamidullah;
-  }
-
-  // Getter for easy access to current reciter
-  Reciter? get currentReciter {
-    final currentState = state;
-    if (currentState is QuranSettingsLoaded) {
-      return currentState.selectedReciter;
-    }
-    return null;
-  }
-
-  // Getter for easy access to current ayah font size
-  double get currentAyahFontSize {
-    final currentState = state;
-    if (currentState is QuranSettingsLoaded) {
-      return currentState.ayahFontSize;
-    }
-    return defaultFontSize;
-  }
+  // Getter for easy access to config items directly from context.read<QuranSettingsCubit>().configItem
+  // However, users can also just use state.selectedTranslation since state is always available and has defaults.
+  quran.Translation get currentTranslation => state.selectedTranslation;
+  Reciter? get currentReciter => state.selectedReciter;
+  double get currentAyahFontSize => state.ayahFontSize;
 
   // Available translations based on the README
   static const List<TranslationOption> availableTranslations = [
@@ -169,60 +143,43 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   void loadSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      
+      // Load Translation
       final translationIndex = prefs.getInt(_translationKey);
-
-      quran.Translation selectedTranslation;
+      quran.Translation selectedTranslation = quran.Translation.frHamidullah;
+      
       if (translationIndex != null &&
           translationIndex < availableTranslations.length) {
         selectedTranslation =
             availableTranslations[translationIndex].translation;
-      } else {
-        // Default to French for first-time users
-        selectedTranslation = quran.Translation.frHamidullah;
       }
 
-      // Load font size, default to 28.0 if not found
+      // Load font size
       final savedFontSize =
           prefs.getDouble(_ayahFontSizeKey) ?? defaultFontSize;
       final ayahFontSize = savedFontSize.clamp(minFontSize, maxFontSize);
 
-      // Check if we have a saved reciter ID, if not set imamsarr as default
+      // Check reciter preference
       final savedReciterId = prefs.getString(_reciterKey);
       if (savedReciterId == null) {
-        // Set imamsarr as default reciter ID in preferences
         await prefs.setString(_reciterKey, 'imamsarr');
       }
 
-      // We'll emit without reciter first, then update when reciter is loaded
-      emit(
-        QuranSettingsLoaded(
-          selectedTranslation: selectedTranslation,
-          selectedReciter: null,
-          ayahFontSize: ayahFontSize,
-        ),
-      );
+      emit(state.copyWith(
+        selectedTranslation: selectedTranslation,
+        ayahFontSize: ayahFontSize,
+        // selectedReciter not set here, waiting for loadReciterFromPrefs
+      ));
 
-      // The reciter will be loaded and set by loadReciterFromPrefs when reciters are available
     } catch (e) {
-      // Fallback to French if there's an error
-      emit(
-        QuranSettingsLoaded(
-          selectedTranslation: quran.Translation.frHamidullah,
-          selectedReciter: null,
-          ayahFontSize: defaultFontSize,
-        ),
-      );
-
-      // Try to set the default reciter ID even in error case
+      // Fallback is handled by default state values, but we can emit a reset if needed.
+      // In this case, if error occurs, we just keep defaults.
       try {
         final prefs = await SharedPreferences.getInstance();
-        final savedReciterId = prefs.getString(_reciterKey);
-        if (savedReciterId == null) {
-          await prefs.setString(_reciterKey, 'imamsarr');
+        if (prefs.getString(_reciterKey) == null) {
+           await prefs.setString(_reciterKey, 'imamsarr');
         }
-      } catch (_) {
-        // Ignore errors in fallback
-      }
+      } catch (_) {}
     }
   }
 
@@ -230,13 +187,9 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_reciterKey, reciter.id);
-
-      final currentState = state;
-      if (currentState is QuranSettingsLoaded) {
-        emit(currentState.copyWith(selectedReciter: reciter));
-      }
+      emit(state.copyWith(selectedReciter: reciter));
     } catch (e) {
-      // Handle error silently or emit error state if needed
+      // Handle error
     }
   }
 
@@ -252,11 +205,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
               ? availableReciters.first
               : throw Exception('No reciters available'),
         );
-
-        final currentState = state;
-        if (currentState is QuranSettingsLoaded) {
-          emit(currentState.copyWith(selectedReciter: selectedReciter));
-        }
+        emit(state.copyWith(selectedReciter: selectedReciter));
       } else if (availableReciters.isNotEmpty) {
         // Set imamsarr as default if available, otherwise first reciter
         final defaultReciter = availableReciters.firstWhere(
@@ -266,7 +215,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         updateReciter(defaultReciter);
       }
     } catch (e) {
-      // Handle error silently
+      // Handle error
     }
   }
 
@@ -278,40 +227,21 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
       );
       if (index != -1) {
         await prefs.setInt(_translationKey, index);
-
-        final currentState = state;
-        if (currentState is QuranSettingsLoaded) {
-          emit(currentState.copyWith(selectedTranslation: translation));
-        } else {
-          emit(QuranSettingsLoaded(selectedTranslation: translation));
-        }
+        emit(state.copyWith(selectedTranslation: translation));
       }
     } catch (e) {
-      // Handle error silently or emit error state if needed
+      // Handle error
     }
   }
 
   void updateAyahFontSize(double fontSize) async {
     try {
-      // Clamp the font size to valid range
       final clampedFontSize = fontSize.clamp(minFontSize, maxFontSize);
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.setDouble(_ayahFontSizeKey, clampedFontSize);
-
-      final currentState = state;
-      if (currentState is QuranSettingsLoaded) {
-        emit(currentState.copyWith(ayahFontSize: clampedFontSize));
-      } else {
-        emit(
-          QuranSettingsLoaded(
-            selectedTranslation: quran.Translation.frHamidullah,
-            ayahFontSize: clampedFontSize,
-          ),
-        );
-      }
+      emit(state.copyWith(ayahFontSize: clampedFontSize));
     } catch (e) {
-      // Handle error silently or emit error state if needed
+      // Handle error
     }
   }
 
@@ -327,7 +257,6 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     }
   }
 
-  // Static utility method to get Surah name in any translation
   static String getSurahNameInTranslation(
     int surahNumber,
     quran.Translation translation,
@@ -344,7 +273,6 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
     }
   }
 
-  // Static utility method to get currently selected translation from SharedPreferences
   static Future<quran.Translation> getCurrentTranslation() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -353,16 +281,13 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
           translationIndex < availableTranslations.length) {
         return availableTranslations[translationIndex].translation;
       } else {
-        // Default to French for first-time users
         return quran.Translation.frHamidullah;
       }
     } catch (e) {
-      // Fallback to French if there's an error
       return quran.Translation.frHamidullah;
     }
   }
 
-  // Static utility method to get currently selected reciter ID from SharedPreferences
   static Future<String?> getSelectedReciterId() async {
     try {
       final prefs = await SharedPreferences.getInstance();

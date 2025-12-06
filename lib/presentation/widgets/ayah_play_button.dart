@@ -33,8 +33,7 @@ class AyahPlayButton extends StatelessWidget {
     return BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
       builder: (context, settingsState) {
         // Only show button if we have a selected reciter
-        if (settingsState is! QuranSettingsLoaded ||
-            settingsState.selectedReciter == null) {
+        if (settingsState.selectedReciter == null) {
           return Icon(
             Icons.play_disabled,
             size: size,

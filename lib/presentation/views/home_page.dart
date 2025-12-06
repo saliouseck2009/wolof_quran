@@ -303,9 +303,7 @@ Widget _buildInitialCard(BuildContext context, AppLocalizations localizations) {
   return GestureDetector(
     onTap: () {
       final settingsCubit = context.read<QuranSettingsCubit>();
-      final currentTranslation = settingsCubit.state is QuranSettingsLoaded
-          ? (settingsCubit.state as QuranSettingsLoaded).selectedTranslation
-          : quran.Translation.enSaheeh;
+      final currentTranslation = settingsCubit.state.selectedTranslation;
       context.read<DailyInspirationCubit>().generateRandomAyah(
         currentTranslation,
       );
@@ -531,11 +529,7 @@ Widget _buildInspirationCard(
                       onPressed: () {
                         final settingsCubit = context
                             .read<QuranSettingsCubit>();
-                        final currentTranslation =
-                            settingsCubit.state is QuranSettingsLoaded
-                            ? (settingsCubit.state as QuranSettingsLoaded)
-                                  .selectedTranslation
-                            : quran.Translation.enSaheeh;
+                        final currentTranslation = settingsCubit.state.selectedTranslation;
                         context.read<DailyInspirationCubit>().refreshAyah(
                           currentTranslation,
                         );
@@ -757,11 +751,7 @@ Widget _buildErrorCard(
         ElevatedButton.icon(
           onPressed: () {
             final settingsCubit = context.read<QuranSettingsCubit>();
-            final currentTranslation =
-                settingsCubit.state is QuranSettingsLoaded
-                ? (settingsCubit.state as QuranSettingsLoaded)
-                      .selectedTranslation
-                : quran.Translation.enSaheeh;
+            final currentTranslation = settingsCubit.state.selectedTranslation;
             context.read<DailyInspirationCubit>().generateRandomAyah(
               currentTranslation,
             );

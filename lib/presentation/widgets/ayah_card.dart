@@ -124,7 +124,7 @@ class AyahCard extends StatelessWidget {
                   double arabicFontSize = 28.0;
                   if (fontSize != null) {
                     arabicFontSize = fontSize!;
-                  } else if (settingsState is QuranSettingsLoaded) {
+                  } else {
                     arabicFontSize = settingsState.ayahFontSize;
                   }
                   if (displayMode == AyahDisplayMode.arabicOnly) {

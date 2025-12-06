@@ -143,9 +143,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
 
             return BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
               builder: (context, settingsState) {
-                final selectedReciter = settingsState is QuranSettingsLoaded
-                    ? settingsState.selectedReciter
-                    : null;
+                final selectedReciter = settingsState.selectedReciter;
 
                 return CustomScrollView(
                   slivers: [

@@ -52,9 +52,7 @@ class _QuranSettingsView extends StatelessWidget {
       ),
       body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
         builder: (context, state) {
-          if (state is! QuranSettingsLoaded) {
-            return const Center(child: CircularProgressIndicator());
-          }
+
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -145,7 +143,7 @@ class _QuranSettingsView extends StatelessWidget {
 
   Widget _buildSettingsMenuItems(
     BuildContext context,
-    QuranSettingsLoaded state,
+    QuranSettingsState state,
     AppLocalizations localizations,
   ) {
     final currentTranslationOption = QuranSettingsCubit.getTranslationOption(
@@ -329,7 +327,7 @@ class _QuranSettingsView extends StatelessWidget {
 
   void _showTranslationSelector(
     BuildContext context,
-    QuranSettingsLoaded state,
+    QuranSettingsState state,
     AppLocalizations localizations,
   ) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -366,7 +364,7 @@ class _QuranSettingsView extends StatelessWidget {
 
   void _showFontSizeSelector(
     BuildContext context,
-    QuranSettingsLoaded state,
+    QuranSettingsState state,
     AppLocalizations localizations,
   ) async {
     final result = await showModalBottomSheet<double?>(
