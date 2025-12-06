@@ -32,7 +32,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
           : colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'Available Reciters', // TODO: Add to localizations
+          'Available Reciters',
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: colorScheme.onPrimary,
@@ -67,7 +67,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                   Icon(Icons.error_outline, size: 64, color: colorScheme.error),
                   const SizedBox(height: 16),
                   Text(
-                    'Error Loading Reciters', // TODO: Add to localizations
+                    'Error Loading Reciters',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurface,
@@ -98,7 +98,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                       ),
                     ),
                     child: Text(
-                      'Retry', // TODO: Add to localizations
+                      'Retry',
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -122,7 +122,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'No Reciters Available', // TODO: Add to localizations
+                      'No Reciters Available',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface,
@@ -130,7 +130,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Check back later for available reciters', // TODO: Add to localizations
+                      'Check back later for available reciters',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -159,16 +159,24 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      colorScheme.surfaceContainer.withValues(alpha: 0.8),
-                                      colorScheme.surfaceContainer.withValues(alpha: 0.9),
+                                      colorScheme.surfaceContainer.withValues(
+                                        alpha: 0.8,
+                                      ),
+                                      colorScheme.surfaceContainer.withValues(
+                                        alpha: 0.9,
+                                      ),
                                     ],
                                   )
                                 : LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      colorScheme.primary.withValues(alpha: 0.1),
-                                      colorScheme.primaryContainer.withValues(alpha: 0.2),
+                                      colorScheme.primary.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      colorScheme.primaryContainer.withValues(
+                                        alpha: 0.2,
+                                      ),
                                     ],
                                   ),
                             borderRadius: BorderRadius.circular(16),
@@ -209,191 +217,226 @@ class _ReciterListPageState extends State<ReciterListPage> {
                       ),
                     ),
                     SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final reciter = reciterState.reciters[index];
-                          final isSelected = selectedReciter?.id == reciter.id;
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final reciter = reciterState.reciters[index];
+                        final isSelected = selectedReciter?.id == reciter.id;
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: colorScheme.surfaceContainer,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: colorScheme.brightness == Brightness.dark
-                                    ? [
-                                        BoxShadow(
-                                          color: colorScheme.primary.withValues(alpha: 0.08),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 2),
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 6,
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceContainer,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow:
+                                  colorScheme.brightness == Brightness.dark
+                                  ? [
+                                      BoxShadow(
+                                        color: colorScheme.primary.withValues(
+                                          alpha: 0.08,
                                         ),
-                                      ]
-                                    : null,
-                                border: Border.all(
-                                  color: colorScheme.primary.withValues(
-                                    alpha: colorScheme.brightness == Brightness.dark ? 0.1 : 0.15,
-                                  ),
-                                  width: 1,
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : null,
+                              border: Border.all(
+                                color: colorScheme.primary.withValues(
+                                  alpha:
+                                      colorScheme.brightness == Brightness.dark
+                                      ? 0.1
+                                      : 0.15,
                                 ),
+                                width: 1,
                               ),
-                      child: Material(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(16),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () {
-                            // Navigate to reciter chapters (restored original behavior)
-                            Navigator.pushNamed(
-                              context,
-                              '/reciter-chapters',
-                              arguments: reciter,
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Row(
-                              children: [
-                                // Reciter icon container (consistent with settings page)
-                                Container(
-                                  width: 48,
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: accentGreen.withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Icon(
-                                    Icons.person,
-                                    color: accentGreen,
-                                    size: 24,
-                                  ),
-                                ),
-
-                                const SizedBox(width: 16),
-
-                                // Reciter info (consistent content structure)
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(16),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  // Navigate to reciter chapters (restored original behavior)
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/reciter-chapters',
+                                    arguments: reciter,
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Row(
                                     children: [
-                                      // English name (title)
-                                      Text(
-                                        reciter.name,
-                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: colorScheme.onSurface,
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 4),
-
-                                      // Arabic name (subtitle)
-                                      Text(
-                                        reciter.arabicName,
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: colorScheme.onSurfaceVariant,
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 8),
-
-                                      // Status badge
+                                      // Reciter icon container (consistent with settings page)
                                       Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
+                                        width: 48,
+                                        height: 48,
                                         decoration: BoxDecoration(
-                                          color: isSelected
-                                              ? accentGreen.withValues(
-                                                  alpha: 0.15,
-                                                )
-                                              : colorScheme.onSurfaceVariant.withValues(
-                                                  alpha: 0.12,
-                                                ),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
+                                          color: accentGreen.withValues(
+                                            alpha: 0.12,
                                           ),
-                                          border: Border.all(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.person,
+                                          color: accentGreen,
+                                          size: 24,
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 16),
+
+                                      // Reciter info (consistent content structure)
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // English name (title)
+                                            Text(
+                                              reciter.name,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                    color:
+                                                        colorScheme.onSurface,
+                                                  ),
+                                            ),
+
+                                            const SizedBox(height: 4),
+
+                                            // Arabic name (subtitle)
+                                            Text(
+                                              reciter.arabicName,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
+                                                  ?.copyWith(
+                                                    color: colorScheme
+                                                        .onSurfaceVariant,
+                                                  ),
+                                            ),
+
+                                            const SizedBox(height: 8),
+
+                                            // Status badge
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 6,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: isSelected
+                                                    ? accentGreen.withValues(
+                                                        alpha: 0.15,
+                                                      )
+                                                    : colorScheme
+                                                          .onSurfaceVariant
+                                                          .withValues(
+                                                            alpha: 0.12,
+                                                          ),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                border: Border.all(
+                                                  color: isSelected
+                                                      ? accentGreen.withValues(
+                                                          alpha: 0.25,
+                                                        )
+                                                      : colorScheme
+                                                            .onSurfaceVariant
+                                                            .withValues(
+                                                              alpha: 0.2,
+                                                            ),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: Text(
+                                                isSelected
+                                                    ? 'Default Reciter'
+                                                    : 'Available',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: isSelected
+                                                          ? accentGreen
+                                                          : colorScheme
+                                                                .onSurfaceVariant,
+                                                    ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 12),
+
+                                      // Selection action (consistent with settings page)
+                                      GestureDetector(
+                                        onTap: () {
+                                          // Select this reciter when tapping the selection area
+                                          context
+                                              .read<QuranSettingsCubit>()
+                                              .updateReciter(reciter);
+
+                                          // Show feedback
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Selected ${reciter.name} as default reciter',
+                                              ),
+                                              backgroundColor: accentGreen,
+                                              duration: const Duration(
+                                                seconds: 2,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
                                             color: isSelected
                                                 ? accentGreen.withValues(
-                                                    alpha: 0.25,
+                                                    alpha: 0.15,
                                                   )
                                                 : colorScheme.onSurfaceVariant
-                                                      .withValues(alpha: 0.2),
-                                            width: 1,
+                                                      .withValues(alpha: 0.12),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
                                           ),
-                                        ),
-                                        child: Text(
-                                          isSelected
-                                              ? 'Default Reciter'
-                                              : 'Available',
-                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            fontWeight: FontWeight.w500,
+                                          child: Icon(
+                                            isSelected
+                                                ? Icons.check_circle
+                                                : Icons.radio_button_unchecked,
                                             color: isSelected
                                                 ? accentGreen
                                                 : colorScheme.onSurfaceVariant,
+                                            size: 20,
                                           ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-
-                                const SizedBox(width: 12),
-
-                                // Selection action (consistent with settings page)
-                                GestureDetector(
-                                  onTap: () {
-                                    // Select this reciter when tapping the selection area
-                                    context
-                                        .read<QuranSettingsCubit>()
-                                        .updateReciter(reciter);
-
-                                    // Show feedback
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Selected ${reciter.name} as default reciter',
-                                        ),
-                                        backgroundColor: accentGreen,
-                                        duration: const Duration(seconds: 2),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? accentGreen.withValues(alpha: 0.15)
-                                          : colorScheme.onSurfaceVariant.withValues(
-                                              alpha: 0.12,
-                                            ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      isSelected
-                                          ? Icons.check_circle
-                                          : Icons.radio_button_unchecked,
-                                      color: isSelected
-                                          ? accentGreen
-                                          : colorScheme.onSurfaceVariant,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                        childCount: reciterState.reciters.length,
-                      ),
+                        );
+                      }, childCount: reciterState.reciters.length),
                     ),
                   ],
                 );

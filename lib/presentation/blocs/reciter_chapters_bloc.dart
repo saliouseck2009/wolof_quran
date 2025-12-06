@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -183,7 +185,7 @@ class ReciterChaptersBloc
         );
       } catch (e) {
         // If refresh fails, keep current state but maybe log the error
-        print('Failed to refresh downloaded surahs: $e');
+        log('Failed to refresh downloaded surahs: $e');
       }
     }
   }

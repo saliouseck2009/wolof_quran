@@ -56,7 +56,7 @@ class _SurahAudioListView extends StatelessWidget {
           : colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'Audio Downloads', // TODO: Add to localizations
+          'Audio Downloads',
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: colorScheme.onPrimary,
@@ -86,7 +86,11 @@ class _SurahAudioListView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error_outline, size: 64, color: colorScheme.error),
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: colorScheme.error,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       reciterState.message,
@@ -113,7 +117,7 @@ class _SurahAudioListView extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No reciter selected', // TODO: Add to localizations
+                        'No reciter selected',
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 16,
@@ -124,9 +128,7 @@ class _SurahAudioListView extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushNamed(context, '/quran-settings');
                         },
-                        child: const Text(
-                          'Select Reciter',
-                        ), // TODO: Add to localizations
+                        child: const Text('Select Reciter'),
                       ),
                     ],
                   ),
@@ -146,8 +148,12 @@ class _SurahAudioListView extends StatelessWidget {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                colorScheme.surfaceContainer.withValues(alpha: 0.8),
-                                colorScheme.surfaceContainer.withValues(alpha: 0.9),
+                                colorScheme.surfaceContainer.withValues(
+                                  alpha: 0.8,
+                                ),
+                                colorScheme.surfaceContainer.withValues(
+                                  alpha: 0.9,
+                                ),
                               ],
                             )
                           : LinearGradient(
@@ -155,7 +161,9 @@ class _SurahAudioListView extends StatelessWidget {
                               end: Alignment.bottomRight,
                               colors: [
                                 colorScheme.primary.withValues(alpha: 0.1),
-                                colorScheme.primaryContainer.withValues(alpha: 0.2),
+                                colorScheme.primaryContainer.withValues(
+                                  alpha: 0.2,
+                                ),
                               ],
                             ),
                       borderRadius: BorderRadius.circular(16),
@@ -200,9 +208,7 @@ class _SurahAudioListView extends StatelessWidget {
                           onPressed: () {
                             Navigator.pushNamed(context, '/quran-settings');
                           },
-                          child: const Text(
-                            'Change',
-                          ), // TODO: Add to localizations
+                          child: const Text('Change'),
                         ),
                       ],
                     ),
@@ -364,7 +370,7 @@ class _SurahAudioListView extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '$versesCount ayahs', // TODO: Add to localizations
+                          '$versesCount ayahs',
                           style: TextStyle(
                             fontFamily: 'Hafs',
                             fontSize: 13,
@@ -408,7 +414,9 @@ class _SurahAudioListView extends StatelessWidget {
                         isDownloaded
                             ? Icons.play_circle_filled
                             : Icons.download,
-                        color: isDownloaded ? accentGreen : colorScheme.onSurfaceVariant,
+                        color: isDownloaded
+                            ? accentGreen
+                            : colorScheme.onSurfaceVariant,
                         size: 32,
                       ),
                       onPressed: () {

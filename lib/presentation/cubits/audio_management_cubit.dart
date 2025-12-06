@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/surah_audio_status.dart';
@@ -221,7 +222,7 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
           '',
         );
       } catch (e) {
-        print('Could not mark download in database: $e');
+        log('Could not mark download in database: $e');
         // Continue with download even if database marking fails
       }
 
@@ -267,7 +268,7 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
           }
         }
       } catch (e) {
-        print('Could not update download status in database: $e');
+        log('Could not update download status in database: $e');
         // Continue even if database update fails
       }
 
@@ -278,7 +279,7 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
       try {
         await downloadRepository.removeSurahDownload(reciterId, surahNumber);
       } catch (dbError) {
-        print('Could not remove failed download from database: $dbError');
+        log('Could not remove failed download from database: $dbError');
       }
       emit(AudioManagementError(e.toString()));
     }
@@ -310,7 +311,7 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
         );
       } catch (e) {
         // If database is not available, fallback to original method
-        print(
+        log(
           'Database not available, falling back to original status check: $e',
         );
         isDownloaded = false;

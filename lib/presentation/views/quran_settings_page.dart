@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -52,8 +54,6 @@ class _QuranSettingsView extends StatelessWidget {
       ),
       body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
         builder: (context, state) {
-
-
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -343,7 +343,7 @@ class _QuranSettingsView extends StatelessWidget {
         currentTranslation: state.selectedTranslation,
         localizations: localizations,
         onTranslationSelected: (translation) {
-          print('🎯 Translation selected in modal: $translation'); // Debug log
+          log('🎯 Translation selected in modal: $translation'); // Debug log
           context.read<QuranSettingsCubit>().updateTranslation(translation);
         },
       ),
