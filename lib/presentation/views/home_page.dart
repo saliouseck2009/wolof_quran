@@ -28,6 +28,8 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
+    final settingsCubit = context.read<QuranSettingsCubit>();
+    final currentTranslation = settingsCubit.state.selectedTranslation;
 
     return MultiBlocProvider(
       providers: [
@@ -35,7 +37,10 @@ class HomePage extends StatelessWidget {
           create: (context) =>
               BookmarkCubit(locator<BookmarkRepository>())..loadBookmarks(),
         ),
-        BlocProvider(create: (context) => DailyInspirationCubit()),
+        BlocProvider(
+          create: (context) =>
+              DailyInspirationCubit()..generateRandomAyah(currentTranslation),
+        ),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -529,7 +534,8 @@ Widget _buildInspirationCard(
                       onPressed: () {
                         final settingsCubit = context
                             .read<QuranSettingsCubit>();
-                        final currentTranslation = settingsCubit.state.selectedTranslation;
+                        final currentTranslation =
+                            settingsCubit.state.selectedTranslation;
                         context.read<DailyInspirationCubit>().refreshAyah(
                           currentTranslation,
                         );
