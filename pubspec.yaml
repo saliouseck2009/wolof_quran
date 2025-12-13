@@ -49,9 +49,11 @@ dependencies:
   archive: ^3.6.1
   path: ^1.9.0
   rxdart: ^0.28.0
+  image: ^4.3.0
   equatable: ^2.0.5
   sqflite: ^2.3.0
   share_plus: ^10.1.2
+  ffmpeg_kit_flutter_new_min_gpl: ^2.1.1
   flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:

@@ -1,13 +1,21 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
+import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:wolof_quran/core/utils/constants/constants.dart';
+import '../../domain/entities/ayah_audio.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../cubits/audio_management_cubit.dart';
+import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
 
 void showDailyInspirationShareModal(
@@ -165,24 +173,57 @@ class _DailyInspirationShareModalState
                   const SizedBox(height: 16),
                   _buildDisplayModeSelector(localizations),
                   const SizedBox(height: 32),
-                  ElevatedButton.icon(
-                    onPressed: _shareImage,
-                    icon: Icon(Icons.share, color: colorScheme.onPrimary),
-                    label: Text(
-                      'Share Image',
-                      style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w400,
-                        color: colorScheme.onPrimary,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _shareImage,
+                          icon: Icon(
+                            Icons.image_outlined,
+                            color: colorScheme.onPrimary,
+                          ),
+                          label: Text(
+                            'Share Image',
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onPrimary,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.primary,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
                       ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _shareVideo,
+                          icon: Icon(
+                            Icons.movie_creation_outlined,
+                            color: colorScheme.primary,
+                          ),
+                          label: Text(
+                            'Share Video',
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: colorScheme.primary),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
                       ),
-                      elevation: 0,
-                    ),
+                    ],
                   ),
                 ],
               ),
@@ -433,10 +474,55 @@ class _DailyInspirationShareModalState
   }
 
   Future<void> _shareImage() async {
+    await _shareWithGuard(_createImageAndShare);
+  }
+
+  Future<void> _shareVideo() async {
+    await _shareWithGuard(() async {
+      final imageFile = await _capturePreviewToFile(jpeg: true);
+      if (imageFile == null) {
+        _showMessage('Impossible de capturer l’image.');
+        return false;
+      }
+
+      final audioPath = await _getAyahAudioPath();
+      if (audioPath == null) return false;
+
+      final videoPath = await _generateVideoFromAssets(
+        imagePath: imageFile.path,
+        audioPath: audioPath,
+      );
+      if (videoPath == null) {
+        _showMessage('Échec de la génération vidéo.');
+        return false;
+      }
+
+      await Share.shareXFiles(
+        [XFile(videoPath, mimeType: 'video/mp4')],
+        text:
+            'Daily Inspiration - ${widget.surahName} - Verse ${widget.verseNumber}',
+      );
+      return true;
+    });
+  }
+
+  Future<bool> _createImageAndShare() async {
+    final imageFile = await _capturePreviewToFile();
+    if (imageFile == null) return false;
+
+    await Share.shareXFiles(
+      [XFile(imageFile.path)],
+      text:
+          'Daily Inspiration - ${widget.surahName} - Verse ${widget.verseNumber}',
+    );
+    return true;
+  }
+
+  Future<void> _shareWithGuard(Future<bool> Function() action) async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
     try {
-      // Show loading
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -445,47 +531,23 @@ class _DailyInspirationShareModalState
         ),
       );
 
-      // Capture the widget as an image
-      final RenderRepaintBoundary boundary =
-          _captureKey.currentContext!.findRenderObject()!
-              as RenderRepaintBoundary;
-      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      final ByteData? byteData = await image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
-      final Uint8List uint8List = byteData!.buffer.asUint8List();
+      final didComplete = await action();
 
-      // Save to temporary file
-      final tempDir = await getTemporaryDirectory();
-      final file = File(
-        '${tempDir.path}/daily_inspiration_${widget.surahNumber}_${widget.verseNumber}.png',
-      );
-      await file.writeAsBytes(uint8List);
-
-      // Hide loading dialog
       if (!mounted) return;
       Navigator.pop(context);
-
-      // Share the file
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text:
-            'Daily Inspiration - ${widget.surahName} - Verse ${widget.verseNumber}',
-      );
-
-      // Close modal
-      if (!mounted) return;
-      Navigator.pop(context);
+      if (didComplete && mounted) {
+        Navigator.pop(context);
+      } else if (!didComplete) {
+        _showMessage('Action annulée.');
+      }
     } catch (e) {
-      // Hide loading dialog if still showing
       if (mounted) Navigator.pop(context);
-
-      // Show error
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.fixed,
           content: Text(
-            'Error sharing image: $e',
+            'Error: $e',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onError,
             ),
@@ -494,6 +556,152 @@ class _DailyInspirationShareModalState
         ),
       );
     }
+  }
+
+  Future<File?> _capturePreviewToFile({bool jpeg = false}) async {
+    final boundary =
+        _captureKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
+    if (boundary == null) return null;
+
+    final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    Uint8List uint8List;
+
+    if (jpeg) {
+      final ByteData? rawBytes = await image.toByteData(
+        format: ui.ImageByteFormat.rawRgba,
+      );
+      if (rawBytes == null) return null;
+      final img.Image converted = img.Image.fromBytes(
+        width: image.width,
+        height: image.height,
+        bytes: rawBytes.buffer,
+        numChannels: 4,
+        order: img.ChannelOrder.rgba,
+      );
+      uint8List = Uint8List.fromList(img.encodeJpg(converted, quality: 95));
+    } else {
+      final ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+      if (byteData == null) return null;
+      uint8List = byteData.buffer.asUint8List();
+    }
+
+    final tempDir = await getTemporaryDirectory();
+    final extension = jpeg ? 'jpg' : 'png';
+    final file = File(
+      '${tempDir.path}/daily_inspiration_${widget.surahNumber}_${widget.verseNumber}_${DateTime.now().millisecondsSinceEpoch}.$extension',
+    );
+    await file.writeAsBytes(uint8List);
+    return file;
+  }
+
+  Future<String?> _getAyahAudioPath() async {
+    final quranSettings = context.read<QuranSettingsCubit>();
+    final selectedReciter = quranSettings.state.selectedReciter;
+    if (selectedReciter == null) {
+      _showMessage(
+        'Veuillez sélectionner un récitateur pour générer la vidéo.',
+      );
+      return null;
+    }
+
+    final audioCubit = context.read<AudioManagementCubit>();
+    if (audioCubit.state is! AudioManagementLoaded &&
+        audioCubit.state is! AudioDownloading) {
+      audioCubit.initialize();
+    }
+
+    await audioCubit.loadAyahAudios(selectedReciter.id, widget.surahNumber);
+
+    final audioState = audioCubit.state;
+
+    List<AyahAudio> ayahAudios = [];
+    if (audioState is AudioManagementLoaded) {
+      ayahAudios = audioState.getAyahAudios(
+        selectedReciter.id,
+        widget.surahNumber,
+      );
+    } else if (audioState is AudioDownloading) {
+      final key = '${selectedReciter.id}_${widget.surahNumber}';
+      ayahAudios = audioState.previousAyahAudiosMap[key] ?? [];
+    } else {
+      _showMessage('Audio non disponible pour cette sourate.');
+      return null;
+    }
+
+    if (ayahAudios.isEmpty) {
+      _showMessage(
+        'Audio non téléchargé pour ce récitateur. Téléchargez les audios puis réessayez.',
+      );
+      return null;
+    }
+
+    final AyahAudio ayahAudio = ayahAudios.firstWhere(
+      (audio) => audio.ayahNumber == widget.verseNumber,
+      orElse: () => const AyahAudio(
+        surahNumber: -1,
+        ayahNumber: -1,
+        reciterId: '',
+        localPath: '',
+      ),
+    );
+
+    if ((ayahAudio.surahNumber == -1 || ayahAudio.localPath.isEmpty)) {
+      _showMessage('Fichier audio introuvable pour cet ayah.');
+      return null;
+    }
+
+    final file = File(ayahAudio.localPath ?? '');
+    if (!await file.exists()) {
+      _showMessage('Fichier audio manquant sur l’appareil.');
+      return null;
+    }
+
+    return file.path;
+  }
+
+  Future<String?> _generateVideoFromAssets({
+    required String imagePath,
+    required String audioPath,
+  }) async {
+    final tempDir = await getTemporaryDirectory();
+    final outputPath =
+        '${tempDir.path}/ayah_video_${DateTime.now().millisecondsSinceEpoch}.mp4';
+
+    final command =
+        '-y -loop 1 -i "$imagePath" -i "$audioPath" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(1080-iw)/2:(1920-ih)/2,format=yuv420p" -c:v libx264 -preset veryfast -tune stillimage -c:a aac -b:a 192k -shortest "$outputPath"';
+
+    final session = await FFmpegKit.execute(command);
+    final returnCode = await session.getReturnCode();
+
+    if (!ReturnCode.isSuccess(returnCode)) {
+      final output = await session.getOutput();
+      log('FFmpeg command failed with output: $output');
+      throw Exception('Video generation failed: $output');
+    }
+
+    return outputPath;
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.fixed,
+        content: Text(
+          message,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onErrorContainer,
+          ),
+        ),
+        backgroundColor: colorScheme.errorContainer,
+      ),
+    );
   }
 }
 
