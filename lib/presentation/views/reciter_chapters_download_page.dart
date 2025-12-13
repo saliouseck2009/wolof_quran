@@ -397,17 +397,7 @@ class _ChapterCard extends StatelessWidget {
                     ),
                     duration: 2,
                   );
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(
-                  //     content: Text(
-                  //       localizations.downloadedSuccessfully(
-                  //         getSurahDisplayName(surahNumber),
-                  //       ),
-                  //     ),
-                  //     backgroundColor: Colors.green,
-                  //     duration: const Duration(seconds: 2),
-                  //   ),
-                  // );
+                
                 } else if (currentState is AudioManagementError) {
                   final formattedError = formatAudioError(
                     currentState.message,
@@ -418,15 +408,7 @@ class _ChapterCard extends StatelessWidget {
                     localizations.downloadFailedWithError(formattedError),
                     duration: 5,
                   );
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(
-                  //     content: Text(
-                  //       localizations.downloadFailedWithError(formattedError),
-                  //     ),
-                  //     backgroundColor: Theme.of(context).colorScheme.error,
-                  //     duration: const Duration(seconds: 3),
-                  //   ),
-                  // );
+              
                 }
               },
               builder: (context, currentState) {
