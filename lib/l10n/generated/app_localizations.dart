@@ -933,6 +933,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{surahName} audio removed'**
   String surahAudioDeleted(String surahName);
+
+  /// Shown when user tries to start a second download while one is active
+  ///
+  /// In en, this message translates to:
+  /// **'Another download is already in progress. Please wait for it to finish.'**
+  String get downloadInProgress;
 }
 
 class _AppLocalizationsDelegate

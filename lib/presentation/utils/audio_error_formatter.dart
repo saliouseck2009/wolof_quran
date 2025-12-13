@@ -6,6 +6,9 @@ String formatAudioError(String error, AppLocalizations localizations) {
   if (trimmed.isEmpty) return localizations.downloadFailed;
 
   final lower = trimmed.toLowerCase();
+  if (lower.contains('download_in_progress')) {
+    return localizations.downloadInProgress;
+  }
   const dio404Signature = 'status code of 404 and requestoptions.validatestatus';
 
   if (lower.contains(dio404Signature) ||

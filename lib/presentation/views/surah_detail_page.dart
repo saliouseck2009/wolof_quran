@@ -865,6 +865,22 @@ class SurahPlayButton extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: ElevatedButton.icon(
                       onPressed: () {
+                        final audioState =
+                            context.read<AudioManagementCubit>().state;
+                        if (audioState is AudioDownloading &&
+                            (audioState.reciterId != selectedReciter.id ||
+                                audioState.surahNumber != surahNumber)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                AppLocalizations.of(context)!
+                                    .downloadInProgress,
+                              ),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                          return;
+                        }
                         // Trigger download
                         context.read<AudioManagementCubit>().downloadSurahAudio(
                           selectedReciter.id,

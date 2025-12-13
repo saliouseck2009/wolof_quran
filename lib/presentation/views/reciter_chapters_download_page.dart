@@ -35,7 +35,7 @@ class ReciterChaptersDownloadPage extends StatelessWidget {
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
-              expandedHeight: 200,
+              expandedHeight: 150,
               floating: false,
               pinned: true,
               backgroundColor: isDark
@@ -49,6 +49,18 @@ class ReciterChaptersDownloadPage extends StatelessWidget {
                   ? Colors.black.withValues(alpha: 0.4)
                   : accentGreen.withValues(alpha: 0.3),
               flexibleSpace: FlexibleSpaceBar(
+                centerTitle: true,
+                title: Text(
+                  reciter.name,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+                titlePadding: const EdgeInsetsDirectional.only(
+                  start: 16,
+                  bottom: 12,
+                ),
                 background: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -67,8 +79,8 @@ class ReciterChaptersDownloadPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          width: 80,
-                          height: 80,
+                          width: 70,
+                          height: 70,
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(20),
@@ -82,15 +94,6 @@ class ReciterChaptersDownloadPage extends StatelessWidget {
                             size: 40,
                             color: Theme.of(context).colorScheme.onPrimary,
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          reciter.name,
-                          style: textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -409,6 +412,11 @@ class _ChapterCard extends StatelessWidget {
                 }
               },
               builder: (context, currentState) {
+                final isOtherDownloading =
+                    currentState is AudioDownloading &&
+                    (currentState.reciterId != reciter.id ||
+                        currentState.surahNumber != surahNumber);
+
                 if (currentState is AudioDownloading &&
                     currentState.reciterId == reciter.id &&
                     currentState.surahNumber == surahNumber) {
@@ -479,8 +487,34 @@ class _ChapterCard extends StatelessWidget {
                   );
                 }
 
+                // if (isOtherDownloading) {
+                //   return IconButton(
+                //     onPressed: () {
+                //       ScaffoldMessenger.of(context).showSnackBar(
+                //         SnackBar(
+                //           content: Text(localizations.downloadInProgress),
+                //           duration: const Duration(seconds: 2),
+                //         ),
+                //       );
+                //     },
+                //     icon: Icon(
+                //       Icons.downloading,
+                //       color: Theme.of(context).colorScheme.onSurfaceVariant,
+                //       size: 28,
+                //     ),
+                //     tooltip: localizations.downloadInProgress,
+                //   );
+                // }
+
                 return IconButton(
                   onPressed: () {
+                    if (isOtherDownloading) {
+                      CustomSnackbar.showSnackbar(
+                        context,
+                        localizations.downloadInProgress,
+                      );
+                      return;
+                    }
                     context.read<AudioManagementCubit>().downloadSurahAudio(
                       reciter.id,
                       surahNumber,

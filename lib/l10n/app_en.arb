@@ -619,5 +619,9 @@
         "description": "Displayed surah name"
       }
     }
+  },
+  "downloadInProgress": "Another download is already in progress. Please wait for it to finish.",
+  "@downloadInProgress": {
+    "description": "Shown when user tries to start a second download while one is active"
   }
 }

@@ -149,6 +149,7 @@
   "change": "تغيير",
   "ayahCountLabel": "{count} آية",
   "surahAudioDeleted": "تم حذف صوت سورة {surahName}",
+  "downloadInProgress": "هناك تنزيل جارٍ بالفعل. يرجى الانتظار حتى ينتهي قبل بدء آخر.",
   "enterWordsToFindVerses": "أدخل كلمات للعثور على آيات في القرآن",
   "enterWordsToSearch": "أدخل كلمات للبحث...",
   "foundOccurrences": "تم العثور على {occurrences} نتيجة في {verses} آية",

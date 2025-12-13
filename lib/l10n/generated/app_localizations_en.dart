@@ -455,4 +455,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String surahAudioDeleted(String surahName) {
     return '$surahName audio removed';
   }
+
+  @override
+  String get downloadInProgress =>
+      'Another download is already in progress. Please wait for it to finish.';
 }

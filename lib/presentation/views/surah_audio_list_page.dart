@@ -272,6 +272,10 @@ class _SurahAudioListView extends StatelessWidget {
     final versesCount = quran.getVerseCount(surahNumber);
     final localizations = AppLocalizations.of(context)!;
     final textTheme = Theme.of(context).textTheme;
+    final isOtherDownloading =
+        audioState is AudioDownloading &&
+        (audioState.reciterId != reciterId ||
+            audioState.surahNumber != surahNumber);
 
     return FutureBuilder<bool>(
       future: _checkDownloadStatus(reciterId, surahNumber),
@@ -423,6 +427,13 @@ class _SurahAudioListView extends StatelessWidget {
                         size: 32,
                       ),
                       onPressed: () {
+                        if (isOtherDownloading) {
+                          ToastService.showError(
+                            context,
+                            localizations.downloadInProgress,
+                          );
+                          return;
+                        }
                         if (isDownloaded) {
                           // Play surah
                           context
