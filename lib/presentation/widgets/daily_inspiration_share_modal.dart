@@ -733,7 +733,7 @@ class _AdaptiveText extends StatelessWidget {
           context,
         ).clamp(4.0, maxFontSize);
         return Align(
-          alignment: Alignment.topCenter,
+          alignment: Alignment.center,
           child: Text(
             text,
             textAlign: textAlign,
@@ -997,10 +997,15 @@ class _AyahTexts extends StatelessWidget {
             constraints.maxHeight -
             (currentArabicHeight + currentTranslationHeight + dividerSpace);
         final extraSpacerHeight = remainingSpace > 0 ? remainingSpace : 0.0;
+        final topSpacer =
+            extraSpacerHeight > 0 ? extraSpacerHeight / 2 : 0.0;
+        final bottomSpacer =
+            extraSpacerHeight > 0 ? extraSpacerHeight - topSpacer : 0.0;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            if (topSpacer > 0) SizedBox(height: topSpacer),
             SizedBox(
               height: currentArabicHeight,
               child: Text(
@@ -1031,7 +1036,7 @@ class _AyahTexts extends StatelessWidget {
                 softWrap: true,
               ),
             ),
-            if (extraSpacerHeight > 0) SizedBox(height: extraSpacerHeight),
+            if (bottomSpacer > 0) SizedBox(height: bottomSpacer),
           ],
         );
       },
