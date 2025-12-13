@@ -129,57 +129,55 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tryDifferentSearch => 'جرب مصطلح بحث مختلف';
 
   @override
-  String get quranSettings => 'Quran Settings';
+  String get quranSettings => 'إعدادات القرآن';
 
   @override
-  String get translationSettings => 'Translation';
+  String get translationSettings => 'إعدادات الترجمة';
 
   @override
-  String get selectTranslation => 'Select Translation';
+  String get selectTranslation => 'اختر الترجمة';
 
   @override
-  String get currentTranslation => 'Current Translation';
+  String get currentTranslation => 'الترجمة الحالية';
 
   @override
-  String get changeTranslation => 'Change Translation';
+  String get changeTranslation => 'تغيير الترجمة';
 
   @override
-  String get translationDescription =>
-      'Choose your preferred translation for Quran verses and chapters';
+  String get translationDescription => 'اختر الترجمة المفضلة لآيات وسور القرآن';
 
   @override
   String translationUpdated(String language) {
-    return 'Translation updated to $language';
+    return 'تم تحديث الترجمة إلى $language';
   }
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'إلغاء';
 
   @override
-  String get searchQuran => 'Search Quran';
+  String get searchQuran => 'بحث في القرآن';
 
   @override
-  String get enterWordsToSearch => 'Enter words to search...';
+  String get enterWordsToSearch => 'أدخل كلمات للبحث...';
 
   @override
-  String get searchTheQuran => 'Search the Quran';
+  String get searchTheQuran => 'ابحث في القرآن';
 
   @override
-  String get enterWordsToFindVerses =>
-      'Enter words to find verses in the Quran';
+  String get enterWordsToFindVerses => 'أدخل كلمات للعثور على آيات في القرآن';
 
   @override
-  String get searchError => 'Search Error';
+  String get searchError => 'خطأ في البحث';
 
   @override
-  String get noResultsFound => 'No Results Found';
+  String get noResultsFound => 'لم يتم العثور على نتائج';
 
   @override
-  String get tryDifferentSearchTerms => 'Try different search terms';
+  String get tryDifferentSearchTerms => 'جرّب مصطلحات بحث أخرى';
 
   @override
   String foundOccurrences(int occurrences, int verses) {
-    return 'Found $occurrences occurrence(s) in $verses verse(s)';
+    return 'تم العثور على $occurrences نتيجة في $verses آية';
   }
 
   @override
@@ -230,6 +228,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tryAgain => 'حاول مرة أخرى';
+
+  @override
+  String get dioStatus404 =>
+      'الصوت لهذا الفصل غير متوفر بعد. يرجى المحاولة مرة أخرى لاحقًا.';
 
   @override
   String errorCheckingDownloadStatus(String error) {
@@ -353,4 +355,93 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get savedAyahs => 'الآيات المحفوظة';
+
+  @override
+  String get settingsDescription => 'خصص تجربة القراءة الخاصة بك';
+
+  @override
+  String get changeAppLanguage => 'تغيير لغة التطبيق';
+
+  @override
+  String get chooseAppTheme => 'اختيار مظهر التطبيق';
+
+  @override
+  String get managePreferences => 'إدارة التفضيلات';
+
+  @override
+  String get about => 'حول التطبيق';
+
+  @override
+  String get aboutSubtitle => 'إصدار التطبيق والدعم';
+
+  @override
+  String get aboutDescription =>
+      'تطبيق لقراءة القرآن والاستماع إلى التلاوات باللغة الولوف.';
+
+  @override
+  String appVersion(String version) {
+    return 'الإصدار $version';
+  }
+
+  @override
+  String get quranSettingsDescription => 'خصص تجربة قراءة القرآن لديك';
+
+  @override
+  String get audioAndReciters => 'الصوت والقراء';
+
+  @override
+  String get manageRecitersAndDownloadAudio => 'إدارة القراء وتنزيل الصوت';
+
+  @override
+  String get viewAvailableReciters => 'عرض القراء المتاحين';
+
+  @override
+  String get unknown => 'غير معروف';
+
+  @override
+  String get availableReciters => 'القراء المتاحون';
+
+  @override
+  String get errorLoadingReciters => 'خطأ في تحميل القراء';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String get noRecitersAvailable => 'لا يوجد قراء متاحون';
+
+  @override
+  String get checkBackLaterReciters => 'عد لاحقاً للاطلاع على القراء المتاحين';
+
+  @override
+  String get selectReciter => 'اختر قارئاً';
+
+  @override
+  String get browseAndSelectReciterHint =>
+      'اضغط على البطاقة للاستعراض • اضغط على الزر للتعيين كافتراضي';
+
+  @override
+  String get defaultReciter => 'القارئ الافتراضي';
+
+  @override
+  String get available => 'متاح';
+
+  @override
+  String selectedAsDefaultReciter(String name) {
+    return 'تم اختيار $name كقارئ افتراضي';
+  }
+
+  @override
+  String get audioDownloads => 'تنزيلات الصوت';
+
+  @override
+  String get noReciterSelected => 'لم يتم اختيار قارئ';
+
+  @override
+  String get change => 'تغيير';
+
+  @override
+  String ayahCountLabel(int count) {
+    return '$count آية';
+  }
 }

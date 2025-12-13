@@ -83,7 +83,7 @@ class SettingsPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Personnalisez votre expérience de lecture',
+                    localizations.settingsDescription,
                     style: TextStyle(
                       fontSize: 14,
                       color: colorScheme.onSurfaceVariant,
@@ -100,7 +100,7 @@ class SettingsPage extends StatelessWidget {
             // Settings Menu Items
             _buildSettingsMenuItems(context, localizations),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 54),
           ],
         ),
       ),
@@ -111,6 +111,9 @@ class SettingsPage extends StatelessWidget {
     BuildContext context,
     AppLocalizations localizations,
   ) {
+    final currentLocale = context.watch<LanguageCubit>().state;
+    final languageValue = LocalizationService.getLanguageName(currentLocale);
+
     return Column(
       children: [
         // Language Settings Menu Item
@@ -118,8 +121,8 @@ class SettingsPage extends StatelessWidget {
           context: context,
           icon: Icons.language,
           title: localizations.language,
-          subtitle: 'Changer la langue de l\'application',
-          value: 'Français',
+          subtitle: localizations.changeAppLanguage,
+          value: languageValue,
           onTap: () => _showLanguageSelector(context, localizations),
         ),
 
@@ -130,7 +133,7 @@ class SettingsPage extends StatelessWidget {
           context: context,
           icon: Icons.palette,
           title: localizations.theme,
-          subtitle: 'Choisir le thème de l\'application',
+          subtitle: localizations.chooseAppTheme,
           value: _getCurrentThemeName(context, localizations),
           onTap: () => _showThemeSelector(context, localizations),
         ),
@@ -141,9 +144,9 @@ class SettingsPage extends StatelessWidget {
         _buildSettingsMenuItem(
           context: context,
           icon: Icons.settings_applications,
-          title: 'Paramètres Coran',
-          subtitle: 'Traductions, récitateurs et audio',
-          value: 'Gérer les préférences',
+          title: localizations.quranSettings,
+          subtitle: localizations.manageRecitersAndDownloadAudio,
+          value: localizations.managePreferences,
           onTap: () {
             Navigator.pushNamed(context, '/quran-settings');
           },
@@ -156,9 +159,9 @@ class SettingsPage extends StatelessWidget {
         _buildSettingsMenuItem(
           context: context,
           icon: Icons.info_outline,
-          title: 'À propos',
-          subtitle: 'Version de l\'application et support',
-          value: 'Version 1.0.0',
+          title: localizations.about,
+          subtitle: localizations.aboutSubtitle,
+          value: localizations.appVersion('1.0.0'),
           onTap: () => _showAboutDialog(context),
         ),
       ],
@@ -408,7 +411,9 @@ class SettingsPage extends StatelessWidget {
                             border: Border.all(
                               color: isSelected
                                   ? colorScheme.primary
-                                  : colorScheme.outlineVariant.withValues(alpha: 0.3),
+                                  : colorScheme.outlineVariant.withValues(
+                                      alpha: 0.3,
+                                    ),
                             ),
                           ),
                           child: Material(
@@ -566,7 +571,9 @@ class SettingsPage extends StatelessWidget {
                             border: Border.all(
                               color: isSelected
                                   ? colorScheme.primary
-                                  : colorScheme.outlineVariant.withValues(alpha: 0.3),
+                                  : colorScheme.outlineVariant.withValues(
+                                      alpha: 0.3,
+                                    ),
                             ),
                           ),
                           child: Material(
@@ -679,7 +686,7 @@ class SettingsPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "Version 1.0.0",
+                    localizations.appVersion('1.0.0'),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: colorScheme.onSurfaceVariant,
                     ),
@@ -694,7 +701,7 @@ class SettingsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Une application pour lire le Coran et écouter les récitations en langue Wolof.",
+              localizations.aboutDescription,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -714,7 +721,7 @@ class SettingsPage extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      "Développé avec ❤️ pour la communauté musulmane",
+                      localizations.developedWithLove,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: colorScheme.primary,
                         fontWeight: FontWeight.w500,
@@ -730,7 +737,7 @@ class SettingsPage extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
-              "Fermer",
+              localizations.close,
               style: TextStyle(
                 color: colorScheme.primary,
                 fontWeight: FontWeight.w600,

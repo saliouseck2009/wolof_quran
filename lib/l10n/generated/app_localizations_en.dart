@@ -233,6 +233,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tryAgain => 'Try Again';
 
   @override
+  String get dioStatus404 =>
+      'Audio for this chapter is not yet available. Please try again later.';
+
+  @override
   String errorCheckingDownloadStatus(String error) {
     return 'Error checking download status: $error';
   }
@@ -354,4 +358,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get savedAyahs => 'Saved Ayahs';
+
+  @override
+  String get settingsDescription => 'Customize your reading experience';
+
+  @override
+  String get changeAppLanguage => 'Change the app language';
+
+  @override
+  String get chooseAppTheme => 'Choose the app theme';
+
+  @override
+  String get managePreferences => 'Manage preferences';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get aboutSubtitle => 'App version and support';
+
+  @override
+  String get aboutDescription =>
+      'An app to read the Quran and listen to recitations in Wolof.';
+
+  @override
+  String appVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get quranSettingsDescription =>
+      'Customize your Quran reading experience';
+
+  @override
+  String get audioAndReciters => 'Audio & Reciters';
+
+  @override
+  String get manageRecitersAndDownloadAudio =>
+      'Manage reciters and download audio';
+
+  @override
+  String get viewAvailableReciters => 'View available reciters';
+
+  @override
+  String get unknown => 'Unknown';
+
+  @override
+  String get availableReciters => 'Available Reciters';
+
+  @override
+  String get errorLoadingReciters => 'Error loading reciters';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get noRecitersAvailable => 'No reciters available';
+
+  @override
+  String get checkBackLaterReciters =>
+      'Check back later for available reciters';
+
+  @override
+  String get selectReciter => 'Select Reciter';
+
+  @override
+  String get browseAndSelectReciterHint =>
+      'Tap card to browse • Tap select button to choose default';
+
+  @override
+  String get defaultReciter => 'Default Reciter';
+
+  @override
+  String get available => 'Available';
+
+  @override
+  String selectedAsDefaultReciter(String name) {
+    return 'Selected $name as default reciter';
+  }
+
+  @override
+  String get audioDownloads => 'Audio Downloads';
+
+  @override
+  String get noReciterSelected => 'No reciter selected';
+
+  @override
+  String get change => 'Change';
+
+  @override
+  String ayahCountLabel(int count) {
+    return '$count ayahs';
+  }
 }

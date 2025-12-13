@@ -59,6 +59,7 @@
   "downloaded": "Téléchargée",
   "notDownloaded": "Non téléchargée",
   "downloading": "Téléchargement...",
+  "dioStatus404": "L’audio de ce chapitre n’est pas encore disponible. Merci de réessayer plus tard",
   "downloadedSuccessfully": "{surahName} téléchargée avec succès",
   "downloadFailedWithError": "Échec du téléchargement : {error}",
   "tryAgain": "Réessayer",
@@ -101,5 +102,49 @@
   "readSurahs": "Lire les sourates",
   "listenAudio": "Écouter l'audio",
   "findVerses": "Trouver des versets",
-  "savedAyahs": "Versets enregistrés"
+  "savedAyahs": "Versets enregistrés",
+  "settingsDescription": "Personnalisez votre expérience de lecture",
+  "changeAppLanguage": "Changer la langue de l'application",
+  "chooseAppTheme": "Choisir le thème de l'application",
+  "managePreferences": "Gérer les préférences",
+  "about": "À propos",
+  "aboutSubtitle": "Version de l'application et support",
+  "aboutDescription": "Une application pour lire le Coran et écouter les récitations en langue wolof.",
+  "appVersion": "Version {version}",
+  "@appVersion": {
+    "description": "Libellé de version de l'application avec numéro",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "description": "Numéro de version de l'application"
+      }
+    }
+  },
+  "quranSettingsDescription": "Personnalisez votre lecture du Coran",
+  "audioAndReciters": "Audio et récitateur(s)",
+  "manageRecitersAndDownloadAudio": "Gérer les récitateur(s) et télécharger l'audio",
+  "viewAvailableReciters": "Voir les récitateur(s) disponibles",
+  "unknown": "Inconnu",
+  "availableReciters": "Récitateur(s) disponibles",
+  "errorLoadingReciters": "Erreur lors du chargement des récitateur(s)",
+  "retry": "Réessayer",
+  "noRecitersAvailable": "Aucun récitateur disponible",
+  "checkBackLaterReciters": "Revenez plus tard pour voir les récitateur(s) disponibles",
+  "selectReciter": "Sélectionner un récitateur",
+  "browseAndSelectReciterHint": "Touchez la carte pour parcourir • Touchez le bouton pour définir par défaut",
+  "defaultReciter": "Récitateur par défaut",
+  "available": "Disponible",
+  "selectedAsDefaultReciter": "{name} sélectionné comme récitateur par défaut",
+  "audioDownloads": "Téléchargements audio",
+  "noReciterSelected": "Aucun récitateur sélectionné",
+  "change": "Changer",
+  "ayahCountLabel": "{count} verset(s)",
+  "enterWordsToFindVerses": "Saisissez des mots pour trouver des versets dans le Coran",
+  "enterWordsToSearch": "Saisissez des mots à rechercher...",
+  "foundOccurrences": "{occurrences} occurrence(s) trouvée(s) dans {verses} verset(s)",
+  "noResultsFound": "Aucun résultat trouvé",
+  "searchError": "Erreur de recherche",
+  "searchQuran": "Rechercher dans le Coran",
+  "searchTheQuran": "Recherchez dans le Coran",
+  "tryDifferentSearchTerms": "Essayez d'autres termes de recherche"
 }

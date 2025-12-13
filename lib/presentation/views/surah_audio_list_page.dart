@@ -7,6 +7,8 @@ import '../cubits/reciter_cubit.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../../service_locator.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../utils/audio_error_formatter.dart';
 
 class SurahAudioListPage extends StatelessWidget {
   static const String routeName = "/surah-audio-list";
@@ -49,6 +51,8 @@ class _SurahAudioListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final accentGreen = colorScheme.primary;
+    final localizations = AppLocalizations.of(context)!;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: colorScheme.brightness == Brightness.dark
@@ -56,7 +60,7 @@ class _SurahAudioListView extends StatelessWidget {
           : colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'Audio Downloads',
+          localizations.audioDownloads,
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: colorScheme.onPrimary,
@@ -70,9 +74,14 @@ class _SurahAudioListView extends StatelessWidget {
         elevation: 2,
       ),
       body: BlocListener<AudioManagementCubit, AudioManagementState>(
+        listenWhen: (previous, current) =>
+            current is AudioManagementError &&
+            previous is! AudioManagementError,
         listener: (context, state) {
           if (state is AudioManagementError) {
-            ToastService.showError(context, state.message);
+            final friendly =
+                formatAudioError(state.message, AppLocalizations.of(context)!);
+            ToastService.showError(context, friendly);
           }
         },
         child: BlocBuilder<ReciterCubit, ReciterState>(
@@ -94,7 +103,9 @@ class _SurahAudioListView extends StatelessWidget {
                     const SizedBox(height: 16),
                     Text(
                       reciterState.message,
-                      style: TextStyle(color: colorScheme.error),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.error,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -117,10 +128,10 @@ class _SurahAudioListView extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No reciter selected',
-                        style: TextStyle(
+                        localizations.noReciterSelected,
+                        style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurfaceVariant,
-                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -128,7 +139,7 @@ class _SurahAudioListView extends StatelessWidget {
                         onPressed: () {
                           Navigator.pushNamed(context, '/quran-settings');
                         },
-                        child: const Text('Select Reciter'),
+                        child: Text(localizations.selectReciter),
                       ),
                     ],
                   ),
@@ -186,19 +197,16 @@ class _SurahAudioListView extends StatelessWidget {
                             children: [
                               Text(
                                 selectedReciter.name,
-                                style: TextStyle(
-                                  fontFamily: 'Hafs',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                style: textTheme.titleMedium?.copyWith(
                                   color: colorScheme.onSurface,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                               Text(
                                 selectedReciter.arabicName,
-                                style: TextStyle(
-                                  fontFamily: 'Hafs',
-                                  fontSize: 14,
+                                style: textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
+                                  fontFamily: 'Hafs',
                                 ),
                               ),
                             ],
@@ -208,7 +216,7 @@ class _SurahAudioListView extends StatelessWidget {
                           onPressed: () {
                             Navigator.pushNamed(context, '/quran-settings');
                           },
-                          child: const Text('Change'),
+                          child: Text(localizations.change),
                         ),
                       ],
                     ),
@@ -262,6 +270,8 @@ class _SurahAudioListView extends StatelessWidget {
       quran.Translation.frHamidullah, // TODO: Use user's selected translation
     );
     final versesCount = quran.getVerseCount(surahNumber);
+    final localizations = AppLocalizations.of(context)!;
+    final textTheme = Theme.of(context).textTheme;
 
     return FutureBuilder<bool>(
       future: _checkDownloadStatus(reciterId, surahNumber),
@@ -324,18 +334,16 @@ class _SurahAudioListView extends StatelessWidget {
                         width: 1,
                       ),
                     ),
-                    child: Center(
-                      child: Text(
-                        surahNumber.toString(),
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: accentGreen,
-                        ),
+                  child: Center(
+                    child: Text(
+                      surahNumber.toString(),
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: accentGreen,
                       ),
                     ),
                   ),
+                ),
 
                   const SizedBox(width: 16),
 
@@ -349,20 +357,18 @@ class _SurahAudioListView extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 surahNameTranslated,
-                                style: TextStyle(
-                                  fontFamily: 'Hafs',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                style: textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w700,
                                   color: colorScheme.onSurface,
                                 ),
                               ),
                             ),
                             Text(
                               surahNameArabic,
-                              style: TextStyle(
+                              style: textTheme.titleMedium?.copyWith(
                                 fontFamily: 'Hafs',
                                 fontSize: 18,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w700,
                                 color: accentGreen,
                               ),
                             ),
@@ -370,10 +376,8 @@ class _SurahAudioListView extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '$versesCount ayahs',
-                          style: TextStyle(
-                            fontFamily: 'Hafs',
-                            fontSize: 13,
+                          localizations.ayahCountLabel(versesCount),
+                          style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
                         ),
@@ -400,8 +404,7 @@ class _SurahAudioListView extends StatelessWidget {
                           ),
                           Text(
                             '${(downloadProgress * 100).round()}%',
-                            style: const TextStyle(
-                              fontSize: 8,
+                            style: textTheme.labelSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),

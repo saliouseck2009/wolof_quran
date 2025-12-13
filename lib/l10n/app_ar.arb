@@ -23,6 +23,22 @@
   "bookmarks": "العلامات المرجعية",
   "recitation": "التلاوة",
   "translation": "الترجمة",
+  "translationSettings": "إعدادات الترجمة",
+  "selectTranslation": "اختر الترجمة",
+  "currentTranslation": "الترجمة الحالية",
+  "changeTranslation": "تغيير الترجمة",
+  "translationDescription": "اختر الترجمة المفضلة لآيات وسور القرآن",
+  "translationUpdated": "تم تحديث الترجمة إلى {language}",
+  "@translationUpdated": {
+    "description": "رسالة تأكيد عند تحديث الترجمة",
+    "placeholders": {
+      "language": {
+        "type": "String",
+        "description": "اسم اللغة المحددة"
+      }
+    }
+  },
+  "quranSettings": "إعدادات القرآن",
   "current": "الحالي",
   "system": "النظام",
   "version": "الإصدار",
@@ -30,6 +46,7 @@
   "rateApp": "قيّم التطبيق",
   "getHelp": "احصل على المساعدة",
   "giveRating": "أعط تقييمك",
+  "cancel": "إلغاء",
   "close": "إغلاق",
   "developedWithLove": "طُور بـ ❤️ للمجتمع المسلم",
   "surahs": "السور",
@@ -47,6 +64,7 @@
   "accessDeniedToAudio": "تم رفض الوصول إلى ملف الصوت",
   "notEnoughStorage": "مساحة التخزين غير كافية",
   "downloadFailed": "فشل التحميل. يرجى المحاولة مرة أخرى",
+  "dioStatus404": "الصوت لهذا الفصل غير متوفر بعد. يرجى المحاولة مرة أخرى لاحقًا.",
   "surahsDownloaded": "{count}/114 سورة محملة",
   "downloaded": "محملة",
   "notDownloaded": "غير محملة",
@@ -93,5 +111,49 @@
   "readSurahs": "قراءة السور",
   "listenAudio": "استمع إلى الصوت",
   "findVerses": "ابحث عن الآيات",
-  "savedAyahs": "الآيات المحفوظة"
+  "savedAyahs": "الآيات المحفوظة",
+  "settingsDescription": "خصص تجربة القراءة الخاصة بك",
+  "changeAppLanguage": "تغيير لغة التطبيق",
+  "chooseAppTheme": "اختيار مظهر التطبيق",
+  "managePreferences": "إدارة التفضيلات",
+  "about": "حول التطبيق",
+  "aboutSubtitle": "إصدار التطبيق والدعم",
+  "aboutDescription": "تطبيق لقراءة القرآن والاستماع إلى التلاوات باللغة الولوف.",
+  "appVersion": "الإصدار {version}",
+  "@appVersion": {
+    "description": "تسمية إصدار التطبيق مع الرقم",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "description": "رقم إصدار التطبيق"
+      }
+    }
+  },
+  "quranSettingsDescription": "خصص تجربة قراءة القرآن لديك",
+  "audioAndReciters": "الصوت والقراء",
+  "manageRecitersAndDownloadAudio": "إدارة القراء وتنزيل الصوت",
+  "viewAvailableReciters": "عرض القراء المتاحين",
+  "unknown": "غير معروف",
+  "availableReciters": "القراء المتاحون",
+  "errorLoadingReciters": "خطأ في تحميل القراء",
+  "retry": "إعادة المحاولة",
+  "noRecitersAvailable": "لا يوجد قراء متاحون",
+  "checkBackLaterReciters": "عد لاحقاً للاطلاع على القراء المتاحين",
+  "selectReciter": "اختر قارئاً",
+  "browseAndSelectReciterHint": "اضغط على البطاقة للاستعراض • اضغط على الزر للتعيين كافتراضي",
+  "defaultReciter": "القارئ الافتراضي",
+  "available": "متاح",
+  "selectedAsDefaultReciter": "تم اختيار {name} كقارئ افتراضي",
+  "audioDownloads": "تنزيلات الصوت",
+  "noReciterSelected": "لم يتم اختيار قارئ",
+  "change": "تغيير",
+  "ayahCountLabel": "{count} آية",
+  "enterWordsToFindVerses": "أدخل كلمات للعثور على آيات في القرآن",
+  "enterWordsToSearch": "أدخل كلمات للبحث...",
+  "foundOccurrences": "تم العثور على {occurrences} نتيجة في {verses} آية",
+  "noResultsFound": "لم يتم العثور على نتائج",
+  "searchError": "خطأ في البحث",
+  "searchQuran": "بحث في القرآن",
+  "searchTheQuran": "ابحث في القرآن",
+  "tryDifferentSearchTerms": "جرّب مصطلحات بحث أخرى"
 }

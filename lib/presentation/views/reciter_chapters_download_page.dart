@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wolof_quran/presentation/widgets/snackbar.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:quran/quran.dart' as quran;
 
@@ -10,11 +11,12 @@ import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../../service_locator.dart';
 import '../../domain/usecases/get_downloaded_surahs_usecase.dart';
+import '../utils/audio_error_formatter.dart';
 
-class ReciterChaptersPage extends StatelessWidget {
+class ReciterChaptersDownloadPage extends StatelessWidget {
   final Reciter reciter;
 
-  const ReciterChaptersPage({super.key, required this.reciter});
+  const ReciterChaptersDownloadPage({super.key, required this.reciter});
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +24,7 @@ class ReciterChaptersPage extends StatelessWidget {
     final accentGreen = isDark
         ? const Color(0xFF4CAF50)
         : Theme.of(context).colorScheme.primary;
+    final textTheme = Theme.of(context).textTheme;
     return BlocProvider(
       create: (context) => ReciterChaptersBloc(
         getDownloadedSurahsUseCase: locator<GetDownloadedSurahsUseCase>(),
@@ -36,8 +39,12 @@ class ReciterChaptersPage extends StatelessWidget {
               expandedHeight: 200,
               floating: false,
               pinned: true,
-              backgroundColor: isDark ? Theme.of(context).colorScheme.surfaceContainer : accentGreen,
-              iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
+              backgroundColor: isDark
+                  ? Theme.of(context).colorScheme.surfaceContainer
+                  : accentGreen,
+              iconTheme: IconThemeData(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
               surfaceTintColor: Colors.transparent,
               shadowColor: isDark
                   ? Colors.black.withValues(alpha: 0.4)
@@ -49,7 +56,10 @@ class ReciterChaptersPage extends StatelessWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: isDark
-                          ? [Theme.of(context).colorScheme.surfaceContainer, Theme.of(context).colorScheme.surface]
+                          ? [
+                              Theme.of(context).colorScheme.surfaceContainer,
+                              Theme.of(context).colorScheme.surface,
+                            ]
                           : [accentGreen.withValues(alpha: 0.85), accentGreen],
                     ),
                   ),
@@ -77,10 +87,8 @@ class ReciterChaptersPage extends StatelessWidget {
                         const SizedBox(height: 16),
                         Text(
                           reciter.name,
-                          style: TextStyle(
-                            fontFamily: 'Hafs',
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                          style: textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w500,
                             color: Theme.of(context).colorScheme.onPrimary,
                           ),
                           textAlign: TextAlign.center,
@@ -131,28 +139,6 @@ class _ReciterChaptersContent extends StatelessWidget {
     return '$arabicName - ${quran.getSurahNameEnglish(surahNumber)}';
   }
 
-  String _getFormattedErrorMessage(
-    String error,
-    AppLocalizations localizations,
-  ) {
-    if (error.contains('SocketException') || error.contains('connection')) {
-      return localizations.checkInternetConnection;
-    }
-    if (error.contains('timeout') || error.contains('Timeout')) {
-      return localizations.connectionTimeout;
-    }
-    if (error.contains('404') || error.contains('not found')) {
-      return localizations.audioFileNotFound;
-    }
-    if (error.contains('403') || error.contains('forbidden')) {
-      return localizations.accessDeniedToAudio;
-    }
-    if (error.contains('storage') || error.contains('space')) {
-      return localizations.notEnoughStorage;
-    }
-    return localizations.downloadFailed;
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -160,6 +146,7 @@ class _ReciterChaptersContent extends StatelessWidget {
 
     return BlocBuilder<ReciterChaptersBloc, ReciterChaptersState>(
       builder: (context, state) {
+        final textTheme = Theme.of(context).textTheme;
         if (state is ReciterChaptersLoading) {
           return SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
@@ -173,17 +160,19 @@ class _ReciterChaptersContent extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Text(
-                    _getFormattedErrorMessage(state.message, localizations),
+                    formatAudioError(state.message, localizations),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Hafs',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -239,10 +228,8 @@ class _ReciterChaptersContent extends StatelessWidget {
                 localizations.surahsDownloaded(
                   state.downloadedSurahNumbers.length,
                 ),
-                style: TextStyle(
-                  fontFamily: 'Hafs',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
                   color: accentGreen,
                 ),
               ),
@@ -309,27 +296,9 @@ class _ChapterCard extends StatelessWidget {
     required this.onDownloadComplete,
   });
 
-  String _getFormattedErrorMessage(String error) {
-    if (error.contains('SocketException') || error.contains('connection')) {
-      return localizations.checkInternetConnection;
-    }
-    if (error.contains('timeout') || error.contains('Timeout')) {
-      return localizations.connectionTimeout;
-    }
-    if (error.contains('404') || error.contains('not found')) {
-      return localizations.audioFileNotFound;
-    }
-    if (error.contains('403') || error.contains('forbidden')) {
-      return localizations.accessDeniedToAudio;
-    }
-    if (error.contains('storage') || error.contains('space')) {
-      return localizations.notEnoughStorage;
-    }
-    return localizations.downloadFailed;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -345,9 +314,7 @@ class _ChapterCard extends StatelessWidget {
               ]
             : null,
         border: Border.all(
-          color: accentGreen.withValues(
-            alpha: isDark ? 0.12 : 0.15,
-          ),
+          color: accentGreen.withValues(alpha: isDark ? 0.12 : 0.15),
           width: 1,
         ),
       ),
@@ -356,24 +323,10 @@ class _ChapterCard extends StatelessWidget {
         child: Row(
           children: [
             // Chapter number
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: accentGreen.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Text(
-                  '$surahNumber',
-                  style: TextStyle(
-                    fontFamily: 'Hafs',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: accentGreen,
-                  ),
-                ),
-              ),
+            ChapterNumberWidget(
+              accentGreen: accentGreen,
+              surahNumber: surahNumber,
+              textTheme: textTheme,
             ),
 
             const SizedBox(width: 16),
@@ -385,11 +338,11 @@ class _ChapterCard extends StatelessWidget {
                 children: [
                   Text(
                     getSurahDisplayName(surahNumber),
-                    style: TextStyle(
-                      fontFamily: 'Hafs',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: isDark ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurface,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w400,
+                      color: isDark
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -408,12 +361,11 @@ class _ChapterCard extends StatelessWidget {
 
                       return Text(
                         statusText,
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontSize: 14,
+                        style: textTheme.bodySmall?.copyWith(
                           color: isDownloaded
                               ? Colors.green
                               : Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
                         ),
                       );
                     },
@@ -438,29 +390,43 @@ class _ChapterCard extends StatelessWidget {
               listener: (context, currentState) {
                 if (currentState is AudioManagementLoaded) {
                   onDownloadComplete();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        localizations.downloadedSuccessfully(
-                          getSurahDisplayName(surahNumber),
-                        ),
-                      ),
-                      backgroundColor: Colors.green,
-                      duration: const Duration(seconds: 2),
+                  CustomSnackbar.showSnackbar(
+                    context,
+                    localizations.downloadedSuccessfully(
+                      getSurahDisplayName(surahNumber),
                     ),
+                    duration: 2,
                   );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(
+                  //     content: Text(
+                  //       localizations.downloadedSuccessfully(
+                  //         getSurahDisplayName(surahNumber),
+                  //       ),
+                  //     ),
+                  //     backgroundColor: Colors.green,
+                  //     duration: const Duration(seconds: 2),
+                  //   ),
+                  // );
                 } else if (currentState is AudioManagementError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        localizations.downloadFailedWithError(
-                          _getFormattedErrorMessage(currentState.message),
-                        ),
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                      duration: const Duration(seconds: 3),
-                    ),
+                  final formattedError = formatAudioError(
+                    currentState.message,
+                    localizations,
                   );
+                  CustomSnackbar.showSnackbar(
+                    context,
+                    localizations.downloadFailedWithError(formattedError),
+                    duration: 5,
+                  );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(
+                  //     content: Text(
+                  //       localizations.downloadFailedWithError(formattedError),
+                  //     ),
+                  //     backgroundColor: Theme.of(context).colorScheme.error,
+                  //     duration: const Duration(seconds: 3),
+                  //   ),
+                  // );
                 }
               },
               builder: (context, currentState) {
@@ -487,9 +453,7 @@ class _ChapterCard extends StatelessWidget {
                           ),
                           Text(
                             '${(currentState.progress * 100).toInt()}%',
-                            style: TextStyle(
-                              fontFamily: 'Hafs',
-                              fontSize: 10,
+                            style: textTheme.labelSmall?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: accentGreen,
                             ),
@@ -498,10 +462,8 @@ class _ChapterCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Downloading...',
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontSize: 10,
+                        localizations.downloading,
+                        style: textTheme.labelSmall?.copyWith(
                           color: accentGreen,
                         ),
                       ),
@@ -588,6 +550,40 @@ class _ChapterCard extends StatelessWidget {
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ChapterNumberWidget extends StatelessWidget {
+  const ChapterNumberWidget({
+    super.key,
+    required this.accentGreen,
+    required this.surahNumber,
+    required this.textTheme,
+  });
+
+  final Color accentGreen;
+  final int surahNumber;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: accentGreen.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(
+        child: Text(
+          '$surahNumber',
+          style: textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: accentGreen,
+          ),
         ),
       ),
     );

@@ -157,30 +157,30 @@ class AppLocalizationsFr extends AppLocalizations {
   String get cancel => 'Annuler';
 
   @override
-  String get searchQuran => 'Search Quran';
+  String get searchQuran => 'Rechercher dans le Coran';
 
   @override
-  String get enterWordsToSearch => 'Enter words to search...';
+  String get enterWordsToSearch => 'Saisissez des mots à rechercher...';
 
   @override
-  String get searchTheQuran => 'Search the Quran';
+  String get searchTheQuran => 'Recherchez dans le Coran';
 
   @override
   String get enterWordsToFindVerses =>
-      'Enter words to find verses in the Quran';
+      'Saisissez des mots pour trouver des versets dans le Coran';
 
   @override
-  String get searchError => 'Search Error';
+  String get searchError => 'Erreur de recherche';
 
   @override
-  String get noResultsFound => 'No Results Found';
+  String get noResultsFound => 'Aucun résultat trouvé';
 
   @override
-  String get tryDifferentSearchTerms => 'Try different search terms';
+  String get tryDifferentSearchTerms => 'Essayez d\'autres termes de recherche';
 
   @override
   String foundOccurrences(int occurrences, int verses) {
-    return 'Found $occurrences occurrence(s) in $verses verse(s)';
+    return '$occurrences occurrence(s) trouvée(s) dans $verses verset(s)';
   }
 
   @override
@@ -233,6 +233,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tryAgain => 'Réessayer';
+
+  @override
+  String get dioStatus404 =>
+      'L’audio de ce chapitre n’est pas encore disponible. Merci de réessayer plus tard';
 
   @override
   String errorCheckingDownloadStatus(String error) {
@@ -359,4 +363,96 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get savedAyahs => 'Versets enregistrés';
+
+  @override
+  String get settingsDescription => 'Personnalisez votre expérience de lecture';
+
+  @override
+  String get changeAppLanguage => 'Changer la langue de l\'application';
+
+  @override
+  String get chooseAppTheme => 'Choisir le thème de l\'application';
+
+  @override
+  String get managePreferences => 'Gérer les préférences';
+
+  @override
+  String get about => 'À propos';
+
+  @override
+  String get aboutSubtitle => 'Version de l\'application et support';
+
+  @override
+  String get aboutDescription =>
+      'Une application pour lire le Coran et écouter les récitations en langue wolof.';
+
+  @override
+  String appVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get quranSettingsDescription => 'Personnalisez votre lecture du Coran';
+
+  @override
+  String get audioAndReciters => 'Audio et récitateur(s)';
+
+  @override
+  String get manageRecitersAndDownloadAudio =>
+      'Gérer les récitateur(s) et télécharger l\'audio';
+
+  @override
+  String get viewAvailableReciters => 'Voir les récitateur(s) disponibles';
+
+  @override
+  String get unknown => 'Inconnu';
+
+  @override
+  String get availableReciters => 'Récitateur(s) disponibles';
+
+  @override
+  String get errorLoadingReciters =>
+      'Erreur lors du chargement des récitateur(s)';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get noRecitersAvailable => 'Aucun récitateur disponible';
+
+  @override
+  String get checkBackLaterReciters =>
+      'Revenez plus tard pour voir les récitateur(s) disponibles';
+
+  @override
+  String get selectReciter => 'Sélectionner un récitateur';
+
+  @override
+  String get browseAndSelectReciterHint =>
+      'Touchez la carte pour parcourir • Touchez le bouton pour définir par défaut';
+
+  @override
+  String get defaultReciter => 'Récitateur par défaut';
+
+  @override
+  String get available => 'Disponible';
+
+  @override
+  String selectedAsDefaultReciter(String name) {
+    return '$name sélectionné comme récitateur par défaut';
+  }
+
+  @override
+  String get audioDownloads => 'Téléchargements audio';
+
+  @override
+  String get noReciterSelected => 'Aucun récitateur sélectionné';
+
+  @override
+  String get change => 'Changer';
+
+  @override
+  String ayahCountLabel(int count) {
+    return '$count verset(s)';
+  }
 }

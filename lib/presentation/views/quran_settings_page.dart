@@ -111,7 +111,7 @@ class _QuranSettingsView extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Customize your Quran reading experience',
+                        localizations.quranSettingsDescription,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
@@ -149,6 +149,8 @@ class _QuranSettingsView extends StatelessWidget {
     final currentTranslationOption = QuranSettingsCubit.getTranslationOption(
       state.selectedTranslation,
     );
+    final currentTranslationValue =
+        currentTranslationOption?.displayName ?? localizations.unknown;
 
     return Column(
       children: [
@@ -158,7 +160,7 @@ class _QuranSettingsView extends StatelessWidget {
           icon: Icons.translate,
           title: localizations.translationSettings,
           subtitle: localizations.currentTranslation,
-          value: currentTranslationOption?.displayName ?? 'Unknown',
+          value: currentTranslationValue,
           onTap: () => _showTranslationSelector(context, state, localizations),
         ),
 
@@ -180,9 +182,9 @@ class _QuranSettingsView extends StatelessWidget {
         _buildSettingsMenuItem(
           context: context,
           icon: Icons.volume_up,
-          title: 'Audio & Reciters',
-          subtitle: 'Manage reciters and download audio',
-          value: 'View available reciters',
+          title: localizations.audioAndReciters,
+          subtitle: localizations.manageRecitersAndDownloadAudio,
+          value: localizations.viewAvailableReciters,
           onTap: () {
             Navigator.pushNamed(context, '/reciter-list');
           },
@@ -544,7 +546,7 @@ class _TranslationSelectorModal extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 48),
             ],
           );
         },
@@ -723,7 +725,7 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
 
             // Close Button
             ElevatedButton(
-              onPressed: () => Navigator.pop(context, _currentFontSize),
+              onPressed: () => Navigator.pop(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
@@ -735,13 +737,14 @@ class _FontSizeSelectorModalState extends State<_FontSizeSelectorModal> {
               ),
               child: Text(
                 widget.localizations.close,
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onPrimary,
+                ),
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 42),
           ],
         ),
       ),

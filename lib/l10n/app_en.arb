@@ -314,6 +314,10 @@
   "@tryAgain": {
     "description": "Button text to retry an action"
   },
+  "dioStatus404": "Audio for this chapter is not yet available. Please try again later.",
+  "@dioStatus404": {
+    "description": "Specific error message returned when Dio throws on status code 404"
+  },
   "errorCheckingDownloadStatus": "Error checking download status: {error}",
   "@errorCheckingDownloadStatus": {
     "description": "Error message when checking download status fails",
@@ -479,5 +483,131 @@
   "savedAyahs": "Saved Ayahs",
   "@savedAyahs": {
     "description": "Subtitle for bookmarks action"
+  },
+  "settingsDescription": "Customize your reading experience",
+  "@settingsDescription": {
+    "description": "Header subtitle on settings page"
+  },
+  "changeAppLanguage": "Change the app language",
+  "@changeAppLanguage": {
+    "description": "Subtitle for language setting"
+  },
+  "chooseAppTheme": "Choose the app theme",
+  "@chooseAppTheme": {
+    "description": "Subtitle for theme setting"
+  },
+  "managePreferences": "Manage preferences",
+  "@managePreferences": {
+    "description": "Value text for Quran settings menu item"
+  },
+  "about": "About",
+  "@about": {
+    "description": "About menu title"
+  },
+  "aboutSubtitle": "App version and support",
+  "@aboutSubtitle": {
+    "description": "About menu subtitle"
+  },
+  "aboutDescription": "An app to read the Quran and listen to recitations in Wolof.",
+  "@aboutDescription": {
+    "description": "About dialog description"
+  },
+  "appVersion": "Version {version}",
+  "@appVersion": {
+    "description": "App version label with number",
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "description": "The app version number"
+      }
+    }
+  },
+  "quranSettingsDescription": "Customize your Quran reading experience",
+  "@quranSettingsDescription": {
+    "description": "Header subtitle on Quran settings page"
+  },
+  "audioAndReciters": "Audio & Reciters",
+  "@audioAndReciters": {
+    "description": "Menu title for audio and reciters"
+  },
+  "manageRecitersAndDownloadAudio": "Manage reciters and download audio",
+  "@manageRecitersAndDownloadAudio": {
+    "description": "Subtitle for audio and reciters menu item"
+  },
+  "viewAvailableReciters": "View available reciters",
+  "@viewAvailableReciters": {
+    "description": "Value text for audio and reciters item"
+  },
+  "unknown": "Unknown",
+  "@unknown": {
+    "description": "Fallback text when value is unknown"
+  },
+  "availableReciters": "Available Reciters",
+  "@availableReciters": {
+    "description": "Title for reciter list page"
+  },
+  "errorLoadingReciters": "Error loading reciters",
+  "@errorLoadingReciters": {
+    "description": "Headline for reciter loading error"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button label"
+  },
+  "noRecitersAvailable": "No reciters available",
+  "@noRecitersAvailable": {
+    "description": "Headline when no reciters found"
+  },
+  "checkBackLaterReciters": "Check back later for available reciters",
+  "@checkBackLaterReciters": {
+    "description": "Subtitle when no reciters available"
+  },
+  "selectReciter": "Select Reciter",
+  "@selectReciter": {
+    "description": "Action to select a reciter"
+  },
+  "browseAndSelectReciterHint": "Tap card to browse • Tap select button to choose default",
+  "@browseAndSelectReciterHint": {
+    "description": "Hint text for reciter selection"
+  },
+  "defaultReciter": "Default Reciter",
+  "@defaultReciter": {
+    "description": "Badge for currently selected reciter"
+  },
+  "available": "Available",
+  "@available": {
+    "description": "Badge for available reciter"
+  },
+  "selectedAsDefaultReciter": "Selected {name} as default reciter",
+  "@selectedAsDefaultReciter": {
+    "description": "Snackbar when user selects a reciter",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "description": "Reciter name"
+      }
+    }
+  },
+  "audioDownloads": "Audio Downloads",
+  "@audioDownloads": {
+    "description": "Title for surah audio downloads page"
+  },
+  "noReciterSelected": "No reciter selected",
+  "@noReciterSelected": {
+    "description": "Message when no reciter chosen"
+  },
+  "change": "Change",
+  "@change": {
+    "description": "Generic change button label"
+  },
+  "ayahCountLabel": "{count} ayahs",
+  "@ayahCountLabel": {
+    "description": "Label showing ayah count per surah",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of ayahs"
+      }
+    }
   }
 }

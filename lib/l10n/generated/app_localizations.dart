@@ -520,6 +520,12 @@ abstract class AppLocalizations {
   /// **'Try Again'**
   String get tryAgain;
 
+  /// Specific error message returned when Dio throws on status code 404
+  ///
+  /// In en, this message translates to:
+  /// **'Audio for this chapter is not yet available. Please try again later.'**
+  String get dioStatus404;
+
   /// Error message when checking download status fails
   ///
   /// In en, this message translates to:
@@ -759,6 +765,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved Ayahs'**
   String get savedAyahs;
+
+  /// Header subtitle on settings page
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your reading experience'**
+  String get settingsDescription;
+
+  /// Subtitle for language setting
+  ///
+  /// In en, this message translates to:
+  /// **'Change the app language'**
+  String get changeAppLanguage;
+
+  /// Subtitle for theme setting
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the app theme'**
+  String get chooseAppTheme;
+
+  /// Value text for Quran settings menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Manage preferences'**
+  String get managePreferences;
+
+  /// About menu title
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// About menu subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'App version and support'**
+  String get aboutSubtitle;
+
+  /// About dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'An app to read the Quran and listen to recitations in Wolof.'**
+  String get aboutDescription;
+
+  /// App version label with number
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String appVersion(String version);
+
+  /// Header subtitle on Quran settings page
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your Quran reading experience'**
+  String get quranSettingsDescription;
+
+  /// Menu title for audio and reciters
+  ///
+  /// In en, this message translates to:
+  /// **'Audio & Reciters'**
+  String get audioAndReciters;
+
+  /// Subtitle for audio and reciters menu item
+  ///
+  /// In en, this message translates to:
+  /// **'Manage reciters and download audio'**
+  String get manageRecitersAndDownloadAudio;
+
+  /// Value text for audio and reciters item
+  ///
+  /// In en, this message translates to:
+  /// **'View available reciters'**
+  String get viewAvailableReciters;
+
+  /// Fallback text when value is unknown
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknown;
+
+  /// Title for reciter list page
+  ///
+  /// In en, this message translates to:
+  /// **'Available Reciters'**
+  String get availableReciters;
+
+  /// Headline for reciter loading error
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading reciters'**
+  String get errorLoadingReciters;
+
+  /// Retry button label
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// Headline when no reciters found
+  ///
+  /// In en, this message translates to:
+  /// **'No reciters available'**
+  String get noRecitersAvailable;
+
+  /// Subtitle when no reciters available
+  ///
+  /// In en, this message translates to:
+  /// **'Check back later for available reciters'**
+  String get checkBackLaterReciters;
+
+  /// Action to select a reciter
+  ///
+  /// In en, this message translates to:
+  /// **'Select Reciter'**
+  String get selectReciter;
+
+  /// Hint text for reciter selection
+  ///
+  /// In en, this message translates to:
+  /// **'Tap card to browse • Tap select button to choose default'**
+  String get browseAndSelectReciterHint;
+
+  /// Badge for currently selected reciter
+  ///
+  /// In en, this message translates to:
+  /// **'Default Reciter'**
+  String get defaultReciter;
+
+  /// Badge for available reciter
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get available;
+
+  /// Snackbar when user selects a reciter
+  ///
+  /// In en, this message translates to:
+  /// **'Selected {name} as default reciter'**
+  String selectedAsDefaultReciter(String name);
+
+  /// Title for surah audio downloads page
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Downloads'**
+  String get audioDownloads;
+
+  /// Message when no reciter chosen
+  ///
+  /// In en, this message translates to:
+  /// **'No reciter selected'**
+  String get noReciterSelected;
+
+  /// Generic change button label
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get change;
+
+  /// Label showing ayah count per surah
+  ///
+  /// In en, this message translates to:
+  /// **'{count} ayahs'**
+  String ayahCountLabel(int count);
 }
 
 class _AppLocalizationsDelegate

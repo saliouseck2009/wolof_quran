@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 import '../cubits/reciter_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
@@ -25,6 +26,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final accentGreen = colorScheme.primary;
+    final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: colorScheme.brightness == Brightness.dark
@@ -32,7 +34,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
           : colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'Available Reciters',
+          localizations.availableReciters,
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: colorScheme.onPrimary,
@@ -67,7 +69,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                   Icon(Icons.error_outline, size: 64, color: colorScheme.error),
                   const SizedBox(height: 16),
                   Text(
-                    'Error Loading Reciters',
+                    localizations.errorLoadingReciters,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: colorScheme.onSurface,
@@ -98,7 +100,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                       ),
                     ),
                     child: Text(
-                      'Retry',
+                      localizations.retry,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -122,7 +124,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'No Reciters Available',
+                      localizations.noRecitersAvailable,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: colorScheme.onSurface,
@@ -130,7 +132,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Check back later for available reciters',
+                      localizations.checkBackLaterReciters,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -194,7 +196,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                'Select Reciter',
+                                localizations.selectReciter,
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w700,
@@ -203,7 +205,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Tap card to browse • Tap select button to choose default',
+                                localizations.browseAndSelectReciterHint,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: colorScheme.onSurfaceVariant,
@@ -357,13 +359,13 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                                   width: 1,
                                                 ),
                                               ),
-                                              child: Text(
-                                                isSelected
-                                                    ? 'Default Reciter'
-                                                    : 'Available',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodySmall
+                                            child: Text(
+                                              isSelected
+                                                  ? localizations.defaultReciter
+                                                  : localizations.available,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall
                                                     ?.copyWith(
                                                       fontWeight:
                                                           FontWeight.w500,
@@ -396,7 +398,10 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                           ).showSnackBar(
                                             SnackBar(
                                               content: Text(
-                                                'Selected ${reciter.name} as default reciter',
+                                                localizations
+                                                    .selectedAsDefaultReciter(
+                                                  reciter.name,
+                                                ),
                                               ),
                                               backgroundColor: accentGreen,
                                               duration: const Duration(

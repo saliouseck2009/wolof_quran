@@ -214,6 +214,18 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
         currentAyahAudiosMap = Map.from(loadedState.ayahAudiosMap);
       }
 
+      // Emit initial downloading state so listeners can react even if the
+      // download fails before progress callbacks fire.
+      emit(
+        AudioDownloading(
+          reciterId: reciterId,
+          surahNumber: surahNumber,
+          progress: 0.0,
+          previousSurahStatusMap: currentSurahStatusMap,
+          previousAyahAudiosMap: currentAyahAudiosMap,
+        ),
+      );
+
       // Mark download as in progress in database
       try {
         await downloadRepository.markSurahAsInProgress(

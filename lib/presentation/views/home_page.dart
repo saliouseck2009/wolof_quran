@@ -10,6 +10,7 @@ import '../../service_locator.dart';
 import '../widgets/home_header.dart';
 import '../widgets/daily_inspiration_card.dart';
 import '../widgets/home_actions_grid.dart';
+import '../utils/audio_error_formatter.dart';
 
 class HomePage extends StatelessWidget {
   static const String routeName = "/";
@@ -37,14 +38,24 @@ class HomePage extends StatelessWidget {
       child: MultiBlocListener(
         listeners: [
           BlocListener<AudioManagementCubit, AudioManagementState>(
+            listenWhen: (previous, current) =>
+                current is AudioManagementError &&
+                previous is! AudioManagementError,
             listener: (context, audioState) {
+              final isCurrentRoute =
+                  ModalRoute.of(context)?.isCurrent ?? true;
+              if (!isCurrentRoute) return;
               if (audioState is AudioManagementError) {
                 final theme = Theme.of(context);
                 final colorScheme = theme.colorScheme;
+                final message = formatAudioError(
+                  audioState.message,
+                  AppLocalizations.of(context)!,
+                );
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      audioState.message,
+                      message,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onError,
                       ),

@@ -7,7 +7,7 @@ import 'package:wolof_quran/presentation/views/surah_detail_page.dart';
 import 'package:wolof_quran/presentation/views/quran_settings_page.dart';
 import 'package:wolof_quran/presentation/views/surah_audio_list_page.dart';
 import 'package:wolof_quran/presentation/views/reciter_list_page.dart';
-import 'package:wolof_quran/presentation/views/reciter_chapters_page.dart';
+import 'package:wolof_quran/presentation/views/reciter_chapters_download_page.dart';
 import 'package:wolof_quran/presentation/views/search_page.dart';
 import 'package:wolof_quran/domain/entities/reciter.dart';
 
@@ -44,7 +44,7 @@ class AppRoutes {
       case '/reciter-chapters':
         final reciter = args as Reciter;
         return _materialRoute(
-          view: ReciterChaptersPage(reciter: reciter),
+          view: ReciterChaptersDownloadPage(reciter: reciter),
           settings: settings,
         );
 

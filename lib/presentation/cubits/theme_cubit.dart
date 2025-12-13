@@ -68,7 +68,7 @@ class ThemeCubit extends Cubit<ThemeMode> {
       case ThemeMode.dark:
         return localizations.dark;
       case ThemeMode.system:
-        return "Système";
+        return localizations.system;
     }
   }
 
