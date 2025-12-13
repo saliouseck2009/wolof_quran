@@ -9,6 +9,8 @@ import '../../domain/usecases/get_surah_audio_status_usecase.dart';
 import '../../domain/usecases/get_ayah_audios_usecase.dart';
 import '../../domain/repositories/download_repository.dart';
 import '../../core/services/audio_player_service.dart';
+import '../../domain/repositories/audio_repository.dart';
+import '../../service_locator.dart';
 
 // States
 abstract class AudioManagementState extends Equatable {
@@ -177,6 +179,7 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
   final GetAyahAudiosUseCase getAyahAudiosUseCase;
   final AudioPlayerService audioPlayerService;
   final DownloadRepository downloadRepository;
+  final AudioRepository _audioRepository = locator<AudioRepository>();
 
   StreamSubscription<double>? _downloadStreamSubscription;
 
@@ -192,6 +195,21 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
   Future<void> close() {
     _downloadStreamSubscription?.cancel();
     return super.close();
+  }
+
+  /// Delete a downloaded surah (files + database) and refresh status.
+  Future<void> deleteSurahAudio(String reciterId, int surahNumber) async {
+    try {
+      await _audioRepository.deleteSurahAudio(reciterId, surahNumber);
+    } catch (e) {
+      log('Failed to delete local surah audio: $e');
+    }
+    try {
+      await downloadRepository.removeSurahDownload(reciterId, surahNumber);
+    } catch (e) {
+      log('Failed to remove download record: $e');
+    }
+    await refreshSurahStatus(reciterId, surahNumber);
   }
 
   /// Initialize with empty data

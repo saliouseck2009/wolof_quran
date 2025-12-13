@@ -148,6 +148,7 @@
   "noReciterSelected": "لم يتم اختيار قارئ",
   "change": "تغيير",
   "ayahCountLabel": "{count} آية",
+  "surahAudioDeleted": "تم حذف صوت سورة {surahName}",
   "enterWordsToFindVerses": "أدخل كلمات للعثور على آيات في القرآن",
   "enterWordsToSearch": "أدخل كلمات للبحث...",
   "foundOccurrences": "تم العثور على {occurrences} نتيجة في {verses} آية",

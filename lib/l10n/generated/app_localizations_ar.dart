@@ -444,4 +444,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String ayahCountLabel(int count) {
     return '$count آية';
   }
+
+  @override
+  String surahAudioDeleted(String surahName) {
+    return 'تم حذف صوت سورة $surahName';
+  }
 }

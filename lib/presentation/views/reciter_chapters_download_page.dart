@@ -4,7 +4,6 @@ import 'package:wolof_quran/presentation/widgets/snackbar.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'package:quran/quran.dart' as quran;
 
-import '../../core/services/audio_player_service.dart';
 import '../../domain/entities/reciter.dart';
 import '../blocs/reciter_chapters_bloc.dart';
 import '../cubits/audio_management_cubit.dart';
@@ -397,7 +396,6 @@ class _ChapterCard extends StatelessWidget {
                     ),
                     duration: 2,
                   );
-                
                 } else if (currentState is AudioManagementError) {
                   final formattedError = formatAudioError(
                     currentState.message,
@@ -408,7 +406,6 @@ class _ChapterCard extends StatelessWidget {
                     localizations.downloadFailedWithError(formattedError),
                     duration: 5,
                   );
-              
                 }
               },
               builder: (context, currentState) {
@@ -454,69 +451,31 @@ class _ChapterCard extends StatelessWidget {
                 }
 
                 if (isDownloaded) {
-                  return StreamBuilder<AudioPlayerState>(
-                    stream: context
-                        .read<AudioManagementCubit>()
-                        .audioPlayerService
-                        .playerState,
-                    builder: (context, playerStateSnapshot) {
-                      return StreamBuilder<PlayingAudioInfo?>(
-                        stream: context
-                            .read<AudioManagementCubit>()
-                            .audioPlayerService
-                            .currentAudio,
-                        builder: (context, currentAudioSnapshot) {
-                          final playerState =
-                              playerStateSnapshot.data ??
-                              AudioPlayerState.stopped;
-                          final currentAudio = currentAudioSnapshot.data;
-                          final audioPlayerService = context
-                              .read<AudioManagementCubit>()
-                              .audioPlayerService;
-
-                          final isThisSurahPlaying =
-                              currentAudio != null &&
-                              currentAudio.surahNumber == surahNumber &&
-                              currentAudio.reciterId == reciter.id &&
-                              audioPlayerService.isPlayingPlaylist;
-
-                          final isPlaying =
-                              isThisSurahPlaying &&
-                              (playerState == AudioPlayerState.playing ||
-                                  playerState == AudioPlayerState.loading);
-
-                          return IconButton(
-                            onPressed: () async {
-                              if (isThisSurahPlaying &&
-                                  playerState == AudioPlayerState.playing) {
-                                await audioPlayerService.stop();
-                              } else {
-                                context
-                                    .read<AudioManagementCubit>()
-                                    .loadAyahAudios(reciter.id, surahNumber);
-                                context
-                                    .read<AudioManagementCubit>()
-                                    .playSurahPlaylist(
-                                      reciter.id,
-                                      surahNumber,
-                                      surahName: getSurahDisplayName(
-                                        surahNumber,
-                                      ),
-                                      startAyahIndex: 0,
-                                    );
-                              }
-                            },
-                            icon: Icon(
-                              isPlaying
-                                  ? Icons.stop_circle
-                                  : Icons.play_circle_filled,
-                              color: accentGreen,
-                              size: 32,
+                  return IconButton(
+                    onPressed: () async {
+                      await context
+                          .read<AudioManagementCubit>()
+                          .deleteSurahAudio(reciter.id, surahNumber);
+                      onDownloadComplete();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              localizations.surahAudioDeleted(
+                                getSurahDisplayName(surahNumber),
+                              ),
                             ),
-                          );
-                        },
-                      );
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
                     },
+                    icon: Icon(
+                      Icons.delete_outline,
+                      color: Theme.of(context).colorScheme.error,
+                      size: 28,
+                    ),
+                    tooltip: localizations.clear,
                   );
                 }
 

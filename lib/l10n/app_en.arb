@@ -609,5 +609,15 @@
         "description": "Number of ayahs"
       }
     }
+  },
+  "surahAudioDeleted": "{surahName} audio removed",
+  "@surahAudioDeleted": {
+    "description": "Confirmation after deleting downloaded surah audio",
+    "placeholders": {
+      "surahName": {
+        "type": "String",
+        "description": "Displayed surah name"
+      }
+    }
   }
 }

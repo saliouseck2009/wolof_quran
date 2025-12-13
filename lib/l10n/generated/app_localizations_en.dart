@@ -450,4 +450,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String ayahCountLabel(int count) {
     return '$count ayahs';
   }
+
+  @override
+  String surahAudioDeleted(String surahName) {
+    return '$surahName audio removed';
+  }
 }

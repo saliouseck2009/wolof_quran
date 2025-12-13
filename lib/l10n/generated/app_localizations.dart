@@ -927,6 +927,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} ayahs'**
   String ayahCountLabel(int count);
+
+  /// Confirmation after deleting downloaded surah audio
+  ///
+  /// In en, this message translates to:
+  /// **'{surahName} audio removed'**
+  String surahAudioDeleted(String surahName);
 }
 
 class _AppLocalizationsDelegate

@@ -139,6 +139,7 @@
   "noReciterSelected": "Aucun récitateur sélectionné",
   "change": "Changer",
   "ayahCountLabel": "{count} verset(s)",
+  "surahAudioDeleted": "Audio de {surahName} supprimé",
   "enterWordsToFindVerses": "Saisissez des mots pour trouver des versets dans le Coran",
   "enterWordsToSearch": "Saisissez des mots à rechercher...",
   "foundOccurrences": "{occurrences} occurrence(s) trouvée(s) dans {verses} verset(s)",
