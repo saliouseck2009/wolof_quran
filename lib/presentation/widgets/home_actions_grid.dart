@@ -16,7 +16,7 @@ class HomeActionsGrid extends StatelessWidget {
               child: _ModernActionCard(
                 icon: Icons.menu_book_outlined,
                 title: localizations.quran,
-                subtitle: 'Read Surahs',
+                subtitle: localizations.readSurahs,
                 onTap: () => Navigator.pushNamed(context, '/surahs'),
               ),
             ),
@@ -25,7 +25,7 @@ class HomeActionsGrid extends StatelessWidget {
               child: _ModernActionCard(
                 icon: Icons.headphones_outlined,
                 title: localizations.recitation,
-                subtitle: 'Listen Audio',
+                subtitle: localizations.listenAudio,
                 onTap: () => Navigator.pushNamed(context, '/surah-audio-list'),
               ),
             ),
@@ -38,7 +38,7 @@ class HomeActionsGrid extends StatelessWidget {
               child: _ModernActionCard(
                 icon: Icons.search_outlined,
                 title: localizations.search,
-                subtitle: 'Find Verses',
+                subtitle: localizations.findVerses,
                 onTap: () => Navigator.pushNamed(context, '/search'),
               ),
             ),
@@ -46,8 +46,8 @@ class HomeActionsGrid extends StatelessWidget {
             Expanded(
               child: _ModernActionCard(
                 icon: Icons.bookmark_outline,
-                title: 'Bookmarks',
-                subtitle: 'Saved Ayahs',
+                title: localizations.bookmarks,
+                subtitle: localizations.savedAyahs,
                 onTap: () => Navigator.pushNamed(context, '/bookmarks'),
               ),
             ),

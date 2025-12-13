@@ -79,5 +79,19 @@
   "clearAllBookmarks": "مسح الكل",
   "confirmClearBookmarks": "مسح جميع الإشارات المرجعية؟",
   "clearBookmarksMessage": "لا يمكن التراجع عن هذا الإجراء.",
-  "clear": "مسح"
+  "clear": "مسح",
+  "salamAlaikum": "السلام عليكم",
+  "dailyInspirationTitle": "إلهام يومي",
+  "loadingDailyInspiration": "جاري تحميل الإلهام اليومي...",
+  "holyQuran": "القرآن الكريم",
+  "tapForDailyVerse": "اضغط للحصول على آيتك اليومية من القرآن",
+  "tapAnywhereToStart": "اضغط في أي مكان للبدء",
+  "tapToReadArabicMore": "اضغط لقراءة العربية والمزيد",
+  "openSurah": "افتح السورة",
+  "bookmark": "إضافة إشارة مرجعية",
+  "bookmarked": "مضاف إلى الإشارات المرجعية",
+  "readSurahs": "قراءة السور",
+  "listenAudio": "استمع إلى الصوت",
+  "findVerses": "ابحث عن الآيات",
+  "savedAyahs": "الآيات المحفوظة"
 }

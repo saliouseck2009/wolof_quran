@@ -311,4 +311,46 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get clear => 'مسح';
+
+  @override
+  String get salamAlaikum => 'السلام عليكم';
+
+  @override
+  String get dailyInspirationTitle => 'إلهام يومي';
+
+  @override
+  String get loadingDailyInspiration => 'جاري تحميل الإلهام اليومي...';
+
+  @override
+  String get holyQuran => 'القرآن الكريم';
+
+  @override
+  String get tapForDailyVerse => 'اضغط للحصول على آيتك اليومية من القرآن';
+
+  @override
+  String get tapAnywhereToStart => 'اضغط في أي مكان للبدء';
+
+  @override
+  String get tapToReadArabicMore => 'اضغط لقراءة العربية والمزيد';
+
+  @override
+  String get openSurah => 'افتح السورة';
+
+  @override
+  String get bookmark => 'إضافة إشارة مرجعية';
+
+  @override
+  String get bookmarked => 'مضاف إلى الإشارات المرجعية';
+
+  @override
+  String get readSurahs => 'قراءة السور';
+
+  @override
+  String get listenAudio => 'استمع إلى الصوت';
+
+  @override
+  String get findVerses => 'ابحث عن الآيات';
+
+  @override
+  String get savedAyahs => 'الآيات المحفوظة';
 }

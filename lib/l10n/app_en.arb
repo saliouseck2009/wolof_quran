@@ -423,5 +423,61 @@
   "clear": "Clear",
   "@clear": {
     "description": "Clear button text"
+  },
+  "salamAlaikum": "As-salamu alaykum",
+  "@salamAlaikum": {
+    "description": "Greeting shown on home header"
+  },
+  "dailyInspirationTitle": "Daily Inspiration",
+  "@dailyInspirationTitle": {
+    "description": "Title for daily inspiration card"
+  },
+  "loadingDailyInspiration": "Loading daily inspiration...",
+  "@loadingDailyInspiration": {
+    "description": "Loading message for daily inspiration section"
+  },
+  "holyQuran": "The Holy Quran",
+  "@holyQuran": {
+    "description": "Arabic title label for Quran"
+  },
+  "tapForDailyVerse": "Tap to get your daily verse from the Quran",
+  "@tapForDailyVerse": {
+    "description": "Subtitle encouraging user to get daily verse"
+  },
+  "tapAnywhereToStart": "Tap anywhere to start",
+  "@tapAnywhereToStart": {
+    "description": "Hint to start daily inspiration"
+  },
+  "tapToReadArabicMore": "Tap to read Arabic & more",
+  "@tapToReadArabicMore": {
+    "description": "Hint to expand daily inspiration for Arabic text"
+  },
+  "openSurah": "Open Surah",
+  "@openSurah": {
+    "description": "Button to open surah detail"
+  },
+  "bookmark": "Bookmark",
+  "@bookmark": {
+    "description": "Bookmark button label"
+  },
+  "bookmarked": "Bookmarked",
+  "@bookmarked": {
+    "description": "State indicating ayah is bookmarked"
+  },
+  "readSurahs": "Read Surahs",
+  "@readSurahs": {
+    "description": "Subtitle for surah list action"
+  },
+  "listenAudio": "Listen Audio",
+  "@listenAudio": {
+    "description": "Subtitle for audio recitation action"
+  },
+  "findVerses": "Find Verses",
+  "@findVerses": {
+    "description": "Subtitle for search action"
+  },
+  "savedAyahs": "Saved Ayahs",
+  "@savedAyahs": {
+    "description": "Subtitle for bookmarks action"
   }
 }

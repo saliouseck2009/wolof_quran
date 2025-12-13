@@ -22,7 +22,7 @@ class HomeHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'السلام عليكم',
+                  localizations.salamAlaikum,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,

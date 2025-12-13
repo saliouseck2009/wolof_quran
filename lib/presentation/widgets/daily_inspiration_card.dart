@@ -32,6 +32,7 @@ class DailyInspirationCard extends StatelessWidget {
 
   Widget _buildLoadingCard(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final localizations = AppLocalizations.of(context)!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -55,7 +56,7 @@ class DailyInspirationCard extends StatelessWidget {
           CircularProgressIndicator(color: colorScheme.primary),
           const SizedBox(height: 16),
           Text(
-            'Loading daily inspiration...',
+            localizations.loadingDailyInspiration,
             style: TextStyle(
               fontSize: 16,
               color: colorScheme.onSurface,
@@ -110,7 +111,7 @@ class DailyInspirationCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Daily Inspiration',
+                        localizations.dailyInspirationTitle,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
@@ -119,7 +120,7 @@ class DailyInspirationCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'القرآن الكريم',
+                        localizations.holyQuran,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -134,7 +135,7 @@ class DailyInspirationCard extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Tap to get your daily verse from the Quran',
+              localizations.tapForDailyVerse,
               style: TextStyle(
                 fontSize: 16,
                 color: colorScheme.onSurfaceVariant,
@@ -147,7 +148,7 @@ class DailyInspirationCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Tap anywhere to start',
+                  localizations.tapAnywhereToStart,
                   style: TextStyle(
                     fontSize: 12,
                     color: accentGreen,
@@ -323,9 +324,9 @@ class DailyInspirationCard extends StatelessWidget {
                         );
                       },
                       icon: const Icon(Icons.open_in_new, size: 16),
-                      label: const Text(
-                        'Open Surah',
-                        style: TextStyle(fontSize: 11),
+                      label: Text(
+                        localizations.openSurah,
+                        style: const TextStyle(fontSize: 11),
                       ),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -369,8 +370,10 @@ class DailyInspirationCard extends StatelessWidget {
                             size: 16,
                           ),
                           label: Text(
-                            isBookmarked ? 'Bookmarked' : 'Bookmark',
-                            style: TextStyle(fontSize: 11),
+                            isBookmarked
+                                ? localizations.bookmarked
+                                : localizations.bookmark,
+                            style: const TextStyle(fontSize: 11),
                           ),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -395,12 +398,12 @@ class DailyInspirationCard extends StatelessWidget {
               // Tap to expand hint
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Tap to read Arabic & more',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: accentGreen,
+              children: [
+                Text(
+                  localizations.tapToReadArabicMore,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: accentGreen,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -436,7 +439,7 @@ class DailyInspirationCard extends StatelessWidget {
               Icon(Icons.error_outline, color: colorScheme.error, size: 24),
               const SizedBox(width: 12),
               Text(
-                'Daily Inspiration',
+                localizations.dailyInspirationTitle,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -466,7 +469,7 @@ class DailyInspirationCard extends StatelessWidget {
               );
             },
             icon: Icon(Icons.refresh),
-            label: Text('Try Again'),
+            label: Text(localizations.tryAgain),
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,

@@ -315,4 +315,48 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get clear => 'Effacer';
+
+  @override
+  String get salamAlaikum => 'As-salam alaykum';
+
+  @override
+  String get dailyInspirationTitle => 'Inspiration quotidienne';
+
+  @override
+  String get loadingDailyInspiration =>
+      'Chargement de l\'inspiration quotidienne...';
+
+  @override
+  String get holyQuran => 'Le Noble Coran';
+
+  @override
+  String get tapForDailyVerse =>
+      'Appuyez pour obtenir votre verset du jour du Coran';
+
+  @override
+  String get tapAnywhereToStart => 'Touchez n\'importe où pour commencer';
+
+  @override
+  String get tapToReadArabicMore => 'Appuyez pour lire l\'arabe et plus';
+
+  @override
+  String get openSurah => 'Ouvrir la sourate';
+
+  @override
+  String get bookmark => 'Marquer';
+
+  @override
+  String get bookmarked => 'Marqué';
+
+  @override
+  String get readSurahs => 'Lire les sourates';
+
+  @override
+  String get listenAudio => 'Écouter l\'audio';
+
+  @override
+  String get findVerses => 'Trouver des versets';
+
+  @override
+  String get savedAyahs => 'Versets enregistrés';
 }

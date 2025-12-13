@@ -675,6 +675,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get clear;
+
+  /// Greeting shown on home header
+  ///
+  /// In en, this message translates to:
+  /// **'As-salamu alaykum'**
+  String get salamAlaikum;
+
+  /// Title for daily inspiration card
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Inspiration'**
+  String get dailyInspirationTitle;
+
+  /// Loading message for daily inspiration section
+  ///
+  /// In en, this message translates to:
+  /// **'Loading daily inspiration...'**
+  String get loadingDailyInspiration;
+
+  /// Arabic title label for Quran
+  ///
+  /// In en, this message translates to:
+  /// **'The Holy Quran'**
+  String get holyQuran;
+
+  /// Subtitle encouraging user to get daily verse
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to get your daily verse from the Quran'**
+  String get tapForDailyVerse;
+
+  /// Hint to start daily inspiration
+  ///
+  /// In en, this message translates to:
+  /// **'Tap anywhere to start'**
+  String get tapAnywhereToStart;
+
+  /// Hint to expand daily inspiration for Arabic text
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to read Arabic & more'**
+  String get tapToReadArabicMore;
+
+  /// Button to open surah detail
+  ///
+  /// In en, this message translates to:
+  /// **'Open Surah'**
+  String get openSurah;
+
+  /// Bookmark button label
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark'**
+  String get bookmark;
+
+  /// State indicating ayah is bookmarked
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarked'**
+  String get bookmarked;
+
+  /// Subtitle for surah list action
+  ///
+  /// In en, this message translates to:
+  /// **'Read Surahs'**
+  String get readSurahs;
+
+  /// Subtitle for audio recitation action
+  ///
+  /// In en, this message translates to:
+  /// **'Listen Audio'**
+  String get listenAudio;
+
+  /// Subtitle for search action
+  ///
+  /// In en, this message translates to:
+  /// **'Find Verses'**
+  String get findVerses;
+
+  /// Subtitle for bookmarks action
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Ayahs'**
+  String get savedAyahs;
 }
 
 class _AppLocalizationsDelegate

@@ -312,4 +312,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clear => 'Clear';
+
+  @override
+  String get salamAlaikum => 'As-salamu alaykum';
+
+  @override
+  String get dailyInspirationTitle => 'Daily Inspiration';
+
+  @override
+  String get loadingDailyInspiration => 'Loading daily inspiration...';
+
+  @override
+  String get holyQuran => 'The Holy Quran';
+
+  @override
+  String get tapForDailyVerse => 'Tap to get your daily verse from the Quran';
+
+  @override
+  String get tapAnywhereToStart => 'Tap anywhere to start';
+
+  @override
+  String get tapToReadArabicMore => 'Tap to read Arabic & more';
+
+  @override
+  String get openSurah => 'Open Surah';
+
+  @override
+  String get bookmark => 'Bookmark';
+
+  @override
+  String get bookmarked => 'Bookmarked';
+
+  @override
+  String get readSurahs => 'Read Surahs';
+
+  @override
+  String get listenAudio => 'Listen Audio';
+
+  @override
+  String get findVerses => 'Find Verses';
+
+  @override
+  String get savedAyahs => 'Saved Ayahs';
 }

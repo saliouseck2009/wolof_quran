@@ -87,5 +87,19 @@
   "clearAllBookmarks": "Tout effacer",
   "confirmClearBookmarks": "Effacer tous les marque-pages ?",
   "clearBookmarksMessage": "Cette action ne peut pas être annulée.",
-  "clear": "Effacer"
+  "clear": "Effacer",
+  "salamAlaikum": "As-salam alaykum",
+  "dailyInspirationTitle": "Inspiration quotidienne",
+  "loadingDailyInspiration": "Chargement de l'inspiration quotidienne...",
+  "holyQuran": "Le Noble Coran",
+  "tapForDailyVerse": "Appuyez pour obtenir votre verset du jour du Coran",
+  "tapAnywhereToStart": "Touchez n'importe où pour commencer",
+  "tapToReadArabicMore": "Appuyez pour lire l'arabe et plus",
+  "openSurah": "Ouvrir la sourate",
+  "bookmark": "Marquer",
+  "bookmarked": "Marqué",
+  "readSurahs": "Lire les sourates",
+  "listenAudio": "Écouter l'audio",
+  "findVerses": "Trouver des versets",
+  "savedAyahs": "Versets enregistrés"
 }
