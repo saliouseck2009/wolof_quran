@@ -19,7 +19,7 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.brightness == Brightness.dark
-          ? colorScheme.surfaceContainerLowest
+          ? AppColor.surfaceDark
           : colorScheme.surface,
       appBar: AppBar(
         title: Text(
@@ -31,10 +31,11 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? colorScheme.surfaceContainer.withValues(alpha: 0.7)
+            ? AppColor.surfaceDark
             : colorScheme.primary,
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
-        elevation: 2,
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -46,15 +47,11 @@ class SettingsPage extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
+                color: colorScheme.brightness == Brightness.dark
+                    ? colorScheme.surfaceContainer
+                    : null,
                 gradient: colorScheme.brightness == Brightness.dark
-                    ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          colorScheme.surfaceContainer.withValues(alpha: 0.8),
-                          colorScheme.surfaceContainer.withValues(alpha: 0.9),
-                        ],
-                      )
+                    ? null
                     : LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -65,7 +62,9 @@ class SettingsPage extends StatelessWidget {
                       ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: colorScheme.primary.withValues(alpha: 0.2),
+                  color: colorScheme.brightness == Brightness.dark
+                      ? colorScheme.outline.withValues(alpha: 0.1)
+                      : colorScheme.primary.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -178,25 +177,30 @@ class SettingsPage extends StatelessWidget {
     bool showArrow = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final activeColor = isDark
+        ? colorScheme.primaryContainer
+        : colorScheme.primary;
+    final activeColorWithAlpha = activeColor.withValues(alpha: 0.1);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
+        color: isDark
+            ? colorScheme.surfaceContainerHigh
+            : colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: colorScheme.brightness == Brightness.dark
-            ? [
-                BoxShadow(
-                  color: colorScheme.primary.withValues(alpha: 0.08),
-                  blurRadius: 12,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
-        border: Border.all(
-          color: colorScheme.primary.withValues(
-            alpha: colorScheme.brightness == Brightness.dark ? 0.1 : 0.15,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
+        ],
+        border: Border.all(
+          color: isDark
+              ? colorScheme.outline.withValues(alpha: 0.1)
+              : colorScheme.primary.withValues(alpha: 0.15),
           width: 1,
         ),
       ),
@@ -215,10 +219,10 @@ class SettingsPage extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
+                    color: activeColorWithAlpha,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: colorScheme.primary, size: 24),
+                  child: Icon(icon, color: activeColor, size: 24),
                 ),
 
                 const SizedBox(width: 16),
@@ -257,17 +261,17 @@ class SettingsPage extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: colorScheme.primary.withValues(alpha: 0.1),
+                          color: activeColorWithAlpha,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: colorScheme.primary.withValues(alpha: 0.2),
+                            color: activeColor.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
                           value,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
-                                color: colorScheme.primary,
+                                color: activeColor,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
@@ -282,12 +286,12 @@ class SettingsPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
+                    color: activeColorWithAlpha,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     showArrow ? Icons.arrow_forward_ios : Icons.edit,
-                    color: colorScheme.primary,
+                    color: activeColor,
                     size: 16,
                   ),
                 ),

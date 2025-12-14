@@ -54,11 +54,11 @@ class MaterialTheme {
     onErrorContainer: AppColor.onErrorContainer,
     surface: AppColor.surfaceDark,
     onSurface: AppColor.onSurfaceDark,
-    surfaceContainerLowest: AppColor.surfaceDark, // Base
-    surfaceContainerLow: AppColor.surfaceContainerDark.withValues(alpha: 0.5),
+    surfaceContainerLowest: AppColor.surfaceDark,
+    surfaceContainerLow: AppColor.surfaceContainerLowDark,
     surfaceContainer: AppColor.surfaceContainerDark,
-    surfaceContainerHigh: AppColor.surfaceContainerDark,
-    surfaceContainerHighest: AppColor.surfaceContainerDark.withValues(alpha: 0.8),
+    surfaceContainerHigh: AppColor.surfaceContainerHighDark,
+    surfaceContainerHighest: AppColor.surfaceContainerHighestDark,
     outline: AppColor.outlineDark,
   );
 

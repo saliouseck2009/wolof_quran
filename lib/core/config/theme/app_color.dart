@@ -37,10 +37,13 @@ class AppColor {
   static const Color outlineLight = Color(0xFF6F7977);
 
   // Neutral Palette (Dark)
-  static const Color surfaceDark = Color(0xFF19211F); // Dark Green-Grey
-  static const Color onSurfaceDark = Color(0xFFE1E3E3);
-  static const Color surfaceContainerDark = Color(0xFF101413); // Darker background
-  static const Color outlineDark = Color(0xFF899390);
+  static const Color surfaceDark = Color(0xFF101612); // Deep charcoal
+  static const Color onSurfaceDark = Color(0xFFE6EBE5); // High-contrast, slightly warm text
+  static const Color surfaceContainerDark = Color(0xFF16201B); // Base containers
+  static const Color surfaceContainerLowDark = Color(0xFF1B2621); // Raised container
+  static const Color surfaceContainerHighDark = Color(0xFF23322C); // Higher elevation
+  static const Color surfaceContainerHighestDark = Color(0xFF2C3D35); // Chips/cards
+  static const Color outlineDark = Color(0xFF3F4B44); // Subtle outline on dark
 
   // Legacy/Compatibility colors (mapped to new palette where possible)
   static const Color primaryGreen = primary;
