@@ -21,7 +21,7 @@ class ReciterChaptersDownloadPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accentGreen = isDark
-        ? const Color(0xFF4CAF50)
+        ? Theme.of(context).colorScheme.primary
         : Theme.of(context).colorScheme.primary;
     final textTheme = Theme.of(context).textTheme;
     return BlocProvider(
@@ -231,7 +231,7 @@ class _ReciterChaptersContent extends StatelessWidget {
                   state.downloadedSurahNumbers.length,
                 ),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   color: accentGreen,
                 ),
               ),
@@ -337,6 +337,7 @@ class _ChapterCard extends StatelessWidget {
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     getSurahDisplayName(surahNumber),
@@ -346,31 +347,6 @@ class _ChapterCard extends StatelessWidget {
                           ? Theme.of(context).colorScheme.onPrimary
                           : Theme.of(context).colorScheme.onSurface,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  BlocBuilder<AudioManagementCubit, AudioManagementState>(
-                    builder: (context, currentState) {
-                      String statusText = isDownloaded
-                          ? localizations.downloaded
-                          : localizations.notDownloaded;
-
-                      if (currentState is AudioDownloading &&
-                          currentState.reciterId == reciter.id &&
-                          currentState.surahNumber == surahNumber) {
-                        statusText =
-                            '${localizations.downloading.replaceAll('...', '')} ${(currentState.progress * 100).toInt()}%';
-                      }
-
-                      return Text(
-                        statusText,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: isDownloaded
-                              ? Colors.green
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      );
-                    },
                   ),
                 ],
               ),

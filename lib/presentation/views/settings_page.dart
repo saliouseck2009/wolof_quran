@@ -178,16 +178,14 @@ class SettingsPage extends StatelessWidget {
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final activeColor = isDark
-        ? colorScheme.primaryContainer
-        : colorScheme.primary;
+    final activeColor = isDark ? colorScheme.primary : colorScheme.primary;
     final activeColorWithAlpha = activeColor.withValues(alpha: 0.1);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
         color: isDark
-            ? colorScheme.surfaceContainerHigh
+            ? colorScheme.surfaceContainer
             : colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wolof_quran/core/config/theme/app_color.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 import '../cubits/reciter_cubit.dart';
@@ -42,10 +43,11 @@ class _ReciterListPageState extends State<ReciterListPage> {
           ),
         ),
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? colorScheme.surfaceContainer.withValues(alpha: 0.7)
+            ? AppColor.surfaceDark
             : colorScheme.primary,
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
-        elevation: 2,
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: BlocConsumer<ReciterCubit, ReciterState>(
         listener: (context, reciterState) {
@@ -359,13 +361,14 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                                   width: 1,
                                                 ),
                                               ),
-                                            child: Text(
-                                              isSelected
-                                                  ? localizations.defaultReciter
-                                                  : localizations.available,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
+                                              child: Text(
+                                                isSelected
+                                                    ? localizations
+                                                          .defaultReciter
+                                                    : localizations.available,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
                                                     ?.copyWith(
                                                       fontWeight:
                                                           FontWeight.w500,
@@ -400,8 +403,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                               content: Text(
                                                 localizations
                                                     .selectedAsDefaultReciter(
-                                                  reciter.name,
-                                                ),
+                                                      reciter.name,
+                                                    ),
                                               ),
                                               backgroundColor: accentGreen,
                                               duration: const Duration(

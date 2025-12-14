@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wolof_quran/core/config/theme/app_color.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/reciter_cubit.dart';
@@ -47,10 +48,11 @@ class _QuranSettingsView extends StatelessWidget {
           ),
         ),
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? colorScheme.surfaceContainer.withValues(alpha: 0.7)
+            ? AppColor.surfaceDark
             : colorScheme.primary,
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
-        elevation: 2,
+        elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
         builder: (context, state) {
