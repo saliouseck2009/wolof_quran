@@ -215,12 +215,16 @@ class _ReciterChaptersContent extends StatelessWidget {
           margin: const EdgeInsets.all(16),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: accentGreen.withValues(alpha: 0.15),
+            color: isDark
+                ? accentGreen.withValues(alpha: 0.15)
+                : Theme.of(context).colorScheme.onPrimary,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: accentGreen.withValues(alpha: 0.25),
-              width: 1,
-            ),
+            border: isDark
+                ? Border.all(
+                    color: accentGreen.withValues(alpha: 0.25),
+                    width: 1,
+                  )
+                : null,
           ),
           child: Row(
             children: [
@@ -304,7 +308,9 @@ class _ChapterCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark ? darkSurfaceHigh : Theme.of(context).colorScheme.surface,
+        color: isDark
+            ? darkSurfaceHigh
+            : Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: isDark
             ? [
@@ -315,10 +321,12 @@ class _ChapterCard extends StatelessWidget {
                 ),
               ]
             : null,
-        border: Border.all(
-          color: accentGreen.withValues(alpha: isDark ? 0.12 : 0.15),
-          width: 1,
-        ),
+        border: isDark
+            ? Border.all(
+                color: accentGreen.withValues(alpha: isDark ? 0.12 : 0.15),
+                width: 1,
+              )
+            : null,
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),

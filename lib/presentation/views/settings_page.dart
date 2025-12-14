@@ -49,22 +49,13 @@ class SettingsPage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: colorScheme.brightness == Brightness.dark
                     ? colorScheme.surfaceContainer
-                    : null,
-                gradient: colorScheme.brightness == Brightness.dark
-                    ? null
-                    : LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          colorScheme.primary.withValues(alpha: 0.1),
-                          colorScheme.primaryContainer.withValues(alpha: 0.2),
-                        ],
-                      ),
+                    : colorScheme.onPrimary,
+
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: colorScheme.brightness == Brightness.dark
                       ? colorScheme.outline.withValues(alpha: 0.1)
-                      : colorScheme.primary.withValues(alpha: 0.2),
+                      : Colors.transparent,
                   width: 1,
                 ),
               ),
@@ -184,21 +175,13 @@ class SettingsPage extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
-        color: isDark
-            ? colorScheme.surfaceContainer
-            : colorScheme.surfaceContainer,
+        color: isDark ? colorScheme.surfaceContainer : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+
         border: Border.all(
           color: isDark
               ? colorScheme.outline.withValues(alpha: 0.1)
-              : colorScheme.primary.withValues(alpha: 0.15),
+              : Colors.transparent,
           width: 1,
         ),
       ),

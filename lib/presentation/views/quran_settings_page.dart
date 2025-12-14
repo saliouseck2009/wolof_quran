@@ -66,32 +66,14 @@ class _QuranSettingsView extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    gradient: colorScheme.brightness == Brightness.dark
-                        ? LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              colorScheme.surfaceContainer.withValues(
-                                alpha: 0.8,
-                              ),
-                              colorScheme.surfaceContainer.withValues(
-                                alpha: 0.9,
-                              ),
-                            ],
-                          )
-                        : LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              colorScheme.primary.withValues(alpha: 0.1),
-                              colorScheme.primaryContainer.withValues(
-                                alpha: 0.2,
-                              ),
-                            ],
-                          ),
+                    color: colorScheme.brightness == Brightness.dark
+                        ? colorScheme.surfaceContainer
+                        : colorScheme.onPrimary,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: colorScheme.primary.withValues(alpha: 0.2),
+                      color: colorScheme.brightness == Brightness.dark
+                          ? colorScheme.outline.withValues(alpha: 0.1)
+                          : Colors.transparent,
                       width: 1,
                     ),
                   ),
@@ -206,11 +188,12 @@ class _QuranSettingsView extends StatelessWidget {
     bool showArrow = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer,
+        color: isDark ? colorScheme.surfaceContainer : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: colorScheme.brightness == Brightness.dark
             ? [
@@ -221,12 +204,6 @@ class _QuranSettingsView extends StatelessWidget {
                 ),
               ]
             : null,
-        border: Border.all(
-          color: colorScheme.primary.withValues(
-            alpha: colorScheme.brightness == Brightness.dark ? 0.1 : 0.15,
-          ),
-          width: 1,
-        ),
       ),
       child: Material(
         color: Colors.transparent,

@@ -33,12 +33,12 @@ class DailyInspirationCard extends StatelessWidget {
   Widget _buildLoadingCard(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final localizations = AppLocalizations.of(context)!;
+    final isDark = colorScheme.brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: colorScheme
-            .surfaceContainer, // darkSurfaceHigh in dark, light surface in light
+        color: isDark ? colorScheme.surfaceContainer : colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: colorScheme.brightness == Brightness.dark
             ? [
@@ -181,13 +181,14 @@ class DailyInspirationCard extends StatelessWidget {
   ) {
     final colorScheme = Theme.of(context).colorScheme;
     final accentGreen = colorScheme.primary;
+    final isDark = colorScheme.brightness == Brightness.dark;
     return GestureDetector(
       onTap: () => context.read<DailyInspirationCubit>().toggleExpansion(),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainer,
+          color: isDark ? colorScheme.surfaceContainer : colorScheme.onPrimary,
           borderRadius: BorderRadius.circular(24),
           boxShadow: colorScheme.brightness == Brightness.dark
               ? [
@@ -198,7 +199,7 @@ class DailyInspirationCard extends StatelessWidget {
                   ),
                 ]
               : null,
-          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+          //border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -398,12 +399,12 @@ class DailyInspirationCard extends StatelessWidget {
               // Tap to expand hint
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  localizations.tapToReadArabicMore,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: accentGreen,
+                children: [
+                  Text(
+                    localizations.tapToReadArabicMore,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: accentGreen,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

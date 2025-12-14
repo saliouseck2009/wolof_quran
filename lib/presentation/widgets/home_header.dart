@@ -25,9 +25,9 @@ class HomeHeader extends StatelessWidget {
                   localizations.salamAlaikum,
                   style: TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface,
-                    fontFamily: 'Hafs',
+                    //fontFamily: 'Hafs',
                   ),
                 ),
                 const SizedBox(height: 4),

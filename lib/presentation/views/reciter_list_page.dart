@@ -175,19 +175,11 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      colorScheme.primary.withValues(
-                                        alpha: 0.1,
-                                      ),
-                                      colorScheme.primaryContainer.withValues(
-                                        alpha: 0.2,
-                                      ),
+                                      colorScheme.onPrimary,
+                                      colorScheme.onPrimary,
                                     ],
                                   ),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: colorScheme.primary.withValues(alpha: 0.2),
-                              width: 1,
-                            ),
                           ),
                           child: Column(
                             children: [
@@ -224,6 +216,8 @@ class _ReciterListPageState extends State<ReciterListPage> {
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final reciter = reciterState.reciters[index];
                         final isSelected = selectedReciter?.id == reciter.id;
+                        final isDark =
+                            colorScheme.brightness == Brightness.dark;
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(
@@ -232,7 +226,9 @@ class _ReciterListPageState extends State<ReciterListPage> {
                           ),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: colorScheme.surfaceContainer,
+                              color: isDark
+                                  ? colorScheme.surfaceContainer
+                                  : colorScheme.onPrimary,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow:
                                   colorScheme.brightness == Brightness.dark
@@ -246,15 +242,6 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                       ),
                                     ]
                                   : null,
-                              border: Border.all(
-                                color: colorScheme.primary.withValues(
-                                  alpha:
-                                      colorScheme.brightness == Brightness.dark
-                                      ? 0.1
-                                      : 0.15,
-                                ),
-                                width: 1,
-                              ),
                             ),
                             child: Material(
                               color: Colors.transparent,

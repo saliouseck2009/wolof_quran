@@ -7,7 +7,7 @@ class HomeActionsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    
+
     return Column(
       children: [
         Row(
@@ -74,6 +74,7 @@ class _ModernActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -82,9 +83,13 @@ class _ModernActionCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainer,
+            color: isDark
+                ? colorScheme.surfaceContainer
+                : colorScheme.onPrimary,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+            // border: Border.all(
+            //   color: colorScheme.outline.withValues(alpha: 0.2),
+            // ),
             boxShadow: colorScheme.brightness == Brightness.dark
                 ? [
                     BoxShadow(
