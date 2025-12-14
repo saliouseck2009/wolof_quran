@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wolof_quran/presentation/views/reciter_chapters_download_page.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
@@ -59,20 +60,8 @@ class AyahCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: isDark ? colorScheme.surface : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(
-            alpha: isDark ? 0.25 : 0.3,
-          ),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: isDark ? 0.45 : 0.12),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -81,24 +70,12 @@ class AyahCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    verseNumber.toString(),
-                    style: textTheme.labelLarge?.copyWith(
-                      fontFamily: 'Hafs',
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                ChapterNumberWidget(
+                  color: colorScheme.primary,
+                  surahNumber: verseNumber,
+                  textTheme: textTheme,
                 ),
+
                 const Spacer(),
                 ...actions,
                 IconButton(
@@ -109,7 +86,7 @@ class AyahCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 8),
             if (displayMode == AyahDisplayMode.both ||
                 displayMode == AyahDisplayMode.arabicOnly)
               BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
@@ -137,48 +114,40 @@ class AyahCard extends StatelessWidget {
                   );
                 },
               ),
-            if (displayMode == AyahDisplayMode.both) const SizedBox(height: 24),
-            if (displayMode == AyahDisplayMode.both)
-              Container(
-                height: 1,
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.3),
-                ),
-              ),
+
             if (displayMode == AyahDisplayMode.translationOnly ||
                 displayMode == AyahDisplayMode.both)
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
             if ((displayMode == AyahDisplayMode.both ||
                     displayMode == AyahDisplayMode.translationOnly) &&
                 translation.isNotEmpty)
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHigh,
+                  color: displayMode == AyahDisplayMode.translationOnly
+                      ? Colors.transparent
+                      : colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      translationSource,
-                      textAlign: TextAlign.justify,
-                      style: textTheme.labelLarge?.copyWith(
-                        fontFamily: 'Hafs',
-                        letterSpacing: 0.5,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
+                    // Text(
+                    //   translationSource,
+                    //   textAlign: TextAlign.justify,
+                    //   style: textTheme.labelMedium?.copyWith(
+                    //     color: colorScheme.primary,
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 4),
                     Text(
                       translation,
                       textAlign: TextAlign.justify,
                       style: textTheme.bodyMedium?.copyWith(
                         fontSize: displayMode == AyahDisplayMode.translationOnly
-                            ? 18
-                            : 16,
-                        height: 1.5,
+                            ? 16
+                            : 14,
+                        height: 1.4,
                         color: colorScheme.onSurfaceVariant,
                       ),
                     ),

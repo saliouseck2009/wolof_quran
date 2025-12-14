@@ -15,6 +15,8 @@ import '../cubits/bookmark_cubit.dart';
 import '../blocs/surah_download_status_bloc.dart';
 import '../widgets/ayah_card.dart';
 import '../widgets/ayah_play_button.dart';
+import '../widgets/snackbar.dart';
+import '../utils/audio_error_formatter.dart';
 import '../../service_locator.dart';
 import '../../domain/usecases/get_downloaded_surahs_usecase.dart';
 
@@ -95,21 +97,29 @@ class SurahDetailErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Theme.of(context).colorScheme.error,
+          ),
           const SizedBox(height: 16),
           Text(
             message,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.error),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.error,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
-          ElevatedButton(onPressed: onRetry, child: const Text('Try Again')),
+          ElevatedButton(
+            onPressed: onRetry,
+            child: Text(localizations.tryAgain),
+          ),
         ],
       ),
     );
@@ -174,7 +184,7 @@ class SurahDetailContent extends StatelessWidget {
         ),
 
         // Bottom padding
-        const SliverToBoxAdapter(child: SizedBox(height: 32)),
+        const SliverToBoxAdapter(child: SizedBox(height: 64)),
       ],
     );
   }
@@ -188,12 +198,12 @@ class SurahDetailAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-          final theme = Theme.of(context);
-          final colorScheme = theme.colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final revelationType = quran.getPlaceOfRevelation(state.surahNumber);
 
     return SliverAppBar(
-      expandedHeight: 250,
+      expandedHeight: 220,
       floating: false,
       pinned: true,
       elevation: 2,
@@ -202,7 +212,6 @@ class SurahDetailAppBar extends StatelessWidget {
       title: Text(
         state.surahNameTranslated,
         style: TextStyle(
-          fontFamily: 'Hafs',
           fontWeight: FontWeight.w600,
           color: colorScheme.onPrimary,
           fontSize: 18,
@@ -235,7 +244,6 @@ class SurahDetailAppBar extends StatelessWidget {
                   Text(
                     localizations.arabicAndTranslation,
                     style: TextStyle(
-                      fontFamily: 'Hafs',
                       color: state.displayMode == AyahDisplayMode.both
                           ? colorScheme.primary
                           : colorScheme.onSurface,
@@ -262,7 +270,6 @@ class SurahDetailAppBar extends StatelessWidget {
                   Text(
                     localizations.arabicOnly,
                     style: TextStyle(
-                      fontFamily: 'Hafs',
                       color: state.displayMode == AyahDisplayMode.arabicOnly
                           ? colorScheme.primary
                           : colorScheme.onSurface,
@@ -290,7 +297,6 @@ class SurahDetailAppBar extends StatelessWidget {
                   Text(
                     localizations.translationOnly,
                     style: TextStyle(
-                      fontFamily: 'Hafs',
                       color:
                           state.displayMode == AyahDisplayMode.translationOnly
                           ? colorScheme.primary
@@ -323,12 +329,10 @@ class SurahDetailAppBar extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: EdgeInsets.zero,
         background: Container(
-          decoration: BoxDecoration(
-            color: colorScheme.primary,
-          ),
+          decoration: BoxDecoration(color: colorScheme.primary),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: SurahHeaderContent(
                 state: state,
                 localizations: localizations,
@@ -376,24 +380,11 @@ class SurahHeaderContent extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'Hafs',
             fontSize: 32,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w500,
             color: Colors.white,
           ),
           textAlign: TextAlign.center,
           textDirection: TextDirection.rtl,
-        ),
-
-        const SizedBox(height: 8),
-
-        // Translated name
-        Text(
-          state.surahNameTranslated,
-          style: TextStyle(
-            fontFamily: 'Hafs',
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-            color: Colors.white.withValues(alpha: 0.9),
-          ),
         ),
 
         const SizedBox(height: 16),
@@ -477,7 +468,6 @@ class SurahInfoChip extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontFamily: 'Hafs',
               color: Colors.white,
               fontWeight: FontWeight.w500,
               fontSize: 12,
@@ -498,14 +488,10 @@ class SurahBasmalaWidget extends StatelessWidget {
     return SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: colorScheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: colorScheme.primary.withValues(alpha: 0.2),
-            width: 1,
-          ),
         ),
         child: Text(
           quran.basmala,
@@ -607,6 +593,7 @@ class SurahPlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
       builder: (context, quranSettingsState) {
         if (quranSettingsState.selectedReciter == null) {
@@ -636,10 +623,14 @@ class SurahPlayButton extends StatelessWidget {
           listener: (context, downloadStatusState) {
             // Handle errors
             if (downloadStatusState is SurahDownloadStatusError) {
+              final formattedError = formatAudioError(
+                downloadStatusState.message,
+                localizations,
+              );
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'Error checking download status: ${downloadStatusState.message}',
+                    localizations.errorCheckingDownloadStatus(formattedError),
                   ),
                   backgroundColor: Theme.of(context).colorScheme.error,
                 ),
@@ -697,9 +688,8 @@ class SurahPlayButton extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Check failed',
+                        localizations.checkFailed,
                         style: TextStyle(
-                          fontFamily: 'Hafs',
                           color: Colors.white.withValues(alpha: 0.7),
                           fontWeight: FontWeight.w500,
                           fontSize: 12,
@@ -737,69 +727,19 @@ class SurahPlayButton extends StatelessWidget {
                     );
 
                     // Show success message
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            Icon(
-                              Icons.download_done,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '$surahName downloaded successfully',
-                                style: TextStyle(
-                                  fontFamily: 'Hafs',
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        duration: const Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        margin: const EdgeInsets.all(16),
-                      ),
+                    CustomSnackbar.showSnackbar(
+                      context,
+                      localizations.downloadedSuccessfully(surahName),
                     );
                   } else if (currentState is AudioManagementError) {
-                    // Show error message
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Download failed: ${currentState.message}',
-                                style: TextStyle(
-                                  fontFamily: 'Hafs',
-                                  color: Theme.of(context).colorScheme.onPrimary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: Theme.of(context).colorScheme.error,
-                        duration: const Duration(seconds: 3),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        margin: const EdgeInsets.all(16),
-                      ),
+                    final formattedError = formatAudioError(
+                      currentState.message,
+                      localizations,
+                    );
+                    CustomSnackbar.showSnackbar(
+                      context,
+                      localizations.downloadFailedWithError(formattedError),
+                      duration: 5,
                     );
                   }
                 },
@@ -811,6 +751,10 @@ class SurahPlayButton extends StatelessWidget {
                       currentState.surahNumber == surahNumber;
 
                   if (isDownloading) {
+                    final downloadingState =
+                        currentState as AudioDownloading;
+                    final progressPercent =
+                        (downloadingState.progress * 100).toInt();
                     // Show download progress
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -822,10 +766,6 @@ class SurahPlayButton extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(25),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.3),
-                            width: 1,
-                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -844,13 +784,10 @@ class SurahPlayButton extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Downloading... ${(currentState.progress * 100).toInt()}%',
+                              '${localizations.downloading} $progressPercent%',
                               style: TextStyle(
-                                fontFamily: 'Hafs',
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withValues(
-                                  alpha: 0.9,
-                                ),
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
                                 fontSize: 12,
                               ),
                             ),
@@ -865,16 +802,18 @@ class SurahPlayButton extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        final audioState =
-                            context.read<AudioManagementCubit>().state;
+                        final audioState = context
+                            .read<AudioManagementCubit>()
+                            .state;
                         if (audioState is AudioDownloading &&
                             (audioState.reciterId != selectedReciter.id ||
                                 audioState.surahNumber != surahNumber)) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                AppLocalizations.of(context)!
-                                    .downloadInProgress,
+                                AppLocalizations.of(
+                                  context,
+                                )!.downloadInProgress,
                               ),
                               duration: const Duration(seconds: 2),
                             ),
@@ -887,26 +826,14 @@ class SurahPlayButton extends StatelessWidget {
                           surahNumber,
                         );
                       },
-                      icon: Icon(
-                        Icons.download_outlined,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        size: 20,
-                      ),
+                      icon: Icon(Icons.download_outlined, size: 20),
                       label: Text(
-                        'Download to play',
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
+                        localizations.downloadToPlay,
+                        style: TextStyle(fontWeight: FontWeight.w500),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(
-                          alpha: 0.2,
-                        ),
-                        foregroundColor: Colors.white.withValues(
-                          alpha: 0.9,
-                        ),
+                        backgroundColor: Colors.white.withValues(alpha: 0.2),
+                        foregroundColor: Colors.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -914,10 +841,6 @@ class SurahPlayButton extends StatelessWidget {
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(25),
-                          side: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.3),
-                            width: 1,
-                          ),
                         ),
                       ),
                     ),
@@ -1025,10 +948,10 @@ class SurahPlayButton extends StatelessWidget {
                               ),
                               label: Text(
                                 isPlaying
-                                    ? 'Pause Surah'
+                                    ? localizations.pauseSurah
                                     : isPaused
-                                    ? 'Resume Surah'
-                                    : 'Play Surah',
+                                    ? localizations.resumeSurah
+                                    : localizations.playSurah,
                                 style: TextStyle(
                                   fontFamily: 'Hafs',
                                   fontWeight: FontWeight.w600,
@@ -1051,7 +974,9 @@ class SurahPlayButton extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(25),
                                   side: isThisSurahPlaying
                                       ? BorderSide(
-                                          color: Theme.of(context).colorScheme.secondary,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.secondary,
                                           width: 2,
                                         )
                                       : BorderSide.none,

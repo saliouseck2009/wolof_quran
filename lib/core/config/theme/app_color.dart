@@ -31,7 +31,7 @@ class AppColor {
   static const Color onErrorContainer = Color(0xFF410002);
 
   // Neutral Palette (Light)
-  static const Color surfaceLight = Color(0xFFFBFDFD);
+  static const Color surfaceLight =  Color(0xFFF5F5F5);// Color(0xFFFBFDFD);
   static const Color onSurfaceLight = Color(0xFF191C1C);
   static const Color surfaceContainerLight = Color(0xFFF0F4F3); // Slightly darker background
   static const Color outlineLight = Color(0xFF6F7977);

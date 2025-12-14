@@ -326,7 +326,7 @@ class _ChapterCard extends StatelessWidget {
           children: [
             // Chapter number
             ChapterNumberWidget(
-              accentGreen: accentGreen,
+              color: accentGreen,
               surahNumber: surahNumber,
               textTheme: textTheme,
             ),
@@ -510,30 +510,30 @@ class _ChapterCard extends StatelessWidget {
 class ChapterNumberWidget extends StatelessWidget {
   const ChapterNumberWidget({
     super.key,
-    required this.accentGreen,
+    required this.color,
     required this.surahNumber,
     required this.textTheme,
   });
 
-  final Color accentGreen;
+  final Color color;
   final int surahNumber;
   final TextTheme textTheme;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 48,
-      height: 48,
+      width: 42,
+      height: 42,
       decoration: BoxDecoration(
-        color: accentGreen.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(40),
       ),
       child: Center(
         child: Text(
           '$surahNumber',
           style: textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w700,
-            color: accentGreen,
+            color: color,
           ),
         ),
       ),

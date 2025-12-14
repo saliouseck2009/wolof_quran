@@ -997,10 +997,10 @@ class _AyahTexts extends StatelessWidget {
             constraints.maxHeight -
             (currentArabicHeight + currentTranslationHeight + dividerSpace);
         final extraSpacerHeight = remainingSpace > 0 ? remainingSpace : 0.0;
-        final topSpacer =
-            extraSpacerHeight > 0 ? extraSpacerHeight / 2 : 0.0;
-        final bottomSpacer =
-            extraSpacerHeight > 0 ? extraSpacerHeight - topSpacer : 0.0;
+        final topSpacer = extraSpacerHeight > 0 ? extraSpacerHeight / 2 : 0.0;
+        final bottomSpacer = extraSpacerHeight > 0
+            ? extraSpacerHeight - topSpacer
+            : 0.0;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

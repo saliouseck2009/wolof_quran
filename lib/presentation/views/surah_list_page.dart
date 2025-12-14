@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
+import 'package:wolof_quran/presentation/views/reciter_chapters_download_page.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 import '../cubits/surah_list_cubit.dart';
@@ -21,8 +22,29 @@ class SurahListPage extends StatelessWidget {
   }
 }
 
-class _SurahListView extends StatelessWidget {
+class _SurahListView extends StatefulWidget {
   const _SurahListView();
+
+  @override
+  State<_SurahListView> createState() => _SurahListViewState();
+}
+
+class _SurahListViewState extends State<_SurahListView> {
+  static const double _expandedHeight = 150;
+  static const double _collapsedToolbarHeight = 72;
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,113 +52,159 @@ class _SurahListView extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: BlocBuilder<SurahListCubit, SurahListState>(
-        builder: (context, state) {
-          if (state is! SurahListLoaded) {
-            return const Center(child: CircularProgressIndicator());
+      body: BlocListener<SurahListCubit, SurahListState>(
+        listenWhen: (previous, current) {
+          if (current is! SurahListLoaded) return false;
+          final previousQuery = previous is SurahListLoaded
+              ? previous.searchQuery
+              : null;
+          // Clear the input when translations reload or search is reset.
+          return current.searchQuery.isEmpty &&
+              (previousQuery?.isNotEmpty ?? _searchController.text.isNotEmpty);
+        },
+        listener: (context, state) {
+          if (_searchController.text.isNotEmpty) {
+            _searchController.clear();
           }
+        },
+        child: BlocBuilder<SurahListCubit, SurahListState>(
+          builder: (context, state) {
+            if (state is! SurahListLoaded) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          return CustomScrollView(
-            slivers: [
-              // Modern App Bar with search
-              SliverAppBar(
-                expandedHeight: 180,
-                floating: false,
-                pinned: true,
-                elevation: 2,
-                backgroundColor: colorScheme.primary,
-                iconTheme: IconThemeData(color: colorScheme.onPrimary),
-                surfaceTintColor: Colors.transparent,
-
-                shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
-                title: Text(
-                  localizations.surahs,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onPrimary,
-                    fontSize: 18,
-                  ),
+            return CustomScrollView(
+              slivers: [
+                SliverLayoutBuilder(
+                  builder: (context, constraints) {
+                    final topPadding = MediaQuery.of(context).padding.top;
+                    final collapseOffset =
+                        (_expandedHeight - _collapsedToolbarHeight - topPadding)
+                            .clamp(0.0, _expandedHeight);
+                    final isCollapsed =
+                        constraints.scrollOffset > collapseOffset;
+                    return SliverAppBar(
+                      expandedHeight: _expandedHeight,
+                      floating: false,
+                      pinned: true,
+                      elevation: 2,
+                      backgroundColor: colorScheme.primary,
+                      iconTheme: IconThemeData(color: colorScheme.onPrimary),
+                      surfaceTintColor: Colors.transparent,
+                      shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
+                      toolbarHeight: _collapsedToolbarHeight,
+                      titleSpacing: isCollapsed ? 0 : null,
+                      title: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: isCollapsed
+                            ? Padding(
+                                key: const ValueKey('search-collapsed'),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                                child: _buildSearchBar(
+                                  context,
+                                  state,
+                                  isInAppBar: true,
+                                ),
+                              )
+                            : Text(
+                                localizations.surahs,
+                                key: const ValueKey('surah-title'),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: colorScheme.onPrimary,
+                                  fontSize: 18,
+                                ),
+                              ),
+                      ),
+                      actions: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.settings,
+                            color: colorScheme.onPrimary,
+                          ),
+                          onPressed: () async {
+                            final result = await Navigator.pushNamed(
+                              context,
+                              '/quran-settings',
+                            );
+                            // If translation was changed, reload the Surah list
+                            if (result == true && context.mounted) {
+                              context
+                                  .read<SurahListCubit>()
+                                  .reloadTranslationSettings();
+                            }
+                          },
+                        ),
+                      ],
+                      flexibleSpace: FlexibleSpaceBar(
+                        titlePadding: EdgeInsets.zero,
+                        background: Container(
+                          decoration: BoxDecoration(color: colorScheme.primary),
+                          child: SafeArea(
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 16,
+                                right: 16,
+                                bottom: 16,
+                              ),
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: isCollapsed
+                                    ? const SizedBox.shrink()
+                                    : _buildSearchBar(context, state),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.settings, color: colorScheme.onPrimary),
-                    onPressed: () async {
-                      final result = await Navigator.pushNamed(
-                        context,
-                        '/quran-settings',
-                      );
-                      // If translation was changed, reload the Surah list
-                      if (result == true && context.mounted) {
-                        context
-                            .read<SurahListCubit>()
-                            .reloadTranslationSettings();
-                      }
-                    },
-                  ),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: EdgeInsets.zero,
-                  background: Container(
-                    decoration: BoxDecoration(color: colorScheme.primary),
-                    child: SafeArea(
-                      child: Padding(
+                // Surah List
+                state.filteredSurahs.isEmpty && state.isSearching
+                    ? _buildNoResults(context)
+                    : SliverPadding(
                         padding: const EdgeInsets.only(
                           left: 16,
                           right: 16,
-                          bottom: 16,
+                          top: 16,
+                          bottom: 48,
                         ),
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: _buildSearchBar(context, state),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate((
+                            context,
+                            index,
+                          ) {
+                            final surahNumber = state.filteredSurahs[index];
+                            return _buildSurahCard(context, surahNumber, state);
+                          }, childCount: state.filteredSurahs.length),
                         ),
                       ),
-                    ),
-                  ),
-                ),
-              ),
-              // Surah List
-              state.filteredSurahs.isEmpty && state.isSearching
-                  ? _buildNoResults(context)
-                  : SliverPadding(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        top: 16,
-                        bottom: 48,
-                      ),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          final surahNumber = state.filteredSurahs[index];
-                          return _buildSurahCard(context, surahNumber, state);
-                        }, childCount: state.filteredSurahs.length),
-                      ),
-                    ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildSearchBar(BuildContext context, SurahListLoaded state) {
+  Widget _buildSearchBar(
+    BuildContext context,
+    SurahListLoaded state, {
+    bool isInAppBar = false,
+  }) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        // color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: colorScheme.brightness == Brightness.dark
-            ? [
-                BoxShadow(
-                  color: colorScheme.shadow.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
       ),
       child: TextField(
+        controller: _searchController,
         onChanged: (value) {
           context.read<SurahListCubit>().searchSurahs(value);
         },
@@ -145,21 +213,20 @@ class _SurahListView extends StatelessWidget {
           hintText: localizations.searchSurah,
           hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
           prefixIcon: Icon(Icons.search, color: colorScheme.primary),
-          suffixIcon: state.searchQuery.isNotEmpty
+          suffixIcon:
+              _searchController.text.isNotEmpty || state.searchQuery.isNotEmpty
               ? IconButton(
                   icon: Icon(Icons.clear, color: colorScheme.onSurfaceVariant),
                   onPressed: () {
+                    _searchController.clear();
                     context.read<SurahListCubit>().clearSearch();
                   },
                 )
               : null,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          contentPadding: const EdgeInsets.symmetric(
+
+          contentPadding: EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: 12,
+            vertical: isInAppBar ? 6 : 8,
           ),
           filled: true,
           fillColor: colorScheme.surface,
@@ -187,7 +254,7 @@ class _SurahListView extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Theme.of(context).colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: colorScheme.brightness == Brightness.dark
             ? [
@@ -197,12 +264,6 @@ class _SurahListView extends StatelessWidget {
                   offset: const Offset(0, 2),
                 ),
               ]
-            : null,
-        border: colorScheme.brightness == Brightness.light
-            ? Border.all(
-                color: colorScheme.primary.withValues(alpha: 0.15),
-                width: 1,
-              )
             : null,
       ),
       child: Material(
@@ -222,23 +283,10 @@ class _SurahListView extends StatelessWidget {
             child: Row(
               children: [
                 // Surah number circle
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text(
-                      surahNumber.toString(),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onPrimary,
-                      ),
-                    ),
-                  ),
+                ChapterNumberWidget(
+                  color: colorScheme.primary,
+                  surahNumber: surahNumber,
+                  textTheme: Theme.of(context).textTheme,
                 ),
 
                 const SizedBox(width: 16),
