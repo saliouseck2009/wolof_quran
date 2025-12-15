@@ -143,7 +143,7 @@
   "downloadInProgress": "Un téléchargement est déjà en cours. Veuillez attendre la fin avant d'en lancer un autre.",
   "enterWordsToFindVerses": "Saisissez des mots pour trouver des versets dans le Coran",
   "enterWordsToSearch": "Saisissez des mots à rechercher...",
-  "foundOccurrences": "{occurrences} occurrence(s) trouvée(s) dans {verses} verset(s)",
+  "foundOccurrences": "{occurrences} occurrence(s) dans {verses} verset(s)",
   "noResultsFound": "Aucun résultat trouvé",
   "searchError": "Erreur de recherche",
   "searchQuran": "Rechercher dans le Coran",

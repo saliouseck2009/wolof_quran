@@ -6,6 +6,7 @@ import '../cubits/bookmark_cubit.dart' as bookmark_cubit;
 import '../widgets/ayah_card.dart';
 import '../widgets/ayah_play_button.dart';
 import '../widgets/bookmarks_tab.dart';
+import '../widgets/app_search_bar.dart';
 import '../../service_locator.dart';
 import '../../domain/repositories/bookmark_repository.dart';
 
@@ -31,86 +32,28 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-class SearchView extends StatelessWidget {
+class SearchView extends StatefulWidget {
   final int initialTab;
 
   const SearchView({super.key, this.initialTab = 0});
 
   @override
-  Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentGreen = isDark
-        ? const Color(0xFF4CAF50)
-        : Theme.of(context).colorScheme.primary;
-
-    return DefaultTabController(
-      length: 2,
-      initialIndex: initialTab,
-      child: Scaffold(
-        backgroundColor: isDark ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: isDark ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface,
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Text(
-            localizations.searchInQuran,
-            style: TextStyle(
-              fontFamily: 'Hafs',
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          centerTitle: true,
-          bottom: TabBar(
-            indicatorColor: accentGreen,
-            labelColor: accentGreen,
-            unselectedLabelColor: isDark
-                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75)
-                : Theme.of(context).colorScheme.onSurface,
-            labelStyle: const TextStyle(
-              fontFamily: 'Hafs',
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontFamily: 'Hafs',
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-            tabs: [
-              Tab(icon: const Icon(Icons.search), text: localizations.search),
-              Tab(
-                icon: const Icon(Icons.bookmark),
-                text: localizations.bookmarks,
-              ),
-            ],
-          ),
-        ),
-        body: TabBarView(children: [const _SearchBody(), const BookmarksTab()]),
-      ),
-    );
-  }
+  State<SearchView> createState() => _SearchViewState();
 }
 
-class _SearchBody extends StatefulWidget {
-  const _SearchBody();
+class _SearchViewState extends State<SearchView> {
+  static const double _expandedHeight = 150;
+  static const double _collapsedToolbarHeight = 72;
 
-  @override
-  State<_SearchBody> createState() => _SearchBodyState();
-}
-
-class _SearchBodyState extends State<_SearchBody> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialTab.clamp(0, 1).toInt();
+  }
 
   @override
   void dispose() {
@@ -120,132 +63,238 @@ class _SearchBodyState extends State<_SearchBody> {
   }
 
   void _performSearch(String query) {
-    if (query.trim().isNotEmpty) {
-      context.read<SearchCubit>().searchWords(query.trim());
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      context.read<SearchCubit>().clearSearch();
+      return;
     }
+    context.read<SearchCubit>().searchWords(trimmed);
+    FocusScope.of(context).unfocus();
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    context.read<SearchCubit>().clearSearch();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentGreen = isDark
-        ? const Color(0xFF4CAF50)
-        : Theme.of(context).colorScheme.primary;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Column(
-      children: [
-        // Search Input
-        Container(
-          margin: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDark ? Theme.of(context).colorScheme.surfaceContainer : Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isDark
-                  ? const Color(0xFF364148)
-                  : Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.4),
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          _buildSearchTab(localizations, colorScheme),
+          SafeArea(
+            child: Container(
+              color: colorScheme.surface,
+              child: const BookmarksTab(),
             ),
-            boxShadow: isDark
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.35),
-                      blurRadius: 14,
-                      offset: const Offset(0, 6),
-                    ),
-                  ]
-                : null,
           ),
-          child: TextField(
-            controller: _searchController,
-            focusNode: _searchFocusNode,
-            style: TextStyle(
-              fontFamily: 'Hafs',
-              fontSize: 16,
-              color: isDark ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface,
+        ],
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainer,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, -4),
             ),
-            decoration: InputDecoration(
-              hintText: localizations.enterWordsToSearch,
-              hintStyle: TextStyle(
-                fontFamily: 'Hafs',
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              prefixIcon: Icon(Icons.search, color: accentGreen),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      icon: Icon(Icons.clear, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                      onPressed: () {
-                        _searchController.clear();
-                        context.read<SearchCubit>().clearSearch();
-                        setState(() {}); // Update UI for clear button
-                      },
-                    )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.all(16),
-            ),
-            onChanged: (value) {
-              setState(() {}); // Update UI for clear button
+          ],
+        ),
+        child: SafeArea(
+          child: NavigationBar(
+            selectedIndex: _currentIndex,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            indicatorColor: colorScheme.primaryContainer.withValues(alpha: 0.3),
+            height: 64,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            onDestinationSelected: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+              if (index != 0) {
+                _searchFocusNode.unfocus();
+              }
             },
-            onSubmitted: _performSearch,
-            textInputAction: TextInputAction.search,
-          ),
-        ),
-
-        // Search Button
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => _performSearch(_searchController.text),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: accentGreen,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.search_outlined),
+                selectedIcon: Icon(
+                  Icons.search,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
+                label: localizations.search,
               ),
-              child: Text(
-                localizations.search,
-                style: TextStyle(
-                  fontFamily: 'Hafs',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+              NavigationDestination(
+                icon: const Icon(Icons.bookmark_outline),
+                selectedIcon: Icon(
+                  Icons.bookmark,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
+                label: localizations.bookmarks,
               ),
-            ),
+            ],
           ),
         ),
+      ),
+    );
+  }
 
-        const SizedBox(height: 16),
+  Widget _buildSearchTab(
+    AppLocalizations localizations,
+    ColorScheme colorScheme,
+  ) {
+    final searchState = context.watch<SearchCubit>().state;
+    final hasActiveFilter =
+        _searchController.text.isNotEmpty ||
+        (searchState is SearchLoaded && searchState.searchQuery.isNotEmpty);
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final accentGreen = isDark ? const Color(0xFF4CAF50) : colorScheme.primary;
 
-        // Search Results
-        Expanded(
-          child: BlocBuilder<SearchCubit, SearchState>(
-            builder: (context, state) {
-              if (state is SearchInitial) {
-                return _buildInitialState(localizations);
-              }
-
-              if (state is SearchLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (state is SearchError) {
-                return _buildErrorState(localizations, state.message);
-              }
-
-              if (state is SearchLoaded) {
-                return _buildSearchResults(localizations, state);
-              }
-
-              return const SizedBox.shrink();
-            },
-          ),
-        ),
+    return NestedScrollView(
+      headerSliverBuilder: (context, _) => [
+        _buildSearchHeader(localizations, colorScheme, hasActiveFilter),
       ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Column(
+          children: [
+            Expanded(
+              child: BlocBuilder<SearchCubit, SearchState>(
+                builder: (context, state) {
+                  if (state is SearchInitial) {
+                    return _buildInitialState(localizations);
+                  }
+
+                  if (state is SearchLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state is SearchError) {
+                    return _buildErrorState(localizations, state.message);
+                  }
+
+                  if (state is SearchLoaded) {
+                    return _buildSearchResults(
+                      localizations,
+                      state,
+                      accentGreen,
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchHeader(
+    AppLocalizations localizations,
+    ColorScheme colorScheme,
+    bool hasActiveFilter,
+  ) {
+    return SliverLayoutBuilder(
+      builder: (context, constraints) {
+        final topPadding = MediaQuery.of(context).padding.top;
+        final collapseOffset =
+            (_expandedHeight - _collapsedToolbarHeight - topPadding).clamp(
+              0.0,
+              _expandedHeight,
+            );
+        final isCollapsed = constraints.scrollOffset > collapseOffset;
+
+        return SliverAppBar(
+          expandedHeight: _expandedHeight,
+          floating: false,
+          pinned: true,
+          elevation: 2,
+          backgroundColor: colorScheme.primary,
+          iconTheme: IconThemeData(color: colorScheme.onPrimary),
+          surfaceTintColor: Colors.transparent,
+          shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
+          toolbarHeight: _collapsedToolbarHeight,
+          titleSpacing: isCollapsed ? 0 : null,
+
+          title: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: isCollapsed
+                ? Padding(
+                    key: const ValueKey('search-collapsed'),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: _buildSearchBar(
+                      localizations: localizations,
+                      isInAppBar: true,
+                      hasActiveFilter: hasActiveFilter,
+                    ),
+                  )
+                : Text(
+                    'Explorer',
+                    key: const ValueKey('search-title'),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onPrimary,
+                      fontSize: 18,
+                    ),
+                  ),
+          ),
+          flexibleSpace: FlexibleSpaceBar(
+            titlePadding: EdgeInsets.zero,
+            background: Container(
+              color: colorScheme.primary,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                  ),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: isCollapsed
+                        ? const SizedBox.shrink()
+                        : _buildSearchBar(
+                            localizations: localizations,
+                            isInAppBar: false,
+                            hasActiveFilter: hasActiveFilter,
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSearchBar({
+    required AppLocalizations localizations,
+    required bool isInAppBar,
+    required bool hasActiveFilter,
+  }) {
+    return AppSearchBar(
+      controller: _searchController,
+      focusNode: _searchFocusNode,
+      hintText: localizations.enterWordsToSearch,
+      isInAppBar: isInAppBar,
+      hasActiveFilter: hasActiveFilter,
+      onSubmitted: _performSearch,
+      onSearch: () => _performSearch(_searchController.text),
+      onClear: _clearSearch,
+      onChanged: (_) => setState(() {}),
     );
   }
 
@@ -254,26 +303,31 @@ class _SearchBodyState extends State<_SearchBody> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
-          const SizedBox(height: 16),
+          Icon(
+            Icons.explore,
+            size: 80,
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+          ),
+          const SizedBox(height: 24),
           Text(
-            localizations.searchTheQuran,
+            localizations.searchInQuran,
             style: TextStyle(
-              fontFamily: 'Hafs',
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            localizations.enterWordsToFindVerses,
-            style: TextStyle(
-              fontFamily: 'Hafs',
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              localizations.enterWordsToFindVerses,
+              style: TextStyle(
+                fontSize: 15,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -285,26 +339,31 @@ class _SearchBodyState extends State<_SearchBody> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
-          const SizedBox(height: 16),
+          Icon(
+            Icons.error_outline,
+            size: 80,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          const SizedBox(height: 24),
           Text(
             localizations.searchError,
             style: TextStyle(
-              fontFamily: 'Hafs',
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.w600,
               color: Theme.of(context).colorScheme.error,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            style: TextStyle(
-              fontFamily: 'Hafs',
-              fontSize: 14,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              message,
+              style: TextStyle(
+                fontSize: 15,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -314,23 +373,23 @@ class _SearchBodyState extends State<_SearchBody> {
   Widget _buildSearchResults(
     AppLocalizations localizations,
     SearchLoaded state,
+    Color accentGreen,
   ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentGreen = isDark
-        ? const Color(0xFF4CAF50)
-        : Theme.of(context).colorScheme.primary;
-
     if (state.results.isEmpty) {
-      return Center(
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            Icon(
+              Icons.travel_explore,
+              size: 64,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(height: 16),
             Text(
               localizations.noResultsFound,
               style: TextStyle(
-                fontFamily: 'Hafs',
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -340,7 +399,6 @@ class _SearchBodyState extends State<_SearchBody> {
             Text(
               localizations.tryDifferentSearchTerms,
               style: TextStyle(
-                fontFamily: 'Hafs',
                 fontSize: 14,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -352,98 +410,123 @@ class _SearchBodyState extends State<_SearchBody> {
 
     return Column(
       children: [
-        // Results header
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: Row(
             children: [
+              Icon(
+                Icons.check_circle_outline,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
               Text(
                 localizations.foundOccurrences(
                   state.totalOccurrences,
                   state.results.length,
                 ),
                 style: TextStyle(
-                  fontFamily: 'Hafs',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
           ),
         ),
-
-        // Results list
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.zero,
             itemCount: state.results.length,
             itemBuilder: (context, index) {
               final result = state.results[index];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Surah header
                   if (index == 0 ||
                       state.results[index - 1].surahNumber !=
                           result.surahNumber)
                     Container(
                       width: double.infinity,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      margin: const EdgeInsets.only(
+                        top: 8,
+                        bottom: 12,
+                        left: 16,
+                        right: 16,
+                      ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 8,
+                        vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: accentGreen.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color: accentGreen.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: accentGreen.withValues(alpha: 0.3),
-                          width: 1,
+                          width: 1.5,
                         ),
                       ),
-                      child: Text(
-                        '${result.surahNumber}. ${result.surahName}',
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: accentGreen,
-                        ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: accentGreen.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${result.surahNumber}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: accentGreen,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            result.surahName,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: accentGreen,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 
-                  // Ayah card
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: AyahCard(
-                      verseNumber: result.verseNumber,
-                      arabicText: result.arabicText,
-                      translationSource: state.translationSource,
-                      translation: result.translation,
-                      surahNumber: result.surahNumber,
-                      surahName: result.surahName,
-                      actions: [
-                        AyahPlayButton(
-                          surahNumber: result.surahNumber,
-                          ayahNumber: result.verseNumber,
-                          surahName: result.surahName,
+                  // margin: const EdgeInsets.only(bottom: 16),
+                  AyahCard(
+                    verseNumber: result.verseNumber,
+                    arabicText: result.arabicText,
+                    translationSource: state.translationSource,
+                    translation: result.translation,
+                    surahNumber: result.surahNumber,
+                    surahName: result.surahName,
+                    actions: [
+                      AyahPlayButton(
+                        surahNumber: result.surahNumber,
+                        ayahNumber: result.verseNumber,
+                        surahName: result.surahName,
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.open_in_new,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.open_in_new,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              '/surah-detail',
-                              arguments: result.surahNumber,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/surah-detail',
+                            arguments: result.surahNumber,
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ],
               );

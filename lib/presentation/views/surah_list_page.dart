@@ -7,6 +7,7 @@ import '../../l10n/generated/app_localizations.dart';
 
 import '../cubits/surah_list_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
+import '../widgets/app_search_bar.dart';
 
 class SurahListPage extends StatelessWidget {
   static const String routeName = "/surahs";
@@ -196,42 +197,19 @@ class _SurahListViewState extends State<_SurahListView> {
     bool isInAppBar = false,
   }) {
     final localizations = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        // color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: TextField(
-        controller: _searchController,
-        onChanged: (value) {
-          context.read<SurahListCubit>().searchSurahs(value);
-        },
-        style: Theme.of(context).textTheme.bodyMedium,
-        decoration: InputDecoration(
-          hintText: localizations.searchSurah,
-          hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-          prefixIcon: Icon(Icons.search, color: colorScheme.primary),
-          suffixIcon:
-              _searchController.text.isNotEmpty || state.searchQuery.isNotEmpty
-              ? IconButton(
-                  icon: Icon(Icons.clear, color: colorScheme.onSurfaceVariant),
-                  onPressed: () {
-                    _searchController.clear();
-                    context.read<SurahListCubit>().clearSearch();
-                  },
-                )
-              : null,
-
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: isInAppBar ? 6 : 8,
-          ),
-          filled: true,
-          fillColor: colorScheme.surface,
-        ),
-      ),
+    return AppSearchBar(
+      controller: _searchController,
+      hintText: localizations.searchSurah,
+      isInAppBar: isInAppBar,
+      hasActiveFilter: state.searchQuery.isNotEmpty,
+      onChanged: (value) {
+        context.read<SurahListCubit>().searchSurahs(value);
+      },
+      onClear: () {
+        _searchController.clear();
+        context.read<SurahListCubit>().clearSearch();
+      },
     );
   }
 

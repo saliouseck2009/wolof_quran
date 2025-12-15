@@ -433,7 +433,7 @@ abstract class AppLocalizations {
   /// Search results count
   ///
   /// In en, this message translates to:
-  /// **'Found {occurrences} occurrence(s) in {verses} verse(s)'**
+  /// **'{occurrences} occurrence(s) in {verses} verse(s)'**
   String foundOccurrences(int occurrences, int verses);
 
   /// Message shown when audio is not downloaded

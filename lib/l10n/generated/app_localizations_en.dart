@@ -179,7 +179,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String foundOccurrences(int occurrences, int verses) {
-    return 'Found $occurrences occurrence(s) in $verses verse(s)';
+    return '$occurrences occurrence(s) in $verses verse(s)';
   }
 
   @override

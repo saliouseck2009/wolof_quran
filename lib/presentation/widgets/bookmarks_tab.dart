@@ -12,209 +12,259 @@ class BookmarksTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return BlocBuilder<BookmarkCubit, BookmarkState>(
-      builder: (context, state) {
-        if (state is BookmarkLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (state is BookmarkError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline, size: 64, color: Theme.of(context).colorScheme.error),
-                const SizedBox(height: 16),
-                Text(
-                  'Error loading bookmarks',
-                  style: TextStyle(
-                    fontFamily: 'Hafs',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  state.message,
-                  style: TextStyle(
-                    fontFamily: 'Hafs',
-                    fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          );
-        }
-
-        if (state is BookmarkLoaded) {
-          if (state.bookmarks.isEmpty) {
-            return _buildEmptyState(context, localizations);
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+        title: Text(
+          localizations.bookmarks,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: colorScheme.onPrimary,
+          ),
+        ),
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        // automaticallyImplyLeading: false,
+      ),
+      body: BlocBuilder<BookmarkCubit, BookmarkState>(
+        builder: (context, state) {
+          if (state is BookmarkLoading) {
+            return const Center(child: CircularProgressIndicator());
           }
 
-          return Column(
-            children: [
-              // Header with clear all button
-              if (state.bookmarks.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${state.bookmarks.length} ${localizations.bookmarks.toLowerCase()}',
-                        style: TextStyle(
-                          fontFamily: 'Hafs',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () =>
-                            _showClearDialog(context, localizations),
-                        child: Text(
-                          localizations.clearAllBookmarks,
-                          style: TextStyle(
-                            fontFamily: 'Hafs',
-                            color: Theme.of(context).colorScheme.error,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
+          if (state is BookmarkError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 80,
+                    color: Theme.of(context).colorScheme.error,
                   ),
-                ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Error loading bookmarks',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Text(
+                      state.message,
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
 
-              // Bookmarks list
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: state.bookmarks.length,
-                  itemBuilder: (context, index) {
-                    final bookmark = state.bookmarks[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          if (state is BookmarkLoaded) {
+            if (state.bookmarks.isEmpty) {
+              return _buildEmptyState(context, localizations);
+            }
+
+            return Column(
+              children: [
+                // Header with clear all button
+                if (state.bookmarks.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Surah header (show when different from previous)
-                        if (index == 0 ||
-                            state.bookmarks[index - 1].surahNumber !=
-                                bookmark.surahNumber)
-                          Container(
-                            width: double.infinity,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.bookmark,
+                              size: 18,
+                              color: colorScheme.primary,
                             ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary.withValues(
-                                alpha: 0.1,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: Theme.of(context).colorScheme.primary.withValues(
-                                  alpha: 0.3,
-                                ),
-                                width: 1,
-                              ),
-                            ),
-                            child: Text(
-                              '${bookmark.surahNumber}. ${bookmark.surahName}',
+                            const SizedBox(width: 8),
+                            Text(
+                              '${state.bookmarks.length} ${localizations.bookmarks.toLowerCase()}',
                               style: TextStyle(
-                                fontFamily: 'Hafs',
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: colorScheme.primary,
                               ),
                             ),
-                          ),
-
-                        // Ayah card
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          child: AyahCard(
-                            verseNumber: bookmark.verseNumber,
-                            arabicText: bookmark.arabicText,
-                            translationSource: bookmark.translationSource,
-                            translation: bookmark.translation,
-                            surahNumber: bookmark.surahNumber,
-                            surahName: bookmark.surahName,
-                            actions: [
-                              AyahPlayButton(
-                                surahNumber: bookmark.surahNumber,
-                                ayahNumber: bookmark.verseNumber,
-                                surahName: bookmark.surahName,
-                              ),
-                              // Bookmark button (filled since it's in bookmarks)
-                              IconButton(
-                                icon: Icon(
-                                  Icons.bookmark,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                onPressed: () {
-                                  context.read<BookmarkCubit>().removeBookmark(
-                                    bookmark.surahNumber,
-                                    bookmark.verseNumber,
-                                  );
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        localizations.bookmarkRemoved,
-                                      ),
-                                      duration: const Duration(seconds: 1),
-                                      backgroundColor: Theme.of(context).colorScheme.primary,
-                                    ),
-                                  );
-                                },
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.open_in_new,
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                ),
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/surah-detail',
-                                    arguments: bookmark.surahNumber,
-                                  );
-                                },
-                              ),
-                            ],
+                          ],
+                        ),
+                        TextButton(
+                          onPressed: () =>
+                              _showClearDialog(context, localizations),
+                          child: Text(
+                            localizations.clearAllBookmarks,
+                            style: TextStyle(
+                              color: colorScheme.error,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ],
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        }
+                    ),
+                  ),
 
-        return const SizedBox.shrink();
-      },
+                // Bookmarks list
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    //padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: state.bookmarks.length,
+                    itemBuilder: (context, index) {
+                      final bookmark = state.bookmarks[index];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Surah header (show when different from previous)
+                          if (index == 0 ||
+                              state.bookmarks[index - 1].surahNumber !=
+                                  bookmark.surahNumber)
+                            Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 16,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withValues(alpha: 0.3),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Text(
+                                '${bookmark.surahNumber}. ${bookmark.surahName}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            ),
+
+                          // Ayah card
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            child: AyahCard(
+                              verseNumber: bookmark.verseNumber,
+                              arabicText: bookmark.arabicText,
+                              translationSource: bookmark.translationSource,
+                              translation: bookmark.translation,
+                              surahNumber: bookmark.surahNumber,
+                              surahName: bookmark.surahName,
+                              actions: [
+                                AyahPlayButton(
+                                  surahNumber: bookmark.surahNumber,
+                                  ayahNumber: bookmark.verseNumber,
+                                  surahName: bookmark.surahName,
+                                ),
+                                // Bookmark button (filled since it's in bookmarks)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.bookmark,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                  onPressed: () {
+                                    context
+                                        .read<BookmarkCubit>()
+                                        .removeBookmark(
+                                          bookmark.surahNumber,
+                                          bookmark.verseNumber,
+                                        );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          localizations.bookmarkRemoved,
+                                        ),
+                                        duration: const Duration(seconds: 1),
+                                        backgroundColor: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.open_in_new,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/surah-detail',
+                                      arguments: bookmark.surahNumber,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, AppLocalizations localizations) {
+  Widget _buildEmptyState(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.bookmark_border, size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
+          Icon(
+            Icons.bookmark_border,
+            size: 64,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(height: 16),
           Text(
             'No Bookmarks', // Use hardcoded text since noBookmarks key doesn't exist
             style: TextStyle(
-              fontFamily: 'Hafs',
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
@@ -223,8 +273,7 @@ class BookmarksTab extends StatelessWidget {
             child: Text(
               localizations.noBookmarksDescription,
               style: TextStyle(
-                fontFamily: 'Hafs',
-                fontSize: 14,
+                fontSize: 15,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
@@ -245,19 +294,15 @@ class BookmarksTab extends StatelessWidget {
           ),
           title: Text(
             localizations.confirmClearBookmarks,
-            style: TextStyle(fontFamily: 'Hafs', fontWeight: FontWeight.w600),
+            style: TextStyle(fontWeight: FontWeight.w600),
           ),
-          content: Text(
-            localizations.clearBookmarksMessage,
-            style: TextStyle(fontFamily: 'Hafs'),
-          ),
+          content: Text(localizations.clearBookmarksMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 localizations.cancel,
                 style: TextStyle(
-                  fontFamily: 'Hafs',
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -276,7 +321,6 @@ class BookmarksTab extends StatelessWidget {
               child: Text(
                 localizations.clear,
                 style: TextStyle(
-                  fontFamily: 'Hafs',
                   color: Theme.of(context).colorScheme.error,
                   fontWeight: FontWeight.w600,
                 ),

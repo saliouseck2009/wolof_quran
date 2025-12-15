@@ -226,7 +226,7 @@
   "@tryDifferentSearchTerms": {
     "description": "No search results subtitle"
   },
-  "foundOccurrences": "Found {occurrences} occurrence(s) in {verses} verse(s)",
+  "foundOccurrences": "{occurrences} occurrence(s) in {verses} verse(s)",
   "@foundOccurrences": {
     "description": "Search results count",
     "placeholders": {
