@@ -114,7 +114,7 @@ class _SearchViewState extends State<SearchView> {
             selectedIndex: _currentIndex,
             backgroundColor: Colors.transparent,
             elevation: 0,
-            indicatorColor: colorScheme.primaryContainer.withValues(alpha: 0.3),
+            indicatorColor: colorScheme.primary.withValues(alpha: 0.1),
             height: 64,
             labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
             onDestinationSelected: (index) {
@@ -306,7 +306,9 @@ class _SearchViewState extends State<SearchView> {
           Icon(
             Icons.explore,
             size: 80,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
           ),
           const SizedBox(height: 24),
           Text(
@@ -314,7 +316,9 @@ class _SearchViewState extends State<SearchView> {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
             ),
           ),
           const SizedBox(height: 12),
