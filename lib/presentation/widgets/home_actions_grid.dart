@@ -8,11 +8,17 @@ class HomeActionsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
-    return Column(
-      children: [
-        Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 16.0;
+        final cardWidth = (constraints.maxWidth - spacing) / 2;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
           children: [
-            Expanded(
+            SizedBox(
+              width: cardWidth,
               child: _ModernActionCard(
                 icon: Icons.menu_book_outlined,
                 title: localizations.quran,
@@ -20,8 +26,8 @@ class HomeActionsGrid extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(context, '/surahs'),
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
+            SizedBox(
+              width: cardWidth,
               child: _ModernActionCard(
                 icon: Icons.headphones_outlined,
                 title: localizations.recitation,
@@ -29,31 +35,19 @@ class HomeActionsGrid extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(context, '/surah-audio-list'),
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
+            SizedBox(
+              width: cardWidth,
               child: _ModernActionCard(
-                icon: Icons.search_outlined,
-                title: localizations.search,
-                subtitle: localizations.findVerses,
+                icon: Icons.explore_outlined,
+                title: 'Explorer',
+                subtitle:
+                    '${localizations.search} & ${localizations.bookmarks}',
                 onTap: () => Navigator.pushNamed(context, '/search'),
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _ModernActionCard(
-                icon: Icons.bookmark_outline,
-                title: localizations.bookmarks,
-                subtitle: localizations.savedAyahs,
-                onTap: () => Navigator.pushNamed(context, '/bookmarks'),
-              ),
-            ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }
