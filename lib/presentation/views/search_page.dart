@@ -87,15 +87,7 @@ class _SearchViewState extends State<SearchView> {
       backgroundColor: colorScheme.surface,
       body: IndexedStack(
         index: _currentIndex,
-        children: [
-          _buildSearchTab(localizations, colorScheme),
-          SafeArea(
-            child: Container(
-              color: colorScheme.surface,
-              child: const BookmarksTab(),
-            ),
-          ),
-        ],
+        children: [_buildSearchTab(localizations, colorScheme), BookmarksTab()],
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
