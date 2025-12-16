@@ -50,7 +50,11 @@ class SurahDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
+      backgroundColor: colorScheme.brightness == Brightness.dark
+          ? AppColor.surfaceDark
+          : colorScheme.surface,
       body: BlocBuilder<SurahDetailCubit, SurahDetailState>(
         builder: (context, state) {
           if (state is SurahDetailLoading) {
@@ -206,8 +210,10 @@ class SurahDetailAppBar extends StatelessWidget {
       expandedHeight: 220,
       floating: false,
       pinned: true,
-      elevation: 2,
-      backgroundColor: colorScheme.primary,
+      elevation: 0,
+      backgroundColor: colorScheme.brightness == Brightness.dark
+          ? AppColor.surfaceDark
+          : colorScheme.primary,
       iconTheme: IconThemeData(color: colorScheme.onPrimary),
       title: Text(
         state.surahNameTranslated,
@@ -329,7 +335,11 @@ class SurahDetailAppBar extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: EdgeInsets.zero,
         background: Container(
-          decoration: BoxDecoration(color: colorScheme.primary),
+          decoration: BoxDecoration(
+            color: colorScheme.brightness == Brightness.dark
+                ? AppColor.surfaceDark
+                : colorScheme.primary,
+          ),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -490,8 +500,8 @@ class SurahBasmalaWidget extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: colorScheme.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(16),
+          color: colorScheme.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
           quran.basmala,
@@ -640,13 +650,17 @@ class SurahPlayButton extends StatelessWidget {
           builder: (context, downloadStatusState) {
             // Loading state
             if (downloadStatusState is SurahDownloadStatusLoading) {
+              final colorScheme = Theme.of(context).colorScheme;
+              final isDark = colorScheme.brightness == Brightness.dark;
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Container(
                   width: 140,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: isDark
+                        ? colorScheme.surfaceContainerHigh
+                        : Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Center(
@@ -667,6 +681,8 @@ class SurahPlayButton extends StatelessWidget {
 
             // Error state or initial state - show disabled button
             if (downloadStatusState is! SurahDownloadStatusLoaded) {
+              final colorScheme = Theme.of(context).colorScheme;
+              final isDark = colorScheme.brightness == Brightness.dark;
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Container(
@@ -675,7 +691,9 @@ class SurahPlayButton extends StatelessWidget {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: isDark
+                        ? colorScheme.surfaceContainerHigh
+                        : Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Row(
@@ -751,11 +769,12 @@ class SurahPlayButton extends StatelessWidget {
                       currentState.surahNumber == surahNumber;
 
                   if (isDownloading) {
-                    final downloadingState =
-                        currentState as AudioDownloading;
-                    final progressPercent =
-                        (downloadingState.progress * 100).toInt();
+                    final downloadingState = currentState;
+                    final progressPercent = (downloadingState.progress * 100)
+                        .toInt();
                     // Show download progress
+                    final colorScheme = Theme.of(context).colorScheme;
+                    final isDark = colorScheme.brightness == Brightness.dark;
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Container(
@@ -764,7 +783,9 @@ class SurahPlayButton extends StatelessWidget {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: isDark
+                              ? colorScheme.surfaceContainerHigh
+                              : Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(25),
                         ),
                         child: Row(
@@ -798,6 +819,8 @@ class SurahPlayButton extends StatelessWidget {
                   }
 
                   // Show download button
+                  final colorScheme = Theme.of(context).colorScheme;
+                  final isDark = colorScheme.brightness == Brightness.dark;
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: ElevatedButton.icon(
@@ -832,8 +855,12 @@ class SurahPlayButton extends StatelessWidget {
                         style: TextStyle(fontWeight: FontWeight.w500),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: 0.2),
-                        foregroundColor: Colors.white,
+                        backgroundColor: isDark
+                            ? colorScheme.surfaceContainer
+                            : Colors.white.withValues(alpha: 0.2),
+                        foregroundColor: isDark
+                            ? colorScheme.onSurface
+                            : Colors.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -953,7 +980,6 @@ class SurahPlayButton extends StatelessWidget {
                                     ? localizations.resumeSurah
                                     : localizations.playSurah,
                                 style: TextStyle(
-                                  fontFamily: 'Hafs',
                                   fontWeight: FontWeight.w600,
                                   color: isThisSurahPlaying
                                       ? Theme.of(context).colorScheme.secondary
@@ -961,7 +987,13 @@ class SurahPlayButton extends StatelessWidget {
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColor.pureWhite,
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.brightness ==
+                                        Brightness.dark
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.surfaceContainer
+                                    : AppColor.pureWhite,
                                 foregroundColor: isThisSurahPlaying
                                     ? Theme.of(context).colorScheme.secondary
                                     : Theme.of(context).colorScheme.primary,

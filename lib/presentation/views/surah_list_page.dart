@@ -4,6 +4,7 @@ import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 import 'package:wolof_quran/presentation/views/reciter_chapters_download_page.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../core/config/theme/app_color.dart';
 
 import '../cubits/surah_list_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
@@ -53,6 +54,9 @@ class _SurahListViewState extends State<_SurahListView> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: colorScheme.brightness == Brightness.dark
+          ? AppColor.surfaceDark
+          : colorScheme.surface,
       body: BlocListener<SurahListCubit, SurahListState>(
         listenWhen: (previous, current) {
           if (current is! SurahListLoaded) return false;
@@ -88,8 +92,10 @@ class _SurahListViewState extends State<_SurahListView> {
                       expandedHeight: _expandedHeight,
                       floating: false,
                       pinned: true,
-                      elevation: 2,
-                      backgroundColor: colorScheme.primary,
+                      elevation: 0,
+                      backgroundColor: colorScheme.brightness == Brightness.dark
+                          ? AppColor.surfaceDark
+                          : colorScheme.primary,
                       iconTheme: IconThemeData(color: colorScheme.onPrimary),
                       surfaceTintColor: Colors.transparent,
                       shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
@@ -142,7 +148,11 @@ class _SurahListViewState extends State<_SurahListView> {
                       flexibleSpace: FlexibleSpaceBar(
                         titlePadding: EdgeInsets.zero,
                         background: Container(
-                          decoration: BoxDecoration(color: colorScheme.primary),
+                          decoration: BoxDecoration(
+                            color: colorScheme.brightness == Brightness.dark
+                                ? AppColor.surfaceDark
+                                : colorScheme.primary,
+                          ),
                           child: SafeArea(
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -232,17 +242,17 @@ class _SurahListViewState extends State<_SurahListView> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surfaceContainer
+            : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: colorScheme.brightness == Brightness.dark
-            ? [
-                BoxShadow(
-                  color: colorScheme.primary.withValues(alpha: 0.08),
-                  blurRadius: 12,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
