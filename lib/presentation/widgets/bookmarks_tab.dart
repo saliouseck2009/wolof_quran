@@ -150,14 +150,21 @@ class BookmarksTab extends StatelessWidget {
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
+                                color: colorScheme.brightness == Brightness.dark
+                                    ? colorScheme.surfaceContainer
+                                    : colorScheme.primary.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.primary.withValues(alpha: 0.3),
+                                  color:
+                                      colorScheme.brightness == Brightness.dark
+                                      ? colorScheme.outline.withValues(
+                                          alpha: 0.1,
+                                        )
+                                      : colorScheme.primary.withValues(
+                                          alpha: 0.3,
+                                        ),
                                   width: 1,
                                 ),
                               ),

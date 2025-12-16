@@ -29,6 +29,7 @@ class AppSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
 
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
@@ -44,10 +45,16 @@ class AppSearchBar extends StatelessWidget {
             onSubmitted: onSubmitted,
             textInputAction: textInputAction,
             maxLines: 1,
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            ),
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+              hintStyle: TextStyle(
+                color: isDark
+                    ? colorScheme.onSurfaceVariant.withValues(alpha: 0.6)
+                    : colorScheme.onSurfaceVariant,
+              ),
 
               suffixIcon: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -56,7 +63,9 @@ class AppSearchBar extends StatelessWidget {
                     IconButton(
                       icon: Icon(
                         Icons.clear,
-                        color: colorScheme.onSurfaceVariant,
+                        color: isDark
+                            ? colorScheme.error
+                            : colorScheme.onSurfaceVariant,
                       ),
                       onPressed: onClear,
                     ),
@@ -72,7 +81,9 @@ class AppSearchBar extends StatelessWidget {
                 vertical: isInAppBar ? 6 : 8,
               ),
               filled: true,
-              fillColor: colorScheme.onPrimary,
+              fillColor: isDark
+                  ? colorScheme.surfaceContainer
+                  : colorScheme.onPrimary,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,

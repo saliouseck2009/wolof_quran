@@ -293,7 +293,9 @@ class DailyInspirationCard extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: accentGreen.withValues(alpha: 0.05),
+                  color: isDark
+                      ? colorScheme.surface
+                      : accentGreen.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(

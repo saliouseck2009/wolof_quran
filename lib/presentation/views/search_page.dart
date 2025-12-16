@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../../core/config/theme/app_color.dart';
 import '../cubits/search_cubit.dart';
 import '../cubits/bookmark_cubit.dart' as bookmark_cubit;
 import '../widgets/ayah_card.dart';
@@ -84,7 +85,9 @@ class _SearchViewState extends State<SearchView> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: colorScheme.brightness == Brightness.dark
+          ? AppColor.surfaceDark
+          : colorScheme.surface,
       body: IndexedStack(
         index: _currentIndex,
         children: [_buildSearchTab(localizations, colorScheme), BookmarksTab()],
@@ -92,11 +95,13 @@ class _SearchViewState extends State<SearchView> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainer,
+          color: colorScheme.brightness == Brightness.dark
+              ? colorScheme.surfaceContainer
+              : colorScheme.surfaceContainer,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
               offset: const Offset(0, -4),
             ),
           ],
@@ -150,7 +155,7 @@ class _SearchViewState extends State<SearchView> {
         _searchController.text.isNotEmpty ||
         (searchState is SearchLoaded && searchState.searchQuery.isNotEmpty);
     final isDark = colorScheme.brightness == Brightness.dark;
-    final accentGreen = isDark ? const Color(0xFF4CAF50) : colorScheme.primary;
+    final accentGreen = colorScheme.primary;
 
     return NestedScrollView(
       headerSliverBuilder: (context, _) => [
@@ -212,8 +217,10 @@ class _SearchViewState extends State<SearchView> {
           expandedHeight: _expandedHeight,
           floating: false,
           pinned: true,
-          elevation: 2,
-          backgroundColor: colorScheme.primary,
+          elevation: 0,
+          backgroundColor: colorScheme.brightness == Brightness.dark
+              ? AppColor.surfaceDark
+              : colorScheme.primary,
           iconTheme: IconThemeData(color: colorScheme.onPrimary),
           surfaceTintColor: Colors.transparent,
           shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
@@ -245,7 +252,9 @@ class _SearchViewState extends State<SearchView> {
           flexibleSpace: FlexibleSpaceBar(
             titlePadding: EdgeInsets.zero,
             background: Container(
-              color: colorScheme.primary,
+              color: colorScheme.brightness == Brightness.dark
+                  ? AppColor.surfaceDark
+                  : colorScheme.primary,
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -371,6 +380,11 @@ class _SearchViewState extends State<SearchView> {
     SearchLoaded state,
     Color accentGreen,
   ) {
+    final contentColor = Theme.of(
+      context,
+    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
     if (state.results.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -410,11 +424,7 @@ class _SearchViewState extends State<SearchView> {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: Row(
             children: [
-              Icon(
-                Icons.check_circle_outline,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              Icon(Icons.check_circle_outline, size: 18, color: contentColor),
               const SizedBox(width: 8),
               Text(
                 localizations.foundOccurrences(
@@ -424,7 +434,7 @@ class _SearchViewState extends State<SearchView> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: contentColor,
                 ),
               ),
             ],
@@ -455,12 +465,10 @@ class _SearchViewState extends State<SearchView> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: accentGreen.withValues(alpha: 0.12),
+                        color: isDark
+                            ? colorScheme.surfaceContainer
+                            : accentGreen.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: accentGreen.withValues(alpha: 0.3),
-                          width: 1.5,
-                        ),
                       ),
                       child: Row(
                         children: [

@@ -60,7 +60,7 @@ class AyahCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surface : colorScheme.onPrimary,
+        color: isDark ? colorScheme.surfaceContainer : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(

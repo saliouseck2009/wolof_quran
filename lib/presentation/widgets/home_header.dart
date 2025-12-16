@@ -82,15 +82,6 @@ class AppIcon extends StatelessWidget {
           colors: [accentGreen, accentGreen.withValues(alpha: 0.8)],
         ),
         borderRadius: BorderRadius.circular(width / 2),
-        boxShadow: colorScheme.brightness == Brightness.dark
-            ? [
-                BoxShadow(
-                  color: accentGreen.withValues(alpha: 0.35),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
       ),
       child: Icon(
         Icons.auto_stories_outlined,
