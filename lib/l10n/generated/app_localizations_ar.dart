@@ -318,6 +318,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clear => 'مسح';
 
   @override
+  String get explorer => 'استكشاف';
+
+  @override
+  String get errorLoadingBookmarks => 'خطأ في تحميل العلامات المرجعية';
+
+  @override
+  String get noBookmarks => 'لا توجد علامات مرجعية';
+
+  @override
+  String get allBookmarksCleared => 'تم مسح جميع العلامات المرجعية';
+
+  @override
   String get salamAlaikum => 'السلام عليكم';
 
   @override

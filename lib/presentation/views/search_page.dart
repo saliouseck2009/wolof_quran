@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wolof_quran/domain/entities/bookmark.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/search_cubit.dart';
@@ -240,7 +241,7 @@ class _SearchViewState extends State<SearchView> {
                     ),
                   )
                 : Text(
-                    'Explorer',
+                    localizations.explorer,
                     key: const ValueKey('search-title'),
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
@@ -518,9 +519,51 @@ class _SearchViewState extends State<SearchView> {
                         surahName: result.surahName,
                       ),
                       IconButton(
+                        icon:
+                            BlocBuilder<
+                              bookmark_cubit.BookmarkCubit,
+                              bookmark_cubit.BookmarkState
+                            >(
+                              builder: (context, bookmarkState) {
+                                final isBookmarked = context
+                                    .read<bookmark_cubit.BookmarkCubit>()
+                                    .isBookmarked(
+                                      result.surahNumber,
+                                      result.verseNumber,
+                                    );
+
+                                return Icon(
+                                  isBookmarked
+                                      ? Icons.bookmark
+                                      : Icons.bookmark_border,
+                                  color: isBookmarked
+                                      ? colorScheme.primary
+                                      : colorScheme.outline,
+                                  size: 20,
+                                );
+                              },
+                            ),
+                        onPressed: () {
+                          final bookmarkCubit = context
+                              .read<bookmark_cubit.BookmarkCubit>();
+                          final bookmark = BookmarkedAyah(
+                            surahNumber: result.surahNumber,
+                            verseNumber: result.verseNumber,
+                            surahName: result.surahName,
+                            arabicText: result.arabicText,
+                            translation: result.translation,
+                            translationSource: state.translationSource,
+                            createdAt: DateTime.now(),
+                          );
+
+                          bookmarkCubit.toggleBookmark(bookmark);
+                        },
+                      ),
+                      IconButton(
                         icon: Icon(
                           Icons.open_in_new,
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          size: 20,
                         ),
                         onPressed: () {
                           Navigator.pushNamed(

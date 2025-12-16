@@ -158,5 +158,9 @@
   "searchError": "خطأ في البحث",
   "searchQuran": "بحث في القرآن",
   "searchTheQuran": "ابحث في القرآن",
-  "tryDifferentSearchTerms": "جرّب مصطلحات بحث أخرى"
+  "tryDifferentSearchTerms": "جرّب مصطلحات بحث أخرى",
+  "explorer": "استكشاف",
+  "errorLoadingBookmarks": "خطأ في تحميل العلامات المرجعية",
+  "noBookmarks": "لا توجد علامات مرجعية",
+  "allBookmarksCleared": "تم مسح جميع العلامات المرجعية"
 }

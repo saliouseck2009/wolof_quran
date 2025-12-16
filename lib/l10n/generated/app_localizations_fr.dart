@@ -324,6 +324,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get clear => 'Effacer';
 
   @override
+  String get explorer => 'Explorer';
+
+  @override
+  String get errorLoadingBookmarks => 'Erreur lors du chargement des signets';
+
+  @override
+  String get noBookmarks => 'Aucun signet';
+
+  @override
+  String get allBookmarksCleared => 'Tous les signets ont été supprimés';
+
+  @override
   String get salamAlaikum => 'As-salam alaykum';
 
   @override

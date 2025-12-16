@@ -688,6 +688,30 @@ abstract class AppLocalizations {
   /// **'Clear'**
   String get clear;
 
+  /// Title for the explorer/search page
+  ///
+  /// In en, this message translates to:
+  /// **'Explorer'**
+  String get explorer;
+
+  /// Error message when bookmarks fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading bookmarks'**
+  String get errorLoadingBookmarks;
+
+  /// Title for empty bookmarks state
+  ///
+  /// In en, this message translates to:
+  /// **'No Bookmarks'**
+  String get noBookmarks;
+
+  /// Success message when all bookmarks are cleared
+  ///
+  /// In en, this message translates to:
+  /// **'All bookmarks cleared'**
+  String get allBookmarksCleared;
+
   /// Greeting shown on home header
   ///
   /// In en, this message translates to:

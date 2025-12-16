@@ -54,7 +54,7 @@ class BookmarksTab extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Error loading bookmarks',
+                    localizations.errorLoadingBookmarks,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -272,7 +272,7 @@ class BookmarksTab extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No Bookmarks', // Use hardcoded text since noBookmarks key doesn't exist
+            localizations.noBookmarks,
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w600,
@@ -327,7 +327,7 @@ class BookmarksTab extends StatelessWidget {
                 context.read<BookmarkCubit>().clearAllBookmarks();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('All bookmarks cleared'),
+                    content: Text(localizations.allBookmarksCleared),
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                 );

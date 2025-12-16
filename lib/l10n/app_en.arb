@@ -432,6 +432,22 @@
   "@clear": {
     "description": "Clear button text"
   },
+  "explorer": "Explorer",
+  "@explorer": {
+    "description": "Title for the explorer/search page"
+  },
+  "errorLoadingBookmarks": "Error loading bookmarks",
+  "@errorLoadingBookmarks": {
+    "description": "Error message when bookmarks fail to load"
+  },
+  "noBookmarks": "No Bookmarks",
+  "@noBookmarks": {
+    "description": "Title for empty bookmarks state"
+  },
+  "allBookmarksCleared": "All bookmarks cleared",
+  "@allBookmarksCleared": {
+    "description": "Success message when all bookmarks are cleared"
+  },
   "salamAlaikum": "As-salamu alaykum",
   "@salamAlaikum": {
     "description": "Greeting shown on home header"

@@ -321,6 +321,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clear => 'Clear';
 
   @override
+  String get explorer => 'Explorer';
+
+  @override
+  String get errorLoadingBookmarks => 'Error loading bookmarks';
+
+  @override
+  String get noBookmarks => 'No Bookmarks';
+
+  @override
+  String get allBookmarksCleared => 'All bookmarks cleared';
+
+  @override
   String get salamAlaikum => 'As-salamu alaykum';
 
   @override

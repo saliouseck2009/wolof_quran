@@ -149,5 +149,9 @@
   "searchError": "Erreur de recherche",
   "searchQuran": "Rechercher dans le Coran",
   "searchTheQuran": "Recherchez dans le Coran",
-  "tryDifferentSearchTerms": "Essayez d'autres termes de recherche"
+  "tryDifferentSearchTerms": "Essayez d'autres termes de recherche",
+  "explorer": "Explorer",
+  "errorLoadingBookmarks": "Erreur lors du chargement des signets",
+  "noBookmarks": "Aucun signet",
+  "allBookmarksCleared": "Tous les signets ont été supprimés"
 }
