@@ -72,6 +72,10 @@
   "@search": {
     "description": "Search text"
   },
+  "features": "Features",
+  "@features": {
+    "description": "Home quick actions section title"
+  },
   "searchInQuran": "Search in Quran",
   "@searchInQuran": {
     "description": "Search in Quran placeholder"

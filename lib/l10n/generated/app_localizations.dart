@@ -208,6 +208,12 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get search;
 
+  /// Home quick actions section title
+  ///
+  /// In en, this message translates to:
+  /// **'Features'**
+  String get features;
+
   /// Search in Quran placeholder
   ///
   /// In en, this message translates to:

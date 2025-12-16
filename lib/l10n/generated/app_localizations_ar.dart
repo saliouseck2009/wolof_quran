@@ -63,6 +63,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get search => 'بحث';
 
   @override
+  String get features => 'الميزات';
+
+  @override
   String get searchInQuran => 'البحث في القرآن';
 
   @override

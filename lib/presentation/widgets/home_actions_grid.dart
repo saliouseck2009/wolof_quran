@@ -26,15 +26,15 @@ class HomeActionsGrid extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(context, '/surahs'),
               ),
             ),
-            SizedBox(
-              width: cardWidth,
-              child: _ModernActionCard(
-                icon: Icons.headphones_outlined,
-                title: localizations.recitation,
-                subtitle: localizations.listenAudio,
-                onTap: () => Navigator.pushNamed(context, '/surah-audio-list'),
-              ),
-            ),
+            // SizedBox(
+            //   width: cardWidth,
+            //   child: _ModernActionCard(
+            //     icon: Icons.headphones_outlined,
+            //     title: localizations.recitation,
+            //     subtitle: localizations.listenAudio,
+            //     onTap: () => Navigator.pushNamed(context, '/surah-audio-list'),
+            //   ),
+            // ),
             SizedBox(
               width: cardWidth,
               child: _ModernActionCard(

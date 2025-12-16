@@ -63,6 +63,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get search => 'Rechercher';
 
   @override
+  String get features => 'Fonctionnalités';
+
+  @override
   String get searchInQuran => 'Rechercher dans le Coran';
 
   @override

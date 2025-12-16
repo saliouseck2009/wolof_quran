@@ -63,6 +63,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get search => 'Search';
 
   @override
+  String get features => 'Features';
+
+  @override
   String get searchInQuran => 'Search in Quran';
 
   @override

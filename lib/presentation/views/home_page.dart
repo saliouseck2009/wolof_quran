@@ -42,8 +42,7 @@ class HomePage extends StatelessWidget {
                 current is AudioManagementError &&
                 previous is! AudioManagementError,
             listener: (context, audioState) {
-              final isCurrentRoute =
-                  ModalRoute.of(context)?.isCurrent ?? true;
+              final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
               if (!isCurrentRoute) return;
               if (audioState is AudioManagementError) {
                 final theme = Theme.of(context);
@@ -105,12 +104,11 @@ class HomePage extends StatelessWidget {
 
                       // Quick Actions Title
                       Text(
-                        localizations.search, // Using available localization
+                        localizations.features,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                           color: colorScheme.onSurface,
-                          fontFamily: 'Hafs',
                         ),
                       ),
                       const SizedBox(height: 16),

@@ -218,9 +218,6 @@ class DailyInspirationCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: colorScheme.primary.withValues(alpha: 0.4),
-                      ),
                     ),
                     child: Text(
                       '${state.surahName} : ${state.verseNumber}',
@@ -298,12 +295,11 @@ class DailyInspirationCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: accentGreen.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: accentGreen.withValues(alpha: 0.2)),
                 ),
                 child: Text(
                   state.arabicText,
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontFamily: 'Hafs',
                     color: colorScheme.onSurface,
                     height: 1.8,

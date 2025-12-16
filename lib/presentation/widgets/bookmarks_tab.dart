@@ -128,8 +128,7 @@ class BookmarksTab extends StatelessWidget {
                 // Bookmarks list
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    //padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
                     itemCount: state.bookmarks.length,
                     itemBuilder: (context, index) {
                       final bookmark = state.bookmarks[index];
