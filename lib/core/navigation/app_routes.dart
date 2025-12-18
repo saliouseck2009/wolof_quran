@@ -10,6 +10,7 @@ import 'package:wolof_quran/presentation/views/reciter_list_page.dart';
 import 'package:wolof_quran/presentation/views/reciter_chapters_download_page.dart';
 import 'package:wolof_quran/presentation/views/search_page.dart';
 import 'package:wolof_quran/domain/entities/reciter.dart';
+import 'package:wolof_quran/core/navigation/surah_detail_arguments.dart';
 
 class AppRoutes {
   static Route onGenerateRoutes(RouteSettings settings) {
@@ -23,9 +24,27 @@ class AppRoutes {
       case '/surahs':
         return _materialRoute(view: SurahListPage(), settings: settings);
       case '/surah-detail':
-        final surahNumber = args as int;
+        int surahNumber;
+        int? initialAyahNumber;
+
+        if (args is SurahDetailArguments) {
+          surahNumber = args.surahNumber;
+          initialAyahNumber = args.initialAyahNumber;
+        } else if (args is int) {
+          surahNumber = args;
+        } else if (args is Map && args['surahNumber'] is int) {
+          surahNumber = args['surahNumber'] as int;
+          if (args['initialAyahNumber'] is int) {
+            initialAyahNumber = args['initialAyahNumber'] as int;
+          }
+        } else {
+          return _errorRoute(settings);
+        }
         return _materialRoute(
-          view: SurahDetailPage(surahNumber: surahNumber),
+          view: SurahDetailPage(
+            surahNumber: surahNumber,
+            initialAyahNumber: initialAyahNumber,
+          ),
           settings: settings,
         );
       case '/quran-settings':

@@ -23,8 +23,13 @@ import '../../domain/usecases/get_downloaded_surahs_usecase.dart';
 class SurahDetailPage extends StatelessWidget {
   static const String routeName = "/surah-detail";
   final int surahNumber;
+  final int? initialAyahNumber;
 
-  const SurahDetailPage({super.key, required this.surahNumber});
+  const SurahDetailPage({
+    super.key,
+    required this.surahNumber,
+    this.initialAyahNumber,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,15 +43,23 @@ class SurahDetailPage extends StatelessWidget {
               BookmarkCubit(locator<BookmarkRepository>())..loadBookmarks(),
         ),
       ],
-      child: SurahDetailView(surahNumber: surahNumber),
+      child: SurahDetailView(
+        surahNumber: surahNumber,
+        initialAyahNumber: initialAyahNumber,
+      ),
     );
   }
 }
 
 class SurahDetailView extends StatelessWidget {
   final int surahNumber;
+  final int? initialAyahNumber;
 
-  const SurahDetailView({super.key, required this.surahNumber});
+  const SurahDetailView({
+    super.key,
+    required this.surahNumber,
+    this.initialAyahNumber,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +86,11 @@ class SurahDetailView extends StatelessWidget {
             return const SizedBox.shrink();
           }
 
-          return SurahDetailContent(state: state, surahNumber: surahNumber);
+          return SurahDetailContent(
+            state: state,
+            surahNumber: surahNumber,
+            initialAyahNumber: initialAyahNumber,
+          );
         },
       ),
     );
@@ -130,18 +147,76 @@ class SurahDetailErrorWidget extends StatelessWidget {
   }
 }
 
-class SurahDetailContent extends StatelessWidget {
+class SurahDetailContent extends StatefulWidget {
   final SurahDetailLoaded state;
   final int surahNumber;
+  final int? initialAyahNumber;
 
   const SurahDetailContent({
     super.key,
     required this.state,
     required this.surahNumber,
+    this.initialAyahNumber,
   });
 
-  void _initializeAudioManagement(BuildContext context) {
-    // Initialize the AudioManagementCubit if not already initialized
+  @override
+  State<SurahDetailContent> createState() => _SurahDetailContentState();
+}
+
+class _SurahDetailContentState extends State<SurahDetailContent> {
+  late final ScrollController _scrollController;
+  late List<GlobalKey> _ayahKeys;
+  bool _hasScrolledToInitialAyah = false;
+
+  static const int _maxScrollAttempts = 6;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _buildAyahKeys();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeAudioManagement();
+      _scrollToInitialAyahIfNeeded();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant SurahDetailContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final hasAyahCountChanged =
+        widget.state.ayahs.length != oldWidget.state.ayahs.length;
+    final hasSurahChanged =
+        widget.state.surahNumber != oldWidget.state.surahNumber;
+    if (hasAyahCountChanged || hasSurahChanged) {
+      _buildAyahKeys();
+      _hasScrolledToInitialAyah = false;
+    }
+
+    if (widget.initialAyahNumber != oldWidget.initialAyahNumber) {
+      _hasScrolledToInitialAyah = false;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToInitialAyahIfNeeded();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _buildAyahKeys() {
+    _ayahKeys = List.generate(
+      widget.state.ayahs.length,
+      (_) => GlobalKey(),
+    );
+  }
+
+  void _initializeAudioManagement() {
     final audioManagementCubit = context.read<AudioManagementCubit>();
     final currentState = audioManagementCubit.state;
 
@@ -149,45 +224,91 @@ class SurahDetailContent extends StatelessWidget {
       audioManagementCubit.initialize();
     }
 
-    // Load ayah audios for this surah with the selected reciter
     final quranSettingsCubit = context.read<QuranSettingsCubit>();
     final quranSettingsState = quranSettingsCubit.state;
 
     if (quranSettingsState.selectedReciter != null) {
       audioManagementCubit.loadAyahAudios(
         quranSettingsState.selectedReciter!.id,
-        surahNumber,
+        widget.surahNumber,
       );
     }
   }
 
+  void _scrollToInitialAyahIfNeeded() {
+    if (_hasScrolledToInitialAyah || widget.initialAyahNumber == null) {
+      return;
+    }
+
+    final targetIndex = widget.initialAyahNumber! - 1;
+    if (targetIndex < 0 || targetIndex >= _ayahKeys.length) {
+      _hasScrolledToInitialAyah = true;
+      return;
+    }
+
+    _attemptScrollToAyah(targetIndex, 0);
+  }
+
+  void _attemptScrollToAyah(int index, int attempt) {
+    if (_hasScrolledToInitialAyah) return;
+
+    if (!_scrollController.hasClients) {
+      _scheduleRetry(index, attempt + 1);
+      return;
+    }
+
+    final ayahContext = _ayahKeys[index].currentContext;
+    if (ayahContext != null) {
+      Scrollable.ensureVisible(
+        ayahContext,
+        duration: const Duration(milliseconds: 450),
+        alignment: 0.08,
+        curve: Curves.easeInOut,
+      );
+      _hasScrolledToInitialAyah = true;
+      return;
+    }
+
+    final position = _scrollController.position;
+    final maxScrollExtent = position.maxScrollExtent;
+    if (maxScrollExtent > 0) {
+      final estimatedOffset =
+          (maxScrollExtent * (index / _ayahKeys.length))
+              .clamp(0.0, maxScrollExtent);
+      _scrollController.jumpTo(estimatedOffset);
+    }
+
+    _scheduleRetry(index, attempt + 1);
+  }
+
+  void _scheduleRetry(int index, int nextAttempt) {
+    if (nextAttempt >= _maxScrollAttempts) {
+      _hasScrolledToInitialAyah = true;
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _attemptScrollToAyah(index, nextAttempt);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Initialize audio management when widget builds
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeAudioManagement(context);
-    });
-
     return CustomScrollView(
+      controller: _scrollController,
       slivers: [
-        // Modern App Bar with Surah Info
-        SurahDetailAppBar(state: state),
-
-        // Basmala (except for Surah At-Tawbah) - only show if Arabic is visible
-        if (surahNumber != 9 &&
-            (state.displayMode == AyahDisplayMode.both ||
-                state.displayMode == AyahDisplayMode.arabicOnly))
+        SurahDetailAppBar(state: widget.state),
+        if (widget.surahNumber != 9 &&
+            (widget.state.displayMode == AyahDisplayMode.both ||
+                widget.state.displayMode == AyahDisplayMode.arabicOnly))
           const SurahBasmalaWidget(),
-
-        // List of Ayahs
         SurahAyahsList(
-          surahNumber: surahNumber,
-          ayahs: state.ayahs,
-          translationSource: state.translationSource,
-          displayMode: state.displayMode,
+          surahNumber: widget.surahNumber,
+          ayahs: widget.state.ayahs,
+          translationSource: widget.state.translationSource,
+          displayMode: widget.state.displayMode,
+          ayahKeys: _ayahKeys,
         ),
-
-        // Bottom padding
         const SliverToBoxAdapter(child: SizedBox(height: 64)),
       ],
     );
@@ -525,6 +646,7 @@ class SurahAyahsList extends StatelessWidget {
   final List<AyahData> ayahs;
   final String translationSource;
   final AyahDisplayMode displayMode;
+  final List<GlobalKey> ayahKeys;
 
   const SurahAyahsList({
     super.key,
@@ -532,6 +654,7 @@ class SurahAyahsList extends StatelessWidget {
     required this.ayahs,
     required this.translationSource,
     required this.displayMode,
+    required this.ayahKeys,
   });
 
   @override
@@ -541,6 +664,7 @@ class SurahAyahsList extends StatelessWidget {
       delegate: SliverChildBuilderDelegate((context, index) {
         final ayah = ayahs[index];
         return AyahCard(
+          key: ayahKeys[index],
           verseNumber: ayah.verseNumber,
           arabicText: ayah.arabicText,
           translationSource: translationSource,

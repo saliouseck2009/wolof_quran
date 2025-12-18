@@ -216,7 +216,7 @@ class _ReciterChaptersContent extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isDark
-                ? accentGreen.withValues(alpha: 0.15)
+                ? accentGreen.withValues(alpha: 0.05)
                 : Theme.of(context).colorScheme.onPrimary,
             borderRadius: BorderRadius.circular(12),
             border: isDark

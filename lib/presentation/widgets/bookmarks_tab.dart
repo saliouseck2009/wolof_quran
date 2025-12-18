@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wolof_quran/core/config/theme/app_color.dart';
+import 'package:wolof_quran/core/navigation/surah_detail_arguments.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/bookmark_cubit.dart';
@@ -233,7 +234,10 @@ class BookmarksTab extends StatelessWidget {
                                     Navigator.pushNamed(
                                       context,
                                       '/surah-detail',
-                                      arguments: bookmark.surahNumber,
+                                      arguments: SurahDetailArguments(
+                                        surahNumber: bookmark.surahNumber,
+                                        initialAyahNumber: bookmark.verseNumber,
+                                      ),
                                     );
                                   },
                                 ),

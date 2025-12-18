@@ -11,6 +11,7 @@ import '../widgets/bookmarks_tab.dart';
 import '../widgets/app_search_bar.dart';
 import '../../service_locator.dart';
 import '../../domain/repositories/bookmark_repository.dart';
+import '../../core/navigation/surah_detail_arguments.dart';
 
 class SearchPage extends StatelessWidget {
   static const String routeName = "/search";
@@ -569,7 +570,10 @@ class _SearchViewState extends State<SearchView> {
                           Navigator.pushNamed(
                             context,
                             '/surah-detail',
-                            arguments: result.surahNumber,
+                            arguments: SurahDetailArguments(
+                              surahNumber: result.surahNumber,
+                              initialAyahNumber: result.verseNumber,
+                            ),
                           );
                         },
                       ),

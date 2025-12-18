@@ -299,24 +299,28 @@ class _SurahListViewState extends State<_SurahListView> {
                       // Verses count and revelation type
                       Row(
                         children: [
-                          _buildInfoChip(
-                            context,
-                            '$versesCount ${localizations.verses}',
-                            Icons.format_list_numbered,
-                            colorScheme.secondary,
+                          Flexible(
+                            child: _buildInfoChip(
+                              context,
+                              '$versesCount ${localizations.verses}',
+                              Icons.format_list_numbered,
+                              colorScheme.secondary,
+                            ),
                           ),
                           const SizedBox(width: 4),
-                          _buildInfoChip(
-                            context,
-                            revelationType == RevelationPlaceEnum.meccan
-                                ? localizations.meccan
-                                : localizations.medinan,
-                            revelationType == RevelationPlaceEnum.meccan
-                                ? Icons.location_on
-                                : Icons.location_city,
-                            revelationType == RevelationPlaceEnum.meccan
-                                ? colorScheme.secondary
-                                : colorScheme.primary,
+                          Flexible(
+                            child: _buildInfoChip(
+                              context,
+                              revelationType == RevelationPlaceEnum.meccan
+                                  ? localizations.meccan
+                                  : localizations.medinan,
+                              revelationType == RevelationPlaceEnum.meccan
+                                  ? Icons.location_on
+                                  : Icons.location_city,
+                              revelationType == RevelationPlaceEnum.meccan
+                                  ? colorScheme.secondary
+                                  : colorScheme.primary,
+                            ),
                           ),
                         ],
                       ),
@@ -364,11 +368,14 @@ class _SurahListViewState extends State<_SurahListView> {
         children: [
           Icon(icon, size: 12, color: color),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w500,
+          Flexible(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

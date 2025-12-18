@@ -6,6 +6,7 @@ import '../cubits/daily_inspiration_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/bookmark_cubit.dart';
 import '../../domain/entities/bookmark.dart';
+import '../../core/navigation/surah_detail_arguments.dart';
 import 'ayah_play_button.dart';
 import 'home_header.dart'; // For AppIcon
 import 'daily_inspiration_share_modal.dart';
@@ -206,71 +207,62 @@ class DailyInspirationCard extends StatelessWidget {
           children: [
             // Header with Islamic logo and title
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
               children: [
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${state.surahName} : ${state.verseNumber}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w600,
                     ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${state.surahName} : ${state.verseNumber}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
-
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      AyahPlayButton(
-                        surahNumber: state.surahNumber,
-                        ayahNumber: state.verseNumber,
-                        surahName: state.surahName,
-                        size: 18.0,
-                        color: accentGreen,
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          showDailyInspirationShareModal(
-                            context,
-                            state.verseNumber,
-                            state.arabicText,
-                            state.translation,
-                            _getTranslationSourceName(state.currentTranslation),
-                            state.surahName,
-                            state.surahNumber,
-                          );
-                        },
-                        icon: Icon(Icons.share, color: accentGreen, size: 18),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          final settingsCubit = context
-                              .read<QuranSettingsCubit>();
-                          final currentTranslation =
-                              settingsCubit.state.selectedTranslation;
-                          context.read<DailyInspirationCubit>().refreshAyah(
-                            currentTranslation,
-                          );
-                        },
-                        icon: Icon(Icons.refresh, color: accentGreen, size: 18),
-                      ),
-                    ],
-                  ),
+                const Spacer(),
+                AyahPlayButton(
+                  surahNumber: state.surahNumber,
+                  ayahNumber: state.verseNumber,
+                  surahName: state.surahName,
+                  size: 18.0,
+                  color: accentGreen,
+                ),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () {
+                    showDailyInspirationShareModal(
+                      context,
+                      state.verseNumber,
+                      state.arabicText,
+                      state.translation,
+                      _getTranslationSourceName(state.currentTranslation),
+                      state.surahName,
+                      state.surahNumber,
+                    );
+                  },
+                  icon: Icon(Icons.share, color: accentGreen, size: 18),
+                ),
+                IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () {
+                    final settingsCubit = context.read<QuranSettingsCubit>();
+                    final currentTranslation =
+                        settingsCubit.state.selectedTranslation;
+                    context.read<DailyInspirationCubit>().refreshAyah(
+                      currentTranslation,
+                    );
+                  },
+                  icon: Icon(Icons.refresh, color: accentGreen, size: 18),
                 ),
               ],
             ),
@@ -319,7 +311,10 @@ class DailyInspirationCard extends StatelessWidget {
                         Navigator.pushNamed(
                           context,
                           '/surah-detail',
-                          arguments: state.surahNumber,
+                          arguments: SurahDetailArguments(
+                            surahNumber: state.surahNumber,
+                            initialAyahNumber: state.verseNumber,
+                          ),
                         );
                       },
                       icon: const Icon(Icons.open_in_new, size: 16),
