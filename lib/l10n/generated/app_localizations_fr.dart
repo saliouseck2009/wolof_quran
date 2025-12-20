@@ -302,6 +302,54 @@ class AppLocalizationsFr extends AppLocalizations {
   String get shareImage => 'Partager l\'Image';
 
   @override
+  String get shareVideo => 'Partager la Vidéo';
+
+  @override
+  String get shareCaptureFailed => 'Impossible de capturer l’image.';
+
+  @override
+  String get shareVideoGenerationFailed => 'Échec de la génération vidéo.';
+
+  @override
+  String get shareActionCancelled => 'Action annulée.';
+
+  @override
+  String get shareSelectReciterForVideo =>
+      'Veuillez sélectionner un récitateur pour générer la vidéo.';
+
+  @override
+  String get shareAudioUnavailableForSurah =>
+      'Audio non disponible pour cette sourate.';
+
+  @override
+  String get shareAudioNotDownloaded =>
+      'Audio non téléchargé pour ce récitateur. Téléchargez les audios puis réessayez.';
+
+  @override
+  String get shareAudioFileMissingAyah =>
+      'Fichier audio introuvable pour cet ayah.';
+
+  @override
+  String get shareAudioFileMissingDevice =>
+      'Fichier audio manquant sur l’appareil.';
+
+  @override
+  String get shareDismissed => 'Partage annulé.';
+
+  @override
+  String get shareUnavailable => 'Partage indisponible sur cet appareil.';
+
+  @override
+  String shareUnexpectedError(String error) {
+    return 'Erreur : $error';
+  }
+
+  @override
+  String shareDefaultText(String surahName, int verseNumber) {
+    return 'Inspiration quotidienne - $surahName - Verset $verseNumber';
+  }
+
+  @override
   String get bookmarkAdded => 'Marque-page ajouté';
 
   @override

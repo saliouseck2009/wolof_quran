@@ -404,6 +404,74 @@
   "@shareImage": {
     "description": "Final share button text"
   },
+  "shareVideo": "Share Video",
+  "@shareVideo": {
+    "description": "Share video button text"
+  },
+  "shareCaptureFailed": "Could not capture the image.",
+  "@shareCaptureFailed": {
+    "description": "Error shown when screenshot capture fails"
+  },
+  "shareVideoGenerationFailed": "Failed to generate video.",
+  "@shareVideoGenerationFailed": {
+    "description": "Error shown when video creation fails"
+  },
+  "shareActionCancelled": "Action cancelled.",
+  "@shareActionCancelled": {
+    "description": "Message shown when user cancels a share action"
+  },
+  "shareSelectReciterForVideo": "Please select a reciter to generate the video.",
+  "@shareSelectReciterForVideo": {
+    "description": "Prompt to select a reciter before creating a video"
+  },
+  "shareAudioUnavailableForSurah": "Audio unavailable for this surah.",
+  "@shareAudioUnavailableForSurah": {
+    "description": "Message when audio isn't available for the surah"
+  },
+  "shareAudioNotDownloaded": "Audio not downloaded for this reciter. Download the audios then try again.",
+  "@shareAudioNotDownloaded": {
+    "description": "Message when audio for the reciter is missing"
+  },
+  "shareAudioFileMissingAyah": "Audio file not found for this ayah.",
+  "@shareAudioFileMissingAyah": {
+    "description": "Message when specific ayah audio file is missing"
+  },
+  "shareAudioFileMissingDevice": "Audio file missing on the device.",
+  "@shareAudioFileMissingDevice": {
+    "description": "Message when expected audio file doesn't exist on device"
+  },
+  "shareDismissed": "Share cancelled.",
+  "@shareDismissed": {
+    "description": "Message when share sheet is dismissed"
+  },
+  "shareUnavailable": "Sharing unavailable on this device.",
+  "@shareUnavailable": {
+    "description": "Message when sharing is not supported"
+  },
+  "shareUnexpectedError": "Error: {error}",
+  "@shareUnexpectedError": {
+    "description": "Unexpected error while sharing",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "description": "The error message"
+      }
+    }
+  },
+  "shareDefaultText": "Daily Inspiration - {surahName} - Verse {verseNumber}",
+  "@shareDefaultText": {
+    "description": "Default text shared alongside exported ayah",
+    "placeholders": {
+      "surahName": {
+        "type": "String",
+        "description": "The name of the surah"
+      },
+      "verseNumber": {
+        "type": "int",
+        "description": "The ayah/verse number"
+      }
+    }
+  },
   "bookmarkAdded": "Bookmark added",
   "@bookmarkAdded": {
     "description": "Confirmation message when bookmark is added"

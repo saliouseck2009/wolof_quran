@@ -148,7 +148,7 @@ class _DailyInspirationShareModalState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Share Ayah ',
+                  localizations.shareAyah,
                   style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: colorScheme.onSurface,
@@ -169,11 +169,11 @@ class _DailyInspirationShareModalState
                 children: [
                   RepaintBoundary(key: _captureKey, child: _buildPreviewCard()),
                   const SizedBox(height: 32),
-                  _buildSectionTitle('Background Style'),
+                  _buildSectionTitle(localizations.backgroundStyle),
                   const SizedBox(height: 16),
                   _buildBackgroundColorSelector(),
                   const SizedBox(height: 32),
-                  _buildSectionTitle('Display Style'),
+                  _buildSectionTitle(localizations.displayStyle),
                   const SizedBox(height: 16),
                   _buildDisplayModeSelector(localizations),
                   const SizedBox(height: 32),
@@ -188,7 +188,7 @@ class _DailyInspirationShareModalState
                             color: colorScheme.onPrimary,
                           ),
                           label: Text(
-                            'Share Image',
+                            localizations.shareImage,
                             style: textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: colorScheme.onPrimary,
@@ -214,7 +214,7 @@ class _DailyInspirationShareModalState
                             color: colorScheme.primary,
                           ),
                           label: Text(
-                            'Share Video',
+                            localizations.shareVideo,
                             style: textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w700,
                               color: colorScheme.primary,
@@ -480,28 +480,33 @@ class _DailyInspirationShareModalState
   }
 
   Future<void> _shareImage() async {
+    final localizations = AppLocalizations.of(context)!;
     await _shareWithGuard(
       originKey: _shareImageButtonKey,
       prepareFiles: () async {
         final imageFile = await _capturePreviewToFile();
         if (imageFile == null) {
-          _showMessage('Impossible de capturer l’image.');
+          _showMessage(localizations.shareCaptureFailed);
           return null;
         }
         return [XFile(imageFile.path, mimeType: 'image/png')];
       },
-      shareText: '${widget.surahName} - Verse ${widget.verseNumber}',
-      fallbackMessage: 'Action annulée.',
+      shareText: localizations.shareDefaultText(
+        widget.surahName,
+        widget.verseNumber,
+      ),
+      fallbackMessage: localizations.shareActionCancelled,
     );
   }
 
   Future<void> _shareVideo() async {
+    final localizations = AppLocalizations.of(context)!;
     await _shareWithGuard(
       originKey: _shareVideoButtonKey,
       prepareFiles: () async {
         final imageFile = await _capturePreviewToFile(jpeg: true);
         if (imageFile == null) {
-          _showMessage('Impossible de capturer l’image.');
+          _showMessage(localizations.shareCaptureFailed);
           return null;
         }
 
@@ -513,15 +518,17 @@ class _DailyInspirationShareModalState
           audioPath: audioPath,
         );
         if (videoPath == null) {
-          _showMessage('Échec de la génération vidéo.');
+          _showMessage(localizations.shareVideoGenerationFailed);
           return null;
         }
 
         return [XFile(videoPath, mimeType: 'video/mp4')];
       },
-      shareText:
-          'Daily Inspiration - ${widget.surahName} - Verse ${widget.verseNumber}',
-      fallbackMessage: 'Action annulée.',
+      shareText: localizations.shareDefaultText(
+        widget.surahName,
+        widget.verseNumber,
+      ),
+      fallbackMessage: localizations.shareActionCancelled,
     );
   }
 
@@ -534,6 +541,7 @@ class _DailyInspirationShareModalState
     if (_isSharing) return;
     _isSharing = true;
 
+    final localizations = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -573,7 +581,7 @@ class _DailyInspirationShareModalState
           SnackBar(
             behavior: SnackBarBehavior.fixed,
             content: Text(
-              'Error: $e',
+              localizations.shareUnexpectedError(e.toString()),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onError,
               ),
@@ -603,6 +611,7 @@ class _DailyInspirationShareModalState
   }
 
   void _handleShareResult(ShareResult result) {
+    final localizations = AppLocalizations.of(context)!;
     switch (result.status) {
       case ShareResultStatus.success:
         if (Navigator.of(context).canPop()) {
@@ -610,10 +619,10 @@ class _DailyInspirationShareModalState
         }
         break;
       case ShareResultStatus.dismissed:
-        _showMessage('Partage annulé.');
+        _showMessage(localizations.shareDismissed);
         break;
       case ShareResultStatus.unavailable:
-        _showMessage('Partage indisponible sur cet appareil.');
+        _showMessage(localizations.shareUnavailable);
         break;
     }
   }
@@ -658,12 +667,11 @@ class _DailyInspirationShareModalState
   }
 
   Future<String?> _getAyahAudioPath() async {
+    final localizations = AppLocalizations.of(context)!;
     final quranSettings = context.read<QuranSettingsCubit>();
     final selectedReciter = quranSettings.state.selectedReciter;
     if (selectedReciter == null) {
-      _showMessage(
-        'Veuillez sélectionner un récitateur pour générer la vidéo.',
-      );
+      _showMessage(localizations.shareSelectReciterForVideo);
       return null;
     }
 
@@ -687,14 +695,12 @@ class _DailyInspirationShareModalState
       final key = '${selectedReciter.id}_${widget.surahNumber}';
       ayahAudios = audioState.previousAyahAudiosMap[key] ?? [];
     } else {
-      _showMessage('Audio non disponible pour cette sourate.');
+      _showMessage(localizations.shareAudioUnavailableForSurah);
       return null;
     }
 
     if (ayahAudios.isEmpty) {
-      _showMessage(
-        'Audio non téléchargé pour ce récitateur. Téléchargez les audios puis réessayez.',
-      );
+      _showMessage(localizations.shareAudioNotDownloaded);
       return null;
     }
 
@@ -709,13 +715,13 @@ class _DailyInspirationShareModalState
     );
 
     if ((ayahAudio.surahNumber == -1 || ayahAudio.localPath.isEmpty)) {
-      _showMessage('Fichier audio introuvable pour cet ayah.');
+      _showMessage(localizations.shareAudioFileMissingAyah);
       return null;
     }
 
     final file = File(ayahAudio.localPath ?? '');
     if (!await file.exists()) {
-      _showMessage('Fichier audio manquant sur l’appareil.');
+      _showMessage(localizations.shareAudioFileMissingDevice);
       return null;
     }
 
@@ -739,7 +745,7 @@ class _DailyInspirationShareModalState
     if (!ReturnCode.isSuccess(returnCode)) {
       final output = await session.getOutput();
       log('FFmpeg command failed with output: $output');
-      throw Exception('Video generation failed: $output');
+      return null;
     }
 
     return outputPath;

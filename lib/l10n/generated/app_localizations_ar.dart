@@ -296,6 +296,50 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareImage => 'مشاركة الصورة';
 
   @override
+  String get shareVideo => 'مشاركة فيديو';
+
+  @override
+  String get shareCaptureFailed => 'تعذّر التقاط الصورة.';
+
+  @override
+  String get shareVideoGenerationFailed => 'فشل إنشاء الفيديو.';
+
+  @override
+  String get shareActionCancelled => 'تم إلغاء العملية.';
+
+  @override
+  String get shareSelectReciterForVideo => 'يرجى اختيار قارئ لإنشاء الفيديو.';
+
+  @override
+  String get shareAudioUnavailableForSurah => 'الصوت غير متوفر لهذه السورة.';
+
+  @override
+  String get shareAudioNotDownloaded =>
+      'الصوت غير محمّل لهذا القارئ. حمّل الملفات ثم أعد المحاولة.';
+
+  @override
+  String get shareAudioFileMissingAyah => 'ملف الصوت غير موجود لهذه الآية.';
+
+  @override
+  String get shareAudioFileMissingDevice => 'ملف الصوت غير موجود على الجهاز.';
+
+  @override
+  String get shareDismissed => 'تم إلغاء المشاركة.';
+
+  @override
+  String get shareUnavailable => 'المشاركة غير متاحة على هذا الجهاز.';
+
+  @override
+  String shareUnexpectedError(String error) {
+    return 'خطأ: $error';
+  }
+
+  @override
+  String shareDefaultText(String surahName, int verseNumber) {
+    return 'الإلهام اليومي - $surahName - الآية $verseNumber';
+  }
+
+  @override
   String get bookmarkAdded => 'تم إضافة الإشارة المرجعية';
 
   @override

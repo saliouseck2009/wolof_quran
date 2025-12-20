@@ -646,6 +646,84 @@ abstract class AppLocalizations {
   /// **'Share Image'**
   String get shareImage;
 
+  /// Share video button text
+  ///
+  /// In en, this message translates to:
+  /// **'Share Video'**
+  String get shareVideo;
+
+  /// Error shown when screenshot capture fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not capture the image.'**
+  String get shareCaptureFailed;
+
+  /// Error shown when video creation fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to generate video.'**
+  String get shareVideoGenerationFailed;
+
+  /// Message shown when user cancels a share action
+  ///
+  /// In en, this message translates to:
+  /// **'Action cancelled.'**
+  String get shareActionCancelled;
+
+  /// Prompt to select a reciter before creating a video
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a reciter to generate the video.'**
+  String get shareSelectReciterForVideo;
+
+  /// Message when audio isn't available for the surah
+  ///
+  /// In en, this message translates to:
+  /// **'Audio unavailable for this surah.'**
+  String get shareAudioUnavailableForSurah;
+
+  /// Message when audio for the reciter is missing
+  ///
+  /// In en, this message translates to:
+  /// **'Audio not downloaded for this reciter. Download the audios then try again.'**
+  String get shareAudioNotDownloaded;
+
+  /// Message when specific ayah audio file is missing
+  ///
+  /// In en, this message translates to:
+  /// **'Audio file not found for this ayah.'**
+  String get shareAudioFileMissingAyah;
+
+  /// Message when expected audio file doesn't exist on device
+  ///
+  /// In en, this message translates to:
+  /// **'Audio file missing on the device.'**
+  String get shareAudioFileMissingDevice;
+
+  /// Message when share sheet is dismissed
+  ///
+  /// In en, this message translates to:
+  /// **'Share cancelled.'**
+  String get shareDismissed;
+
+  /// Message when sharing is not supported
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing unavailable on this device.'**
+  String get shareUnavailable;
+
+  /// Unexpected error while sharing
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String shareUnexpectedError(String error);
+
+  /// Default text shared alongside exported ayah
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Inspiration - {surahName} - Verse {verseNumber}'**
+  String shareDefaultText(String surahName, int verseNumber);
+
   /// Confirmation message when bookmark is added
   ///
   /// In en, this message translates to:
