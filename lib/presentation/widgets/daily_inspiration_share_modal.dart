@@ -916,6 +916,8 @@ class _AyahTexts extends StatelessWidget {
     const dividerHeight = 2.0;
     const dividerPadding = 12.0;
     const dividerSpace = dividerHeight + dividerPadding * 2;
+    const layoutSafety =
+        8.0; // Leave breathing room so we never clip the last line.
 
     final arabicStyle = TextStyle(
       fontFamily: 'Hafs',
@@ -955,7 +957,7 @@ class _AyahTexts extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = constraints.maxWidth;
-        final maxHeight = (constraints.maxHeight - dividerSpace)
+        final maxHeight = (constraints.maxHeight - dividerSpace - layoutSafety)
             .clamp(0.0, double.infinity)
             .toDouble();
 
