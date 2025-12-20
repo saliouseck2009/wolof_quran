@@ -68,6 +68,10 @@ class DailyInspirationShareModal extends StatefulWidget {
 class _DailyInspirationShareModalState
     extends State<DailyInspirationShareModal> {
   final GlobalKey _captureKey = GlobalKey();
+  final GlobalKey _shareImageButtonKey = GlobalKey();
+  final GlobalKey _shareVideoButtonKey = GlobalKey();
+
+  bool _isSharing = false;
 
   // Customization options
   late Color _selectedBackgroundColor;
@@ -177,6 +181,7 @@ class _DailyInspirationShareModalState
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
+                          key: _shareImageButtonKey,
                           onPressed: _shareImage,
                           icon: Icon(
                             Icons.image_outlined,
@@ -202,6 +207,7 @@ class _DailyInspirationShareModalState
                       const SizedBox(width: 12),
                       Expanded(
                         child: OutlinedButton.icon(
+                          key: _shareVideoButtonKey,
                           onPressed: _shareVideo,
                           icon: Icon(
                             Icons.movie_creation_outlined,
@@ -474,51 +480,60 @@ class _DailyInspirationShareModalState
   }
 
   Future<void> _shareImage() async {
-    await _shareWithGuard(_createImageAndShare);
+    await _shareWithGuard(
+      originKey: _shareImageButtonKey,
+      prepareFiles: () async {
+        final imageFile = await _capturePreviewToFile();
+        if (imageFile == null) {
+          _showMessage('Impossible de capturer l’image.');
+          return null;
+        }
+        return [XFile(imageFile.path, mimeType: 'image/png')];
+      },
+      shareText: '${widget.surahName} - Verse ${widget.verseNumber}',
+      fallbackMessage: 'Action annulée.',
+    );
   }
 
   Future<void> _shareVideo() async {
-    await _shareWithGuard(() async {
-      final imageFile = await _capturePreviewToFile(jpeg: true);
-      if (imageFile == null) {
-        _showMessage('Impossible de capturer l’image.');
-        return false;
-      }
+    await _shareWithGuard(
+      originKey: _shareVideoButtonKey,
+      prepareFiles: () async {
+        final imageFile = await _capturePreviewToFile(jpeg: true);
+        if (imageFile == null) {
+          _showMessage('Impossible de capturer l’image.');
+          return null;
+        }
 
-      final audioPath = await _getAyahAudioPath();
-      if (audioPath == null) return false;
+        final audioPath = await _getAyahAudioPath();
+        if (audioPath == null) return null;
 
-      final videoPath = await _generateVideoFromAssets(
-        imagePath: imageFile.path,
-        audioPath: audioPath,
-      );
-      if (videoPath == null) {
-        _showMessage('Échec de la génération vidéo.');
-        return false;
-      }
+        final videoPath = await _generateVideoFromAssets(
+          imagePath: imageFile.path,
+          audioPath: audioPath,
+        );
+        if (videoPath == null) {
+          _showMessage('Échec de la génération vidéo.');
+          return null;
+        }
 
-      await Share.shareXFiles(
-        [XFile(videoPath, mimeType: 'video/mp4')],
-        text:
-            'Daily Inspiration - ${widget.surahName} - Verse ${widget.verseNumber}',
-      );
-      return true;
-    });
-  }
-
-  Future<bool> _createImageAndShare() async {
-    final imageFile = await _capturePreviewToFile();
-    if (imageFile == null) return false;
-
-    await Share.shareXFiles(
-      [XFile(imageFile.path)],
-      text:
+        return [XFile(videoPath, mimeType: 'video/mp4')];
+      },
+      shareText:
           'Daily Inspiration - ${widget.surahName} - Verse ${widget.verseNumber}',
+      fallbackMessage: 'Action annulée.',
     );
-    return true;
   }
 
-  Future<void> _shareWithGuard(Future<bool> Function() action) async {
+  Future<void> _shareWithGuard({
+    required GlobalKey originKey,
+    required Future<List<XFile>?> Function() prepareFiles,
+    required String shareText,
+    required String fallbackMessage,
+  }) async {
+    if (_isSharing) return;
+    _isSharing = true;
+
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -526,35 +541,80 @@ class _DailyInspirationShareModalState
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Center(
+        useRootNavigator: true,
+        builder: (dialogContext) => Center(
           child: CircularProgressIndicator(color: colorScheme.primary),
         ),
       );
 
-      final didComplete = await action();
+      final files = await prepareFiles();
+
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+
+      if (!mounted || files == null || files.isEmpty) {
+        _showMessage(fallbackMessage);
+        return;
+      }
+
+      final result = await Share.shareXFiles(
+        files,
+        text: shareText,
+        sharePositionOrigin: _shareOrigin(originKey),
+      );
 
       if (!mounted) return;
-      Navigator.pop(context);
-      if (didComplete && mounted) {
-        Navigator.pop(context);
-      } else if (!didComplete) {
-        _showMessage('Action annulée.');
-      }
+      _handleShareResult(result);
     } catch (e) {
-      if (mounted) Navigator.pop(context);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.fixed,
-          content: Text(
-            'Error: $e',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onError,
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.fixed,
+            content: Text(
+              'Error: $e',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onError,
+              ),
             ),
+            backgroundColor: colorScheme.error,
           ),
-          backgroundColor: colorScheme.error,
-        ),
-      );
+        );
+      }
+    } finally {
+      _isSharing = false;
+    }
+  }
+
+  ui.Rect _shareOrigin(GlobalKey key) {
+    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null && renderBox.hasSize) {
+      final offset = renderBox.localToGlobal(Offset.zero);
+      return offset & renderBox.size;
+    }
+    final overlayBox =
+        Overlay.maybeOf(context)?.context.findRenderObject() as RenderBox?;
+    if (overlayBox != null && overlayBox.hasSize) {
+      final offset = overlayBox.localToGlobal(Offset.zero);
+      return offset & overlayBox.size;
+    }
+    return const ui.Rect.fromLTWH(0, 0, 1, 1);
+  }
+
+  void _handleShareResult(ShareResult result) {
+    switch (result.status) {
+      case ShareResultStatus.success:
+        if (Navigator.of(context).canPop()) {
+          Navigator.pop(context);
+        }
+        break;
+      case ShareResultStatus.dismissed:
+        _showMessage('Partage annulé.');
+        break;
+      case ShareResultStatus.unavailable:
+        _showMessage('Partage indisponible sur cet appareil.');
+        break;
     }
   }
 
