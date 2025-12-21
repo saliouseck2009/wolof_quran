@@ -210,10 +210,7 @@ class _SurahDetailContentState extends State<SurahDetailContent> {
   }
 
   void _buildAyahKeys() {
-    _ayahKeys = List.generate(
-      widget.state.ayahs.length,
-      (_) => GlobalKey(),
-    );
+    _ayahKeys = List.generate(widget.state.ayahs.length, (_) => GlobalKey());
   }
 
   void _initializeAudioManagement() {
@@ -272,9 +269,8 @@ class _SurahDetailContentState extends State<SurahDetailContent> {
     final position = _scrollController.position;
     final maxScrollExtent = position.maxScrollExtent;
     if (maxScrollExtent > 0) {
-      final estimatedOffset =
-          (maxScrollExtent * (index / _ayahKeys.length))
-              .clamp(0.0, maxScrollExtent);
+      final estimatedOffset = (maxScrollExtent * (index / _ayahKeys.length))
+          .clamp(0.0, maxScrollExtent);
       _scrollController.jumpTo(estimatedOffset);
     }
 
@@ -954,10 +950,7 @@ class SurahPlayButton extends StatelessWidget {
                                 audioState.surahNumber != surahNumber)) {
                           CustomSnackbar.showSnackbar(
                             context,
-                            AppLocalizations.of(
-                              context,
-                            )!
-                                .downloadInProgress,
+                            AppLocalizations.of(context)!.downloadInProgress,
                             duration: 2,
                           );
                           return;
@@ -1048,7 +1041,8 @@ class SurahPlayButton extends StatelessWidget {
 
                           final isPlaying =
                               isThisSurahPlaying &&
-                              playerState == AudioPlayerState.playing;
+                              (playerState == AudioPlayerState.playing ||
+                                  playerState == AudioPlayerState.loading);
                           final isPaused =
                               isThisSurahPlaying &&
                               playerState == AudioPlayerState.paused;
