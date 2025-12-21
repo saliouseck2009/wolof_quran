@@ -450,15 +450,12 @@ class _ChapterCard extends StatelessWidget {
                           .deleteSurahAudio(reciter.id, surahNumber);
                       onDownloadComplete();
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              localizations.surahAudioDeleted(
-                                getSurahDisplayName(surahNumber),
-                              ),
-                            ),
-                            duration: const Duration(seconds: 2),
+                        CustomSnackbar.showSnackbar(
+                          context,
+                          localizations.surahAudioDeleted(
+                            getSurahDisplayName(surahNumber),
                           ),
+                          duration: 2,
                         );
                       }
                     },

@@ -7,6 +7,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/reciter_cubit.dart';
 import '../../service_locator.dart';
+import '../widgets/snackbar.dart';
 
 class QuranSettingsPage extends StatelessWidget {
   static const String routeName = "/quran-settings";
@@ -311,11 +312,6 @@ class _QuranSettingsView extends StatelessWidget {
     QuranSettingsState state,
     AppLocalizations localizations,
   ) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accentGreen = isDark
-        ? Theme.of(context).colorScheme.secondary
-        : Theme.of(context).colorScheme.primary;
-
     final result = await showModalBottomSheet<TranslationOption?>(
       context: context,
       isScrollControlled: true,
@@ -332,12 +328,10 @@ class _QuranSettingsView extends StatelessWidget {
 
     // If translation was changed, show feedback and return true to parent
     if (result != null && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(localizations.translationUpdated(result.language)),
-          backgroundColor: accentGreen,
-          duration: const Duration(seconds: 2),
-        ),
+      CustomSnackbar.showSnackbar(
+        context,
+        localizations.translationUpdated(result.language),
+        duration: 2,
       );
       Navigator.pop(context, true);
     }

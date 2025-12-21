@@ -761,13 +761,10 @@ class SurahPlayButton extends StatelessWidget {
                 downloadStatusState.message,
                 localizations,
               );
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    localizations.errorCheckingDownloadStatus(formattedError),
-                  ),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
+              CustomSnackbar.showErrorSnackbar(
+                context,
+                localizations.errorCheckingDownloadStatus(formattedError),
+                duration: 3,
               );
             }
           },
@@ -955,15 +952,13 @@ class SurahPlayButton extends StatelessWidget {
                         if (audioState is AudioDownloading &&
                             (audioState.reciterId != selectedReciter.id ||
                                 audioState.surahNumber != surahNumber)) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                AppLocalizations.of(
-                                  context,
-                                )!.downloadInProgress,
-                              ),
-                              duration: const Duration(seconds: 2),
-                            ),
+                          CustomSnackbar.showSnackbar(
+                            context,
+                            AppLocalizations.of(
+                              context,
+                            )!
+                                .downloadInProgress,
+                            duration: 2,
                           );
                           return;
                         }

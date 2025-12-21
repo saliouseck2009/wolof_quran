@@ -4,6 +4,7 @@ import '../../core/services/audio_player_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/ayah_playback_cubit.dart';
+import 'snackbar.dart';
 
 /// A reusable play button widget for ayah audio playback
 /// that integrates with QuranSettingsCubit for selected reciter
@@ -51,34 +52,10 @@ class AyahPlayButton extends StatelessWidget {
                 playbackState.ayahNumber == ayahNumber) {
               final localizations = AppLocalizations.of(context)!;
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(
-                        Icons.download_outlined,
-                        color: colorScheme.onErrorContainer,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          localizations.audioNotAvailable,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onErrorContainer,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  backgroundColor: colorScheme.errorContainer,
-                  duration: const Duration(seconds: 3),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  margin: const EdgeInsets.all(16),
-                ),
+              CustomSnackbar.showErrorSnackbar(
+                context,
+                localizations.audioNotAvailable,
+                duration: 3,
               );
             }
           },

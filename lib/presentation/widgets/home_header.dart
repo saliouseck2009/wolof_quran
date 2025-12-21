@@ -1,4 +1,3 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
 
@@ -69,7 +68,7 @@ class AppIcon extends StatelessWidget {
     this.height = 60,
   });
 
-  final ui.Color accentGreen;
+  final Color accentGreen;
   final ColorScheme colorScheme;
 
   @override
@@ -79,7 +78,7 @@ class AppIcon extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [accentGreen, accentGreen.withValues(alpha: 0.8)],
+          colors: [accentGreen, accentGreen.withOpacity(0.8)],
         ),
         borderRadius: BorderRadius.circular(width / 2),
       ),

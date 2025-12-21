@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/navigation/surah_detail_arguments.dart';
+import 'package:wolof_quran/presentation/widgets/snackbar.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/bookmark_cubit.dart';
@@ -210,16 +211,9 @@ class BookmarksTab extends StatelessWidget {
                                           bookmark.surahNumber,
                                           bookmark.verseNumber,
                                         );
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          localizations.bookmarkRemoved,
-                                        ),
-                                        duration: const Duration(seconds: 1),
-                                        backgroundColor: Theme.of(
-                                          context,
-                                        ).colorScheme.primary,
-                                      ),
+                                    CustomSnackbar.showSnackbar(
+                                      context,
+                                      localizations.bookmarkRemoved,
                                     );
                                   },
                                 ),
@@ -329,11 +323,9 @@ class BookmarksTab extends StatelessWidget {
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 context.read<BookmarkCubit>().clearAllBookmarks();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(localizations.allBookmarksCleared),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                  ),
+                CustomSnackbar.showSnackbar(
+                  context,
+                  localizations.allBookmarksCleared,
                 );
               },
               child: Text(

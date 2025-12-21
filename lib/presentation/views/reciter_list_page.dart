@@ -5,6 +5,7 @@ import '../../l10n/generated/app_localizations.dart';
 
 import '../cubits/reciter_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
+import '../widgets/snackbar.dart';
 
 class ReciterListPage extends StatefulWidget {
   const ReciterListPage({super.key});
@@ -383,21 +384,13 @@ class _ReciterListPageState extends State<ReciterListPage> {
                                               .updateReciter(reciter);
 
                                           // Show feedback
-                                          ScaffoldMessenger.of(
+                                          CustomSnackbar.showSnackbar(
                                             context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                localizations
-                                                    .selectedAsDefaultReciter(
-                                                      reciter.name,
-                                                    ),
-                                              ),
-                                              backgroundColor: accentGreen,
-                                              duration: const Duration(
-                                                seconds: 2,
-                                              ),
-                                            ),
+                                            localizations
+                                                .selectedAsDefaultReciter(
+                                                  reciter.name,
+                                                ),
+                                            duration: 2,
                                           );
                                         },
                                         child: Container(

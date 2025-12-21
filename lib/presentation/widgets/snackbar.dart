@@ -59,7 +59,7 @@ class CustomSnackbar {
                   horizontal: 20,
                   vertical: 15,
                 ),
-                color: backgroundColor.withValues(alpha: 0.85),
+                color: backgroundColor.withOpacity(0.85),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -114,7 +114,7 @@ class CustomSnackbar {
                     horizontal: 20,
                     vertical: 15,
                   ),
-                  color: Colors.black87.withValues(alpha: 0.85),
+                  color: Colors.black87.withOpacity(0.85),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
