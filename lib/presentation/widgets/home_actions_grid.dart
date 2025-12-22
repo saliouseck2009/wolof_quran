@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wolof_quran/presentation/views/surah_audio_list_page.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 class HomeActionsGrid extends StatelessWidget {
@@ -32,7 +33,8 @@ class HomeActionsGrid extends StatelessWidget {
             //     icon: Icons.headphones_outlined,
             //     title: localizations.recitation,
             //     subtitle: localizations.listenAudio,
-            //     onTap: () => Navigator.pushNamed(context, '/surah-audio-list'),
+            //     onTap: () =>
+            //         Navigator.pushNamed(context, SurahAudioListPage.routeName),
             //   ),
             // ),
             SizedBox(
