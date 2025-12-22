@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 import 'package:wolof_quran/presentation/views/reciter_chapters_download_page.dart';
+import 'package:wolof_quran/presentation/widgets/reciter_chapters/chapter_number_widget.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 

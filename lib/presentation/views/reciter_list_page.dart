@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wolof_quran/core/config/theme/app_color.dart';
+import '../../domain/entities/reciter.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 import '../cubits/reciter_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
+import '../widgets/reciter_list/reciter_list_empty_state.dart';
+import '../widgets/reciter_list/reciter_list_error_state.dart';
+import '../widgets/reciter_list/reciter_list_view.dart';
 import '../widgets/snackbar.dart';
 
 class ReciterListPage extends StatefulWidget {
@@ -24,10 +28,27 @@ class _ReciterListPageState extends State<ReciterListPage> {
     context.read<QuranSettingsCubit>().loadSettings();
   }
 
+  void _openReciterChapters(Reciter reciter) {
+    Navigator.pushNamed(
+      context,
+      '/reciter-chapters',
+      arguments: reciter,
+    );
+  }
+
+  void _selectReciter(Reciter reciter) {
+    final localizations = AppLocalizations.of(context)!;
+    context.read<QuranSettingsCubit>().updateReciter(reciter);
+    CustomSnackbar.showSnackbar(
+      context,
+      localizations.selectedAsDefaultReciter(reciter.name),
+      duration: 2,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final accentGreen = colorScheme.primary;
     final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -65,368 +86,24 @@ class _ReciterListPageState extends State<ReciterListPage> {
           }
 
           if (reciterState is ReciterError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text(
-                    localizations.errorLoadingReciters,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    reciterState.message,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<ReciterCubit>().loadReciters();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: accentGreen,
-                      foregroundColor: colorScheme.onPrimary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      localizations.retry,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            return ReciterListErrorState(
+              message: reciterState.message,
+              onRetry: () => context.read<ReciterCubit>().loadReciters(),
             );
           }
 
           if (reciterState is ReciterLoaded) {
             if (reciterState.reciters.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.library_music_outlined,
-                      size: 64,
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      localizations.noRecitersAvailable,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      localizations.checkBackLaterReciters,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              );
+              return const ReciterListEmptyState();
             }
 
             return BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
               builder: (context, settingsState) {
-                final selectedReciter = settingsState.selectedReciter;
-
-                return CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            gradient: colorScheme.brightness == Brightness.dark
-                                ? LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      colorScheme.surfaceContainer.withValues(
-                                        alpha: 0.8,
-                                      ),
-                                      colorScheme.surfaceContainer.withValues(
-                                        alpha: 0.9,
-                                      ),
-                                    ],
-                                  )
-                                : LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      colorScheme.onPrimary,
-                                      colorScheme.onPrimary,
-                                    ],
-                                  ),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.record_voice_over,
-                                size: 48,
-                                color: colorScheme.primary,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                localizations.selectReciter,
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w700,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                localizations.browseAndSelectReciterHint,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final reciter = reciterState.reciters[index];
-                        final isSelected = selectedReciter?.id == reciter.id;
-                        final isDark =
-                            colorScheme.brightness == Brightness.dark;
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 6,
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? colorScheme.surfaceContainer
-                                  : colorScheme.onPrimary,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow:
-                                  colorScheme.brightness == Brightness.dark
-                                  ? [
-                                      BoxShadow(
-                                        color: colorScheme.primary.withValues(
-                                          alpha: 0.08,
-                                        ),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : null,
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(16),
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(16),
-                                onTap: () {
-                                  // Navigate to reciter chapters (restored original behavior)
-                                  Navigator.pushNamed(
-                                    context,
-                                    '/reciter-chapters',
-                                    arguments: reciter,
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: Row(
-                                    children: [
-                                      // Reciter icon container (consistent with settings page)
-                                      Container(
-                                        width: 48,
-                                        height: 48,
-                                        decoration: BoxDecoration(
-                                          color: accentGreen.withValues(
-                                            alpha: 0.12,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          Icons.person,
-                                          color: accentGreen,
-                                          size: 24,
-                                        ),
-                                      ),
-
-                                      const SizedBox(width: 16),
-
-                                      // Reciter info (consistent content structure)
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // English name (title)
-                                            Text(
-                                              reciter.name,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium
-                                                  ?.copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                    color:
-                                                        colorScheme.onSurface,
-                                                  ),
-                                            ),
-
-                                            const SizedBox(height: 4),
-
-                                            // Arabic name (subtitle)
-                                            Text(
-                                              reciter.arabicName,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall
-                                                  ?.copyWith(
-                                                    color: colorScheme
-                                                        .onSurfaceVariant,
-                                                  ),
-                                            ),
-
-                                            const SizedBox(height: 8),
-
-                                            // Status badge
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 6,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: isSelected
-                                                    ? accentGreen.withValues(
-                                                        alpha: 0.15,
-                                                      )
-                                                    : colorScheme
-                                                          .onSurfaceVariant
-                                                          .withValues(
-                                                            alpha: 0.12,
-                                                          ),
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                border: Border.all(
-                                                  color: isSelected
-                                                      ? accentGreen.withValues(
-                                                          alpha: 0.25,
-                                                        )
-                                                      : colorScheme
-                                                            .onSurfaceVariant
-                                                            .withValues(
-                                                              alpha: 0.2,
-                                                            ),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: Text(
-                                                isSelected
-                                                    ? localizations
-                                                          .defaultReciter
-                                                    : localizations.available,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodySmall
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: isSelected
-                                                          ? accentGreen
-                                                          : colorScheme
-                                                                .onSurfaceVariant,
-                                                    ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-
-                                      const SizedBox(width: 12),
-
-                                      // Selection action (consistent with settings page)
-                                      GestureDetector(
-                                        onTap: () {
-                                          // Select this reciter when tapping the selection area
-                                          context
-                                              .read<QuranSettingsCubit>()
-                                              .updateReciter(reciter);
-
-                                          // Show feedback
-                                          CustomSnackbar.showSnackbar(
-                                            context,
-                                            localizations
-                                                .selectedAsDefaultReciter(
-                                                  reciter.name,
-                                                ),
-                                            duration: 2,
-                                          );
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: isSelected
-                                                ? accentGreen.withValues(
-                                                    alpha: 0.15,
-                                                  )
-                                                : colorScheme.onSurfaceVariant
-                                                      .withValues(alpha: 0.12),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          child: Icon(
-                                            isSelected
-                                                ? Icons.check_circle
-                                                : Icons.radio_button_unchecked,
-                                            color: isSelected
-                                                ? accentGreen
-                                                : colorScheme.onSurfaceVariant,
-                                            size: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }, childCount: reciterState.reciters.length),
-                    ),
-                  ],
+                return ReciterListView(
+                  reciters: reciterState.reciters,
+                  selectedReciter: settingsState.selectedReciter,
+                  onSelectReciter: _selectReciter,
+                  onOpenChapters: _openReciterChapters,
                 );
               },
             );
@@ -438,6 +115,3 @@ class _ReciterListPageState extends State<ReciterListPage> {
     );
   }
 }
-
-// Helper constant to avoid const removal of dynamic reciter.arabicName in compressed edit
-const String reciterArabicPlaceholder = '';
