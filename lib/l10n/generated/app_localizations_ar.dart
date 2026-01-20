@@ -377,6 +377,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get salamAlaikum => 'السلام عليكم';
 
   @override
+  String get homeTagline => 'اكتشف حكمة الآيات بلغة الولوف';
+
+  @override
   String get dailyInspirationTitle => 'إلهام يومي';
 
   @override

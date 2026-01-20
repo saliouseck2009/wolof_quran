@@ -11,36 +11,21 @@ class HomeHeader extends StatelessWidget {
     final accentGreen = colorScheme.primary;
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          children: [
-            AppIcon(accentGreen: accentGreen, colorScheme: colorScheme),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  localizations.salamAlaikum,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
-                    //fontFamily: 'Hafs',
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  localizations.welcome,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+        AppIcon(accentGreen: accentGreen, colorScheme: colorScheme),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            localizations.homeTagline,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
             ),
-          ],
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         IconButton(
           onPressed: () {

@@ -387,6 +387,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get salamAlaikum => 'As-salam alaykum';
 
   @override
+  String get homeTagline => 'Découvrez la sagesse des versets en wolof';
+
+  @override
   String get dailyInspirationTitle => 'Inspiration quotidienne';
 
   @override

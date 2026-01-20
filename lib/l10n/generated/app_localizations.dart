@@ -796,6 +796,12 @@ abstract class AppLocalizations {
   /// **'As-salamu alaykum'**
   String get salamAlaikum;
 
+  /// Home page tagline describing the app
+  ///
+  /// In en, this message translates to:
+  /// **'Discover the wisdom of verses in Wolof'**
+  String get homeTagline;
+
   /// Title for daily inspiration card
   ///
   /// In en, this message translates to:

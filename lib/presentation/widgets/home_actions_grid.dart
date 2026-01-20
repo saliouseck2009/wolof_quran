@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wolof_quran/presentation/views/surah_audio_list_page.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 class HomeActionsGrid extends StatelessWidget {
@@ -12,7 +11,8 @@ class HomeActionsGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         const spacing = 16.0;
-        final cardWidth = (constraints.maxWidth - spacing) / 2;
+        // Ensure we don't get negative width by using max
+        final cardWidth = ((constraints.maxWidth - spacing) / 2).clamp(0.0, double.infinity);
 
         return Wrap(
           spacing: spacing,

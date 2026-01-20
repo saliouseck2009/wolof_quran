@@ -382,6 +382,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get salamAlaikum => 'As-salamu alaykum';
 
   @override
+  String get homeTagline => 'Discover the wisdom of verses in Wolof';
+
+  @override
   String get dailyInspirationTitle => 'Daily Inspiration';
 
   @override

@@ -520,6 +520,10 @@
   "@salamAlaikum": {
     "description": "Greeting shown on home header"
   },
+  "homeTagline": "Discover the wisdom of verses in Wolof",
+  "@homeTagline": {
+    "description": "Home page tagline describing the app"
+  },
   "dailyInspirationTitle": "Daily Inspiration",
   "@dailyInspirationTitle": {
     "description": "Title for daily inspiration card"
