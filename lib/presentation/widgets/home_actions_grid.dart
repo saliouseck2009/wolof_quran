@@ -12,7 +12,10 @@ class HomeActionsGrid extends StatelessWidget {
       builder: (context, constraints) {
         const spacing = 16.0;
         // Ensure we don't get negative width by using max
-        final cardWidth = ((constraints.maxWidth - spacing) / 2).clamp(0.0, double.infinity);
+        final cardWidth = ((constraints.maxWidth - spacing) / 2).clamp(
+          0.0,
+          double.infinity,
+        );
 
         return Wrap(
           spacing: spacing,
