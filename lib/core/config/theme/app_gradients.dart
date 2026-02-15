@@ -10,7 +10,7 @@ class AppGradients {
     return LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [colorScheme.primary, colorScheme.primaryContainer],
+      colors: [colorScheme.primary, colorScheme.primary.withValues(alpha: .7)],
     );
   }
 

@@ -17,7 +17,7 @@ class HomeHeader extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            localizations.homeTagline,
+            localizations.appTitle,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,

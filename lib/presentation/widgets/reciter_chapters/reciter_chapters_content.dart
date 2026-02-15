@@ -47,7 +47,11 @@ class ReciterChaptersContent extends StatelessWidget {
         if (state is ReciterChaptersLoading) {
           return SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
-            child: Center(child: CircularProgressIndicator(color: accentGreen)),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
           );
         }
 
@@ -132,8 +136,8 @@ class ReciterChaptersContent extends StatelessWidget {
               localizations: localizations,
               onDownloadComplete: () {
                 context.read<ReciterChaptersBloc>().add(
-                      RefreshDownloadedSurahs(reciter.id),
-                    );
+                  RefreshDownloadedSurahs(reciter.id),
+                );
               },
             );
           },

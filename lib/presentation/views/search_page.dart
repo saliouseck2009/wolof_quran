@@ -159,47 +159,70 @@ class _SearchViewState extends State<SearchView> {
 
     return NestedScrollView(
       headerSliverBuilder: (context, _) => [
-        SearchSliverHeader(
-          expandedHeight: _expandedHeight,
-          collapsedToolbarHeight: _collapsedToolbarHeight,
-          colorScheme: colorScheme,
-          localizations: localizations,
-          searchBarBuilder: (isCollapsed) => _buildSearchBar(
+        SliverOverlapAbsorber(
+          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+          sliver: SearchSliverHeader(
+            expandedHeight: _expandedHeight,
+            collapsedToolbarHeight: _collapsedToolbarHeight,
+            colorScheme: colorScheme,
             localizations: localizations,
-            isInAppBar: isCollapsed,
-            hasActiveFilter: hasActiveFilter,
+            searchBarBuilder: (isCollapsed) => _buildSearchBar(
+              localizations: localizations,
+              isInAppBar: isCollapsed,
+              hasActiveFilter: hasActiveFilter,
+            ),
           ),
         ),
       ],
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Column(
-          children: [
-            Expanded(
-              child: BlocBuilder<SearchCubit, SearchState>(
-                builder: (context, state) {
-                  if (state is SearchInitial) {
-                    return const SearchInitialStateView();
-                  }
+      body: Builder(
+        builder: (context) {
+          final overlapHandle = NestedScrollView.sliverOverlapAbsorberHandleFor(
+            context,
+          );
 
-                  if (state is SearchLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+          return AnimatedBuilder(
+            animation: overlapHandle,
+            builder: (context, child) {
+              final topOffset = overlapHandle.layoutExtent ?? 0;
+              return Padding(
+                padding: EdgeInsets.only(top: topOffset),
+                child: child,
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: BlocBuilder<SearchCubit, SearchState>(
+                      builder: (context, state) {
+                        if (state is SearchInitial) {
+                          return const SearchInitialStateView();
+                        }
 
-                  if (state is SearchError) {
-                    return SearchErrorStateView(message: state.message);
-                  }
+                        if (state is SearchLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
 
-                  if (state is SearchLoaded) {
-                    return SearchResultsList(state: state);
-                  }
+                        if (state is SearchError) {
+                          return SearchErrorStateView(message: state.message);
+                        }
 
-                  return const SizedBox.shrink();
-                },
+                        if (state is SearchLoaded) {
+                          return SearchResultsList(state: state);
+                        }
+
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -221,5 +244,4 @@ class _SearchViewState extends State<SearchView> {
       onChanged: (_) => setState(() {}),
     );
   }
-
 }

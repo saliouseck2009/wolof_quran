@@ -38,7 +38,7 @@ class LanguageSelectorSheet extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.only(left: 20, right: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -57,6 +57,7 @@ class LanguageSelectorSheet extends StatelessWidget {
                       ],
                     ),
                   ),
+                  SizedBox(height: 16),
                   Expanded(
                     child: ListView.builder(
                       controller: scrollController,
