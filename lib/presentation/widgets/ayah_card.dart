@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wolof_quran/presentation/views/reciter_chapters_download_page.dart';
+import 'package:wolof_quran/presentation/widgets/reciter_chapters/chapter_number_widget.dart';
 
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';

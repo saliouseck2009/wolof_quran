@@ -17,6 +17,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
+import 'snackbar.dart';
 
 void showDailyInspirationShareModal(
   BuildContext context,
@@ -577,17 +578,10 @@ class _DailyInspirationShareModalState
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.fixed,
-            content: Text(
-              localizations.shareUnexpectedError(e.toString()),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onError,
-              ),
-            ),
-            backgroundColor: colorScheme.error,
-          ),
+        CustomSnackbar.showErrorSnackbar(
+          context,
+          localizations.shareUnexpectedError(e.toString()),
+          duration: 3,
         );
       }
     } finally {
@@ -753,21 +747,7 @@ class _DailyInspirationShareModalState
 
   void _showMessage(String message) {
     if (!mounted) return;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.fixed,
-        content: Text(
-          message,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onErrorContainer,
-          ),
-        ),
-        backgroundColor: colorScheme.errorContainer,
-      ),
-    );
+    CustomSnackbar.showSnackbar(context, message, duration: 3);
   }
 }
 

@@ -520,6 +520,10 @@
   "@salamAlaikum": {
     "description": "Greeting shown on home header"
   },
+  "homeTagline": "Discover the wisdom of verses in Wolof",
+  "@homeTagline": {
+    "description": "Home page tagline describing the app"
+  },
   "dailyInspirationTitle": "Daily Inspiration",
   "@dailyInspirationTitle": {
     "description": "Title for daily inspiration card"
@@ -596,7 +600,7 @@
   "@aboutSubtitle": {
     "description": "About menu subtitle"
   },
-  "aboutDescription": "An app to read the Quran and listen to recitations in Wolof.",
+  "aboutDescription": "An app to read the Quran and listen to translation in Wolof.",
   "@aboutDescription": {
     "description": "About dialog description"
   },
@@ -614,65 +618,65 @@
   "@quranSettingsDescription": {
     "description": "Header subtitle on Quran settings page"
   },
-  "audioAndReciters": "Audio & Reciters",
+  "audioAndReciters": "Audio & Tafsir Authors",
   "@audioAndReciters": {
-    "description": "Menu title for audio and reciters"
+    "description": "Menu title for audio and tafsir authors"
   },
-  "manageRecitersAndDownloadAudio": "Manage reciters and download audio",
+  "manageRecitersAndDownloadAudio": "Manage tafsir authors and download audio",
   "@manageRecitersAndDownloadAudio": {
-    "description": "Subtitle for audio and reciters menu item"
+    "description": "Subtitle for audio and tafsir authors menu item"
   },
-  "viewAvailableReciters": "View available reciters",
+  "viewAvailableReciters": "View available tafsir authors",
   "@viewAvailableReciters": {
-    "description": "Value text for audio and reciters item"
+    "description": "Value text for audio and tafsir authors item"
   },
   "unknown": "Unknown",
   "@unknown": {
     "description": "Fallback text when value is unknown"
   },
-  "availableReciters": "Available Reciters",
+  "availableReciters": "Available Tafsir Authors",
   "@availableReciters": {
-    "description": "Title for reciter list page"
+    "description": "Title for tafsir author list page"
   },
-  "errorLoadingReciters": "Error loading reciters",
+  "errorLoadingReciters": "Error loading tafsir authors",
   "@errorLoadingReciters": {
-    "description": "Headline for reciter loading error"
+    "description": "Headline for tafsir author loading error"
   },
   "retry": "Retry",
   "@retry": {
     "description": "Retry button label"
   },
-  "noRecitersAvailable": "No reciters available",
+  "noRecitersAvailable": "No tafsir authors available",
   "@noRecitersAvailable": {
-    "description": "Headline when no reciters found"
+    "description": "Headline when no tafsir authors found"
   },
-  "checkBackLaterReciters": "Check back later for available reciters",
+  "checkBackLaterReciters": "Check back later for available tafsir authors",
   "@checkBackLaterReciters": {
-    "description": "Subtitle when no reciters available"
+    "description": "Subtitle when no tafsir authors available"
   },
-  "selectReciter": "Select Reciter",
+  "selectReciter": "Select Tafsir Author",
   "@selectReciter": {
-    "description": "Action to select a reciter"
+    "description": "Action to select a tafsir author"
   },
   "browseAndSelectReciterHint": "Tap card to browse • Tap select button to choose default",
   "@browseAndSelectReciterHint": {
-    "description": "Hint text for reciter selection"
+    "description": "Hint text for tafsir author selection"
   },
-  "defaultReciter": "Default Reciter",
+  "defaultReciter": "Default Tafsir Author",
   "@defaultReciter": {
-    "description": "Badge for currently selected reciter"
+    "description": "Badge for currently selected tafsir author"
   },
   "available": "Available",
   "@available": {
     "description": "Badge for available reciter"
   },
-  "selectedAsDefaultReciter": "Selected {name} as default reciter",
+  "selectedAsDefaultReciter": "Selected {name} as default tafsir author",
   "@selectedAsDefaultReciter": {
-    "description": "Snackbar when user selects a reciter",
+    "description": "Snackbar when user selects a tafsir author",
     "placeholders": {
       "name": {
         "type": "String",
-        "description": "Reciter name"
+        "description": "Tafsir author name"
       }
     }
   },
@@ -680,9 +684,9 @@
   "@audioDownloads": {
     "description": "Title for surah audio downloads page"
   },
-  "noReciterSelected": "No reciter selected",
+  "noReciterSelected": "No tafsir author selected",
   "@noReciterSelected": {
-    "description": "Message when no reciter chosen"
+    "description": "Message when no tafsir author chosen"
   },
   "change": "Change",
   "@change": {

@@ -11,7 +11,11 @@ class HomeActionsGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         const spacing = 16.0;
-        final cardWidth = (constraints.maxWidth - spacing) / 2;
+        // Ensure we don't get negative width by using max
+        final cardWidth = ((constraints.maxWidth - spacing) / 2).clamp(
+          0.0,
+          double.infinity,
+        );
 
         return Wrap(
           spacing: spacing,
@@ -32,7 +36,8 @@ class HomeActionsGrid extends StatelessWidget {
             //     icon: Icons.headphones_outlined,
             //     title: localizations.recitation,
             //     subtitle: localizations.listenAudio,
-            //     onTap: () => Navigator.pushNamed(context, '/surah-audio-list'),
+            //     onTap: () =>
+            //         Navigator.pushNamed(context, SurahAudioListPage.routeName),
             //   ),
             // ),
             SizedBox(

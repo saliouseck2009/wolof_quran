@@ -387,6 +387,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get salamAlaikum => 'As-salam alaykum';
 
   @override
+  String get homeTagline => 'Découvrez la sagesse des versets en wolof';
+
+  @override
   String get dailyInspirationTitle => 'Inspiration quotidienne';
 
   @override
@@ -447,7 +450,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get aboutDescription =>
-      'Une application pour lire le Coran et écouter les récitations en langue wolof.';
+      'Une application pour lire le Coran et écouter la traduction en langue wolof.';
 
   @override
   String appVersion(String version) {
@@ -458,58 +461,59 @@ class AppLocalizationsFr extends AppLocalizations {
   String get quranSettingsDescription => 'Personnalisez votre lecture du Coran';
 
   @override
-  String get audioAndReciters => 'Audio et récitateur(s)';
+  String get audioAndReciters => 'Audio et auteur(s) de tafsir';
 
   @override
   String get manageRecitersAndDownloadAudio =>
-      'Gérer les récitateur(s) et télécharger l\'audio';
+      'Gérer les auteur(s) de tafsir et télécharger l\'audio';
 
   @override
-  String get viewAvailableReciters => 'Voir les récitateur(s) disponibles';
+  String get viewAvailableReciters =>
+      'Voir les auteur(s) de tafsir disponibles';
 
   @override
   String get unknown => 'Inconnu';
 
   @override
-  String get availableReciters => 'Récitateur(s) disponibles';
+  String get availableReciters => 'Auteur(s) de tafsir disponibles';
 
   @override
   String get errorLoadingReciters =>
-      'Erreur lors du chargement des récitateur(s)';
+      'Erreur lors du chargement des auteur(s) de tafsir';
 
   @override
   String get retry => 'Réessayer';
 
   @override
-  String get noRecitersAvailable => 'Aucun récitateur disponible';
+  String get noRecitersAvailable => 'Aucun auteur de tafsir disponible';
 
   @override
   String get checkBackLaterReciters =>
-      'Revenez plus tard pour voir les récitateur(s) disponibles';
+      'Revenez plus tard pour voir les auteur(s) de tafsir disponibles';
 
   @override
-  String get selectReciter => 'Sélectionner un récitateur';
+  String get selectReciter => 'Sélectionner un auteur de tafsir';
 
   @override
   String get browseAndSelectReciterHint =>
       'Touchez la carte pour parcourir • Touchez le bouton pour définir par défaut';
 
   @override
-  String get defaultReciter => 'Récitateur par défaut';
+  String get defaultReciter => 'Auteur de tafsir par défaut';
 
   @override
   String get available => 'Disponible';
 
   @override
   String selectedAsDefaultReciter(String name) {
-    return '$name sélectionné comme récitateur par défaut';
+    return '$name sélectionné comme auteur de tafsir par défaut';
   }
 
   @override
   String get audioDownloads => 'Téléchargements audio';
 
   @override
-  String get noReciterSelected => 'Aucun récitateur sélectionné';
+  String get noReciterSelected => 'Aucun auteur de tafsir sélectionné';
 
   @override
   String get change => 'Changer';

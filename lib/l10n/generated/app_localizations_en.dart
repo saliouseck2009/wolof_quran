@@ -382,6 +382,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get salamAlaikum => 'As-salamu alaykum';
 
   @override
+  String get homeTagline => 'Discover the wisdom of verses in Wolof';
+
+  @override
   String get dailyInspirationTitle => 'Daily Inspiration';
 
   @override
@@ -440,7 +443,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutDescription =>
-      'An app to read the Quran and listen to recitations in Wolof.';
+      'An app to read the Quran and listen to translation in Wolof.';
 
   @override
   String appVersion(String version) {
@@ -452,57 +455,57 @@ class AppLocalizationsEn extends AppLocalizations {
       'Customize your Quran reading experience';
 
   @override
-  String get audioAndReciters => 'Audio & Reciters';
+  String get audioAndReciters => 'Audio & Tafsir Authors';
 
   @override
   String get manageRecitersAndDownloadAudio =>
-      'Manage reciters and download audio';
+      'Manage tafsir authors and download audio';
 
   @override
-  String get viewAvailableReciters => 'View available reciters';
+  String get viewAvailableReciters => 'View available tafsir authors';
 
   @override
   String get unknown => 'Unknown';
 
   @override
-  String get availableReciters => 'Available Reciters';
+  String get availableReciters => 'Available Tafsir Authors';
 
   @override
-  String get errorLoadingReciters => 'Error loading reciters';
+  String get errorLoadingReciters => 'Error loading tafsir authors';
 
   @override
   String get retry => 'Retry';
 
   @override
-  String get noRecitersAvailable => 'No reciters available';
+  String get noRecitersAvailable => 'No tafsir authors available';
 
   @override
   String get checkBackLaterReciters =>
-      'Check back later for available reciters';
+      'Check back later for available tafsir authors';
 
   @override
-  String get selectReciter => 'Select Reciter';
+  String get selectReciter => 'Select Tafsir Author';
 
   @override
   String get browseAndSelectReciterHint =>
       'Tap card to browse • Tap select button to choose default';
 
   @override
-  String get defaultReciter => 'Default Reciter';
+  String get defaultReciter => 'Default Tafsir Author';
 
   @override
   String get available => 'Available';
 
   @override
   String selectedAsDefaultReciter(String name) {
-    return 'Selected $name as default reciter';
+    return 'Selected $name as default tafsir author';
   }
 
   @override
   String get audioDownloads => 'Audio Downloads';
 
   @override
-  String get noReciterSelected => 'No reciter selected';
+  String get noReciterSelected => 'No tafsir author selected';
 
   @override
   String get change => 'Change';

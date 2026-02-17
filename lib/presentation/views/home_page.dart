@@ -11,6 +11,7 @@ import '../widgets/home_header.dart';
 import '../widgets/daily_inspiration_card.dart';
 import '../widgets/home_actions_grid.dart';
 import '../utils/audio_error_formatter.dart';
+import '../widgets/snackbar.dart';
 
 class HomePage extends StatelessWidget {
   static const String routeName = "/";
@@ -45,26 +46,14 @@ class HomePage extends StatelessWidget {
               final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
               if (!isCurrentRoute) return;
               if (audioState is AudioManagementError) {
-                final theme = Theme.of(context);
-                final colorScheme = theme.colorScheme;
                 final message = formatAudioError(
                   audioState.message,
                   AppLocalizations.of(context)!,
                 );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      message,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onError,
-                      ),
-                    ),
-                    backgroundColor: colorScheme.error,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                CustomSnackbar.showErrorSnackbar(
+                  context,
+                  message,
+                  duration: 3,
                 );
               }
             },

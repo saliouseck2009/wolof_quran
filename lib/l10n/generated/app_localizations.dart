@@ -796,6 +796,12 @@ abstract class AppLocalizations {
   /// **'As-salamu alaykum'**
   String get salamAlaikum;
 
+  /// Home page tagline describing the app
+  ///
+  /// In en, this message translates to:
+  /// **'Discover the wisdom of verses in Wolof'**
+  String get homeTagline;
+
   /// Title for daily inspiration card
   ///
   /// In en, this message translates to:
@@ -913,7 +919,7 @@ abstract class AppLocalizations {
   /// About dialog description
   ///
   /// In en, this message translates to:
-  /// **'An app to read the Quran and listen to recitations in Wolof.'**
+  /// **'An app to read the Quran and listen to translation in Wolof.'**
   String get aboutDescription;
 
   /// App version label with number
@@ -928,22 +934,22 @@ abstract class AppLocalizations {
   /// **'Customize your Quran reading experience'**
   String get quranSettingsDescription;
 
-  /// Menu title for audio and reciters
+  /// Menu title for audio and tafsir authors
   ///
   /// In en, this message translates to:
-  /// **'Audio & Reciters'**
+  /// **'Audio & Tafsir Authors'**
   String get audioAndReciters;
 
-  /// Subtitle for audio and reciters menu item
+  /// Subtitle for audio and tafsir authors menu item
   ///
   /// In en, this message translates to:
-  /// **'Manage reciters and download audio'**
+  /// **'Manage tafsir authors and download audio'**
   String get manageRecitersAndDownloadAudio;
 
-  /// Value text for audio and reciters item
+  /// Value text for audio and tafsir authors item
   ///
   /// In en, this message translates to:
-  /// **'View available reciters'**
+  /// **'View available tafsir authors'**
   String get viewAvailableReciters;
 
   /// Fallback text when value is unknown
@@ -952,16 +958,16 @@ abstract class AppLocalizations {
   /// **'Unknown'**
   String get unknown;
 
-  /// Title for reciter list page
+  /// Title for tafsir author list page
   ///
   /// In en, this message translates to:
-  /// **'Available Reciters'**
+  /// **'Available Tafsir Authors'**
   String get availableReciters;
 
-  /// Headline for reciter loading error
+  /// Headline for tafsir author loading error
   ///
   /// In en, this message translates to:
-  /// **'Error loading reciters'**
+  /// **'Error loading tafsir authors'**
   String get errorLoadingReciters;
 
   /// Retry button label
@@ -970,34 +976,34 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get retry;
 
-  /// Headline when no reciters found
+  /// Headline when no tafsir authors found
   ///
   /// In en, this message translates to:
-  /// **'No reciters available'**
+  /// **'No tafsir authors available'**
   String get noRecitersAvailable;
 
-  /// Subtitle when no reciters available
+  /// Subtitle when no tafsir authors available
   ///
   /// In en, this message translates to:
-  /// **'Check back later for available reciters'**
+  /// **'Check back later for available tafsir authors'**
   String get checkBackLaterReciters;
 
-  /// Action to select a reciter
+  /// Action to select a tafsir author
   ///
   /// In en, this message translates to:
-  /// **'Select Reciter'**
+  /// **'Select Tafsir Author'**
   String get selectReciter;
 
-  /// Hint text for reciter selection
+  /// Hint text for tafsir author selection
   ///
   /// In en, this message translates to:
   /// **'Tap card to browse • Tap select button to choose default'**
   String get browseAndSelectReciterHint;
 
-  /// Badge for currently selected reciter
+  /// Badge for currently selected tafsir author
   ///
   /// In en, this message translates to:
-  /// **'Default Reciter'**
+  /// **'Default Tafsir Author'**
   String get defaultReciter;
 
   /// Badge for available reciter
@@ -1006,10 +1012,10 @@ abstract class AppLocalizations {
   /// **'Available'**
   String get available;
 
-  /// Snackbar when user selects a reciter
+  /// Snackbar when user selects a tafsir author
   ///
   /// In en, this message translates to:
-  /// **'Selected {name} as default reciter'**
+  /// **'Selected {name} as default tafsir author'**
   String selectedAsDefaultReciter(String name);
 
   /// Title for surah audio downloads page
@@ -1018,10 +1024,10 @@ abstract class AppLocalizations {
   /// **'Audio Downloads'**
   String get audioDownloads;
 
-  /// Message when no reciter chosen
+  /// Message when no tafsir author chosen
   ///
   /// In en, this message translates to:
-  /// **'No reciter selected'**
+  /// **'No tafsir author selected'**
   String get noReciterSelected;
 
   /// Generic change button label

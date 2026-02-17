@@ -377,6 +377,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get salamAlaikum => 'السلام عليكم';
 
   @override
+  String get homeTagline => 'اكتشف حكمة الآيات بلغة الولوف';
+
+  @override
   String get dailyInspirationTitle => 'إلهام يومي';
 
   @override
@@ -446,55 +449,57 @@ class AppLocalizationsAr extends AppLocalizations {
   String get quranSettingsDescription => 'خصص تجربة قراءة القرآن لديك';
 
   @override
-  String get audioAndReciters => 'الصوت والقراء';
+  String get audioAndReciters => 'الصوت ومؤلفو التفسير';
 
   @override
-  String get manageRecitersAndDownloadAudio => 'إدارة القراء وتنزيل الصوت';
+  String get manageRecitersAndDownloadAudio =>
+      'إدارة مؤلفي التفسير وتنزيل الصوت';
 
   @override
-  String get viewAvailableReciters => 'عرض القراء المتاحين';
+  String get viewAvailableReciters => 'عرض مؤلفي التفسير المتاحين';
 
   @override
   String get unknown => 'غير معروف';
 
   @override
-  String get availableReciters => 'القراء المتاحون';
+  String get availableReciters => 'مؤلفو التفسير المتاحون';
 
   @override
-  String get errorLoadingReciters => 'خطأ في تحميل القراء';
+  String get errorLoadingReciters => 'خطأ في تحميل مؤلفي التفسير';
 
   @override
   String get retry => 'إعادة المحاولة';
 
   @override
-  String get noRecitersAvailable => 'لا يوجد قراء متاحون';
+  String get noRecitersAvailable => 'لا يوجد مؤلفو تفسير متاحون';
 
   @override
-  String get checkBackLaterReciters => 'عد لاحقاً للاطلاع على القراء المتاحين';
+  String get checkBackLaterReciters =>
+      'عد لاحقاً للاطلاع على مؤلفي التفسير المتاحين';
 
   @override
-  String get selectReciter => 'اختر قارئاً';
+  String get selectReciter => 'اختر مؤلف تفسير';
 
   @override
   String get browseAndSelectReciterHint =>
       'اضغط على البطاقة للاستعراض • اضغط على الزر للتعيين كافتراضي';
 
   @override
-  String get defaultReciter => 'القارئ الافتراضي';
+  String get defaultReciter => 'مؤلف التفسير الافتراضي';
 
   @override
   String get available => 'متاح';
 
   @override
   String selectedAsDefaultReciter(String name) {
-    return 'تم اختيار $name كقارئ افتراضي';
+    return 'تم اختيار $name كمؤلف تفسير افتراضي';
   }
 
   @override
   String get audioDownloads => 'تنزيلات الصوت';
 
   @override
-  String get noReciterSelected => 'لم يتم اختيار قارئ';
+  String get noReciterSelected => 'لم يتم اختيار مؤلف تفسير';
 
   @override
   String get change => 'تغيير';
