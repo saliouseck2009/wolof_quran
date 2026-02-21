@@ -483,6 +483,36 @@ class AppLocalizationsFr extends AppLocalizations {
       'Une application pour lire le Coran et écouter la traduction en langue wolof.';
 
   @override
+  String get aboutContentSourcesTitle => 'Sources du contenu';
+
+  @override
+  String get quranTextSourceTitle => 'Source du texte coranique';
+
+  @override
+  String get audioManifestSourceTitle => 'Manifeste de disponibilité audio';
+
+  @override
+  String get tafsirAudioSourceTitle => 'Source de l\'audio tafsir';
+
+  @override
+  String get tafsirAudioSourceDetails =>
+      'Imam Assane Sarr (Sénégal, Dakar, Mosquée Saad Ibn Abi Waqqas, Unité 21)';
+
+  @override
+  String get aboutContactTitle => 'Contact';
+
+  @override
+  String get contactEmailLabel => 'Email';
+
+  @override
+  String get copyLabel => 'Copier';
+
+  @override
+  String copiedToClipboard(String label) {
+    return '$label copié';
+  }
+
+  @override
   String appVersion(String version) {
     return 'Version $version';
   }

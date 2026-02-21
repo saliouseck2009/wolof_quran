@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/config/localization/localization_service.dart';
 import '../../l10n/generated/app_localizations.dart';
+import 'about_page.dart';
 import '../cubits/language_cubit.dart';
 import '../cubits/theme_cubit.dart';
-import '../widgets/settings/about_app_dialog.dart';
 import '../widgets/settings/language_selector_sheet.dart';
 import '../widgets/settings/settings_header.dart';
 import '../widgets/settings/settings_menu_item.dart';
@@ -32,10 +32,9 @@ class SettingsPage extends StatelessWidget {
             fontSize: 18,
           ),
         ),
-        backgroundColor:
-            colorScheme.brightness == Brightness.dark
-                ? colorScheme.surface
-                : colorScheme.primary,
+        backgroundColor: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surface
+            : colorScheme.primary,
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -49,15 +48,11 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 24),
             _SettingsMenu(
               localizations: localizations,
-              onShowLanguage: () => _showLanguageSelector(
-                context,
-                localizations,
-              ),
-              onShowTheme: () => _showThemeSelector(
-                context,
-                localizations,
-              ),
-              onShowAbout: () => showAboutAppDialog(context),
+              onShowLanguage: () =>
+                  _showLanguageSelector(context, localizations),
+              onShowTheme: () => _showThemeSelector(context, localizations),
+              onShowAbout: () =>
+                  Navigator.pushNamed(context, AboutPage.routeName),
             ),
             const SizedBox(height: 54),
           ],
@@ -107,8 +102,7 @@ class _SettingsMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentLocale = context.watch<LanguageCubit>().state;
-    final languageValue =
-        LocalizationService.getLanguageName(currentLocale);
+    final languageValue = LocalizationService.getLanguageName(currentLocale);
 
     return Column(
       children: [
@@ -143,7 +137,9 @@ class _SettingsMenu extends StatelessWidget {
           subtitle: localizations.aboutSubtitle,
           value: localizations.appVersion('1.0.0'),
           onTap: onShowAbout,
+          showArrow: true,
         ),
+        SizedBox(height: 16),
       ],
     );
   }

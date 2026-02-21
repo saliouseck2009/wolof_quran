@@ -469,6 +469,36 @@ class AppLocalizationsAr extends AppLocalizations {
       'تطبيق لقراءة القرآن والاستماع إلى التلاوات باللغة الولوف.';
 
   @override
+  String get aboutContentSourcesTitle => 'مصادر المحتوى';
+
+  @override
+  String get quranTextSourceTitle => 'مصدر نص القرآن';
+
+  @override
+  String get audioManifestSourceTitle => 'ملف توفر الصوت';
+
+  @override
+  String get tafsirAudioSourceTitle => 'مصدر صوت التفسير';
+
+  @override
+  String get tafsirAudioSourceDetails =>
+      'الإمام أسان صار (السنغال، داكار، مسجد سعد بن أبي وقاص، الوحدة 21)';
+
+  @override
+  String get aboutContactTitle => 'التواصل';
+
+  @override
+  String get contactEmailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get copyLabel => 'نسخ';
+
+  @override
+  String copiedToClipboard(String label) {
+    return 'تم نسخ $label';
+  }
+
+  @override
   String appVersion(String version) {
     return 'الإصدار $version';
   }

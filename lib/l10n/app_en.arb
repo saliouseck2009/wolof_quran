@@ -648,6 +648,48 @@
   "@aboutDescription": {
     "description": "About dialog description"
   },
+  "aboutContentSourcesTitle": "Content Sources",
+  "@aboutContentSourcesTitle": {
+    "description": "Section title for content attribution sources"
+  },
+  "quranTextSourceTitle": "Quran text source",
+  "@quranTextSourceTitle": {
+    "description": "Label for Quran text source URL"
+  },
+  "audioManifestSourceTitle": "Audio availability manifest",
+  "@audioManifestSourceTitle": {
+    "description": "Label for remote audio availability manifest source"
+  },
+  "tafsirAudioSourceTitle": "Tafsir audio source",
+  "@tafsirAudioSourceTitle": {
+    "description": "Label for tafsir audio attribution"
+  },
+  "tafsirAudioSourceDetails": "Imam Assane Sarr (Senegal, Dakar, Mosque Saad Ibn Abi Waqqas, Unite 21)",
+  "@tafsirAudioSourceDetails": {
+    "description": "Attribution details for tafsir audio source"
+  },
+  "aboutContactTitle": "Contact",
+  "@aboutContactTitle": {
+    "description": "Section title for contact information"
+  },
+  "contactEmailLabel": "Email",
+  "@contactEmailLabel": {
+    "description": "Label for contact email row"
+  },
+  "copyLabel": "Copy",
+  "@copyLabel": {
+    "description": "Tooltip/label for copy action"
+  },
+  "copiedToClipboard": "{label} copied",
+  "@copiedToClipboard": {
+    "description": "Snackbar message after copying a value",
+    "placeholders": {
+      "label": {
+        "type": "String",
+        "description": "Name of the copied value"
+      }
+    }
+  },
   "appVersion": "Version {version}",
   "@appVersion": {
     "description": "App version label with number",

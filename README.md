@@ -21,5 +21,6 @@ samples, guidance on mobile development, and a full API reference.
 
 Quran text source : https://tanzil.net/docs/tanzil_project
 Tafsir audio : Imam Assane Sarr Sénégal, Dakar , Mosquée Saad Ibn Abī Waqqas unité 21 
+Contact : saliouseck2009@gmail.com
 https://tanzil.net/docs/who_is_using_tanzil 
 https://github.com/aqeelshamz/quran/blob/main/lib/quran_text.dart

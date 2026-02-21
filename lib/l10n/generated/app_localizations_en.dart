@@ -475,6 +475,36 @@ class AppLocalizationsEn extends AppLocalizations {
       'An app to read the Quran and listen to translation in Wolof.';
 
   @override
+  String get aboutContentSourcesTitle => 'Content Sources';
+
+  @override
+  String get quranTextSourceTitle => 'Quran text source';
+
+  @override
+  String get audioManifestSourceTitle => 'Audio availability manifest';
+
+  @override
+  String get tafsirAudioSourceTitle => 'Tafsir audio source';
+
+  @override
+  String get tafsirAudioSourceDetails =>
+      'Imam Assane Sarr (Senegal, Dakar, Mosque Saad Ibn Abi Waqqas, Unite 21)';
+
+  @override
+  String get aboutContactTitle => 'Contact';
+
+  @override
+  String get contactEmailLabel => 'Email';
+
+  @override
+  String get copyLabel => 'Copy';
+
+  @override
+  String copiedToClipboard(String label) {
+    return '$label copied';
+  }
+
+  @override
   String appVersion(String version) {
     return 'Version $version';
   }

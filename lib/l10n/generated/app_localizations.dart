@@ -970,6 +970,60 @@ abstract class AppLocalizations {
   /// **'An app to read the Quran and listen to translation in Wolof.'**
   String get aboutDescription;
 
+  /// Section title for content attribution sources
+  ///
+  /// In en, this message translates to:
+  /// **'Content Sources'**
+  String get aboutContentSourcesTitle;
+
+  /// Label for Quran text source URL
+  ///
+  /// In en, this message translates to:
+  /// **'Quran text source'**
+  String get quranTextSourceTitle;
+
+  /// Label for remote audio availability manifest source
+  ///
+  /// In en, this message translates to:
+  /// **'Audio availability manifest'**
+  String get audioManifestSourceTitle;
+
+  /// Label for tafsir audio attribution
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir audio source'**
+  String get tafsirAudioSourceTitle;
+
+  /// Attribution details for tafsir audio source
+  ///
+  /// In en, this message translates to:
+  /// **'Imam Assane Sarr (Senegal, Dakar, Mosque Saad Ibn Abi Waqqas, Unite 21)'**
+  String get tafsirAudioSourceDetails;
+
+  /// Section title for contact information
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get aboutContactTitle;
+
+  /// Label for contact email row
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get contactEmailLabel;
+
+  /// Tooltip/label for copy action
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copyLabel;
+
+  /// Snackbar message after copying a value
+  ///
+  /// In en, this message translates to:
+  /// **'{label} copied'**
+  String copiedToClipboard(String label);
+
   /// App version label with number
   ///
   /// In en, this message translates to:
