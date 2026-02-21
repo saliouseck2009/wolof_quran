@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../l10n/generated/app_localizations.dart';
+import '../../cubits/audio_availability_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../settings/settings_menu_item.dart';
 
@@ -46,13 +48,54 @@ class QuranSettingsMenu extends StatelessWidget {
           onTap: onFontSizeTap,
         ),
         const SizedBox(height: 16),
-        SettingsMenuItem(
-          icon: Icons.volume_up,
-          title: localizations.audioAndReciters,
-          subtitle: localizations.manageRecitersAndDownloadAudio,
-          value: localizations.viewAvailableReciters,
-          onTap: onRecitersTap,
-          showArrow: true,
+        BlocBuilder<AudioAvailabilityCubit, AudioAvailabilityState>(
+          builder: (context, availabilityState) {
+            final selectedReciterId = state.selectedReciter?.id;
+            final unreadCount = selectedReciterId == null
+                ? 0
+                : availabilityState.unreadCountForReciter(selectedReciterId);
+
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                SettingsMenuItem(
+                  icon: Icons.volume_up,
+                  title: localizations.audioAndReciters,
+                  subtitle: localizations.manageRecitersAndDownloadAudio,
+                  value: localizations.viewAvailableReciters,
+                  onTap: onRecitersTap,
+                  showArrow: true,
+                ),
+                if (unreadCount > 0)
+                  Positioned(
+                    top: -8,
+                    right: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      child: Text(
+                        localizations.newAudioBadge(unreadCount),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
       ],
     );

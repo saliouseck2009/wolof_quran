@@ -248,6 +248,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get downloadToPlay => 'تحميل للتشغيل';
 
   @override
+  String get downloadLabel => 'تحميل';
+
+  @override
+  String get audioNotYetAvailable => 'صوت هذه السورة غير متاح بعد.';
+
+  @override
+  String get audioNotYetAvailableShort => 'غير متاح بعد';
+
+  @override
+  String get audioNowAvailable => 'متاح الآن';
+
+  @override
+  String get newAudioUpdatesTitle => 'تحديثات صوتية جديدة';
+
+  @override
+  String get noNewAudioUpdates => 'لا توجد تحديثات صوتية جديدة حالياً.';
+
+  @override
+  String newAudioBadge(int count) {
+    return 'جديد ($count)';
+  }
+
+  @override
+  String newAudioUpdatesCount(int count) {
+    return '$count سورة صوتية جديدة متاحة الآن';
+  }
+
+  @override
   String get pauseSurah => 'إيقاف مؤقت للسورة';
 
   @override

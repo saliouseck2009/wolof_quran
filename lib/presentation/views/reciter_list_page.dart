@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wolof_quran/core/config/theme/app_color.dart';
+import 'package:wolof_quran/core/navigation/reciter_audio_updates_arguments.dart';
 import '../../domain/entities/reciter.dart';
 import '../../l10n/generated/app_localizations.dart';
 
+import '../cubits/audio_availability_cubit.dart';
 import '../cubits/reciter_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
+import 'reciter_audio_updates_page.dart';
 import '../widgets/reciter_list/reciter_list_empty_state.dart';
 import '../widgets/reciter_list/reciter_list_error_state.dart';
 import '../widgets/reciter_list/reciter_list_view.dart';
@@ -24,15 +27,32 @@ class _ReciterListPageState extends State<ReciterListPage> {
     super.initState();
     // Load reciters when page initializes
     context.read<ReciterCubit>().loadReciters();
+    context.read<AudioAvailabilityCubit>().refreshReciter('imamsarr');
     // Load current settings
     context.read<QuranSettingsCubit>().loadSettings();
   }
 
   void _openReciterChapters(Reciter reciter) {
+    Navigator.pushNamed(context, '/reciter-chapters', arguments: reciter);
+  }
+
+  void _openReciterUpdates(Reciter reciter) {
+    final availabilitySnapshot = context
+        .read<AudioAvailabilityCubit>()
+        .state
+        .snapshotForReciter(reciter.id);
+    final unreadSurahs = availabilitySnapshot?.unreadNewSurahs ?? const [];
+    if (unreadSurahs.isEmpty) {
+      return;
+    }
+
     Navigator.pushNamed(
       context,
-      '/reciter-chapters',
-      arguments: reciter,
+      ReciterAudioUpdatesPage.routeName,
+      arguments: ReciterAudioUpdatesArguments(
+        reciter: reciter,
+        newSurahNumbers: unreadSurahs,
+      ),
     );
   }
 
@@ -78,6 +98,9 @@ class _ReciterListPageState extends State<ReciterListPage> {
             context.read<QuranSettingsCubit>().loadReciterFromPrefs(
               reciterState.reciters,
             );
+            context.read<AudioAvailabilityCubit>().refreshReciters(
+              reciterState.reciters.map((reciter) => reciter.id).toList(),
+            );
           }
         },
         builder: (context, reciterState) {
@@ -104,6 +127,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
                   selectedReciter: settingsState.selectedReciter,
                   onSelectReciter: _selectReciter,
                   onOpenChapters: _openReciterChapters,
+                  onOpenUpdates: _openReciterUpdates,
                 );
               },
             );

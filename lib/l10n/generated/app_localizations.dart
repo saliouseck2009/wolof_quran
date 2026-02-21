@@ -550,6 +550,54 @@ abstract class AppLocalizations {
   /// **'Download to play'**
   String get downloadToPlay;
 
+  /// Short download button label
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get downloadLabel;
+
+  /// Shown when a surah is not present in the remote manifest yet
+  ///
+  /// In en, this message translates to:
+  /// **'Audio for this surah is not yet available.'**
+  String get audioNotYetAvailable;
+
+  /// Compact label for unavailable audio
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet available'**
+  String get audioNotYetAvailableShort;
+
+  /// Short helper text for newly available audio
+  ///
+  /// In en, this message translates to:
+  /// **'Now available'**
+  String get audioNowAvailable;
+
+  /// Title for page listing new audio updates
+  ///
+  /// In en, this message translates to:
+  /// **'New Audio Updates'**
+  String get newAudioUpdatesTitle;
+
+  /// Empty state for new audio updates page
+  ///
+  /// In en, this message translates to:
+  /// **'No new audio updates right now.'**
+  String get noNewAudioUpdates;
+
+  /// Badge showing unread new audio count
+  ///
+  /// In en, this message translates to:
+  /// **'New ({count})'**
+  String newAudioBadge(int count);
+
+  /// Summary text of newly available surahs count
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new surah(s) now available'**
+  String newAudioUpdatesCount(int count);
+
   /// Button text to pause surah playback
   ///
   /// In en, this message translates to:

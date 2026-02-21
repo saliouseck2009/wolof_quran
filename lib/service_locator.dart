@@ -5,16 +5,20 @@ import 'package:dio/dio.dart';
 import 'data/datasources/reciter_local_data_source.dart';
 import 'data/datasources/audio_local_data_source.dart';
 import 'data/datasources/database_helper.dart';
+import 'data/datasources/audio_availability_local_data_source.dart';
+import 'data/datasources/audio_availability_remote_data_source.dart';
 
 // Repositories
 import 'data/repositories/reciter_repository_impl.dart';
 import 'data/repositories/audio_repository_impl.dart';
 import 'data/repositories/download_repository_impl.dart';
 import 'data/repositories/bookmark_repository_impl.dart';
+import 'data/repositories/audio_availability_repository_impl.dart';
 import 'domain/repositories/reciter_repository.dart';
 import 'domain/repositories/audio_repository.dart';
 import 'domain/repositories/download_repository.dart';
 import 'domain/repositories/bookmark_repository.dart';
+import 'domain/repositories/audio_availability_repository.dart';
 
 // Use Cases
 import 'domain/usecases/get_reciters_usecase.dart';
@@ -23,6 +27,9 @@ import 'domain/usecases/get_surah_audio_status_usecase.dart';
 import 'domain/usecases/get_ayah_audios_usecase.dart';
 import 'domain/usecases/download_management_usecases.dart';
 import 'domain/usecases/get_downloaded_surahs_usecase.dart';
+import 'domain/usecases/refresh_audio_availability_usecase.dart';
+import 'domain/usecases/get_cached_audio_availability_usecase.dart';
+import 'domain/usecases/mark_audio_updates_seen_usecase.dart';
 
 // Services
 import 'core/services/audio_player_service.dart';
@@ -48,6 +55,12 @@ Future<void> setupDependencies() async {
     () => AudioLocalDataSource(locator<Dio>()),
   );
   locator.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper());
+  locator.registerLazySingleton<AudioAvailabilityLocalDataSource>(
+    () => AudioAvailabilityLocalDataSource(),
+  );
+  locator.registerLazySingleton<AudioAvailabilityRemoteDataSource>(
+    () => AudioAvailabilityRemoteDataSource(locator<Dio>()),
+  );
 
   // Repositories
   locator.registerLazySingleton<ReciterRepository>(
@@ -61,6 +74,12 @@ Future<void> setupDependencies() async {
   );
   locator.registerLazySingleton<BookmarkRepository>(
     () => BookmarkRepositoryImpl(locator<DatabaseHelper>()),
+  );
+  locator.registerLazySingleton<AudioAvailabilityRepository>(
+    () => AudioAvailabilityRepositoryImpl(
+      remoteDataSource: locator<AudioAvailabilityRemoteDataSource>(),
+      localDataSource: locator<AudioAvailabilityLocalDataSource>(),
+    ),
   );
 
   // Use Cases
@@ -87,5 +106,17 @@ Future<void> setupDependencies() async {
   );
   locator.registerLazySingleton<GetDownloadedSurahsUseCase>(
     () => GetDownloadedSurahsUseCase(locator<DownloadRepository>()),
+  );
+  locator.registerLazySingleton<RefreshAudioAvailabilityUseCase>(
+    () =>
+        RefreshAudioAvailabilityUseCase(locator<AudioAvailabilityRepository>()),
+  );
+  locator.registerLazySingleton<GetCachedAudioAvailabilityUseCase>(
+    () => GetCachedAudioAvailabilityUseCase(
+      locator<AudioAvailabilityRepository>(),
+    ),
+  );
+  locator.registerLazySingleton<MarkAudioUpdatesSeenUseCase>(
+    () => MarkAudioUpdatesSeenUseCase(locator<AudioAvailabilityRepository>()),
   );
 }

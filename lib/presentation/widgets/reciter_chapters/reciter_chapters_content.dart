@@ -5,6 +5,7 @@ import 'package:quran/quran.dart' as quran;
 import '../../../domain/entities/reciter.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../blocs/reciter_chapters_bloc.dart';
+import '../../cubits/audio_availability_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../../utils/audio_error_formatter.dart';
 import 'chapter_card.dart';
@@ -87,12 +88,22 @@ class ReciterChaptersContent extends StatelessWidget {
               .read<QuranSettingsCubit>()
               .currentTranslation;
 
-          return _buildChaptersList(
-            context,
-            isDark,
-            state,
-            translation,
-            localizations,
+          return BlocBuilder<AudioAvailabilityCubit, AudioAvailabilityState>(
+            builder: (context, availabilityState) {
+              final snapshot = availabilityState.snapshotForReciter(reciter.id);
+              final remoteAvailableSet = snapshot?.availableSurahs.toSet();
+              final hasAvailabilityData = snapshot != null;
+
+              return _buildChaptersList(
+                context,
+                isDark,
+                state,
+                translation,
+                localizations,
+                remoteAvailableSet,
+                hasAvailabilityData,
+              );
+            },
           );
         }
         return const SizedBox.shrink();
@@ -106,6 +117,8 @@ class ReciterChaptersContent extends StatelessWidget {
     ReciterChaptersLoaded state,
     quran.Translation? translation,
     AppLocalizations localizations,
+    Set<int>? remoteAvailableSet,
+    bool hasAvailabilityData,
   ) {
     return Column(
       children: [
@@ -122,6 +135,9 @@ class ReciterChaptersContent extends StatelessWidget {
           itemBuilder: (context, index) {
             final surahNumber = index + 1;
             final isDownloaded = state.isSurahDownloaded(surahNumber);
+            final isAvailableRemotely =
+                !hasAvailabilityData ||
+                (remoteAvailableSet?.contains(surahNumber) ?? false);
 
             return ChapterCard(
               reciter: reciter,
@@ -129,6 +145,7 @@ class ReciterChaptersContent extends StatelessWidget {
               translation: translation,
               isDark: isDark,
               isDownloaded: isDownloaded,
+              isAvailableRemotely: isAvailableRemotely,
               accentGreen: accentGreen,
               darkSurfaceHigh: darkSurfaceHigh,
               getSurahDisplayName: (number) =>

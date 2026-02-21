@@ -253,6 +253,36 @@ class AppLocalizationsFr extends AppLocalizations {
   String get downloadToPlay => 'Télécharger pour lire';
 
   @override
+  String get downloadLabel => 'Télécharger';
+
+  @override
+  String get audioNotYetAvailable =>
+      'L\'audio de cette sourate n\'est pas encore disponible.';
+
+  @override
+  String get audioNotYetAvailableShort => 'Bientôt';
+
+  @override
+  String get audioNowAvailable => 'Disponible maintenant';
+
+  @override
+  String get newAudioUpdatesTitle => 'Nouveaux audios';
+
+  @override
+  String get noNewAudioUpdates =>
+      'Aucune nouvelle disponibilité audio pour le moment.';
+
+  @override
+  String newAudioBadge(int count) {
+    return 'Nouveau ($count)';
+  }
+
+  @override
+  String newAudioUpdatesCount(int count) {
+    return '$count nouvelle(s) sourate(s) audio disponible(s)';
+  }
+
+  @override
   String get pauseSurah => 'Mettre en pause la Sourate';
 
   @override

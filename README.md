@@ -14,3 +14,12 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+
+
+
+Quran text source : https://tanzil.net/docs/tanzil_project
+Tafsir audio : Imam Assane Sarr Sénégal, Dakar , Mosquée Saad Ibn Abī Waqqas unité 21 
+https://tanzil.net/docs/who_is_using_tanzil 
+https://github.com/aqeelshamz/quran/blob/main/lib/quran_text.dart
