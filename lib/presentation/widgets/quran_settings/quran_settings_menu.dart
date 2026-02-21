@@ -76,7 +76,7 @@ class QuranSettingsMenu extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
+                        color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
                           color: Theme.of(
@@ -88,7 +88,7 @@ class QuranSettingsMenu extends StatelessWidget {
                         localizations.newAudioBadge(unreadCount),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                       ),
                     ),

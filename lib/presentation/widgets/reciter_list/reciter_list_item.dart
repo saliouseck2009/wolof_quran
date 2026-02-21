@@ -133,7 +133,7 @@ class ReciterListItem extends StatelessWidget {
                                     vertical: 6,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: colorScheme.primaryContainer,
+                                    color: colorScheme.primary,
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                       color: colorScheme.primary.withValues(
@@ -146,7 +146,7 @@ class ReciterListItem extends StatelessWidget {
                                     style: Theme.of(context).textTheme.bodySmall
                                         ?.copyWith(
                                           fontWeight: FontWeight.w700,
-                                          color: colorScheme.primary,
+                                          color: colorScheme.onPrimary,
                                         ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
