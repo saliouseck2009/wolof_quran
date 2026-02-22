@@ -713,7 +713,7 @@ class _DailyInspirationShareModalState
       return null;
     }
 
-    final file = File(ayahAudio.localPath ?? '');
+    final file = File(ayahAudio.localPath);
     if (!await file.exists()) {
       _showMessage(localizations.shareAudioFileMissingDevice);
       return null;

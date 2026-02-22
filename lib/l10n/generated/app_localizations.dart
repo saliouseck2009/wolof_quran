@@ -550,6 +550,54 @@ abstract class AppLocalizations {
   /// **'Download to play'**
   String get downloadToPlay;
 
+  /// Short download button label
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get downloadLabel;
+
+  /// Shown when a surah is not present in the remote manifest yet
+  ///
+  /// In en, this message translates to:
+  /// **'Audio for this surah is not yet available.'**
+  String get audioNotYetAvailable;
+
+  /// Compact label for unavailable audio
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet available'**
+  String get audioNotYetAvailableShort;
+
+  /// Short helper text for newly available audio
+  ///
+  /// In en, this message translates to:
+  /// **'Now available'**
+  String get audioNowAvailable;
+
+  /// Title for page listing new audio updates
+  ///
+  /// In en, this message translates to:
+  /// **'New Audio Updates'**
+  String get newAudioUpdatesTitle;
+
+  /// Empty state for new audio updates page
+  ///
+  /// In en, this message translates to:
+  /// **'No new audio updates right now.'**
+  String get noNewAudioUpdates;
+
+  /// Badge showing unread new audio count
+  ///
+  /// In en, this message translates to:
+  /// **'New ({count})'**
+  String newAudioBadge(int count);
+
+  /// Summary text of newly available surahs count
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new surah(s) now available'**
+  String newAudioUpdatesCount(int count);
+
   /// Button text to pause surah playback
   ///
   /// In en, this message translates to:
@@ -921,6 +969,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An app to read the Quran and listen to translation in Wolof.'**
   String get aboutDescription;
+
+  /// Section title for content attribution sources
+  ///
+  /// In en, this message translates to:
+  /// **'Content Sources'**
+  String get aboutContentSourcesTitle;
+
+  /// Label for Quran text source URL
+  ///
+  /// In en, this message translates to:
+  /// **'Quran text source'**
+  String get quranTextSourceTitle;
+
+  /// Label for remote audio availability manifest source
+  ///
+  /// In en, this message translates to:
+  /// **'Audio availability manifest'**
+  String get audioManifestSourceTitle;
+
+  /// Label for tafsir audio attribution
+  ///
+  /// In en, this message translates to:
+  /// **'Tafsir audio source'**
+  String get tafsirAudioSourceTitle;
+
+  /// Attribution details for tafsir audio source
+  ///
+  /// In en, this message translates to:
+  /// **'Imam Assane Sarr (Senegal, Dakar, Mosque Saad Ibn Abi Waqqas, Unite 21)'**
+  String get tafsirAudioSourceDetails;
+
+  /// Section title for contact information
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get aboutContactTitle;
+
+  /// Label for contact email row
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get contactEmailLabel;
+
+  /// Tooltip/label for copy action
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copyLabel;
+
+  /// Snackbar message after copying a value
+  ///
+  /// In en, this message translates to:
+  /// **'{label} copied'**
+  String copiedToClipboard(String label);
 
   /// App version label with number
   ///

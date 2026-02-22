@@ -9,7 +9,6 @@ import '../widgets/app_search_bar.dart';
 import '../widgets/search/search_error_state.dart';
 import '../widgets/search/search_initial_state.dart';
 import '../widgets/search/search_results_list.dart';
-import '../widgets/search/search_sliver_header.dart';
 import '../../service_locator.dart';
 import '../../domain/repositories/bookmark_repository.dart';
 
@@ -45,9 +44,6 @@ class SearchView extends StatefulWidget {
 }
 
 class _SearchViewState extends State<SearchView> {
-  static const double _expandedHeight = 150;
-  static const double _collapsedToolbarHeight = 72;
-
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   late int _currentIndex;
@@ -157,73 +153,44 @@ class _SearchViewState extends State<SearchView> {
         _searchController.text.isNotEmpty ||
         (searchState is SearchLoaded && searchState.searchQuery.isNotEmpty);
 
-    return NestedScrollView(
-      headerSliverBuilder: (context, _) => [
-        SliverOverlapAbsorber(
-          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-          sliver: SearchSliverHeader(
-            expandedHeight: _expandedHeight,
-            collapsedToolbarHeight: _collapsedToolbarHeight,
-            colorScheme: colorScheme,
+    return Column(
+      children: [
+        _SearchHeader(
+          colorScheme: colorScheme,
+          localizations: localizations,
+          searchBarBuilder: (isCollapsed) => _buildSearchBar(
             localizations: localizations,
-            searchBarBuilder: (isCollapsed) => _buildSearchBar(
-              localizations: localizations,
-              isInAppBar: isCollapsed,
-              hasActiveFilter: hasActiveFilter,
+            isInAppBar: isCollapsed,
+            hasActiveFilter: hasActiveFilter,
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: BlocBuilder<SearchCubit, SearchState>(
+              builder: (context, state) {
+                if (state is SearchInitial) {
+                  return const SearchInitialStateView();
+                }
+
+                if (state is SearchLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (state is SearchError) {
+                  return SearchErrorStateView(message: state.message);
+                }
+
+                if (state is SearchLoaded) {
+                  return SearchResultsList(state: state);
+                }
+
+                return const SizedBox.shrink();
+              },
             ),
           ),
         ),
       ],
-      body: Builder(
-        builder: (context) {
-          final overlapHandle = NestedScrollView.sliverOverlapAbsorberHandleFor(
-            context,
-          );
-
-          return AnimatedBuilder(
-            animation: overlapHandle,
-            builder: (context, child) {
-              final topOffset = overlapHandle.layoutExtent ?? 0;
-              return Padding(
-                padding: EdgeInsets.only(top: topOffset),
-                child: child,
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: BlocBuilder<SearchCubit, SearchState>(
-                      builder: (context, state) {
-                        if (state is SearchInitial) {
-                          return const SearchInitialStateView();
-                        }
-
-                        if (state is SearchLoading) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        if (state is SearchError) {
-                          return SearchErrorStateView(message: state.message);
-                        }
-
-                        if (state is SearchLoaded) {
-                          return SearchResultsList(state: state);
-                        }
-
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 
@@ -242,6 +209,59 @@ class _SearchViewState extends State<SearchView> {
       onSearch: () => _performSearch(_searchController.text),
       onClear: _clearSearch,
       onChanged: (_) => setState(() {}),
+    );
+  }
+}
+
+class _SearchHeader extends StatelessWidget {
+  const _SearchHeader({
+    required this.colorScheme,
+    required this.localizations,
+    required this.searchBarBuilder,
+  });
+
+  final ColorScheme colorScheme;
+  final AppLocalizations localizations;
+  final Widget Function(bool isCollapsed) searchBarBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: colorScheme.brightness == Brightness.dark
+          ? AppColor.surfaceDark
+          : colorScheme.primary,
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: colorScheme.onPrimary),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    localizations.explorer,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onPrimary,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+              child: searchBarBuilder(false),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -340,6 +340,50 @@
   "@downloadToPlay": {
     "description": "Button text to download content before playing"
   },
+  "downloadLabel": "Download",
+  "@downloadLabel": {
+    "description": "Short download button label"
+  },
+  "audioNotYetAvailable": "Audio for this surah is not yet available.",
+  "@audioNotYetAvailable": {
+    "description": "Shown when a surah is not present in the remote manifest yet"
+  },
+  "audioNotYetAvailableShort": "Not yet available",
+  "@audioNotYetAvailableShort": {
+    "description": "Compact label for unavailable audio"
+  },
+  "audioNowAvailable": "Now available",
+  "@audioNowAvailable": {
+    "description": "Short helper text for newly available audio"
+  },
+  "newAudioUpdatesTitle": "New Audio Updates",
+  "@newAudioUpdatesTitle": {
+    "description": "Title for page listing new audio updates"
+  },
+  "noNewAudioUpdates": "No new audio updates right now.",
+  "@noNewAudioUpdates": {
+    "description": "Empty state for new audio updates page"
+  },
+  "newAudioBadge": "New ({count})",
+  "@newAudioBadge": {
+    "description": "Badge showing unread new audio count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Unread new surahs count"
+      }
+    }
+  },
+  "newAudioUpdatesCount": "{count} new surah(s) now available",
+  "@newAudioUpdatesCount": {
+    "description": "Summary text of newly available surahs count",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of newly available surahs"
+      }
+    }
+  },
   "pauseSurah": "Pause Surah",
   "@pauseSurah": {
     "description": "Button text to pause surah playback"
@@ -603,6 +647,48 @@
   "aboutDescription": "An app to read the Quran and listen to translation in Wolof.",
   "@aboutDescription": {
     "description": "About dialog description"
+  },
+  "aboutContentSourcesTitle": "Content Sources",
+  "@aboutContentSourcesTitle": {
+    "description": "Section title for content attribution sources"
+  },
+  "quranTextSourceTitle": "Quran text source",
+  "@quranTextSourceTitle": {
+    "description": "Label for Quran text source URL"
+  },
+  "audioManifestSourceTitle": "Audio availability manifest",
+  "@audioManifestSourceTitle": {
+    "description": "Label for remote audio availability manifest source"
+  },
+  "tafsirAudioSourceTitle": "Tafsir audio source",
+  "@tafsirAudioSourceTitle": {
+    "description": "Label for tafsir audio attribution"
+  },
+  "tafsirAudioSourceDetails": "Imam Assane Sarr (Senegal, Dakar, Mosque Saad Ibn Abi Waqqas, Unite 21)",
+  "@tafsirAudioSourceDetails": {
+    "description": "Attribution details for tafsir audio source"
+  },
+  "aboutContactTitle": "Contact",
+  "@aboutContactTitle": {
+    "description": "Section title for contact information"
+  },
+  "contactEmailLabel": "Email",
+  "@contactEmailLabel": {
+    "description": "Label for contact email row"
+  },
+  "copyLabel": "Copy",
+  "@copyLabel": {
+    "description": "Tooltip/label for copy action"
+  },
+  "copiedToClipboard": "{label} copied",
+  "@copiedToClipboard": {
+    "description": "Snackbar message after copying a value",
+    "placeholders": {
+      "label": {
+        "type": "String",
+        "description": "Name of the copied value"
+      }
+    }
   },
   "appVersion": "Version {version}",
   "@appVersion": {

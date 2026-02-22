@@ -248,6 +248,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get downloadToPlay => 'تحميل للتشغيل';
 
   @override
+  String get downloadLabel => 'تحميل';
+
+  @override
+  String get audioNotYetAvailable => 'صوت هذه السورة غير متاح بعد.';
+
+  @override
+  String get audioNotYetAvailableShort => 'غير متاح بعد';
+
+  @override
+  String get audioNowAvailable => 'متاح الآن';
+
+  @override
+  String get newAudioUpdatesTitle => 'تحديثات صوتية جديدة';
+
+  @override
+  String get noNewAudioUpdates => 'لا توجد تحديثات صوتية جديدة حالياً.';
+
+  @override
+  String newAudioBadge(int count) {
+    return 'جديد ($count)';
+  }
+
+  @override
+  String newAudioUpdatesCount(int count) {
+    return '$count سورة صوتية جديدة متاحة الآن';
+  }
+
+  @override
   String get pauseSurah => 'إيقاف مؤقت للسورة';
 
   @override
@@ -439,6 +467,36 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get aboutDescription =>
       'تطبيق لقراءة القرآن والاستماع إلى التلاوات باللغة الولوف.';
+
+  @override
+  String get aboutContentSourcesTitle => 'مصادر المحتوى';
+
+  @override
+  String get quranTextSourceTitle => 'مصدر نص القرآن';
+
+  @override
+  String get audioManifestSourceTitle => 'ملف توفر الصوت';
+
+  @override
+  String get tafsirAudioSourceTitle => 'مصدر صوت التفسير';
+
+  @override
+  String get tafsirAudioSourceDetails =>
+      'الإمام أسان صار (السنغال، داكار، مسجد سعد بن أبي وقاص، الوحدة 21)';
+
+  @override
+  String get aboutContactTitle => 'التواصل';
+
+  @override
+  String get contactEmailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get copyLabel => 'نسخ';
+
+  @override
+  String copiedToClipboard(String label) {
+    return 'تم نسخ $label';
+  }
 
   @override
   String appVersion(String version) {

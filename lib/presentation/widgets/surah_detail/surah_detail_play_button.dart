@@ -4,6 +4,7 @@ import '../../../core/config/theme/app_color.dart';
 import '../../../core/services/audio_player_service.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../blocs/surah_download_status_bloc.dart';
+import '../../cubits/audio_availability_cubit.dart';
 import '../../cubits/audio_management_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../../utils/audio_error_formatter.dart';
@@ -36,11 +37,11 @@ class SurahPlayButton extends StatelessWidget {
               currentState.reciterId != selectedReciter.id ||
               currentState.surahNumber != surahNumber) {
             context.read<SurahDownloadStatusBloc>().add(
-                  CheckSurahDownloadStatus(
-                    reciterId: selectedReciter.id,
-                    surahNumber: surahNumber,
-                  ),
-                );
+              CheckSurahDownloadStatus(
+                reciterId: selectedReciter.id,
+                surahNumber: surahNumber,
+              ),
+            );
           }
         });
 
@@ -59,7 +60,8 @@ class SurahPlayButton extends StatelessWidget {
             }
           },
           builder: (context, downloadStatusState) {
-            if (downloadStatusState is SurahDownloadStatusLoading) {
+            if (downloadStatusState is SurahDownloadStatusLoading ||
+                downloadStatusState is SurahDownloadStatusInitial) {
               final colorScheme = Theme.of(context).colorScheme;
               final isDark = colorScheme.brightness == Brightness.dark;
               return Padding(
@@ -129,12 +131,17 @@ class SurahPlayButton extends StatelessWidget {
             }
 
             final isDownloaded = downloadStatusState.isDownloaded;
+            final isAvailableRemotely = context
+                .watch<AudioAvailabilityCubit>()
+                .state
+                .isSurahAvailable(selectedReciter.id, surahNumber);
 
             if (!isDownloaded) {
               return _DownloadSurahButton(
                 reciterId: selectedReciter.id,
                 surahNumber: surahNumber,
                 surahName: surahName,
+                isAvailableRemotely: isAvailableRemotely,
               );
             }
 
@@ -154,11 +161,13 @@ class _DownloadSurahButton extends StatelessWidget {
   final String reciterId;
   final int surahNumber;
   final String surahName;
+  final bool isAvailableRemotely;
 
   const _DownloadSurahButton({
     required this.reciterId,
     required this.surahNumber,
     required this.surahName,
+    required this.isAvailableRemotely,
   });
 
   @override
@@ -166,6 +175,36 @@ class _DownloadSurahButton extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
+
+    if (!isAvailableRemotely) {
+      final bgColor = isDark
+          ? colorScheme.surfaceContainer
+          : Colors.white.withValues(alpha: 0.2);
+      final fgColor = isDark ? colorScheme.onSurfaceVariant : Colors.white70;
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: ElevatedButton.icon(
+          onPressed: null,
+          icon: const Icon(Icons.download_for_offline_outlined, size: 20),
+          label: Text(
+            localizations.audioNotYetAvailableShort,
+            style: const TextStyle(fontWeight: FontWeight.w500),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: bgColor,
+            foregroundColor: fgColor,
+            disabledBackgroundColor: bgColor,
+            disabledForegroundColor: fgColor,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+          ),
+        ),
+      );
+    }
 
     return BlocConsumer<AudioManagementCubit, AudioManagementState>(
       listenWhen: (previous, current) {
@@ -180,11 +219,11 @@ class _DownloadSurahButton extends StatelessWidget {
       listener: (context, currentState) {
         if (currentState is AudioManagementLoaded) {
           context.read<SurahDownloadStatusBloc>().add(
-                RefreshSurahDownloadStatus(
-                  reciterId: reciterId,
-                  surahNumber: surahNumber,
-                ),
-              );
+            RefreshSurahDownloadStatus(
+              reciterId: reciterId,
+              surahNumber: surahNumber,
+            ),
+          );
           CustomSnackbar.showSnackbar(
             context,
             localizations.downloadedSuccessfully(surahName),
@@ -204,8 +243,8 @@ class _DownloadSurahButton extends StatelessWidget {
       builder: (context, currentState) {
         final isDownloading =
             currentState is AudioDownloading &&
-                currentState.reciterId == reciterId &&
-                currentState.surahNumber == surahNumber;
+            currentState.reciterId == reciterId &&
+            currentState.surahNumber == surahNumber;
 
         if (isDownloading) {
           final progressPercent = (currentState.progress * 100).toInt();
@@ -215,10 +254,7 @@ class _DownloadSurahButton extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(25),
@@ -251,10 +287,9 @@ class _DownloadSurahButton extends StatelessWidget {
           );
         }
 
-        final bgColor =
-            isDark ? colorScheme.surfaceContainer : Colors.white.withValues(
-              alpha: 0.2,
-            );
+        final bgColor = isDark
+            ? colorScheme.surfaceContainer
+            : Colors.white.withValues(alpha: 0.2);
         final fgColor = isDark ? colorScheme.onSurface : Colors.white;
 
         return Padding(
@@ -274,9 +309,9 @@ class _DownloadSurahButton extends StatelessWidget {
               }
 
               context.read<AudioManagementCubit>().downloadSurahAudio(
-                    reciterId,
-                    surahNumber,
-                  );
+                reciterId,
+                surahNumber,
+              );
             },
             icon: const Icon(Icons.download_outlined, size: 20),
             label: Text(
@@ -287,10 +322,7 @@ class _DownloadSurahButton extends StatelessWidget {
               backgroundColor: bgColor,
               foregroundColor: fgColor,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
@@ -329,11 +361,11 @@ class _PlaySurahButton extends StatelessWidget {
       },
       listener: (context, state) {
         context.read<SurahDownloadStatusBloc>().add(
-              RefreshSurahDownloadStatus(
-                reciterId: selectedReciter,
-                surahNumber: surahNumber,
-              ),
-            );
+          RefreshSurahDownloadStatus(
+            reciterId: selectedReciter,
+            surahNumber: surahNumber,
+          ),
+        );
       },
       child: BlocBuilder<AudioManagementCubit, AudioManagementState>(
         builder: (context, audioState) {
@@ -352,28 +384,30 @@ class _PlaySurahButton extends StatelessWidget {
                   final playerState =
                       playerStateSnapshot.data ?? AudioPlayerState.stopped;
                   final currentAudio = currentAudioSnapshot.data;
-                  final audioPlayerService =
-                      context.read<AudioManagementCubit>().audioPlayerService;
+                  final audioPlayerService = context
+                      .read<AudioManagementCubit>()
+                      .audioPlayerService;
 
                   final isThisSurahPlaying =
                       currentAudio != null &&
-                          currentAudio.surahNumber == surahNumber &&
-                          currentAudio.reciterId == selectedReciter &&
-                          audioPlayerService.isPlayingPlaylist;
+                      currentAudio.surahNumber == surahNumber &&
+                      currentAudio.reciterId == selectedReciter &&
+                      audioPlayerService.isPlayingPlaylist;
 
-                  final isPlaying = isThisSurahPlaying &&
+                  final isPlaying =
+                      isThisSurahPlaying &&
                       (playerState == AudioPlayerState.playing ||
                           playerState == AudioPlayerState.loading);
                   final isPaused =
                       isThisSurahPlaying &&
-                          playerState == AudioPlayerState.paused;
+                      playerState == AudioPlayerState.paused;
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        final audioManagementCubit =
-                            context.read<AudioManagementCubit>();
+                        final audioManagementCubit = context
+                            .read<AudioManagementCubit>();
 
                         if (isThisSurahPlaying) {
                           if (isPlaying) {
@@ -409,8 +443,8 @@ class _PlaySurahButton extends StatelessWidget {
                         isPlaying
                             ? localizations.pauseSurah
                             : isPaused
-                                ? localizations.resumeSurah
-                                : localizations.playSurah,
+                            ? localizations.resumeSurah
+                            : localizations.playSurah,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: isThisSurahPlaying
@@ -421,8 +455,8 @@ class _PlaySurahButton extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             theme.colorScheme.brightness == Brightness.dark
-                                ? theme.colorScheme.surfaceContainer
-                                : AppColor.pureWhite,
+                            ? theme.colorScheme.surfaceContainer
+                            : AppColor.pureWhite,
                         foregroundColor: isThisSurahPlaying
                             ? theme.colorScheme.secondary
                             : theme.colorScheme.primary,

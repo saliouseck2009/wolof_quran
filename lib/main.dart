@@ -10,7 +10,11 @@ import 'package:wolof_quran/domain/usecases/download_surah_audio_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_ayah_audios_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_reciters_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_surah_audio_status_usecase.dart';
+import 'package:wolof_quran/domain/usecases/get_cached_audio_availability_usecase.dart';
+import 'package:wolof_quran/domain/usecases/mark_audio_updates_seen_usecase.dart';
+import 'package:wolof_quran/domain/usecases/refresh_audio_availability_usecase.dart';
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/audio_availability_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/quran_settings_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/reciter_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/ayah_playback_cubit.dart';
@@ -57,6 +61,16 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           lazy: false,
+          create: (context) => AudioAvailabilityCubit(
+            refreshAudioAvailabilityUseCase:
+                locator<RefreshAudioAvailabilityUseCase>(),
+            getCachedAudioAvailabilityUseCase:
+                locator<GetCachedAudioAvailabilityUseCase>(),
+            markAudioUpdatesSeenUseCase: locator<MarkAudioUpdatesSeenUseCase>(),
+          )..refreshReciter('imamsarr'),
+        ),
+        BlocProvider(
+          lazy: false,
           create: (context) => QuranSettingsCubit()..loadSettings(),
         ),
         // provide ayat playback
@@ -77,6 +91,11 @@ class MyApp extends StatelessWidget {
                   if (reciterState is ReciterLoaded) {
                     context.read<QuranSettingsCubit>().loadReciterFromPrefs(
                       reciterState.reciters,
+                    );
+                    context.read<AudioAvailabilityCubit>().refreshReciters(
+                      reciterState.reciters
+                          .map((reciter) => reciter.id)
+                          .toList(),
                     );
                   }
                 },

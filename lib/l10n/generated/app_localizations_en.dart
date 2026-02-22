@@ -251,6 +251,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadToPlay => 'Download to play';
 
   @override
+  String get downloadLabel => 'Download';
+
+  @override
+  String get audioNotYetAvailable =>
+      'Audio for this surah is not yet available.';
+
+  @override
+  String get audioNotYetAvailableShort => 'Not yet available';
+
+  @override
+  String get audioNowAvailable => 'Now available';
+
+  @override
+  String get newAudioUpdatesTitle => 'New Audio Updates';
+
+  @override
+  String get noNewAudioUpdates => 'No new audio updates right now.';
+
+  @override
+  String newAudioBadge(int count) {
+    return 'New ($count)';
+  }
+
+  @override
+  String newAudioUpdatesCount(int count) {
+    return '$count new surah(s) now available';
+  }
+
+  @override
   String get pauseSurah => 'Pause Surah';
 
   @override
@@ -444,6 +473,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aboutDescription =>
       'An app to read the Quran and listen to translation in Wolof.';
+
+  @override
+  String get aboutContentSourcesTitle => 'Content Sources';
+
+  @override
+  String get quranTextSourceTitle => 'Quran text source';
+
+  @override
+  String get audioManifestSourceTitle => 'Audio availability manifest';
+
+  @override
+  String get tafsirAudioSourceTitle => 'Tafsir audio source';
+
+  @override
+  String get tafsirAudioSourceDetails =>
+      'Imam Assane Sarr (Senegal, Dakar, Mosque Saad Ibn Abi Waqqas, Unite 21)';
+
+  @override
+  String get aboutContactTitle => 'Contact';
+
+  @override
+  String get contactEmailLabel => 'Email';
+
+  @override
+  String get copyLabel => 'Copy';
+
+  @override
+  String copiedToClipboard(String label) {
+    return '$label copied';
+  }
 
   @override
   String appVersion(String version) {

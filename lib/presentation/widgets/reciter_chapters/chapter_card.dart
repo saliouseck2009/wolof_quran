@@ -15,6 +15,7 @@ class ChapterCard extends StatelessWidget {
   final quran.Translation? translation;
   final bool isDark;
   final bool isDownloaded;
+  final bool isAvailableRemotely;
   final Color accentGreen;
   final Color darkSurfaceHigh;
   final String Function(int) getSurahDisplayName;
@@ -28,6 +29,7 @@ class ChapterCard extends StatelessWidget {
     required this.translation,
     required this.isDark,
     required this.isDownloaded,
+    required this.isAvailableRemotely,
     required this.accentGreen,
     required this.darkSurfaceHigh,
     required this.getSurahDisplayName,
@@ -93,6 +95,7 @@ class ChapterCard extends StatelessWidget {
               reciter: reciter,
               surahNumber: surahNumber,
               isDownloaded: isDownloaded,
+              isAvailableRemotely: isAvailableRemotely,
               accentGreen: accentGreen,
               localizations: localizations,
               getSurahDisplayName: getSurahDisplayName,
@@ -109,6 +112,7 @@ class _DownloadActions extends StatelessWidget {
   final Reciter reciter;
   final int surahNumber;
   final bool isDownloaded;
+  final bool isAvailableRemotely;
   final Color accentGreen;
   final AppLocalizations localizations;
   final String Function(int) getSurahDisplayName;
@@ -118,6 +122,7 @@ class _DownloadActions extends StatelessWidget {
     required this.reciter,
     required this.surahNumber,
     required this.isDownloaded,
+    required this.isAvailableRemotely,
     required this.accentGreen,
     required this.localizations,
     required this.getSurahDisplayName,
@@ -181,9 +186,7 @@ class _DownloadActions extends StatelessWidget {
                       value: currentState.progress,
                       strokeWidth: 3,
                       color: accentGreen,
-                      backgroundColor: accentGreen.withValues(
-                        alpha: 0.25,
-                      ),
+                      backgroundColor: accentGreen.withValues(alpha: 0.25),
                     ),
                   ),
                   Text(
@@ -198,9 +201,7 @@ class _DownloadActions extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 localizations.downloading,
-                style: textTheme.labelSmall?.copyWith(
-                  color: accentGreen,
-                ),
+                style: textTheme.labelSmall?.copyWith(color: accentGreen),
               ),
             ],
           );
@@ -209,9 +210,10 @@ class _DownloadActions extends StatelessWidget {
         if (isDownloaded) {
           return IconButton(
             onPressed: () async {
-              await context
-                  .read<AudioManagementCubit>()
-                  .deleteSurahAudio(reciter.id, surahNumber);
+              await context.read<AudioManagementCubit>().deleteSurahAudio(
+                reciter.id,
+                surahNumber,
+              );
               onDownloadComplete();
               if (context.mounted) {
                 CustomSnackbar.showSnackbar(
@@ -232,6 +234,34 @@ class _DownloadActions extends StatelessWidget {
           );
         }
 
+        if (!isAvailableRemotely) {
+          return Tooltip(
+            message: localizations.audioNotYetAvailable,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.download_for_offline_outlined,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                  size: 28,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  localizations.audioNotYetAvailableShort,
+                  style: textTheme.labelSmall?.copyWith(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
         return IconButton(
           onPressed: () {
             if (isOtherDownloading) {
@@ -242,9 +272,9 @@ class _DownloadActions extends StatelessWidget {
               return;
             }
             context.read<AudioManagementCubit>().downloadSurahAudio(
-                  reciter.id,
-                  surahNumber,
-                );
+              reciter.id,
+              surahNumber,
+            );
           },
           icon: Icon(Icons.download, color: accentGreen, size: 32),
         );
