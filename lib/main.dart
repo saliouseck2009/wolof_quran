@@ -106,7 +106,10 @@ class MyApp extends StatelessWidget {
                 return BlocBuilder<ThemeCubit, ThemeMode>(
                   builder: (context, themeMode) {
                     return MaterialApp(
-                      title: 'Wolof Quran',
+                      onGenerateTitle: (context) {
+                        return AppLocalizations.of(context)?.appTitle ??
+                            'Wolof Quran';
+                      },
                       debugShowCheckedModeBanner: false,
 
                       // Localization setup
