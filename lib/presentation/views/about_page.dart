@@ -141,7 +141,9 @@ class _HeaderCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colorScheme.onPrimary,
+        color: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surfaceContainer
+            : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -210,7 +212,9 @@ class _SectionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colorScheme.onPrimary,
+        color: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surfaceContainer
+            : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

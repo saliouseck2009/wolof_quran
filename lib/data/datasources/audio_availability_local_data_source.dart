@@ -11,13 +11,13 @@ class AudioAvailabilityLocalDataSource {
       '$_snapshotKeyPrefix$reciterId';
 
   Future<AudioAvailabilitySnapshot?> getSnapshot(String reciterId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final rawJson = prefs.getString(_snapshotKeyForReciter(reciterId));
-    if (rawJson == null || rawJson.isEmpty) {
-      return null;
-    }
-
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final rawJson = prefs.getString(_snapshotKeyForReciter(reciterId));
+      if (rawJson == null || rawJson.isEmpty) {
+        return null;
+      }
+
       final decoded = json.decode(rawJson);
       if (decoded is! Map) {
         return null;
@@ -34,10 +34,14 @@ class AudioAvailabilityLocalDataSource {
   }
 
   Future<void> saveSnapshot(AudioAvailabilitySnapshot snapshot) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      _snapshotKeyForReciter(snapshot.reciterId),
-      json.encode(snapshot.toJson()),
-    );
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        _snapshotKeyForReciter(snapshot.reciterId),
+        json.encode(snapshot.toJson()),
+      );
+    } catch (_) {
+      // Keep app functional if local persistence is temporarily unavailable.
+    }
   }
 }

@@ -66,8 +66,6 @@ class AudioAvailabilityCubit extends Cubit<AudioAvailabilityState> {
     bool force = false,
     Duration ttl = const Duration(hours: 6),
   }) async {
-    await _mergeCachedSnapshot(reciterId);
-
     final loadingReciters = Set<String>.from(state.loadingReciters)
       ..add(reciterId);
     final updatedErrors = Map<String, String>.from(state.errors)
@@ -77,6 +75,8 @@ class AudioAvailabilityCubit extends Cubit<AudioAvailabilityState> {
     );
 
     try {
+      await _mergeCachedSnapshot(reciterId);
+
       final snapshot = await refreshAudioAvailabilityUseCase(
         params: RefreshAudioAvailabilityParams(
           reciterId: reciterId,
@@ -131,16 +131,22 @@ class AudioAvailabilityCubit extends Cubit<AudioAvailabilityState> {
   }
 
   Future<void> _mergeCachedSnapshot(String reciterId) async {
-    final cachedSnapshot = await getCachedAudioAvailabilityUseCase(
-      params: reciterId,
-    );
-    if (cachedSnapshot == null) {
-      return;
-    }
+    try {
+      final cachedSnapshot = await getCachedAudioAvailabilityUseCase(
+        params: reciterId,
+      );
+      if (cachedSnapshot == null) {
+        return;
+      }
 
-    final snapshots = Map<String, AudioAvailabilitySnapshot>.from(
-      state.snapshots,
-    )..[reciterId] = cachedSnapshot;
-    emit(state.copyWith(snapshots: snapshots));
+      final snapshots = Map<String, AudioAvailabilitySnapshot>.from(
+        state.snapshots,
+      )..[reciterId] = cachedSnapshot;
+      emit(state.copyWith(snapshots: snapshots));
+    } catch (e) {
+      final errors = Map<String, String>.from(state.errors)
+        ..[reciterId] = e.toString();
+      emit(state.copyWith(errors: errors));
+    }
   }
 }

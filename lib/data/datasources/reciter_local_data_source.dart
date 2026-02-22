@@ -32,13 +32,21 @@ class ReciterLocalDataSource implements ReciterDataSource {
 
   @override
   Future<String?> getSelectedReciterId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_selectedReciterKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_selectedReciterKey);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
   Future<void> setSelectedReciterId(String reciterId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_selectedReciterKey, reciterId);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_selectedReciterKey, reciterId);
+    } catch (_) {
+      // Ignore persistence failure and keep in-memory selection flow alive.
+    }
   }
 }
