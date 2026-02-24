@@ -56,6 +56,8 @@ class AudioPlayerService {
   List<String> _currentPlaylist = [];
   int _currentPlaylistIndex = 0;
   bool _isPlayingPlaylist = false;
+  int _consecutiveFailures = 0;
+  static const int _maxConsecutiveFailures = 3;
 
   // Getters for streams
   Stream<AudioPlayerState> get playerState => _playerStateSubject.stream;
@@ -162,8 +164,7 @@ class AudioPlayerService {
 
       if (_currentPlaylist.isNotEmpty &&
           _currentPlaylistIndex < _currentPlaylist.length) {
-        await _audioPlayer.setFilePath(_currentPlaylist[_currentPlaylistIndex]);
-        await _audioPlayer.play();
+        await _playCurrentPlaylistItem();
       }
     } catch (e) {
       _playerStateSubject.add(AudioPlayerState.error);
@@ -262,8 +263,30 @@ class AudioPlayerService {
         );
       }
 
-      await _audioPlayer.setFilePath(_currentPlaylist[_currentPlaylistIndex]);
-      await _audioPlayer.play();
+      try {
+        await _audioPlayer.setFilePath(_currentPlaylist[_currentPlaylistIndex]);
+        await _audioPlayer.play();
+        // Reset consecutive failures on successful playback
+        _consecutiveFailures = 0;
+      } catch (e) {
+        // If the file fails to load (corrupted/invalid format), skip to next track
+        print(
+          'Audio file failed to load: ${_currentPlaylist[_currentPlaylistIndex]}, error: $e',
+        );
+        _consecutiveFailures++;
+
+        // Prevent infinite loop if too many consecutive failures
+        if (_consecutiveFailures >= _maxConsecutiveFailures) {
+          print('Too many consecutive audio failures, stopping playlist');
+          _playerStateSubject.add(AudioPlayerState.error);
+          _isPlayingPlaylist = false;
+          _consecutiveFailures = 0;
+          return;
+        }
+
+        // Try next track in playlist
+        await _playNextInPlaylist();
+      }
     }
   }
 
@@ -273,6 +296,7 @@ class AudioPlayerService {
     _isPlayingPlaylist = false;
     _currentPlaylist.clear();
     _currentPlaylistIndex = 0;
+    _consecutiveFailures = 0;
     _currentAudioSubject.add(null);
     _playerStateSubject.add(AudioPlayerState.stopped);
   }
