@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../core/config/theme/app_color.dart';
 import '../../../core/services/audio_player_service.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -10,14 +11,20 @@ import '../../cubits/quran_settings_cubit.dart';
 import '../../utils/audio_error_formatter.dart';
 import '../snackbar.dart';
 
+enum SurahPlayButtonVariant { pill, icon }
+
 class SurahPlayButton extends StatelessWidget {
+  static const Key iconActionKey = Key('surah_play_button_icon_action');
+
   final int surahNumber;
   final String surahName;
+  final SurahPlayButtonVariant variant;
 
   const SurahPlayButton({
     super.key,
     required this.surahNumber,
     required this.surahName,
+    this.variant = SurahPlayButtonVariant.pill,
   });
 
   @override
@@ -62,6 +69,27 @@ class SurahPlayButton extends StatelessWidget {
           builder: (context, downloadStatusState) {
             if (downloadStatusState is SurahDownloadStatusLoading ||
                 downloadStatusState is SurahDownloadStatusInitial) {
+              if (variant == SurahPlayButtonVariant.icon) {
+                final iconColor =
+                    Theme.of(context).iconTheme.color ??
+                    Theme.of(context).colorScheme.onPrimary;
+                return SizedBox(
+                  key: iconActionKey,
+                  width: 40,
+                  height: 40,
+                  child: Center(
+                    child: SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+                      ),
+                    ),
+                  ),
+                );
+              }
+
               final colorScheme = Theme.of(context).colorScheme;
               final isDark = colorScheme.brightness == Brightness.dark;
               return Padding(
@@ -92,6 +120,15 @@ class SurahPlayButton extends StatelessWidget {
             }
 
             if (downloadStatusState is! SurahDownloadStatusLoaded) {
+              if (variant == SurahPlayButtonVariant.icon) {
+                return IconButton(
+                  key: iconActionKey,
+                  onPressed: null,
+                  tooltip: localizations.checkFailed,
+                  icon: const Icon(Icons.error_outline, size: 22),
+                );
+              }
+
               final colorScheme = Theme.of(context).colorScheme;
               final isDark = colorScheme.brightness == Brightness.dark;
               return Padding(
@@ -142,6 +179,7 @@ class SurahPlayButton extends StatelessWidget {
                 surahNumber: surahNumber,
                 surahName: surahName,
                 isAvailableRemotely: isAvailableRemotely,
+                variant: variant,
               );
             }
 
@@ -149,6 +187,7 @@ class SurahPlayButton extends StatelessWidget {
               selectedReciter: selectedReciter.id,
               surahNumber: surahNumber,
               surahName: surahName,
+              variant: variant,
             );
           },
         );
@@ -162,12 +201,14 @@ class _DownloadSurahButton extends StatelessWidget {
   final int surahNumber;
   final String surahName;
   final bool isAvailableRemotely;
+  final SurahPlayButtonVariant variant;
 
   const _DownloadSurahButton({
     required this.reciterId,
     required this.surahNumber,
     required this.surahName,
     required this.isAvailableRemotely,
+    required this.variant,
   });
 
   @override
@@ -177,6 +218,15 @@ class _DownloadSurahButton extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
 
     if (!isAvailableRemotely) {
+      if (variant == SurahPlayButtonVariant.icon) {
+        return IconButton(
+          key: SurahPlayButton.iconActionKey,
+          onPressed: null,
+          tooltip: localizations.audioNotYetAvailableShort,
+          icon: const Icon(Icons.download_for_offline_outlined, size: 22),
+        );
+      }
+
       final bgColor = isDark
           ? colorScheme.surfaceContainer
           : Colors.white.withValues(alpha: 0.2);
@@ -248,6 +298,37 @@ class _DownloadSurahButton extends StatelessWidget {
 
         if (isDownloading) {
           final progressPercent = (currentState.progress * 100).toInt();
+
+          if (variant == SurahPlayButtonVariant.icon) {
+            final iconColor =
+                Theme.of(context).iconTheme.color ??
+                Theme.of(context).colorScheme.onPrimary;
+            return SizedBox(
+              key: SurahPlayButton.iconActionKey,
+              width: 40,
+              height: 40,
+              child: Tooltip(
+                message: '${localizations.downloading} $progressPercent%',
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        value: currentState.progress,
+                        strokeWidth: 2,
+                        color: iconColor.withValues(alpha: 0.95),
+                        backgroundColor: iconColor.withValues(alpha: 0.25),
+                      ),
+                    ),
+                    Icon(Icons.download_outlined, size: 20, color: iconColor),
+                  ],
+                ),
+              ),
+            );
+          }
+
           final bgColor = isDark
               ? colorScheme.surfaceContainerHigh
               : Colors.white.withValues(alpha: 0.2);
@@ -287,6 +368,15 @@ class _DownloadSurahButton extends StatelessWidget {
           );
         }
 
+        if (variant == SurahPlayButtonVariant.icon) {
+          return IconButton(
+            key: SurahPlayButton.iconActionKey,
+            onPressed: () => _handleDownloadPressed(context),
+            tooltip: localizations.downloadToPlay,
+            icon: const Icon(Icons.download_outlined, size: 22),
+          );
+        }
+
         final bgColor = isDark
             ? colorScheme.surfaceContainer
             : Colors.white.withValues(alpha: 0.2);
@@ -295,24 +385,7 @@ class _DownloadSurahButton extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: ElevatedButton.icon(
-            onPressed: () {
-              final audioState = context.read<AudioManagementCubit>().state;
-              if (audioState is AudioDownloading &&
-                  (audioState.reciterId != reciterId ||
-                      audioState.surahNumber != surahNumber)) {
-                CustomSnackbar.showSnackbar(
-                  context,
-                  AppLocalizations.of(context)!.downloadInProgress,
-                  duration: 2,
-                );
-                return;
-              }
-
-              context.read<AudioManagementCubit>().downloadSurahAudio(
-                reciterId,
-                surahNumber,
-              );
-            },
+            onPressed: () => _handleDownloadPressed(context),
             icon: const Icon(Icons.download_outlined, size: 20),
             label: Text(
               localizations.downloadToPlay,
@@ -332,17 +405,38 @@ class _DownloadSurahButton extends StatelessWidget {
       },
     );
   }
+
+  void _handleDownloadPressed(BuildContext context) {
+    final audioState = context.read<AudioManagementCubit>().state;
+    if (audioState is AudioDownloading &&
+        (audioState.reciterId != reciterId ||
+            audioState.surahNumber != surahNumber)) {
+      CustomSnackbar.showSnackbar(
+        context,
+        AppLocalizations.of(context)!.downloadInProgress,
+        duration: 2,
+      );
+      return;
+    }
+
+    context.read<AudioManagementCubit>().downloadSurahAudio(
+      reciterId,
+      surahNumber,
+    );
+  }
 }
 
 class _PlaySurahButton extends StatelessWidget {
   final String selectedReciter;
   final int surahNumber;
   final String surahName;
+  final SurahPlayButtonVariant variant;
 
   const _PlaySurahButton({
     required this.selectedReciter,
     required this.surahNumber,
     required this.surahName,
+    required this.variant,
   });
 
   @override
@@ -368,7 +462,7 @@ class _PlaySurahButton extends StatelessWidget {
         );
       },
       child: BlocBuilder<AudioManagementCubit, AudioManagementState>(
-        builder: (context, audioState) {
+        builder: (context, _) {
           return StreamBuilder<AudioPlayerState>(
             stream: context
                 .read<AudioManagementCubit>()
@@ -402,34 +496,43 @@ class _PlaySurahButton extends StatelessWidget {
                       isThisSurahPlaying &&
                       playerState == AudioPlayerState.paused;
 
+                  if (variant == SurahPlayButtonVariant.icon) {
+                    return IconButton(
+                      key: SurahPlayButton.iconActionKey,
+                      tooltip: isPlaying
+                          ? localizations.pauseSurah
+                          : isPaused
+                          ? localizations.resumeSurah
+                          : localizations.playSurah,
+                      onPressed: () => _handlePlayPressed(
+                        context,
+                        isThisSurahPlaying: isThisSurahPlaying,
+                        isPlaying: isPlaying,
+                        isPaused: isPaused,
+                        audioPlayerService: audioPlayerService,
+                      ),
+                      icon: Icon(
+                        isPlaying
+                            ? Icons.pause_circle_filled
+                            : Icons.play_circle_filled,
+                        color: isThisSurahPlaying
+                            ? theme.colorScheme.secondary
+                            : null,
+                        size: 22,
+                      ),
+                    );
+                  }
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: ElevatedButton.icon(
-                      onPressed: () async {
-                        final audioManagementCubit = context
-                            .read<AudioManagementCubit>();
-
-                        if (isThisSurahPlaying) {
-                          if (isPlaying) {
-                            await audioPlayerService.pause();
-                          } else if (isPaused) {
-                            await audioPlayerService.resume();
-                          }
-                          return;
-                        }
-
-                        await audioManagementCubit.loadAyahAudios(
-                          selectedReciter,
-                          surahNumber,
-                        );
-
-                        audioManagementCubit.playSurahPlaylist(
-                          selectedReciter,
-                          surahNumber,
-                          surahName: surahName,
-                          startAyahIndex: 0,
-                        );
-                      },
+                      onPressed: () => _handlePlayPressed(
+                        context,
+                        isThisSurahPlaying: isThisSurahPlaying,
+                        isPlaying: isPlaying,
+                        isPaused: isPaused,
+                        audioPlayerService: audioPlayerService,
+                      ),
                       icon: Icon(
                         isPlaying
                             ? Icons.pause_circle_filled
@@ -483,6 +586,34 @@ class _PlaySurahButton extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Future<void> _handlePlayPressed(
+    BuildContext context, {
+    required bool isThisSurahPlaying,
+    required bool isPlaying,
+    required bool isPaused,
+    required AudioPlayerService audioPlayerService,
+  }) async {
+    final audioManagementCubit = context.read<AudioManagementCubit>();
+
+    if (isThisSurahPlaying) {
+      if (isPlaying) {
+        await audioPlayerService.pause();
+      } else if (isPaused) {
+        await audioPlayerService.resume();
+      }
+      return;
+    }
+
+    await audioManagementCubit.loadAyahAudios(selectedReciter, surahNumber);
+
+    audioManagementCubit.playSurahPlaylist(
+      selectedReciter,
+      surahNumber,
+      surahName: surahName,
+      startAyahIndex: 0,
     );
   }
 }

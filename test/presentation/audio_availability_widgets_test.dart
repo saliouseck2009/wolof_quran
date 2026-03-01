@@ -23,9 +23,13 @@ import 'package:wolof_quran/l10n/generated/app_localizations.dart';
 import 'package:wolof_quran/presentation/blocs/surah_download_status_bloc.dart';
 import 'package:wolof_quran/presentation/cubits/audio_availability_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/ayah_playback_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/quran_settings_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/surah_detail_cubit.dart';
+import 'package:wolof_quran/presentation/widgets/ayah_play_button.dart';
 import 'package:wolof_quran/presentation/widgets/quran_settings/quran_settings_menu.dart';
 import 'package:wolof_quran/presentation/widgets/reciter_chapters/chapter_card.dart';
+import 'package:wolof_quran/presentation/widgets/surah_detail/surah_detail_app_bar.dart';
 import 'package:wolof_quran/presentation/widgets/surah_detail/surah_detail_play_button.dart';
 import 'package:wolof_quran/service_locator.dart';
 
@@ -153,6 +157,44 @@ class _FakeDownloadRepository implements DownloadRepository {
 class _TestQuranSettingsCubit extends QuranSettingsCubit {
   void setSelectedReciter(Reciter reciter) {
     emit(state.copyWith(selectedReciter: reciter));
+  }
+}
+
+class _SpyAudioManagementCubit extends AudioManagementCubit {
+  int downloadCallCount = 0;
+  String? lastReciterId;
+  int? lastSurahNumber;
+
+  _SpyAudioManagementCubit()
+    : super(
+        downloadSurahAudioUseCase: DownloadSurahAudioUseCase(
+          _FakeAudioRepository(),
+        ),
+        getSurahAudioStatusUseCase: GetSurahAudioStatusUseCase(
+          _FakeAudioRepository(),
+        ),
+        getAyahAudiosUseCase: GetAyahAudiosUseCase(_FakeAudioRepository()),
+        audioPlayerService: AudioPlayerService(),
+        downloadRepository: _FakeDownloadRepository(),
+      ) {
+    initialize();
+  }
+
+  @override
+  Future<void> downloadSurahAudio(String reciterId, int surahNumber) async {
+    downloadCallCount += 1;
+    lastReciterId = reciterId;
+    lastSurahNumber = surahNumber;
+  }
+}
+
+class _ModalSpyAudioManagementCubit extends _SpyAudioManagementCubit {
+  @override
+  Future<void> refreshSurahStatus(String reciterId, int surahNumber) async {}
+
+  @override
+  bool isSurahDownloaded(String reciterId, int surahNumber) {
+    return false;
   }
 }
 
@@ -384,6 +426,322 @@ void main() {
         await tester.pump(const Duration(milliseconds: 50));
 
         expect(find.text('Not yet available'), findsOneWidget);
+      },
+    );
+
+    testWidgets('SurahDetailAppBar shows "number - translated name"', (
+      tester,
+    ) async {
+      if (locator.isRegistered<GetDownloadedSurahsUseCase>()) {
+        locator.unregister<GetDownloadedSurahsUseCase>();
+      }
+      locator.registerLazySingleton<GetDownloadedSurahsUseCase>(
+        () => GetDownloadedSurahsUseCase(_FakeDownloadRepository()),
+      );
+
+      final quranSettingsCubit = QuranSettingsCubit();
+      final state = SurahDetailLoaded(
+        surahNumber: 2,
+        surahNameArabic: 'البقرة',
+        surahNameEnglish: 'Al-Baqara',
+        surahNameTranslated: 'The Cow',
+        versesCount: 286,
+        ayahs: [],
+        translationSource: 'Sahih International',
+      );
+
+      await tester.pumpWidget(
+        _buildLocalizedApp(
+          BlocProvider<QuranSettingsCubit>.value(
+            value: quranSettingsCubit,
+            child: CustomScrollView(slivers: [SurahDetailAppBar(state: state)]),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('2 - The Cow'), findsOneWidget);
+
+      await quranSettingsCubit.close();
+      if (locator.isRegistered<GetDownloadedSurahsUseCase>()) {
+        locator.unregister<GetDownloadedSurahsUseCase>();
+      }
+    });
+
+    testWidgets(
+      'SurahPlayButton icon variant hides labels and triggers direct download',
+      (tester) async {
+        if (locator.isRegistered<AudioRepository>()) {
+          locator.unregister<AudioRepository>();
+        }
+        locator.registerLazySingleton<AudioRepository>(
+          () => _FakeAudioRepository(),
+        );
+
+        final audioManagementCubit = _SpyAudioManagementCubit();
+
+        final availabilityRepository = _InMemoryAudioAvailabilityRepository([
+          AudioAvailabilitySnapshot(
+            reciterId: reciter.id,
+            catalogVersion: 2,
+            availableSurahs: const [2],
+            unreadNewSurahs: const [],
+            lastCheckedAt: DateTime.now(),
+          ),
+        ]);
+        final availabilityCubit = AudioAvailabilityCubit(
+          refreshAudioAvailabilityUseCase: RefreshAudioAvailabilityUseCase(
+            availabilityRepository,
+          ),
+          getCachedAudioAvailabilityUseCase: GetCachedAudioAvailabilityUseCase(
+            availabilityRepository,
+          ),
+          markAudioUpdatesSeenUseCase: MarkAudioUpdatesSeenUseCase(
+            availabilityRepository,
+          ),
+        );
+        await availabilityCubit.refreshReciter(reciter.id, force: true);
+
+        final quranSettingsCubit = _TestQuranSettingsCubit()
+          ..setSelectedReciter(reciter);
+        final surahStatusBloc = _FixedSurahDownloadStatusBloc(
+          reciterId: reciter.id,
+          surahNumber: 2,
+          isDownloaded: false,
+        );
+
+        await tester.pumpWidget(
+          _buildLocalizedApp(
+            MultiBlocProvider(
+              providers: [
+                BlocProvider<QuranSettingsCubit>.value(
+                  value: quranSettingsCubit,
+                ),
+                BlocProvider<AudioManagementCubit>.value(
+                  value: audioManagementCubit,
+                ),
+                BlocProvider<AudioAvailabilityCubit>.value(
+                  value: availabilityCubit,
+                ),
+                BlocProvider<SurahDownloadStatusBloc>.value(
+                  value: surahStatusBloc,
+                ),
+              ],
+              child: const SurahPlayButton(
+                surahNumber: 2,
+                surahName: 'Al-Baqara',
+                variant: SurahPlayButtonVariant.icon,
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        expect(find.byKey(SurahPlayButton.iconActionKey), findsOneWidget);
+        expect(find.text('Download to play'), findsNothing);
+        expect(find.text('Play Surah'), findsNothing);
+        expect(audioManagementCubit.downloadCallCount, 0);
+        final button = tester.widget<IconButton>(
+          find.byKey(SurahPlayButton.iconActionKey),
+        );
+        expect(button.onPressed, isNotNull);
+        button.onPressed!.call();
+        await tester.pump();
+        expect(audioManagementCubit.downloadCallCount, 1);
+        expect(audioManagementCubit.lastReciterId, reciter.id);
+        expect(audioManagementCubit.lastSurahNumber, 2);
+
+        await quranSettingsCubit.close();
+        await availabilityCubit.close();
+        await audioManagementCubit.close();
+        if (locator.isRegistered<AudioRepository>()) {
+          locator.unregister<AudioRepository>();
+        }
+      },
+    );
+
+    testWidgets(
+      'SurahPlayButton icon variant is disabled when surah is unavailable remotely',
+      (tester) async {
+        final audioRepository = _FakeAudioRepository();
+        if (locator.isRegistered<AudioRepository>()) {
+          locator.unregister<AudioRepository>();
+        }
+        locator.registerLazySingleton<AudioRepository>(() => audioRepository);
+
+        final audioManagementCubit = AudioManagementCubit(
+          downloadSurahAudioUseCase: DownloadSurahAudioUseCase(audioRepository),
+          getSurahAudioStatusUseCase: GetSurahAudioStatusUseCase(
+            audioRepository,
+          ),
+          getAyahAudiosUseCase: GetAyahAudiosUseCase(audioRepository),
+          audioPlayerService: AudioPlayerService(),
+          downloadRepository: _FakeDownloadRepository(),
+        )..initialize();
+
+        final availabilityRepository = _InMemoryAudioAvailabilityRepository([
+          AudioAvailabilitySnapshot(
+            reciterId: reciter.id,
+            catalogVersion: 2,
+            availableSurahs: const [1],
+            unreadNewSurahs: const [],
+            lastCheckedAt: DateTime.now(),
+          ),
+        ]);
+        final availabilityCubit = AudioAvailabilityCubit(
+          refreshAudioAvailabilityUseCase: RefreshAudioAvailabilityUseCase(
+            availabilityRepository,
+          ),
+          getCachedAudioAvailabilityUseCase: GetCachedAudioAvailabilityUseCase(
+            availabilityRepository,
+          ),
+          markAudioUpdatesSeenUseCase: MarkAudioUpdatesSeenUseCase(
+            availabilityRepository,
+          ),
+        );
+        await availabilityCubit.refreshReciter(reciter.id, force: true);
+
+        final quranSettingsCubit = _TestQuranSettingsCubit()
+          ..setSelectedReciter(reciter);
+        final surahStatusBloc = _FixedSurahDownloadStatusBloc(
+          reciterId: reciter.id,
+          surahNumber: 2,
+          isDownloaded: false,
+        );
+
+        await tester.pumpWidget(
+          _buildLocalizedApp(
+            MultiBlocProvider(
+              providers: [
+                BlocProvider<QuranSettingsCubit>.value(
+                  value: quranSettingsCubit,
+                ),
+                BlocProvider<AudioManagementCubit>.value(
+                  value: audioManagementCubit,
+                ),
+                BlocProvider<AudioAvailabilityCubit>.value(
+                  value: availabilityCubit,
+                ),
+                BlocProvider<SurahDownloadStatusBloc>.value(
+                  value: surahStatusBloc,
+                ),
+              ],
+              child: const SurahPlayButton(
+                surahNumber: 2,
+                surahName: 'Al-Baqara',
+                variant: SurahPlayButtonVariant.icon,
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        final button = tester.widget<IconButton>(
+          find.byKey(SurahPlayButton.iconActionKey),
+        );
+        expect(button.onPressed, isNull);
+        expect(find.text('Not yet available'), findsNothing);
+        expect(
+          find.byIcon(Icons.download_for_offline_outlined),
+          findsOneWidget,
+        );
+
+        await quranSettingsCubit.close();
+        await availabilityCubit.close();
+        await audioManagementCubit.close();
+        if (locator.isRegistered<AudioRepository>()) {
+          locator.unregister<AudioRepository>();
+        }
+      },
+    );
+
+    testWidgets(
+      'AyahPlayButton opens modal and downloads surah when confirmed',
+      (tester) async {
+        if (locator.isRegistered<AudioRepository>()) {
+          locator.unregister<AudioRepository>();
+        }
+        locator.registerLazySingleton<AudioRepository>(
+          () => _FakeAudioRepository(),
+        );
+
+        final audioManagementCubit = _ModalSpyAudioManagementCubit();
+        final availabilityRepository = _InMemoryAudioAvailabilityRepository([
+          AudioAvailabilitySnapshot(
+            reciterId: reciter.id,
+            catalogVersion: 2,
+            availableSurahs: const [2],
+            unreadNewSurahs: const [],
+            lastCheckedAt: DateTime.now(),
+          ),
+        ]);
+        final availabilityCubit = AudioAvailabilityCubit(
+          refreshAudioAvailabilityUseCase: RefreshAudioAvailabilityUseCase(
+            availabilityRepository,
+          ),
+          getCachedAudioAvailabilityUseCase: GetCachedAudioAvailabilityUseCase(
+            availabilityRepository,
+          ),
+          markAudioUpdatesSeenUseCase: MarkAudioUpdatesSeenUseCase(
+            availabilityRepository,
+          ),
+        );
+        await availabilityCubit.refreshReciter(reciter.id, force: true);
+
+        final quranSettingsCubit = _TestQuranSettingsCubit()
+          ..setSelectedReciter(reciter);
+        final ayahPlaybackCubit = AyahPlaybackCubit(
+          audioPlayerService: AudioPlayerService(),
+          audioManagementCubit: audioManagementCubit,
+        );
+
+        await tester.pumpWidget(
+          _buildLocalizedApp(
+            MultiBlocProvider(
+              providers: [
+                BlocProvider<QuranSettingsCubit>.value(
+                  value: quranSettingsCubit,
+                ),
+                BlocProvider<AudioManagementCubit>.value(
+                  value: audioManagementCubit,
+                ),
+                BlocProvider<AudioAvailabilityCubit>.value(
+                  value: availabilityCubit,
+                ),
+                BlocProvider<AyahPlaybackCubit>.value(value: ayahPlaybackCubit),
+              ],
+              child: const AyahPlayButton(
+                surahNumber: 2,
+                ayahNumber: 5,
+                surahName: 'Al-Baqara',
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        await tester.tap(find.byIcon(Icons.play_arrow));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Audio not available. Please download the surah first.'),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.text('Download'));
+        await tester.pumpAndSettle();
+
+        expect(audioManagementCubit.downloadCallCount, 1);
+        expect(audioManagementCubit.lastReciterId, reciter.id);
+        expect(audioManagementCubit.lastSurahNumber, 2);
+
+        await quranSettingsCubit.close();
+        await availabilityCubit.close();
+        await ayahPlaybackCubit.close();
+        await audioManagementCubit.close();
+        if (locator.isRegistered<AudioRepository>()) {
+          locator.unregister<AudioRepository>();
+        }
       },
     );
   });
