@@ -8,6 +8,7 @@ import '../../blocs/surah_download_status_bloc.dart';
 import '../../cubits/audio_availability_cubit.dart';
 import '../../cubits/audio_management_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
+import '../../cubits/surah_mini_player_cubit.dart';
 import '../../utils/audio_error_formatter.dart';
 import '../snackbar.dart';
 
@@ -609,11 +610,19 @@ class _PlaySurahButton extends StatelessWidget {
 
     await audioManagementCubit.loadAyahAudios(selectedReciter, surahNumber);
 
-    audioManagementCubit.playSurahPlaylist(
+    await audioManagementCubit.playSurahPlaylist(
       selectedReciter,
       surahNumber,
       surahName: surahName,
       startAyahIndex: 0,
+    );
+
+    if (!context.mounted) {
+      return;
+    }
+
+    await context.read<SurahMiniPlayerCubit>().attachToCurrentPlayback(
+      expanded: false,
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../views/surah_audio_list_page.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 class HomeActionsGrid extends StatelessWidget {
@@ -30,16 +31,16 @@ class HomeActionsGrid extends StatelessWidget {
                 onTap: () => Navigator.pushNamed(context, '/surahs'),
               ),
             ),
-            // SizedBox(
-            //   width: cardWidth,
-            //   child: _ModernActionCard(
-            //     icon: Icons.headphones_outlined,
-            //     title: localizations.recitation,
-            //     subtitle: localizations.listenAudio,
-            //     onTap: () =>
-            //         Navigator.pushNamed(context, SurahAudioListPage.routeName),
-            //   ),
-            // ),
+            SizedBox(
+              width: cardWidth,
+              child: _ModernActionCard(
+                icon: Icons.headphones_outlined,
+                title: localizations.recitation,
+                subtitle: localizations.listenAudio,
+                onTap: () =>
+                    Navigator.pushNamed(context, SurahAudioListPage.routeName),
+              ),
+            ),
             SizedBox(
               width: cardWidth,
               child: _ModernActionCard(

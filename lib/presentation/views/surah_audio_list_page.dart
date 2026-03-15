@@ -1,454 +1,417 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:quran/quran.dart' as quran;
-// import '../../core/utils/toast_service.dart';
-// import '../../domain/repositories/download_repository.dart';
-// import '../cubits/reciter_cubit.dart';
-// import '../cubits/audio_management_cubit.dart';
-// import '../cubits/quran_settings_cubit.dart';
-// import '../../service_locator.dart';
-// import '../../l10n/generated/app_localizations.dart';
-// import '../utils/audio_error_formatter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran/quran.dart' as quran;
 
-// class SurahAudioListPage extends StatelessWidget {
-//   static const String routeName = "/surah-audio-list";
+import '../../domain/entities/reciter.dart';
+import '../../domain/usecases/get_downloaded_surahs_usecase.dart';
+import '../../l10n/generated/app_localizations.dart';
+import '../../service_locator.dart';
+import '../blocs/reciter_chapters_bloc.dart';
+import '../cubits/audio_availability_cubit.dart';
+import '../cubits/audio_management_cubit.dart';
+import '../cubits/quran_settings_cubit.dart';
+import '../cubits/surah_mini_player_cubit.dart';
+import '../utils/audio_error_formatter.dart';
+import '../widgets/snackbar.dart';
 
-//   const SurahAudioListPage({super.key});
+class SurahAudioListPage extends StatelessWidget {
+  static const String routeName = '/surah-audio-list';
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return const _SurahAudioListView();
-//   }
-// }
+  const SurahAudioListPage({super.key});
 
-// class _SurahAudioListView extends StatelessWidget {
-//   const _SurahAudioListView();
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
 
-//   // Helper method to safely check download stat²us
-//   Future<bool> _checkDownloadStatus(String reciterId, int surahNumber) async {
-//     try {
-//       return await locator<DownloadRepository>().isSurahDownloaded(
-//         reciterId,
-//         surahNumber,
-//       );
-//     } catch (e) {
-//       print('Could not check download status from database: $e');
-//       return false; // Fallback to not downloaded
-//     }
-//   }
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+        title: Text(
+          localizations.audioDownloads,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onPrimary,
+            fontSize: 18,
+          ),
+        ),
+        backgroundColor: colorScheme.brightness == Brightness.dark
+            ? colorScheme.surfaceContainerLowest
+            : colorScheme.primary,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
+        builder: (context, quranSettingsState) {
+          final selectedReciter = quranSettingsState.selectedReciter;
+          if (selectedReciter == null) {
+            return _NoReciterSelectedState(localizations: localizations);
+          }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final colorScheme = Theme.of(context).colorScheme;
-//     final accentGreen = colorScheme.primary;
-//     final localizations = AppLocalizations.of(context)!;
-//     final textTheme = Theme.of(context).textTheme;
+          return KeyedSubtree(
+            key: ValueKey<String>('surah-audio-list-${selectedReciter.id}'),
+            child: BlocProvider(
+              create: (context) => ReciterChaptersBloc(
+                getDownloadedSurahsUseCase:
+                    locator<GetDownloadedSurahsUseCase>(),
+              )..add(LoadReciterChapters(selectedReciter)),
+              child: _SurahAudioListBody(reciter: selectedReciter),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
 
-//     return Scaffold(
-//       backgroundColor: colorScheme.brightness == Brightness.dark
-//           ? colorScheme.surfaceContainerLowest
-//           : colorScheme.surface,
-//       appBar: AppBar(
-//         title: Text(
-//           localizations.audioDownloads,
-//           style: TextStyle(
-//             fontWeight: FontWeight.w600,
-//             color: colorScheme.onPrimary,
-//             fontSize: 18,
-//           ),
-//         ),
-//         backgroundColor: colorScheme.brightness == Brightness.dark
-//             ? colorScheme.surfaceContainer.withValues(alpha: 0.7)
-//             : colorScheme.primary,
-//         iconTheme: IconThemeData(color: colorScheme.onPrimary),
-//         elevation: 2,
-//       ),
-//       body: BlocListener<AudioManagementCubit, AudioManagementState>(
-//         listenWhen: (previous, current) =>
-//             current is AudioManagementError &&
-//             previous is! AudioManagementError,
-//         listener: (context, state) {
-//           if (state is AudioManagementError) {
-//             final friendly = formatAudioError(
-//               state.message,
-//               AppLocalizations.of(context)!,
-//             );
-//             ToastService.showError(context, friendly);
-//           }
-//         },
-//         child: BlocBuilder<ReciterCubit, ReciterState>(
-//           builder: (context, reciterState) {
-//             if (reciterState is ReciterLoading) {
-//               return const Center(child: CircularProgressIndicator());
-//             }
+class _NoReciterSelectedState extends StatelessWidget {
+  final AppLocalizations localizations;
 
-//             if (reciterState is ReciterError) {
-//               return Center(
-//                 child: Column(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     Icon(
-//                       Icons.error_outline,
-//                       size: 64,
-//                       color: colorScheme.error,
-//                     ),
-//                     const SizedBox(height: 16),
-//                     Text(
-//                       reciterState.message,
-//                       style: textTheme.bodyMedium?.copyWith(
-//                         color: colorScheme.error,
-//                       ),
-//                       textAlign: TextAlign.center,
-//                     ),
-//                   ],
-//                 ),
-//               );
-//             }
+  const _NoReciterSelectedState({required this.localizations});
 
-//             if (reciterState is ReciterLoaded) {
-//               final selectedReciter = reciterState.selectedReciter;
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-//               if (selectedReciter == null) {
-//                 return Center(
-//                   child: Column(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       Icon(
-//                         Icons.person_off,
-//                         size: 64,
-//                         color: colorScheme.onSurfaceVariant,
-//                       ),
-//                       const SizedBox(height: 16),
-//                       Text(
-//                         localizations.noReciterSelected,
-//                         style: textTheme.bodyMedium?.copyWith(
-//                           color: colorScheme.onSurfaceVariant,
-//                           fontWeight: FontWeight.w600,
-//                         ),
-//                       ),
-//                       const SizedBox(height: 16),
-//                       ElevatedButton(
-//                         onPressed: () {
-//                           Navigator.pushNamed(context, '/quran-settings');
-//                         },
-//                         child: Text(localizations.selectReciter),
-//                       ),
-//                     ],
-//                   ),
-//                 );
-//               }
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.record_voice_over_outlined,
+              size: 56,
+              color: colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              localizations.noReciterSelected,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              localizations.selectReciter,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: () => Navigator.pushNamed(context, '/reciter-list'),
+              icon: const Icon(Icons.manage_accounts_outlined),
+              label: Text(localizations.selectReciter),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-//               return Column(
-//                 children: [
-//                   // Selected reciter info
-//                   Container(
-//                     width: double.infinity,
-//                     padding: const EdgeInsets.all(16),
-//                     margin: const EdgeInsets.all(16),
-//                     decoration: BoxDecoration(
-//                       gradient: colorScheme.brightness == Brightness.dark
-//                           ? LinearGradient(
-//                               begin: Alignment.topLeft,
-//                               end: Alignment.bottomRight,
-//                               colors: [
-//                                 colorScheme.surfaceContainer.withValues(
-//                                   alpha: 0.8,
-//                                 ),
-//                                 colorScheme.surfaceContainer.withValues(
-//                                   alpha: 0.9,
-//                                 ),
-//                               ],
-//                             )
-//                           : LinearGradient(
-//                               begin: Alignment.topLeft,
-//                               end: Alignment.bottomRight,
-//                               colors: [
-//                                 colorScheme.primary.withValues(alpha: 0.1),
-//                                 colorScheme.primaryContainer.withValues(
-//                                   alpha: 0.2,
-//                                 ),
-//                               ],
-//                             ),
-//                       borderRadius: BorderRadius.circular(16),
-//                       border: Border.all(
-//                         color: colorScheme.primary.withValues(alpha: 0.2),
-//                         width: 1,
-//                       ),
-//                     ),
-//                     child: Row(
-//                       children: [
-//                         Icon(
-//                           Icons.record_voice_over,
-//                           color: accentGreen,
-//                           size: 24,
-//                         ),
-//                         const SizedBox(width: 12),
-//                         Expanded(
-//                           child: Column(
-//                             crossAxisAlignment: CrossAxisAlignment.start,
-//                             children: [
-//                               Text(
-//                                 selectedReciter.name,
-//                                 style: textTheme.titleMedium?.copyWith(
-//                                   color: colorScheme.onSurface,
-//                                   fontWeight: FontWeight.w700,
-//                                 ),
-//                               ),
-//                               Text(
-//                                 selectedReciter.arabicName,
-//                                 style: textTheme.bodySmall?.copyWith(
-//                                   color: colorScheme.onSurfaceVariant,
-//                                   fontFamily: 'Hafs',
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                         TextButton(
-//                           onPressed: () {
-//                             Navigator.pushNamed(context, '/quran-settings');
-//                           },
-//                           child: Text(localizations.change),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
+class _SurahAudioListBody extends StatelessWidget {
+  final Reciter reciter;
 
-//                   // Surah list
-//                   Expanded(
-//                     child:
-//                         BlocBuilder<AudioManagementCubit, AudioManagementState>(
-//                           builder: (context, audioState) {
-//                             return ListView.builder(
-//                               padding: const EdgeInsets.symmetric(
-//                                 horizontal: 16,
-//                               ),
-//                               itemCount: 114, // 114 surahs
-//                               itemBuilder: (context, index) {
-//                                 final surahNumber = index + 1;
-//                                 return _buildSurahCard(
-//                                   context,
-//                                   surahNumber,
-//                                   selectedReciter.id,
-//                                   audioState,
-//                                 );
-//                               },
-//                             );
-//                           },
-//                         ),
-//                   ),
-//                 ],
-//               );
-//             }
+  const _SurahAudioListBody({required this.reciter});
 
-//             return const SizedBox.shrink();
-//           },
-//         ),
-//       ),
-//     );
-//   }
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final translation = context.watch<QuranSettingsCubit>().currentTranslation;
 
-//   Widget _buildSurahCard(
-//     BuildContext context,
-//     int surahNumber,
-//     String reciterId,
-//     AudioManagementState audioState,
-//   ) {
-//     final colorScheme = Theme.of(context).colorScheme;
-//     final accentGreen = colorScheme.primary;
-//     final surahNameArabic = quran.getSurahNameArabic(surahNumber);
-//     final surahNameTranslated = QuranSettingsCubit.getSurahNameInTranslation(
-//       surahNumber,
-//       quran.Translation.frHamidullah, // TODO: Use user's selected translation
-//     );
-//     final versesCount = quran.getVerseCount(surahNumber);
-//     final localizations = AppLocalizations.of(context)!;
-//     final textTheme = Theme.of(context).textTheme;
-//     final isOtherDownloading =
-//         audioState is AudioDownloading &&
-//         (audioState.reciterId != reciterId ||
-//             audioState.surahNumber != surahNumber);
+    return BlocListener<AudioManagementCubit, AudioManagementState>(
+      listenWhen: (previous, current) {
+        if (previous is AudioDownloading && previous.reciterId == reciter.id) {
+          return current is AudioManagementLoaded ||
+              current is AudioManagementError;
+        }
+        return false;
+      },
+      listener: (context, audioState) {
+        if (audioState is AudioManagementLoaded) {
+          context.read<ReciterChaptersBloc>().add(
+            RefreshDownloadedSurahs(reciter.id),
+          );
+          context.read<SurahMiniPlayerCubit>().refreshQueueForReciter(
+            reciter.id,
+          );
+        }
 
-//     return FutureBuilder<bool>(
-//       future: _checkDownloadStatus(reciterId, surahNumber),
-//       builder: (context, downloadSnapshot) {
-//         // Get download status from database (with fallback)
-//         bool isDownloaded = downloadSnapshot.data ?? false;
-//         bool isDownloading = false;
-//         double downloadProgress = 0.0;
+        if (audioState is AudioManagementError) {
+          final formatted = formatAudioError(audioState.message, localizations);
+          CustomSnackbar.showErrorSnackbar(context, formatted, duration: 3);
+        }
+      },
+      child: BlocBuilder<ReciterChaptersBloc, ReciterChaptersState>(
+        builder: (context, chaptersState) {
+          if (chaptersState is ReciterChaptersLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-//         // Check for current downloading state
-//         if (audioState is AudioDownloading &&
-//             audioState.reciterId == reciterId &&
-//             audioState.surahNumber == surahNumber) {
-//           isDownloading = true;
-//           downloadProgress = audioState.progress;
-//         }
+          if (chaptersState is ReciterChaptersError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  formatAudioError(chaptersState.message, localizations),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
 
-//         return Container(
-//           margin: const EdgeInsets.only(bottom: 12),
-//           decoration: BoxDecoration(
-//             color: colorScheme.surfaceContainer,
-//             borderRadius: BorderRadius.circular(16),
-//             boxShadow: colorScheme.brightness == Brightness.dark
-//                 ? [
-//                     BoxShadow(
-//                       color: colorScheme.primary.withValues(alpha: 0.08),
-//                       blurRadius: 12,
-//                       offset: const Offset(0, 2),
-//                     ),
-//                   ]
-//                 : null,
-//             border: Border.all(
-//               color: colorScheme.primary.withValues(
-//                 alpha: colorScheme.brightness == Brightness.dark ? 0.1 : 0.15,
-//               ),
-//               width: 1,
-//             ),
-//           ),
-//           child: InkWell(
-//             borderRadius: BorderRadius.circular(12),
-//             onTap: isDownloaded
-//                 ? () {
-//                     // Navigate to surah detail page with audio playback
-//                     // TODO: Implement navigation to detail page
-//                   }
-//                 : null,
-//             child: Padding(
-//               padding: const EdgeInsets.all(16),
-//               child: Row(
-//                 children: [
-//                   // Surah number circle
-//                   Container(
-//                     width: 40,
-//                     height: 40,
-//                     decoration: BoxDecoration(
-//                       color: accentGreen.withValues(alpha: 0.1),
-//                       shape: BoxShape.circle,
-//                       border: Border.all(
-//                         color: accentGreen.withValues(alpha: 0.3),
-//                         width: 1,
-//                       ),
-//                     ),
-//                     child: Center(
-//                       child: Text(
-//                         surahNumber.toString(),
-//                         style: textTheme.titleSmall?.copyWith(
-//                           fontWeight: FontWeight.w700,
-//                           color: accentGreen,
-//                         ),
-//                       ),
-//                     ),
-//                   ),
+          if (chaptersState is! ReciterChaptersLoaded) {
+            return const SizedBox.shrink();
+          }
 
-//                   const SizedBox(width: 16),
+          return BlocBuilder<AudioAvailabilityCubit, AudioAvailabilityState>(
+            builder: (context, availabilityState) {
+              final snapshot = availabilityState.snapshotForReciter(reciter.id);
+              final remoteAvailableSet = snapshot?.availableSurahs.toSet();
+              final hasAvailabilityData = snapshot != null;
 
-//                   // Surah info
-//                   Expanded(
-//                     child: Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-//                         Row(
-//                           children: [
-//                             Expanded(
-//                               child: Text(
-//                                 surahNameTranslated,
-//                                 style: textTheme.titleMedium?.copyWith(
-//                                   fontWeight: FontWeight.w700,
-//                                   color: colorScheme.onSurface,
-//                                 ),
-//                               ),
-//                             ),
-//                             Text(
-//                               surahNameArabic,
-//                               style: textTheme.titleMedium?.copyWith(
-//                                 fontFamily: 'Hafs',
-//                                 fontSize: 18,
-//                                 fontWeight: FontWeight.w700,
-//                                 color: accentGreen,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                         const SizedBox(height: 4),
-//                         Text(
-//                           localizations.ayahCountLabel(versesCount),
-//                           style: textTheme.bodySmall?.copyWith(
-//                             color: colorScheme.onSurfaceVariant,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
+              return BlocBuilder<AudioManagementCubit, AudioManagementState>(
+                builder: (context, audioState) {
+                  return ListView.builder(
+                    key: const PageStorageKey<String>('surah-audio-list'),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+                    itemCount: 114,
+                    itemBuilder: (context, index) {
+                      final surahNumber = index + 1;
+                      final isDownloaded = chaptersState.isSurahDownloaded(
+                        surahNumber,
+                      );
+                      final isAvailableRemotely =
+                          !hasAvailabilityData ||
+                          (remoteAvailableSet?.contains(surahNumber) ?? false);
 
-//                   const SizedBox(width: 16),
+                      final isDownloading =
+                          audioState is AudioDownloading &&
+                          audioState.reciterId == reciter.id &&
+                          audioState.surahNumber == surahNumber;
+                      final currentDownloadProgress =
+                          audioState is AudioDownloading &&
+                              audioState.reciterId == reciter.id &&
+                              audioState.surahNumber == surahNumber
+                          ? audioState.progress
+                          : 0.0;
 
-//                   // Download/Play button
-//                   if (isDownloading)
-//                     SizedBox(
-//                       width: 40,
-//                       height: 40,
-//                       child: Stack(
-//                         alignment: Alignment.center,
-//                         children: [
-//                           CircularProgressIndicator(
-//                             value: downloadProgress,
-//                             strokeWidth: 2,
-//                             valueColor: AlwaysStoppedAnimation<Color>(
-//                               colorScheme.primary,
-//                             ),
-//                           ),
-//                           Text(
-//                             '${(downloadProgress * 100).round()}%',
-//                             style: textTheme.labelSmall?.copyWith(
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     )
-//                   else
-//                     IconButton(
-//                       icon: Icon(
-//                         isDownloaded
-//                             ? Icons.play_circle_filled
-//                             : Icons.download,
-//                         color: isDownloaded
-//                             ? accentGreen
-//                             : colorScheme.onSurfaceVariant,
-//                         size: 32,
-//                       ),
-//                       onPressed: () {
-//                         if (isOtherDownloading) {
-//                           ToastService.showError(
-//                             context,
-//                             localizations.downloadInProgress,
-//                           );
-//                           return;
-//                         }
-//                         if (isDownloaded) {
-//                           // Play surah
-//                           context
-//                               .read<AudioManagementCubit>()
-//                               .playSurahPlaylist(
-//                                 reciterId,
-//                                 surahNumber,
-//                                 surahName: surahNameTranslated,
-//                               );
-//                         } else {
-//                           // Download surah
-//                           context
-//                               .read<AudioManagementCubit>()
-//                               .downloadSurahAudio(reciterId, surahNumber);
-//                         }
-//                       },
-//                     ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }
+                      final isOtherDownloading =
+                          audioState is AudioDownloading &&
+                          (audioState.reciterId != reciter.id ||
+                              audioState.surahNumber != surahNumber);
+
+                      final translatedName =
+                          QuranSettingsCubit.getSurahNameInTranslation(
+                            surahNumber,
+                            translation,
+                          );
+
+                      return _SurahAudioItemCard(
+                        surahNumber: surahNumber,
+                        surahNameArabic: quran.getSurahNameArabic(surahNumber),
+                        surahNameTranslated: translatedName,
+                        versesCount: quran.getVerseCount(surahNumber),
+                        isDownloaded: isDownloaded,
+                        isDownloading: isDownloading,
+                        downloadProgress: currentDownloadProgress,
+                        isOtherDownloading: isOtherDownloading,
+                        isAvailableRemotely: isAvailableRemotely,
+                        reciterId: reciter.id,
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SurahAudioItemCard extends StatelessWidget {
+  final int surahNumber;
+  final String surahNameArabic;
+  final String surahNameTranslated;
+  final int versesCount;
+  final bool isDownloaded;
+  final bool isDownloading;
+  final double downloadProgress;
+  final bool isOtherDownloading;
+  final bool isAvailableRemotely;
+  final String reciterId;
+
+  const _SurahAudioItemCard({
+    required this.surahNumber,
+    required this.surahNameArabic,
+    required this.surahNameTranslated,
+    required this.versesCount,
+    required this.isDownloaded,
+    required this.isDownloading,
+    required this.downloadProgress,
+    required this.isOtherDownloading,
+    required this.isAvailableRemotely,
+    required this.reciterId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final localizations = AppLocalizations.of(context)!;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                '$surahNumber',
+                style: TextStyle(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$surahNameArabic - $surahNameTranslated',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    localizations.ayahCountLabel(versesCount),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            _buildAction(context, localizations),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAction(BuildContext context, AppLocalizations localizations) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (isDownloading) {
+      final progressPercent = (downloadProgress * 100).toInt();
+      return SizedBox(
+        width: 44,
+        height: 44,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            CircularProgressIndicator(
+              value: downloadProgress,
+              strokeWidth: 3,
+              color: colorScheme.primary,
+              backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
+            ),
+            Text(
+              '$progressPercent%',
+              style: Theme.of(
+                context,
+              ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isDownloaded) {
+      return IconButton(
+        icon: Icon(
+          Icons.play_circle_fill,
+          size: 34,
+          color: colorScheme.primary,
+        ),
+        tooltip: localizations.playSurah,
+        onPressed: () async {
+          final audioManagementCubit = context.read<AudioManagementCubit>();
+          await audioManagementCubit.loadAyahAudios(reciterId, surahNumber);
+          if (!context.mounted) {
+            return;
+          }
+
+          await audioManagementCubit.playSurahPlaylist(
+            reciterId,
+            surahNumber,
+            surahName: surahNameTranslated,
+            startAyahIndex: 0,
+          );
+
+          if (!context.mounted) {
+            return;
+          }
+
+          await context.read<SurahMiniPlayerCubit>().attachToCurrentPlayback(
+            expanded: true,
+          );
+        },
+      );
+    }
+
+    if (!isAvailableRemotely) {
+      return Tooltip(
+        message: localizations.audioNotYetAvailable,
+        child: Icon(
+          Icons.download_for_offline_outlined,
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+          size: 30,
+        ),
+      );
+    }
+
+    return IconButton(
+      icon: Icon(Icons.download_rounded, size: 30, color: colorScheme.primary),
+      tooltip: localizations.downloadLabel,
+      onPressed: () {
+        if (isOtherDownloading) {
+          CustomSnackbar.showSnackbar(
+            context,
+            localizations.downloadInProgress,
+            duration: 2,
+          );
+          return;
+        }
+
+        context.read<AudioManagementCubit>().downloadSurahAudio(
+          reciterId,
+          surahNumber,
+        );
+      },
+    );
+  }
+}

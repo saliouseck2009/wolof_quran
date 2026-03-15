@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -51,6 +53,8 @@ class AudioPlayerService {
       BehaviorSubject<Duration>.seeded(Duration.zero);
   final BehaviorSubject<Duration?> _durationSubject =
       BehaviorSubject<Duration?>.seeded(null);
+  final BehaviorSubject<bool> _repeatSurahSubject =
+      BehaviorSubject<bool>.seeded(false);
 
   // Playlist management
   List<String> _currentPlaylist = [];
@@ -64,12 +68,14 @@ class AudioPlayerService {
   Stream<PlayingAudioInfo?> get currentAudio => _currentAudioSubject.stream;
   Stream<Duration> get position => _positionSubject.stream;
   Stream<Duration?> get duration => _durationSubject.stream;
+  Stream<bool> get repeatSurah => _repeatSurahSubject.stream;
 
   // Current values
   AudioPlayerState get currentPlayerState => _playerStateSubject.value;
   PlayingAudioInfo? get currentPlayingAudio => _currentAudioSubject.value;
   bool get isPlaying => currentPlayerState == AudioPlayerState.playing;
   bool get isPlayingPlaylist => _isPlayingPlaylist;
+  bool get isRepeatSurahEnabled => _repeatSurahSubject.value;
 
   /// Initialize the audio player service
   void initialize() {
@@ -192,6 +198,17 @@ class AudioPlayerService {
     await _audioPlayer.seek(position);
   }
 
+  /// Seek relative to current position.
+  Future<void> seekBy(Duration delta) async {
+    final target = computeSeekTarget(
+      current: _positionSubject.value,
+      delta: delta,
+      total: _durationSubject.value,
+    );
+
+    await _audioPlayer.seek(target);
+  }
+
   /// Skip to next track in playlist
   Future<void> skipToNext() async {
     if (_isPlayingPlaylist &&
@@ -214,6 +231,11 @@ class AudioPlayerService {
     await _audioPlayer.setVolume(volume.clamp(0.0, 1.0));
   }
 
+  /// Enable/disable repeat for surah playlist.
+  Future<void> setRepeatSurah(bool enabled) async {
+    _repeatSurahSubject.add(enabled);
+  }
+
   /// Dispose resources
   Future<void> dispose() async {
     await _audioPlayer.dispose();
@@ -221,6 +243,7 @@ class AudioPlayerService {
     await _currentAudioSubject.close();
     await _positionSubject.close();
     await _durationSubject.close();
+    await _repeatSurahSubject.close();
   }
 
   /// Handle playback completion
@@ -235,15 +258,22 @@ class AudioPlayerService {
 
   /// Play next item in playlist
   Future<void> _playNextInPlaylist() async {
-    if (_currentPlaylistIndex < _currentPlaylist.length - 1) {
-      _currentPlaylistIndex++;
-      await _playCurrentPlaylistItem();
-    } else {
+    final nextIndex = computeNextPlaylistIndex(
+      currentIndex: _currentPlaylistIndex,
+      playlistLength: _currentPlaylist.length,
+      repeatEnabled: _repeatSurahSubject.value,
+    );
+
+    if (nextIndex == null) {
       // Playlist finished
       _isPlayingPlaylist = false;
       _playerStateSubject.add(AudioPlayerState.stopped);
       _currentAudioSubject.add(null);
+      return;
     }
+
+    _currentPlaylistIndex = nextIndex;
+    await _playCurrentPlaylistItem();
   }
 
   /// Play current item in playlist
@@ -270,14 +300,14 @@ class AudioPlayerService {
         _consecutiveFailures = 0;
       } catch (e) {
         // If the file fails to load (corrupted/invalid format), skip to next track
-        print(
+        log(
           'Audio file failed to load: ${_currentPlaylist[_currentPlaylistIndex]}, error: $e',
         );
         _consecutiveFailures++;
 
         // Prevent infinite loop if too many consecutive failures
         if (_consecutiveFailures >= _maxConsecutiveFailures) {
-          print('Too many consecutive audio failures, stopping playlist');
+          log('Too many consecutive audio failures, stopping playlist');
           _playerStateSubject.add(AudioPlayerState.error);
           _isPlayingPlaylist = false;
           _consecutiveFailures = 0;
@@ -299,5 +329,41 @@ class AudioPlayerService {
     _consecutiveFailures = 0;
     _currentAudioSubject.add(null);
     _playerStateSubject.add(AudioPlayerState.stopped);
+  }
+
+  /// Computes a clamped seek target from a delta.
+  static Duration computeSeekTarget({
+    required Duration current,
+    required Duration delta,
+    Duration? total,
+  }) {
+    var target = current + delta;
+    if (target.isNegative) {
+      target = Duration.zero;
+    }
+    if (total != null && target > total) {
+      target = total;
+    }
+    return target;
+  }
+
+  /// Returns the next playlist index or null if playback should end.
+  static int? computeNextPlaylistIndex({
+    required int currentIndex,
+    required int playlistLength,
+    required bool repeatEnabled,
+  }) {
+    if (playlistLength <= 0 ||
+        currentIndex < 0 ||
+        currentIndex >= playlistLength) {
+      return null;
+    }
+    if (currentIndex < playlistLength - 1) {
+      return currentIndex + 1;
+    }
+    if (repeatEnabled) {
+      return 0;
+    }
+    return null;
   }
 }
