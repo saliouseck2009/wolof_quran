@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:archive/archive.dart';
 import 'package:path/path.dart' as p;
+import 'package:just_audio/just_audio.dart';
 import '../../domain/entities/surah_audio_status.dart';
 import '../../domain/entities/ayah_audio.dart';
 import '../datasources/audio_data_source.dart';
@@ -15,6 +18,10 @@ class AudioLocalDataSource implements AudioDataSource {
       'https://github.com/saliouseck2009/algo-practice/raw/refs/heads/main';
   static const String _audioFolderName = 'quran_audio';
   static const String _statusFileName = 'download_status.json';
+  static const String _durationCacheFileName = 'durations_v1.json';
+  static const int _durationCacheSchemaVersion = 1;
+
+  Future<void> _warmupChain = Future<void>.value();
 
   AudioLocalDataSource(this._dio);
 
@@ -67,7 +74,7 @@ class AudioLocalDataSource implements AudioDataSource {
 
             // Validate audio file has minimum size and basic header
             if (data.length < 1024 || !_hasValidAudioHeader(data)) {
-              print('Skipping invalid audio file: $filename');
+              log('Skipping invalid audio file: $filename');
               continue;
             }
 
@@ -81,6 +88,7 @@ class AudioLocalDataSource implements AudioDataSource {
 
       // Update download status
       await _updateDownloadStatus(reciterId, surahNumber, true);
+      await _deleteDurationCache(surahDir);
 
       // Clean up temporary file
       if (zipFile.existsSync()) {
@@ -154,39 +162,52 @@ class AudioLocalDataSource implements AudioDataSource {
       return [];
     }
 
+    final files = await _getSortedAyahFiles(surahDir);
+    final durationsMs = await _readDurationsCacheMs(surahDir, files);
     final audioFiles = <AyahAudio>[];
-    final files = surahDir.listSync().whereType<File>().toList();
 
-    for (final file in files) {
-      if (_isAudioFile(file.path)) {
-        // Extract ayah number from filename (format like "114-001.mp3", "114-002.mp3", etc.)
-        final filename = p.basenameWithoutExtension(file.path);
-
-        // Split by dash and get the second part (ayah number)
-        final parts = filename.split('-');
-        if (parts.length == 2) {
-          final ayahNumber = int.tryParse(parts[1]);
-
-          if (ayahNumber != null) {
-            // Verify the file actually exists and has content
-            if (await file.exists() && await file.length() > 0) {
-              audioFiles.add(
-                AyahAudio(
-                  surahNumber: surahNumber,
-                  ayahNumber: ayahNumber,
-                  reciterId: reciterId,
-                  localPath: file.path,
-                ),
-              );
-            }
-          }
-        }
+    for (var index = 0; index < files.length; index++) {
+      final file = files[index];
+      final ayahNumber = _extractAyahNumberFromPath(file.path);
+      if (ayahNumber == null) {
+        continue;
       }
+      final durationMs = durationsMs != null && index < durationsMs.length
+          ? durationsMs[index]
+          : null;
+      final duration = durationMs != null
+          ? Duration(milliseconds: durationMs)
+          : null;
+      audioFiles.add(
+        AyahAudio(
+          surahNumber: surahNumber,
+          ayahNumber: ayahNumber,
+          reciterId: reciterId,
+          localPath: file.path,
+          duration: duration,
+        ),
+      );
     }
 
-    // Sort by ayah number
-    audioFiles.sort((a, b) => a.ayahNumber.compareTo(b.ayahNumber));
     return audioFiles;
+  }
+
+  @override
+  Future<void> warmUpAyahDurations(String reciterId, int surahNumber) async {
+    final completer = Completer<void>();
+    _warmupChain = _warmupChain.catchError((_) {}).then((_) async {
+      try {
+        await _performWarmUpAyahDurations(reciterId, surahNumber);
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
+      } catch (e, st) {
+        if (!completer.isCompleted) {
+          completer.completeError(e, st);
+        }
+      }
+    });
+    return completer.future;
   }
 
   @override
@@ -320,5 +341,165 @@ class AudioLocalDataSource implements AudioDataSource {
     final reciterDir = await _getReciterDirectory(reciterId);
     final statusFile = File(p.join(reciterDir.path, _statusFileName));
     await statusFile.writeAsString(json.encode(statusMap));
+  }
+
+  Future<void> _performWarmUpAyahDurations(
+    String reciterId,
+    int surahNumber,
+  ) async {
+    final surahPath = await getSurahAudioPath(reciterId, surahNumber);
+    final surahDir = Directory(surahPath);
+    if (!surahDir.existsSync()) {
+      return;
+    }
+
+    final files = await _getSortedAyahFiles(surahDir);
+    if (files.isEmpty) {
+      return;
+    }
+
+    final cachedDurations = await _readDurationsCacheMs(surahDir, files);
+    final durationsMs =
+        cachedDurations != null && cachedDurations.length == files.length
+        ? List<int?>.from(cachedDurations)
+        : List<int?>.filled(files.length, null);
+
+    if (durationsMs.every((duration) => duration != null && duration > 0)) {
+      return;
+    }
+
+    final probePlayer = AudioPlayer();
+    try {
+      for (var index = 0; index < files.length; index++) {
+        if (durationsMs[index] != null && durationsMs[index]! > 0) {
+          continue;
+        }
+        final file = files[index];
+        try {
+          var duration = await probePlayer.setFilePath(file.path);
+          duration ??= probePlayer.duration;
+          if (duration != null && duration.inMilliseconds > 0) {
+            durationsMs[index] = duration.inMilliseconds;
+          }
+        } catch (_) {
+          // Keep null for this ayah; cache remains partial.
+        }
+      }
+    } finally {
+      await probePlayer.dispose();
+    }
+
+    await _writeDurationsCacheMs(surahDir, files, durationsMs);
+  }
+
+  Future<List<File>> _getSortedAyahFiles(Directory surahDir) async {
+    final entries = <MapEntry<int, File>>[];
+    final files = surahDir.listSync().whereType<File>();
+
+    for (final file in files) {
+      if (!_isAudioFile(file.path)) {
+        continue;
+      }
+      if (!await file.exists() || await file.length() <= 0) {
+        continue;
+      }
+      final ayahNumber = _extractAyahNumberFromPath(file.path);
+      if (ayahNumber != null) {
+        entries.add(MapEntry(ayahNumber, file));
+      }
+    }
+
+    entries.sort((a, b) => a.key.compareTo(b.key));
+    return entries.map((entry) => entry.value).toList();
+  }
+
+  int? _extractAyahNumberFromPath(String path) {
+    final filename = p.basenameWithoutExtension(path);
+    final parts = filename.split('-');
+    if (parts.length != 2) {
+      return null;
+    }
+    return int.tryParse(parts[1]);
+  }
+
+  Future<List<int?>?> _readDurationsCacheMs(
+    Directory surahDir,
+    List<File> sortedAudioFiles,
+  ) async {
+    final cacheFile = File(p.join(surahDir.path, _durationCacheFileName));
+    if (!cacheFile.existsSync()) {
+      return null;
+    }
+
+    try {
+      final raw = await cacheFile.readAsString();
+      final payload = json.decode(raw) as Map<String, dynamic>;
+
+      final schemaVersion = payload['schemaVersion'];
+      if (schemaVersion != _durationCacheSchemaVersion) {
+        return null;
+      }
+
+      final trackFiles = payload['trackFiles'];
+      final durationsMsRaw = payload['durationsMs'];
+      if (trackFiles is! List || durationsMsRaw is! List) {
+        return null;
+      }
+      if (trackFiles.length != sortedAudioFiles.length ||
+          durationsMsRaw.length != sortedAudioFiles.length) {
+        return null;
+      }
+
+      for (var i = 0; i < sortedAudioFiles.length; i++) {
+        final expected = p.basename(sortedAudioFiles[i].path);
+        if (trackFiles[i] != expected) {
+          return null;
+        }
+      }
+
+      return durationsMsRaw.map<int?>((value) {
+        if (value is int && value > 0) {
+          return value;
+        }
+        if (value is num && value > 0) {
+          return value.toInt();
+        }
+        return null;
+      }).toList();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _writeDurationsCacheMs(
+    Directory surahDir,
+    List<File> sortedAudioFiles,
+    List<int?> durationsMs,
+  ) async {
+    if (sortedAudioFiles.length != durationsMs.length) {
+      return;
+    }
+    final totalMs = durationsMs.any((item) => item == null)
+        ? null
+        : durationsMs.fold<int>(0, (sum, value) => sum + value!);
+    final payload = <String, dynamic>{
+      'schemaVersion': _durationCacheSchemaVersion,
+      'generatedAt': DateTime.now().toIso8601String(),
+      'trackFiles': sortedAudioFiles
+          .map((file) => p.basename(file.path))
+          .toList(),
+      'durationsMs': durationsMs,
+      'totalMs': totalMs,
+    };
+
+    final cacheFile = File(p.join(surahDir.path, _durationCacheFileName));
+    await cacheFile.writeAsString(json.encode(payload), flush: true);
+  }
+
+  Future<void> _deleteDurationCache(Directory surahDir) async {
+    final cacheFile = File(p.join(surahDir.path, _durationCacheFileName));
+    if (cacheFile.existsSync()) {
+      await cacheFile.delete();
+    }
   }
 }

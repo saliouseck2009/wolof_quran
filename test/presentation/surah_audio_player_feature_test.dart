@@ -159,6 +159,9 @@ class _FakeAudioRepository implements AudioRepository {
   }
 
   @override
+  Future<void> warmUpAyahDurations(String reciterId, int surahNumber) async {}
+
+  @override
   Future<SurahAudioStatus> getSurahAudioStatus(
     String reciterId,
     int surahNumber,
@@ -300,6 +303,7 @@ class _SpySurahMiniPlayerCubit extends SurahMiniPlayerCubit {
     required int surahNumber,
     String surahName = 'Al-Fatihah',
     bool expanded = true,
+    bool isSeekReady = true,
   }) {
     emit(
       SurahMiniPlayerState(
@@ -313,6 +317,7 @@ class _SpySurahMiniPlayerCubit extends SurahMiniPlayerCubit {
         playerState: AudioPlayerState.playing,
         position: const Duration(seconds: 5),
         duration: const Duration(minutes: 2),
+        isSeekReady: isSeekReady,
         repeatSurah: false,
       ),
     );
@@ -885,5 +890,45 @@ void main() {
 
     expect(miniPlayerCubit.state.uiState, SurahMiniPlayerUiState.hidden);
     expect(find.text('1 - Al-Fatihah'), findsNothing);
+  });
+
+  testWidgets('Mini-player keeps seek disabled while duration is not ready', (
+    tester,
+  ) async {
+    final downloadRepository = _ConfigurableDownloadRepository();
+    final audioRepository = _FakeAudioRepository();
+    _registerLocatorDependencies(
+      audioRepository: audioRepository,
+      downloadRepository: downloadRepository,
+    );
+
+    final miniPlayerCubit = _SpySurahMiniPlayerCubit(
+      audioPlayerService: AudioPlayerService(),
+      downloadRepository: downloadRepository,
+      audioRepository: audioRepository,
+    );
+    addTearDown(() async {
+      await miniPlayerCubit.close();
+    });
+
+    await tester.pumpWidget(
+      _buildLocalizedApp(
+        child: BlocProvider<SurahMiniPlayerCubit>.value(
+          value: miniPlayerCubit,
+          child: const Scaffold(body: SurahMiniPlayerOverlay()),
+        ),
+      ),
+    );
+
+    miniPlayerCubit.showForTest(
+      surahNumber: 1,
+      expanded: true,
+      isSeekReady: false,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('--:--'), findsOneWidget);
+    final slider = tester.widget<Slider>(find.byType(Slider));
+    expect(slider.onChanged, isNull);
   });
 }

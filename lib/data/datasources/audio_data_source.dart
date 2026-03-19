@@ -25,6 +25,9 @@ abstract class AudioDataSource {
   /// Get ayah audio files from local storage
   Future<List<AyahAudio>> getAyahAudios(String reciterId, int surahNumber);
 
+  /// Build or refresh local ayah duration cache for a surah.
+  Future<void> warmUpAyahDurations(String reciterId, int surahNumber);
+
   /// Delete downloaded surah audio
   Future<void> deleteSurahAudio(String reciterId, int surahNumber);
 

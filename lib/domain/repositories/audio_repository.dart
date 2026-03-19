@@ -25,6 +25,9 @@ abstract class AudioRepository {
   /// Get ayah audio files for a surah
   Future<List<AyahAudio>> getAyahAudios(String reciterId, int surahNumber);
 
+  /// Build or refresh local ayah duration cache for a surah.
+  Future<void> warmUpAyahDurations(String reciterId, int surahNumber);
+
   /// Delete downloaded audio for a surah
   Future<void> deleteSurahAudio(String reciterId, int surahNumber);
 

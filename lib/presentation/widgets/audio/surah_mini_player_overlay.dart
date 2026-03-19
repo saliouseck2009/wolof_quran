@@ -18,6 +18,7 @@ class SurahMiniPlayerOverlay extends StatelessWidget {
           previous.playerState != current.playerState ||
           previous.position != current.position ||
           previous.duration != current.duration ||
+          previous.isSeekReady != current.isSeekReady ||
           previous.repeatSurah != current.repeatSurah ||
           previous.downloadedQueue != current.downloadedQueue,
       builder: (context, state) {
@@ -105,7 +106,9 @@ class _CollapsedMiniPlayer extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     LinearProgressIndicator(
-                      value: _progressValue(state.position, state.duration),
+                      value: state.isSeekReady
+                          ? _progressValue(state.position, state.duration)
+                          : null,
                       minHeight: 3,
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -195,7 +198,7 @@ class _ExpandedMiniPlayer extends StatelessWidget {
                     max: total.inMilliseconds <= 0
                         ? 1
                         : total.inMilliseconds.toDouble(),
-                    onChanged: total.inMilliseconds <= 0
+                    onChanged: !state.isSeekReady || total.inMilliseconds <= 0
                         ? null
                         : (value) {
                             context.read<SurahMiniPlayerCubit>().seek(
@@ -209,7 +212,9 @@ class _ExpandedMiniPlayer extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(_formatDuration(state.position)),
-                        Text(_formatDuration(total)),
+                        Text(
+                          state.isSeekReady ? _formatDuration(total) : '--:--',
+                        ),
                       ],
                     ),
                   ),
@@ -226,9 +231,11 @@ class _ExpandedMiniPlayer extends StatelessWidget {
                         icon: const Icon(Icons.skip_previous),
                       ),
                       IconButton(
-                        onPressed: () => context
-                            .read<SurahMiniPlayerCubit>()
-                            .seekBySeconds(-10),
+                        onPressed: state.isSeekReady
+                            ? () => context
+                                  .read<SurahMiniPlayerCubit>()
+                                  .seekBySeconds(-10)
+                            : null,
                         icon: const Icon(Icons.replay_10),
                       ),
                       IconButton(
@@ -243,9 +250,11 @@ class _ExpandedMiniPlayer extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: () => context
-                            .read<SurahMiniPlayerCubit>()
-                            .seekBySeconds(10),
+                        onPressed: state.isSeekReady
+                            ? () => context
+                                  .read<SurahMiniPlayerCubit>()
+                                  .seekBySeconds(10)
+                            : null,
                         icon: const Icon(Icons.forward_10),
                       ),
                       IconButton(

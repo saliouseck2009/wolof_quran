@@ -19,6 +19,7 @@ class SurahMiniPlayerState extends Equatable {
   final AudioPlayerState playerState;
   final Duration position;
   final Duration? duration;
+  final bool isSeekReady;
   final bool repeatSurah;
 
   const SurahMiniPlayerState({
@@ -30,6 +31,7 @@ class SurahMiniPlayerState extends Equatable {
     this.playerState = AudioPlayerState.idle,
     this.position = Duration.zero,
     this.duration,
+    this.isSeekReady = false,
     this.repeatSurah = false,
   });
 
@@ -57,6 +59,7 @@ class SurahMiniPlayerState extends Equatable {
     Duration? position,
     Duration? duration,
     bool clearDuration = false,
+    bool? isSeekReady,
     bool? repeatSurah,
     bool clearTrack = false,
   }) {
@@ -69,6 +72,7 @@ class SurahMiniPlayerState extends Equatable {
       playerState: playerState ?? this.playerState,
       position: position ?? this.position,
       duration: clearDuration ? null : (duration ?? this.duration),
+      isSeekReady: isSeekReady ?? this.isSeekReady,
       repeatSurah: repeatSurah ?? this.repeatSurah,
     );
   }
@@ -83,6 +87,7 @@ class SurahMiniPlayerState extends Equatable {
     playerState,
     position,
     duration,
+    isSeekReady,
     repeatSurah,
   ];
 }
@@ -94,8 +99,9 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
 
   StreamSubscription<PlayingAudioInfo?>? _audioSub;
   StreamSubscription<AudioPlayerState>? _playerStateSub;
-  StreamSubscription<Duration>? _positionSub;
-  StreamSubscription<Duration?>? _durationSub;
+  StreamSubscription<Duration>? _globalPositionSub;
+  StreamSubscription<Duration?>? _globalDurationSub;
+  StreamSubscription<bool>? _seekReadySub;
   StreamSubscription<bool>? _repeatSub;
 
   SurahMiniPlayerCubit({
@@ -108,6 +114,9 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
        super(
          SurahMiniPlayerState(
            playerState: audioPlayerService.currentPlayerState,
+           position: audioPlayerService.currentSurahGlobalPosition,
+           duration: audioPlayerService.currentSurahGlobalDuration,
+           isSeekReady: audioPlayerService.isSurahSeekReady,
            repeatSurah: audioPlayerService.isRepeatSurahEnabled,
          ),
        ) {
@@ -119,11 +128,18 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     _playerStateSub = _audioPlayerService.playerState.listen((playerState) {
       emit(state.copyWith(playerState: playerState));
     });
-    _positionSub = _audioPlayerService.position.listen((position) {
+    _globalPositionSub = _audioPlayerService.surahGlobalPosition.listen((
+      position,
+    ) {
       emit(state.copyWith(position: position));
     });
-    _durationSub = _audioPlayerService.duration.listen((duration) {
+    _globalDurationSub = _audioPlayerService.surahGlobalDuration.listen((
+      duration,
+    ) {
       emit(state.copyWith(duration: duration));
+    });
+    _seekReadySub = _audioPlayerService.surahSeekReady.listen((isSeekReady) {
+      emit(state.copyWith(isSeekReady: isSeekReady));
     });
     _repeatSub = _audioPlayerService.repeatSurah.listen((repeatEnabled) {
       emit(state.copyWith(repeatSurah: repeatEnabled));
@@ -225,7 +241,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
   }
 
   Future<void> seek(Duration position) async {
-    await _audioPlayerService.seek(position);
+    await _audioPlayerService.seekWithinSurah(position);
   }
 
   Future<void> seekBySeconds(int seconds) async {
@@ -282,14 +298,23 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     }
 
     final filePaths = ayahAudios.map((audio) => audio.localPath).toList();
+    final ayahDurations = ayahAudios.map((audio) => audio.duration).toList();
+    final hasMissingDurations = ayahDurations.any(
+      (duration) => duration == null || duration.inMilliseconds <= 0,
+    );
 
     await _audioPlayerService.playSurahPlaylist(
       filePaths: filePaths,
       surahNumber: surahNumber,
       reciterId: reciterId,
       surahName: quran.getSurahNameEnglish(surahNumber),
+      ayahDurations: ayahDurations,
       startIndex: 0,
     );
+
+    if (hasMissingDurations) {
+      unawaited(_warmUpDurationsAndUpdateTimeline(reciterId, surahNumber));
+    }
 
     emit(
       state.copyWith(
@@ -300,12 +325,34 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     );
   }
 
+  Future<void> _warmUpDurationsAndUpdateTimeline(
+    String reciterId,
+    int surahNumber,
+  ) async {
+    try {
+      await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
+      final ayahAudios = await _audioRepository.getAyahAudios(
+        reciterId,
+        surahNumber,
+      );
+      final durations = ayahAudios.map((audio) => audio.duration).toList();
+      _audioPlayerService.updatePlaylistDurations(
+        reciterId: reciterId,
+        surahNumber: surahNumber,
+        durations: durations,
+      );
+    } catch (_) {
+      // Keep current timeline; runtime durations can still fill over time.
+    }
+  }
+
   @override
   Future<void> close() async {
     await _audioSub?.cancel();
     await _playerStateSub?.cancel();
-    await _positionSub?.cancel();
-    await _durationSub?.cancel();
+    await _globalPositionSub?.cancel();
+    await _globalDurationSub?.cancel();
+    await _seekReadySub?.cancel();
     await _repeatSub?.cancel();
     return super.close();
   }

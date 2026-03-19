@@ -457,14 +457,25 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
         }
 
         final filePaths = ayahAudios.map((audio) => audio.localPath).toList();
+        final ayahDurations = ayahAudios
+            .map((audio) => audio.duration)
+            .toList();
+        final hasMissingDurations = ayahDurations.any(
+          (duration) => duration == null || duration.inMilliseconds <= 0,
+        );
 
         await audioPlayerService.playSurahPlaylist(
           filePaths: filePaths,
           surahNumber: surahNumber,
           reciterId: reciterId,
           surahName: surahName,
+          ayahDurations: ayahDurations,
           startIndex: startAyahIndex,
         );
+
+        if (hasMissingDurations) {
+          unawaited(_warmUpDurationsAndUpdateTimeline(reciterId, surahNumber));
+        }
       }
     } catch (e) {
       emit(
@@ -499,5 +510,38 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
       return currentState.getAyahAudios(reciterId, surahNumber);
     }
     return [];
+  }
+
+  Future<void> _warmUpDurationsAndUpdateTimeline(
+    String reciterId,
+    int surahNumber,
+  ) async {
+    try {
+      await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
+      final warmedAyahs = await _audioRepository.getAyahAudios(
+        reciterId,
+        surahNumber,
+      );
+      final warmedDurations = warmedAyahs
+          .map((audio) => audio.duration)
+          .toList();
+
+      audioPlayerService.updatePlaylistDurations(
+        reciterId: reciterId,
+        surahNumber: surahNumber,
+        durations: warmedDurations,
+      );
+
+      final currentState = state;
+      if (currentState is AudioManagementLoaded) {
+        final updatedAyahAudiosMap = Map<String, List<AyahAudio>>.from(
+          currentState.ayahAudiosMap,
+        );
+        updatedAyahAudiosMap['${reciterId}_$surahNumber'] = warmedAyahs;
+        emit(currentState.copyWith(ayahAudiosMap: updatedAyahAudiosMap));
+      }
+    } catch (e) {
+      log('Failed to warm up ayah durations: $e');
+    }
   }
 }

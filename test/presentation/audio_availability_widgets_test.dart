@@ -97,6 +97,9 @@ class _FakeAudioRepository implements AudioRepository {
   }
 
   @override
+  Future<void> warmUpAyahDurations(String reciterId, int surahNumber) async {}
+
+  @override
   Future<SurahAudioStatus> getSurahAudioStatus(
     String reciterId,
     int surahNumber,
