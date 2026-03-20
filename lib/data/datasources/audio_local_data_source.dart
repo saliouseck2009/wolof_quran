@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:isolate';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:archive/archive.dart';
 import 'package:path/path.dart' as p;
 import 'package:just_audio/just_audio.dart';
+import '../../core/utils/mp3_duration_parser.dart';
 import '../../domain/entities/surah_audio_status.dart';
 import '../../domain/entities/ayah_audio.dart';
 import '../datasources/audio_data_source.dart';
@@ -86,9 +88,23 @@ class AudioLocalDataSource implements AudioDataSource {
         }
       }
 
+      // Pre-compute and cache ayah durations so the player shows them instantly.
+      try {
+        final sortedFiles = await _getSortedAyahFiles(surahDir);
+        if (sortedFiles.isNotEmpty) {
+          final paths = sortedFiles.map((f) => f.path).toList();
+          final durations = await Isolate.run(
+            () => parseMp3DurationsInIsolate(paths),
+          );
+          await _writeDurationsCacheMs(surahDir, sortedFiles, durations);
+        }
+      } catch (e) {
+        log('Failed to pre-compute durations at download: $e');
+        // Not critical — warmUp will handle it later.
+      }
+
       // Update download status
       await _updateDownloadStatus(reciterId, surahNumber, true);
-      await _deleteDurationCache(surahDir);
 
       // Clean up temporary file
       if (zipFile.existsSync()) {
@@ -368,25 +384,57 @@ class AudioLocalDataSource implements AudioDataSource {
       return;
     }
 
-    final probePlayer = AudioPlayer();
+    // Collect files that still need duration probing.
+    final uncachedIndices = <int>[];
+    final uncachedPaths = <String>[];
+    for (var i = 0; i < files.length; i++) {
+      if (durationsMs[i] == null || durationsMs[i]! <= 0) {
+        uncachedIndices.add(i);
+        uncachedPaths.add(files[i].path);
+      }
+    }
+
+    // Fast path: parse MP3 headers in a background isolate.
+    final sw = Stopwatch()..start();
     try {
-      for (var index = 0; index < files.length; index++) {
-        if (durationsMs[index] != null && durationsMs[index]! > 0) {
-          continue;
-        }
-        final file = files[index];
-        try {
-          var duration = await probePlayer.setFilePath(file.path);
-          duration ??= probePlayer.duration;
-          if (duration != null && duration.inMilliseconds > 0) {
-            durationsMs[index] = duration.inMilliseconds;
-          }
-        } catch (_) {
-          // Keep null for this ayah; cache remains partial.
+      final parsed = await Isolate.run(
+        () => parseMp3DurationsInIsolate(uncachedPaths),
+      );
+      final successCount = parsed.where((d) => d != null && d > 0).length;
+      log('MP3 header parsing: ${successCount}/${uncachedPaths.length} files '
+          'parsed in ${sw.elapsedMilliseconds}ms');
+      for (var j = 0; j < uncachedIndices.length; j++) {
+        if (parsed[j] != null && parsed[j]! > 0) {
+          durationsMs[uncachedIndices[j]] = parsed[j];
         }
       }
-    } finally {
-      await probePlayer.dispose();
+    } catch (e) {
+      log('MP3 header parsing failed in ${sw.elapsedMilliseconds}ms, '
+          'falling back to AudioPlayer: $e');
+    }
+
+    // Fallback: use AudioPlayer for any files the parser could not handle.
+    final stillMissing = uncachedIndices
+        .where((i) => durationsMs[i] == null || durationsMs[i]! <= 0)
+        .toList();
+    if (stillMissing.isNotEmpty) {
+      log('Fallback: ${stillMissing.length} files need AudioPlayer probing');
+      final probePlayer = AudioPlayer();
+      try {
+        for (final index in stillMissing) {
+          try {
+            var duration = await probePlayer.setFilePath(files[index].path);
+            duration ??= probePlayer.duration;
+            if (duration != null && duration.inMilliseconds > 0) {
+              durationsMs[index] = duration.inMilliseconds;
+            }
+          } catch (_) {
+            // Keep null for this ayah; cache remains partial.
+          }
+        }
+      } finally {
+        await probePlayer.dispose();
+      }
     }
 
     await _writeDurationsCacheMs(surahDir, files, durationsMs);
@@ -496,10 +544,4 @@ class AudioLocalDataSource implements AudioDataSource {
     await cacheFile.writeAsString(json.encode(payload), flush: true);
   }
 
-  Future<void> _deleteDurationCache(Directory surahDir) async {
-    final cacheFile = File(p.join(surahDir.path, _durationCacheFileName));
-    if (cacheFile.existsSync()) {
-      await cacheFile.delete();
-    }
-  }
 }

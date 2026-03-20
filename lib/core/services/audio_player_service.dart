@@ -1,5 +1,9 @@
+import 'dart:developer' as dev;
+
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
+
+void _log(String message) => dev.log(message, name: 'AudioPlayerService');
 
 /// Enum for audio player state
 enum AudioPlayerState { idle, loading, playing, paused, stopped, error }
@@ -236,6 +240,7 @@ class AudioPlayerService {
     required List<Duration?> durations,
   }) {
     if (!_isPlayingPlaylist || _currentPlaylist.isEmpty) {
+      _log('updatePlaylistDurations: skipped (not playing playlist)');
       return;
     }
     final current = _currentAudioSubject.value;
@@ -243,8 +248,12 @@ class AudioPlayerService {
         !current.isPlaylist ||
         current.reciterId != reciterId ||
         current.surahNumber != surahNumber) {
+      _log('updatePlaylistDurations: skipped (surah/reciter mismatch)');
       return;
     }
+    final nullCount = durations.where((d) => d == null).length;
+    _log('updatePlaylistDurations: ${durations.length} durations, '
+        '$nullCount null');
     _playlistCachedDurations = _normalizeDurations(
       rawDurations: durations,
       expectedLength: _currentPlaylist.length,
@@ -437,6 +446,11 @@ class AudioPlayerService {
     }
 
     final total = computeTotalDuration(durations);
+    final nullCount = durations.where((d) => d == null).length;
+    if (nullCount > 0) {
+      _log('_emitSurahTimeline: $nullCount/${durations.length} durations null '
+          '→ total=$total');
+    }
     final rawPosition = computeGlobalPosition(
       segmentDurations: durations,
       currentIndex: _audioPlayer.currentIndex ?? _currentPlaylistIndex,
