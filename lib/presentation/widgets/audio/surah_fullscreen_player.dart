@@ -100,106 +100,71 @@ class _FullscreenContent extends StatelessWidget {
           }
         },
         child: Scaffold(
-          // Dark: transparent so the gradient Container shows through.
-          // Light: normal surface color — same as every other page.
-          backgroundColor: t.isDark ? Colors.transparent : colorScheme.surface,
-          body: Container(
-            // Dark: cinematic gradient; Light: no decoration (surface bg).
-            decoration: t.isDark
-                ? BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppColor.primary.withValues(alpha: 0.85),
-                        Colors.black,
-                      ],
-                      stops: const [0.0, 0.75],
-                    ),
-                  )
-                : null,
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // ── Header ────────────────────────────────────────────────
-                  _FullscreenHeader(
-                    tokens: t,
-                    reciterName: activeReciterName,
-                    onCollapse: () => _dismiss(context),
-                  ),
+          backgroundColor: colorScheme.surface,
+          body: SafeArea(
+            child: Column(
+              children: [
+                // ── Header ────────────────────────────────────────────────
+                _FullscreenHeader(
+                  tokens: t,
+                  reciterName: activeReciterName,
+                  onCollapse: () => _dismiss(context),
+                ),
 
-                  const SizedBox(height: 24),
+                const SizedBox(height: 8),
 
-                  const SizedBox(height: 8),
-
-                  // ── Title ─────────────────────────────────────────────────
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    child: Column(
-                      children: [
-                        Text(
-                          _surahTitleWithNumber(context, state.surahNumber),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headlineSmall
-                              ?.copyWith(
-                                color: t.content,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.2,
-                              ),
+                // ── Center content ───────────────────────────────────────
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: _CenterNowPlayingCard(
+                        state: state,
+                        tokens: t,
+                        reciterName: activeReciterName,
+                        surahTitle: _surahTitleWithNumber(
+                          context,
+                          state.surahNumber,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          state.surahNumber != null
-                              ? quran.getSurahNameArabic(state.surahNumber!)
-                              : '',
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: t.muted,
-                                fontWeight: FontWeight.w500,
-                              ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // ── Seek bar ──────────────────────────────────────────────
-                  _SeekBar(state: state, total: total, tokens: t),
-
-                  const SizedBox(height: 16),
-
-                  // ── Controls ──────────────────────────────────────────────
-                  _FullscreenControls(
-                    state: state,
-                    isPlaying: isPlaying,
-                    tokens: t,
-                    colorScheme: colorScheme,
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // ── Repeat ────────────────────────────────────────────────
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: () =>
-                            context.read<SurahMiniPlayerCubit>().toggleRepeat(),
-                        icon: Icon(
-                          Icons.repeat,
-                          color: state.repeatSurah ? t.accent : t.disabled,
-                        ),
-                        tooltip: 'Répéter',
                       ),
-                    ],
+                    ),
                   ),
+                ),
 
-                  const SizedBox(height: 16),
-                ],
-              ),
+                // ── Seek bar ──────────────────────────────────────────────
+                _SeekBar(state: state, total: total, tokens: t),
+
+                const SizedBox(height: 12),
+
+                // ── Controls ──────────────────────────────────────────────
+                _FullscreenControls(
+                  state: state,
+                  isPlaying: isPlaying,
+                  tokens: t,
+                  colorScheme: colorScheme,
+                ),
+
+                const SizedBox(height: 8),
+
+                // ── Repeat ────────────────────────────────────────────────
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () =>
+                          context.read<SurahMiniPlayerCubit>().toggleRepeat(),
+                      icon: Icon(
+                        Icons.repeat,
+                        color: state.repeatSurah ? t.accent : t.disabled,
+                      ),
+                      tooltip: 'Répéter',
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+              ],
             ),
           ),
         ),
@@ -276,6 +241,229 @@ class _FullscreenHeader extends StatelessWidget {
           const SizedBox(width: 48),
         ],
       ),
+    );
+  }
+}
+
+class _CenterNowPlayingCard extends StatelessWidget {
+  final SurahMiniPlayerState state;
+  final _ThemeTokens tokens;
+  final String reciterName;
+  final String surahTitle;
+
+  const _CenterNowPlayingCard({
+    required this.state,
+    required this.tokens,
+    required this.reciterName,
+    required this.surahTitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isPlaying =
+        state.playerState == AudioPlayerState.playing ||
+        state.playerState == AudioPlayerState.loading;
+    final queuePosition = state.currentQueueIndex >= 0
+        ? '${state.currentQueueIndex + 1}/${state.downloadedQueue.length}'
+        : '--/--';
+
+    final cardDecoration = BoxDecoration(
+      borderRadius: BorderRadius.circular(28),
+      color: tokens.isDark ? cs.surfaceContainerHigh : cs.surfaceContainerLow,
+      border: Border.all(
+        color: tokens.isDark
+            ? Colors.white.withValues(alpha: 0.08)
+            : cs.primary.withValues(alpha: 0.12),
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: tokens.isDark
+              ? Colors.black.withValues(alpha: 0.22)
+              : cs.shadow.withValues(alpha: 0.08),
+          blurRadius: 18,
+          offset: const Offset(0, 8),
+        ),
+      ],
+    );
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 520),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 260),
+        decoration: cardDecoration,
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _InfoChip(
+                  icon: Icons.menu_book_rounded,
+                  label: state.surahNumber != null
+                      ? 'Sourate ${state.surahNumber}'
+                      : 'Sourate --',
+                  tokens: tokens,
+                ),
+                _InfoChip(
+                  icon: isPlaying
+                      ? Icons.multitrack_audio_rounded
+                      : Icons.pause_circle_outline_rounded,
+                  label: isPlaying ? 'Lecture' : 'Pause',
+                  tokens: tokens,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              surahTitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: tokens.content,
+                fontWeight: FontWeight.w800,
+                height: 1.15,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              state.surahNumber != null
+                  ? quran.getSurahNameArabic(state.surahNumber!)
+                  : '',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: tokens.muted,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: tokens.isDark
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : cs.onSurface.withValues(alpha: 0.1),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: _MetaRow(
+                    icon: Icons.person_rounded,
+                    label: 'Interprète',
+                    value: reciterName,
+                    tokens: tokens,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _MetaRow(
+                    icon: Icons.queue_music_rounded,
+                    label: 'File',
+                    value: queuePosition,
+                    tokens: tokens,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final _ThemeTokens tokens;
+
+  const _InfoChip({
+    required this.icon,
+    required this.label,
+    required this.tokens,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: tokens.isDark
+            ? Colors.white.withValues(alpha: 0.1)
+            : cs.surface.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 15, color: tokens.content),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: tokens.content,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetaRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final _ThemeTokens tokens;
+
+  const _MetaRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.tokens,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: tokens.muted),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: tokens.muted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: tokens.content,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
