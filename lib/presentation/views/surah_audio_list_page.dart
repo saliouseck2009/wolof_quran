@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
+import '../../core/config/theme/app_color.dart';
+import '../../core/services/audio_player_service.dart';
 import '../../domain/entities/reciter.dart';
 import '../../domain/usecases/get_downloaded_surahs_usecase.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -22,48 +24,35 @@ class SurahAudioListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          localizations.audioDownloads,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onPrimary,
-            fontSize: 18,
-          ),
-        ),
-        backgroundColor: colorScheme.brightness == Brightness.dark
-            ? colorScheme.surfaceContainerLowest
-            : colorScheme.primary,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
-        elevation: 0,
-        scrolledUnderElevation: 0,
-      ),
-      body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
-        builder: (context, quranSettingsState) {
-          final selectedReciter = quranSettingsState.selectedReciter;
-          if (selectedReciter == null) {
-            return _NoReciterSelectedState(localizations: localizations);
-          }
+    return BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
+      builder: (context, quranSettingsState) {
+        final selectedReciter = quranSettingsState.selectedReciter;
 
-          return KeyedSubtree(
-            key: ValueKey<String>('surah-audio-list-${selectedReciter.id}'),
-            child: BlocProvider(
-              create: (context) => ReciterChaptersBloc(
-                getDownloadedSurahsUseCase:
-                    locator<GetDownloadedSurahsUseCase>(),
-              )..add(LoadReciterChapters(selectedReciter)),
-              child: _SurahAudioListBody(reciter: selectedReciter),
-            ),
+        if (selectedReciter == null) {
+          return Scaffold(
+            appBar: AppBar(title: Text(localizations.audioDownloads)),
+            body: _NoReciterSelectedState(localizations: localizations),
           );
-        },
-      ),
+        }
+
+        return KeyedSubtree(
+          key: ValueKey<String>('surah-audio-list-${selectedReciter.id}'),
+          child: BlocProvider(
+            create: (context) => ReciterChaptersBloc(
+              getDownloadedSurahsUseCase: locator<GetDownloadedSurahsUseCase>(),
+            )..add(LoadReciterChapters(selectedReciter)),
+            child: _SurahAudioListBody(reciter: selectedReciter),
+          ),
+        );
+      },
     );
   }
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// EMPTY STATE
+// ════════════════════════════════════════════════════════════════════════════
 
 class _NoReciterSelectedState extends StatelessWidget {
   final AppLocalizations localizations;
@@ -76,21 +65,29 @@ class _NoReciterSelectedState extends StatelessWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.record_voice_over_outlined,
-              size: 56,
-              color: colorScheme.onSurfaceVariant,
+            Container(
+              width: 88,
+              height: 88,
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer.withValues(alpha: 0.4),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.record_voice_over_outlined,
+                size: 42,
+                color: colorScheme.primary,
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               localizations.noReciterSelected,
               style: Theme.of(
                 context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
@@ -99,8 +96,9 @@ class _NoReciterSelectedState extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 28),
             FilledButton.icon(
               onPressed: () => Navigator.pushNamed(context, '/reciter-list'),
               icon: const Icon(Icons.manage_accounts_outlined),
@@ -112,6 +110,10 @@ class _NoReciterSelectedState extends StatelessWidget {
     );
   }
 }
+
+// ════════════════════════════════════════════════════════════════════════════
+// BODY
+// ════════════════════════════════════════════════════════════════════════════
 
 class _SurahAudioListBody extends StatelessWidget {
   final Reciter reciter;
@@ -140,7 +142,6 @@ class _SurahAudioListBody extends StatelessWidget {
             reciter.id,
           );
         }
-
         if (audioState is AudioManagementError) {
           final formatted = formatAudioError(audioState.message, localizations);
           CustomSnackbar.showErrorSnackbar(context, formatted, duration: 3);
@@ -148,10 +149,12 @@ class _SurahAudioListBody extends StatelessWidget {
       },
       child: BlocBuilder<ReciterChaptersBloc, ReciterChaptersState>(
         builder: (context, chaptersState) {
+          // ── Loading ───────────────────────────────────────────────────────
           if (chaptersState is ReciterChaptersLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const _LoadingPlaceholder();
           }
 
+          // ── Error ─────────────────────────────────────────────────────────
           if (chaptersState is ReciterChaptersError) {
             return Center(
               child: Padding(
@@ -168,6 +171,11 @@ class _SurahAudioListBody extends StatelessWidget {
             return const SizedBox.shrink();
           }
 
+          final downloadedCount = List.generate(
+            114,
+            (i) => chaptersState.isSurahDownloaded(i + 1),
+          ).where((v) => v).length;
+
           return BlocBuilder<AudioAvailabilityCubit, AudioAvailabilityState>(
             builder: (context, availabilityState) {
               final snapshot = availabilityState.snapshotForReciter(reciter.id);
@@ -176,52 +184,95 @@ class _SurahAudioListBody extends StatelessWidget {
 
               return BlocBuilder<AudioManagementCubit, AudioManagementState>(
                 builder: (context, audioState) {
-                  return ListView.builder(
-                    key: const PageStorageKey<String>('surah-audio-list'),
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-                    itemCount: 114,
-                    itemBuilder: (context, index) {
-                      final surahNumber = index + 1;
-                      final isDownloaded = chaptersState.isSurahDownloaded(
-                        surahNumber,
-                      );
-                      final isAvailableRemotely =
-                          !hasAvailabilityData ||
-                          (remoteAvailableSet?.contains(surahNumber) ?? false);
+                  return BlocBuilder<
+                    SurahMiniPlayerCubit,
+                    SurahMiniPlayerState
+                  >(
+                    builder: (context, playerState) {
+                      final colorScheme = Theme.of(context).colorScheme;
 
-                      final isDownloading =
-                          audioState is AudioDownloading &&
-                          audioState.reciterId == reciter.id &&
-                          audioState.surahNumber == surahNumber;
-                      final currentDownloadProgress =
-                          audioState is AudioDownloading &&
-                              audioState.reciterId == reciter.id &&
-                              audioState.surahNumber == surahNumber
-                          ? audioState.progress
-                          : 0.0;
+                      return ColoredBox(
+                        color: colorScheme.surface,
+                        child: CustomScrollView(
+                          key: const PageStorageKey<String>('surah-audio-list'),
+                          slivers: [
+                            // ── Sliver header ───────────────────────────────
+                            _ReciterSliverHeader(
+                              reciter: reciter,
+                              downloadedCount: downloadedCount,
+                              localizations: localizations,
+                            ),
 
-                      final isOtherDownloading =
-                          audioState is AudioDownloading &&
-                          (audioState.reciterId != reciter.id ||
-                              audioState.surahNumber != surahNumber);
+                            // ── List ────────────────────────────────────────
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(
+                                16,
+                                8,
+                                16,
+                                120,
+                              ),
+                              sliver: SliverList.builder(
+                                itemCount: 114,
+                                itemBuilder: (context, index) {
+                                  final surahNumber = index + 1;
+                                  final isDownloaded = chaptersState
+                                      .isSurahDownloaded(surahNumber);
+                                  final isAvailableRemotely =
+                                      !hasAvailabilityData ||
+                                      (remoteAvailableSet?.contains(
+                                            surahNumber,
+                                          ) ??
+                                          false);
+                                  final downloadingState =
+                                      audioState is AudioDownloading &&
+                                          audioState.reciterId == reciter.id &&
+                                          audioState.surahNumber == surahNumber
+                                      ? audioState
+                                      : null;
+                                  final isDownloading =
+                                      downloadingState != null;
+                                  final downloadProgress =
+                                      downloadingState?.progress ?? 0.0;
+                                  final isOtherDownloading =
+                                      audioState is AudioDownloading &&
+                                      (audioState.reciterId != reciter.id ||
+                                          audioState.surahNumber !=
+                                              surahNumber);
+                                  final isNowPlaying =
+                                      playerState.hasActiveSurah &&
+                                      playerState.surahNumber == surahNumber &&
+                                      playerState.reciterId == reciter.id;
 
-                      final translatedName =
-                          QuranSettingsCubit.getSurahNameInTranslation(
-                            surahNumber,
-                            translation,
-                          );
+                                  final translatedName =
+                                      QuranSettingsCubit.getSurahNameInTranslation(
+                                        surahNumber,
+                                        translation,
+                                      );
 
-                      return _SurahAudioItemCard(
-                        surahNumber: surahNumber,
-                        surahNameArabic: quran.getSurahNameArabic(surahNumber),
-                        surahNameTranslated: translatedName,
-                        versesCount: quran.getVerseCount(surahNumber),
-                        isDownloaded: isDownloaded,
-                        isDownloading: isDownloading,
-                        downloadProgress: currentDownloadProgress,
-                        isOtherDownloading: isOtherDownloading,
-                        isAvailableRemotely: isAvailableRemotely,
-                        reciterId: reciter.id,
+                                  return _SurahTrackTile(
+                                    surahNumber: surahNumber,
+                                    surahNameArabic: quran.getSurahNameArabic(
+                                      surahNumber,
+                                    ),
+                                    surahNameTranslated: translatedName,
+                                    versesCount: quran.getVerseCount(
+                                      surahNumber,
+                                    ),
+                                    isDownloaded: isDownloaded,
+                                    isDownloading: isDownloading,
+                                    downloadProgress: downloadProgress,
+                                    isOtherDownloading: isOtherDownloading,
+                                    isAvailableRemotely: isAvailableRemotely,
+                                    isNowPlaying: isNowPlaying,
+                                    playerState: playerState,
+                                    reciterId: reciter.id,
+                                    localizations: localizations,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   );
@@ -235,7 +286,159 @@ class _SurahAudioListBody extends StatelessWidget {
   }
 }
 
-class _SurahAudioItemCard extends StatelessWidget {
+// ════════════════════════════════════════════════════════════════════════════
+// SLIVER HEADER (reciter banner)
+// ════════════════════════════════════════════════════════════════════════════
+
+class _ReciterSliverHeader extends StatelessWidget {
+  final Reciter reciter;
+  final int downloadedCount;
+  final AppLocalizations localizations;
+
+  const _ReciterSliverHeader({
+    required this.reciter,
+    required this.downloadedCount,
+    required this.localizations,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return SliverAppBar(
+      expandedHeight: 180,
+      pinned: true,
+      backgroundColor: isDark
+          ? colorScheme.surfaceContainerLowest
+          : colorScheme.primary,
+      iconTheme: const IconThemeData(color: Colors.white),
+      flexibleSpace: FlexibleSpaceBar(
+        collapseMode: CollapseMode.pin,
+        background: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColor.primary,
+                AppColor.primary.withValues(alpha: 0.7),
+              ],
+            ),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 56, 20, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      // Reciter avatar
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.4),
+                            width: 2,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.mic_rounded,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              reciter.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                _Chip(
+                                  label:
+                                      '$downloadedCount / 114 ${localizations.downloaded}',
+                                  icon: Icons.download_done_rounded,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        title: Text(
+          reciter.name,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        titlePadding: const EdgeInsets.only(left: 56, bottom: 14),
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+
+  const _Chip({required this.label, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 13),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// TRACK TILE
+// ════════════════════════════════════════════════════════════════════════════
+
+class _SurahTrackTile extends StatelessWidget {
   final int surahNumber;
   final String surahNameArabic;
   final String surahNameTranslated;
@@ -245,9 +448,12 @@ class _SurahAudioItemCard extends StatelessWidget {
   final double downloadProgress;
   final bool isOtherDownloading;
   final bool isAvailableRemotely;
+  final bool isNowPlaying;
+  final SurahMiniPlayerState playerState;
   final String reciterId;
+  final AppLocalizations localizations;
 
-  const _SurahAudioItemCard({
+  const _SurahTrackTile({
     required this.surahNumber,
     required this.surahNameArabic,
     required this.surahNameTranslated,
@@ -257,76 +463,381 @@ class _SurahAudioItemCard extends StatelessWidget {
     required this.downloadProgress,
     required this.isOtherDownloading,
     required this.isAvailableRemotely,
+    required this.isNowPlaying,
+    required this.playerState,
     required this.reciterId,
+    required this.localizations,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final localizations = AppLocalizations.of(context)!;
+    final isDark = colorScheme.brightness == Brightness.dark;
+
+    final isPlaying =
+        isNowPlaying &&
+        (playerState.playerState == AudioPlayerState.playing ||
+            playerState.playerState == AudioPlayerState.loading);
+
+    // In dark mode, primary (#006E62) is too dark on dark surfaces.
+    // Use tertiary (#4DB6AC) as a lighter, readable teal accent instead.
+    final accentColor = isDark ? AppColor.tertiary : colorScheme.primary;
+
+    // Now-playing background:
+    //  • dark  → elevated surface (surfaceContainerHigh)
+    //  • light → soft primaryContainer wash (much more visible than 7% primary)
+    final bgColor = isNowPlaying
+        ? (isDark
+              ? colorScheme.surfaceContainerHigh
+              : colorScheme.primaryContainer.withValues(alpha: 0.35))
+        : (isDark ? colorScheme.surfaceContainerLow : colorScheme.surface);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(14),
+        border: isNowPlaying
+            ? Border.all(
+                color: accentColor.withValues(alpha: isDark ? 0.5 : 0.45),
+                width: 1,
+              )
+            : null,
+      ),
+      // Material(transparent) gives InkWell a surface to paint its ripple on,
+      // while AnimatedContainer keeps ownership of the background color.
+      child: Material(
+        type: MaterialType.transparency,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: isDownloaded ? () => _play(context) : null,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                // ── Left: number / equalizer ───────────────────────────────
+                SizedBox(
+                  width: 42,
+                  height: 42,
+                  child: isPlaying
+                      ? _EqualizerBadge(color: accentColor)
+                      : _NumberBadge(
+                          number: surahNumber,
+                          isDownloaded: isDownloaded,
+                          isNowPlaying: isNowPlaying,
+                          accentColor: accentColor,
+                          colorScheme: colorScheme,
+                        ),
+                ),
+
+                const SizedBox(width: 12),
+
+                // ── Center: names + meta ───────────────────────────────────
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              surahNameTranslated,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: isNowPlaying ? accentColor : null,
+                                  ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            surahNameArabic,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isNowPlaying
+                                  ? accentColor
+                                  : colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.graphic_eq_rounded,
+                            size: 12,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            localizations.ayahCountLabel(versesCount),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: colorScheme.onSurfaceVariant),
+                          ),
+
+                          if (isNowPlaying) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              localizations.playSurah,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: accentColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      // // Download progress bar
+                      // if (isDownloading) ...[
+                      //   const SizedBox(height: 6),
+                      //   ClipRRect(
+                      //     borderRadius: BorderRadius.circular(4),
+                      //     child: LinearProgressIndicator(
+                      //       value: downloadProgress,
+                      //       minHeight: 3,
+                      //       color: colorScheme.primary,
+                      //       backgroundColor: colorScheme.primary.withValues(
+                      //         alpha: 0.2,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ],
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                // ── Right: action ──────────────────────────────────────────
+                _TrackAction(
+                  isDownloaded: isDownloaded,
+                  isDownloading: isDownloading,
+                  downloadProgress: downloadProgress,
+                  isOtherDownloading: isOtherDownloading,
+                  isAvailableRemotely: isAvailableRemotely,
+                  isNowPlaying: isNowPlaying,
+                  isPlaying: isPlaying,
+                  accentColor: accentColor,
+                  colorScheme: colorScheme,
+                  localizations: localizations,
+                  onPlay: () => _play(context),
+                  onDownload: () => _download(context),
+                ),
+              ],
+            ),
+          ),
+        ), // InkWell
+      ), // Material
+    );
+  }
+
+  Future<void> _play(BuildContext context) async {
+    final audioMgmt = context.read<AudioManagementCubit>();
+    await audioMgmt.loadAyahAudios(reciterId, surahNumber);
+    if (!context.mounted) return;
+
+    await audioMgmt.playSurahPlaylist(
+      reciterId,
+      surahNumber,
+      surahName: surahNameTranslated,
+      startAyahIndex: 0,
+    );
+    if (!context.mounted) return;
+
+    await context.read<SurahMiniPlayerCubit>().attachToCurrentPlayback(
+      expanded: true,
+    );
+  }
+
+  void _download(BuildContext context) {
+    if (isOtherDownloading) {
+      CustomSnackbar.showSnackbar(
+        context,
+        localizations.downloadInProgress,
+        duration: 2,
+      );
+      return;
+    }
+    context.read<AudioManagementCubit>().downloadSurahAudio(
+      reciterId,
+      surahNumber,
+    );
+  }
+}
+
+// ── Sub-widgets ───────────────────────────────────────────────────────────────
+
+class _NumberBadge extends StatelessWidget {
+  final int number;
+  final bool isDownloaded;
+  final bool isNowPlaying;
+  final Color accentColor;
+  final ColorScheme colorScheme;
+
+  const _NumberBadge({
+    required this.number,
+    required this.isDownloaded,
+    required this.isNowPlaying,
+    required this.accentColor,
+    required this.colorScheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = colorScheme.brightness == Brightness.dark;
+
+    // Now playing: solid accent fill
+    // Downloaded (light): use primaryContainer for a clear but soft teal chip
+    // Downloaded (dark): semi-transparent accent
+    // Default: neutral grey tint
+    final bgColor = isNowPlaying
+        ? accentColor
+        : isDownloaded
+        ? (isDark ? accentColor.withValues(alpha: 0.25) : colorScheme.primary)
+        : colorScheme.onSurface.withValues(alpha: 0.07);
+
+    final textColor = isNowPlaying
+        ? (isDark ? colorScheme.surface : Colors.white)
+        : isDownloaded
+        ? (isDark ? accentColor : colorScheme.onPrimary)
+        : colorScheme.onSurfaceVariant;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '$surahNumber',
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$surahNameArabic - $surahNameTranslated',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    localizations.ayahCountLabel(versesCount),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 10),
-            _buildAction(context, localizations),
-          ],
+      alignment: Alignment.center,
+      child: Text(
+        '$number',
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.w800,
+          fontSize: 15,
         ),
       ),
     );
   }
+}
 
-  Widget _buildAction(BuildContext context, AppLocalizations localizations) {
-    final colorScheme = Theme.of(context).colorScheme;
+/// Animated equalizer bars — shown when the surah is currently playing.
+class _EqualizerBadge extends StatefulWidget {
+  final Color color;
 
+  const _EqualizerBadge({required this.color});
+
+  @override
+  State<_EqualizerBadge> createState() => _EqualizerBadgeState();
+}
+
+class _EqualizerBadgeState extends State<_EqualizerBadge>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: widget.color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      alignment: Alignment.center,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: AnimatedBuilder(
+          animation: _ctrl,
+          builder: (_, __) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _EqBar(height: 8 + _ctrl.value * 14),
+              _EqBar(height: 14 + (1 - _ctrl.value) * 8),
+              _EqBar(height: 6 + _ctrl.value * 16),
+              _EqBar(height: 12 + (1 - _ctrl.value) * 10),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EqBar extends StatelessWidget {
+  final double height;
+
+  const _EqBar({required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 3,
+      height: height.clamp(4.0, 24.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+  }
+}
+
+class _TrackAction extends StatelessWidget {
+  final bool isDownloaded;
+  final bool isDownloading;
+  final double downloadProgress;
+  final bool isOtherDownloading;
+  final bool isAvailableRemotely;
+  final bool isNowPlaying;
+  final bool isPlaying;
+  final Color accentColor;
+  final ColorScheme colorScheme;
+  final AppLocalizations localizations;
+  final VoidCallback onPlay;
+  final VoidCallback onDownload;
+
+  const _TrackAction({
+    required this.isDownloaded,
+    required this.isDownloading,
+    required this.downloadProgress,
+    required this.isOtherDownloading,
+    required this.isAvailableRemotely,
+    required this.isNowPlaying,
+    required this.isPlaying,
+    required this.accentColor,
+    required this.colorScheme,
+    required this.localizations,
+    required this.onPlay,
+    required this.onDownload,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = colorScheme.brightness == Brightness.dark;
+
+    // Downloading: circular progress
     if (isDownloading) {
-      final progressPercent = (downloadProgress * 100).toInt();
+      final pct = (downloadProgress * 100).toInt();
       return SizedBox(
         width: 44,
         height: 44,
@@ -336,80 +847,147 @@ class _SurahAudioItemCard extends StatelessWidget {
             CircularProgressIndicator(
               value: downloadProgress,
               strokeWidth: 3,
-              color: colorScheme.primary,
-              backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
+              color: accentColor,
+              backgroundColor: accentColor.withValues(alpha: 0.15),
             ),
             Text(
-              '$progressPercent%',
-              style: Theme.of(
-                context,
-              ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700),
+              '$pct%',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                fontSize: 10,
+              ),
             ),
           ],
         ),
       );
     }
 
+    // Downloaded: play/pause button
     if (isDownloaded) {
-      return IconButton(
-        icon: Icon(
-          Icons.play_circle_fill,
-          size: 34,
-          color: colorScheme.primary,
+      // Now playing → solid accent fill with white icon
+      // Idle downloaded → primaryContainer fill in light, semi-transparent in dark
+      final btnBg = isNowPlaying
+          ? accentColor
+          : (isDark ? accentColor.withValues(alpha: 0.2) : colorScheme.primary);
+      final iconColor = isNowPlaying
+          ? (isDark ? colorScheme.surface : Colors.white)
+          : (isDark ? accentColor : colorScheme.onPrimary);
+
+      return GestureDetector(
+        onTap: onPlay,
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(color: btnBg, shape: BoxShape.circle),
+          child: Icon(
+            isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+            size: 22,
+            color: iconColor,
+          ),
         ),
-        tooltip: localizations.playSurah,
-        onPressed: () async {
-          final audioManagementCubit = context.read<AudioManagementCubit>();
-          await audioManagementCubit.loadAyahAudios(reciterId, surahNumber);
-          if (!context.mounted) {
-            return;
-          }
-
-          await audioManagementCubit.playSurahPlaylist(
-            reciterId,
-            surahNumber,
-            surahName: surahNameTranslated,
-            startAyahIndex: 0,
-          );
-
-          if (!context.mounted) {
-            return;
-          }
-
-          await context.read<SurahMiniPlayerCubit>().attachToCurrentPlayback(
-            expanded: true,
-          );
-        },
       );
     }
 
+    // Not available remotely
     if (!isAvailableRemotely) {
       return Tooltip(
         message: localizations.audioNotYetAvailable,
-        child: Icon(
-          Icons.download_for_offline_outlined,
-          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-          size: 30,
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: colorScheme.primary,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.cloud_off_outlined,
+            size: 20,
+            color: colorScheme.onPrimary.withValues(alpha: 0.6),
+          ),
         ),
       );
     }
 
-    return IconButton(
-      icon: Icon(Icons.download_rounded, size: 30, color: colorScheme.primary),
-      tooltip: localizations.downloadLabel,
-      onPressed: () {
-        if (isOtherDownloading) {
-          CustomSnackbar.showSnackbar(
-            context,
-            localizations.downloadInProgress,
-            duration: 2,
-          );
-          return;
-        }
+    // Available: download button
+    // Light: primaryContainer fill with primary icon — clear and inviting
+    // Dark: semi-transparent accent fill
+    return GestureDetector(
+      onTap: onDownload,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: isDark
+              ? accentColor.withValues(alpha: 0.15)
+              : colorScheme.primary,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: accentColor.withValues(alpha: isDark ? 0.4 : 0.5),
+            width: 1,
+          ),
+        ),
+        child: Icon(
+          Icons.download_rounded,
+          size: 20,
+          color: isDark ? accentColor : colorScheme.onPrimary,
+        ),
+      ),
+    );
+  }
+}
 
-        context.read<AudioManagementCubit>().downloadSurahAudio(
-          reciterId,
-          surahNumber,
+// ════════════════════════════════════════════════════════════════════════════
+// LOADING PLACEHOLDER
+// ════════════════════════════════════════════════════════════════════════════
+
+class _LoadingPlaceholder extends StatefulWidget {
+  const _LoadingPlaceholder();
+
+  @override
+  State<_LoadingPlaceholder> createState() => _LoadingPlaceholderState();
+}
+
+class _LoadingPlaceholderState extends State<_LoadingPlaceholder>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+    _anim = Tween<double>(
+      begin: 0.4,
+      end: 0.9,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (context, _) {
+        return ListView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          itemCount: 12,
+          itemBuilder: (_, i) => Container(
+            height: 62,
+            margin: const EdgeInsets.only(bottom: 6),
+            decoration: BoxDecoration(
+              color: colorScheme.onSurface.withValues(alpha: _anim.value * 0.1),
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
         );
       },
     );

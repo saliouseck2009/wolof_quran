@@ -8,7 +8,7 @@ import '../../core/services/audio_player_service.dart';
 import '../../domain/repositories/audio_repository.dart';
 import '../../domain/repositories/download_repository.dart';
 
-enum SurahMiniPlayerUiState { hidden, collapsed, expanded }
+enum SurahMiniPlayerUiState { hidden, collapsed, expanded, fullscreen }
 
 class SurahMiniPlayerState extends Equatable {
   final SurahMiniPlayerUiState uiState;
@@ -211,6 +211,16 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
       return;
     }
     emit(state.copyWith(uiState: SurahMiniPlayerUiState.collapsed));
+  }
+
+  void openFullscreen() {
+    if (!state.hasActiveSurah) return;
+    emit(state.copyWith(uiState: SurahMiniPlayerUiState.fullscreen));
+  }
+
+  void closeFullscreen() {
+    if (!state.hasActiveSurah) return;
+    emit(state.copyWith(uiState: SurahMiniPlayerUiState.expanded));
   }
 
   Future<void> closePlayer() async {
