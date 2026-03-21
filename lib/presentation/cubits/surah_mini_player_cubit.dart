@@ -126,6 +126,21 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
   void _listenToPlayerStreams() {
     _audioSub = _audioPlayerService.currentAudio.listen(_handleCurrentAudio);
     _playerStateSub = _audioPlayerService.playerState.listen((playerState) {
+      if ((playerState == AudioPlayerState.stopped ||
+              playerState == AudioPlayerState.idle) &&
+          _audioPlayerService.currentPlayingAudio == null &&
+          state.hasActiveSurah) {
+        emit(
+          state.copyWith(
+            uiState: SurahMiniPlayerUiState.hidden,
+            playerState: playerState,
+            clearTrack: true,
+            position: Duration.zero,
+            clearDuration: true,
+          ),
+        );
+        return;
+      }
       emit(state.copyWith(playerState: playerState));
     });
     _globalPositionSub = _audioPlayerService.surahGlobalPosition.listen((
@@ -147,7 +162,30 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
   }
 
   Future<void> _handleCurrentAudio(PlayingAudioInfo? audioInfo) async {
-    if (audioInfo == null || !audioInfo.isPlaylist) {
+    if (audioInfo == null) {
+      final currentPlayerState = _audioPlayerService.currentPlayerState;
+      final hasTransientPlaybackState =
+          currentPlayerState == AudioPlayerState.playing ||
+          currentPlayerState == AudioPlayerState.loading ||
+          currentPlayerState == AudioPlayerState.paused;
+
+      // Guard against transient null emissions from the player while playback
+      // is still active (or paused) to prevent fullscreen from being dismissed.
+      if (hasTransientPlaybackState && state.hasActiveSurah) {
+        return;
+      }
+      emit(
+        state.copyWith(
+          uiState: SurahMiniPlayerUiState.hidden,
+          clearTrack: true,
+          position: Duration.zero,
+          clearDuration: true,
+        ),
+      );
+      return;
+    }
+
+    if (!audioInfo.isPlaylist) {
       emit(
         state.copyWith(
           uiState: SurahMiniPlayerUiState.hidden,

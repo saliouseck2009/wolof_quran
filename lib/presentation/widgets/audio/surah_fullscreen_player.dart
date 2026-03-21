@@ -19,8 +19,10 @@ class SurahFullscreenPlayer extends StatelessWidget {
     return BlocConsumer<SurahMiniPlayerCubit, SurahMiniPlayerState>(
       listenWhen: (previous, current) => previous.uiState != current.uiState,
       listener: (context, state) {
-        // If the cubit moved away from fullscreen (e.g. player closed), pop.
-        if (state.uiState != SurahMiniPlayerUiState.fullscreen &&
+        // Pop only when playback is no longer active.
+        // This avoids accidental fullscreen exits on transient UI state changes.
+        if ((state.uiState == SurahMiniPlayerUiState.hidden ||
+                !state.hasActiveSurah) &&
             Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
         }
