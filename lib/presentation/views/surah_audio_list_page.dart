@@ -489,8 +489,8 @@ class _SurahTrackTile extends StatelessWidget {
     final bgColor = isNowPlaying
         ? (isDark
               ? colorScheme.surfaceContainerHigh
-              : colorScheme.primaryContainer.withValues(alpha: 0.35))
-        : (isDark ? colorScheme.surfaceContainerLow : colorScheme.surface);
+              : colorScheme.primary.withValues(alpha: 0.15))
+        : (isDark ? colorScheme.surfaceContainerLow : colorScheme.onPrimary);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -498,12 +498,6 @@ class _SurahTrackTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(14),
-        border: isNowPlaying
-            ? Border.all(
-                color: accentColor.withValues(alpha: isDark ? 0.5 : 0.45),
-                width: 1,
-              )
-            : null,
       ),
       // Material(transparent) gives InkWell a surface to paint its ripple on,
       // while AnimatedContainer keeps ownership of the background color.

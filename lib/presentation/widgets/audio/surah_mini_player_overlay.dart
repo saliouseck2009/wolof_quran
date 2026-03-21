@@ -608,25 +608,28 @@ class _ExpandedMiniPlayer extends StatelessWidget {
           const SizedBox(height: 2),
 
           // ── Repeat ────────────────────────────────────────────────────────
-          Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              decoration: BoxDecoration(
-                color: state.repeatSurah
-                    ? colorScheme.primaryContainer.withValues(alpha: 0.7)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: IconButton(
-                onPressed: cubit.toggleRepeat,
-                iconSize: 20,
-                icon: Icon(
-                  Icons.repeat_rounded,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
                   color: state.repeatSurah
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
+                      ? Colors.transparent
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                tooltip: 'Répéter',
+                child: IconButton(
+                  onPressed: cubit.toggleRepeat,
+                  iconSize: 20,
+                  icon: Icon(
+                    Icons.repeat_rounded,
+                    color: state.repeatSurah
+                        ? colorScheme.primary
+                        : colorScheme.primary.withValues(alpha: 0.4),
+                  ),
+                  tooltip: 'Répéter',
+                ),
               ),
             ),
           ),
