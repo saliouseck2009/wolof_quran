@@ -457,12 +457,37 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
         }
 
         final filePaths = ayahAudios.map((audio) => audio.localPath).toList();
-        final ayahDurations = ayahAudios
+        var ayahDurations = ayahAudios
             .map((audio) => audio.duration)
             .toList();
         final hasMissingDurations = ayahDurations.any(
           (duration) => duration == null || duration.inMilliseconds <= 0,
         );
+
+        // Warmup durations before playback so the UI has them immediately.
+        if (hasMissingDurations) {
+          try {
+            await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
+            final warmedAyahs = await _audioRepository.getAyahAudios(
+              reciterId,
+              surahNumber,
+            );
+            ayahDurations = warmedAyahs
+                .map((audio) => audio.duration)
+                .toList();
+
+            final currentState2 = state;
+            if (currentState2 is AudioManagementLoaded) {
+              final updatedMap = Map<String, List<AyahAudio>>.from(
+                currentState2.ayahAudiosMap,
+              );
+              updatedMap['${reciterId}_$surahNumber'] = warmedAyahs;
+              emit(currentState2.copyWith(ayahAudiosMap: updatedMap));
+            }
+          } catch (e) {
+            log('Pre-play warmup failed, continuing with partial durations: $e');
+          }
+        }
 
         await audioPlayerService.playSurahPlaylist(
           filePaths: filePaths,
@@ -472,10 +497,6 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
           ayahDurations: ayahDurations,
           startIndex: startAyahIndex,
         );
-
-        if (hasMissingDurations) {
-          unawaited(_warmUpDurationsAndUpdateTimeline(reciterId, surahNumber));
-        }
       }
     } catch (e) {
       emit(
@@ -512,36 +533,4 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
     return [];
   }
 
-  Future<void> _warmUpDurationsAndUpdateTimeline(
-    String reciterId,
-    int surahNumber,
-  ) async {
-    try {
-      await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
-      final warmedAyahs = await _audioRepository.getAyahAudios(
-        reciterId,
-        surahNumber,
-      );
-      final warmedDurations = warmedAyahs
-          .map((audio) => audio.duration)
-          .toList();
-
-      audioPlayerService.updatePlaylistDurations(
-        reciterId: reciterId,
-        surahNumber: surahNumber,
-        durations: warmedDurations,
-      );
-
-      final currentState = state;
-      if (currentState is AudioManagementLoaded) {
-        final updatedAyahAudiosMap = Map<String, List<AyahAudio>>.from(
-          currentState.ayahAudiosMap,
-        );
-        updatedAyahAudiosMap['${reciterId}_$surahNumber'] = warmedAyahs;
-        emit(currentState.copyWith(ayahAudiosMap: updatedAyahAudiosMap));
-      }
-    } catch (e) {
-      log('Failed to warm up ayah durations: $e');
-    }
-  }
 }

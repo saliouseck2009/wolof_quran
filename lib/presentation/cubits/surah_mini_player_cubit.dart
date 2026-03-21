@@ -298,10 +298,24 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     }
 
     final filePaths = ayahAudios.map((audio) => audio.localPath).toList();
-    final ayahDurations = ayahAudios.map((audio) => audio.duration).toList();
+    var ayahDurations = ayahAudios.map((audio) => audio.duration).toList();
     final hasMissingDurations = ayahDurations.any(
       (duration) => duration == null || duration.inMilliseconds <= 0,
     );
+
+    // Warmup durations before playback so the UI has them immediately.
+    if (hasMissingDurations) {
+      try {
+        await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
+        final warmedAyahs = await _audioRepository.getAyahAudios(
+          reciterId,
+          surahNumber,
+        );
+        ayahDurations = warmedAyahs.map((audio) => audio.duration).toList();
+      } catch (_) {
+        // Continue with partial durations.
+      }
+    }
 
     await _audioPlayerService.playSurahPlaylist(
       filePaths: filePaths,
@@ -312,10 +326,6 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
       startIndex: 0,
     );
 
-    if (hasMissingDurations) {
-      unawaited(_warmUpDurationsAndUpdateTimeline(reciterId, surahNumber));
-    }
-
     emit(
       state.copyWith(
         uiState: SurahMiniPlayerUiState.expanded,
@@ -323,27 +333,6 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         surahName: quran.getSurahNameEnglish(surahNumber),
       ),
     );
-  }
-
-  Future<void> _warmUpDurationsAndUpdateTimeline(
-    String reciterId,
-    int surahNumber,
-  ) async {
-    try {
-      await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
-      final ayahAudios = await _audioRepository.getAyahAudios(
-        reciterId,
-        surahNumber,
-      );
-      final durations = ayahAudios.map((audio) => audio.duration).toList();
-      _audioPlayerService.updatePlaylistDurations(
-        reciterId: reciterId,
-        surahNumber: surahNumber,
-        durations: durations,
-      );
-    } catch (_) {
-      // Keep current timeline; runtime durations can still fill over time.
-    }
   }
 
   @override
