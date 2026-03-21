@@ -883,13 +883,13 @@ void main() {
     miniPlayerCubit.showForTest(surahNumber: 1, expanded: true);
     await tester.pumpAndSettle();
 
-    expect(find.text('1 - Al-Fatihah'), findsOneWidget);
+    expect(find.text('Al-Fatihah'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.close).last);
+    await tester.tap(find.byIcon(Icons.close_rounded).first);
     await tester.pumpAndSettle();
 
     expect(miniPlayerCubit.state.uiState, SurahMiniPlayerUiState.hidden);
-    expect(find.text('1 - Al-Fatihah'), findsNothing);
+    expect(find.text('Al-Fatihah'), findsNothing);
   });
 
   testWidgets('Mini-player keeps seek disabled while duration is not ready', (

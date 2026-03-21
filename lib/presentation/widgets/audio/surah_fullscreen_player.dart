@@ -117,15 +117,16 @@ class _FullscreenContent extends StatelessWidget {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Align(
-                      alignment: Alignment.topCenter,
+                    child: Center(
                       child: _CenterNowPlayingCard(
                         state: state,
                         tokens: t,
                         reciterName: activeReciterName,
+                        total: total,
                         surahTitle: _surahTitleWithNumber(
                           context,
                           state.surahNumber,
+                          fallbackName: state.surahName,
                         ),
                       ),
                     ),
@@ -249,12 +250,14 @@ class _CenterNowPlayingCard extends StatelessWidget {
   final SurahMiniPlayerState state;
   final _ThemeTokens tokens;
   final String reciterName;
+  final Duration total;
   final String surahTitle;
 
   const _CenterNowPlayingCard({
     required this.state,
     required this.tokens,
     required this.reciterName,
+    required this.total,
     required this.surahTitle,
   });
 
@@ -264,9 +267,12 @@ class _CenterNowPlayingCard extends StatelessWidget {
     final isPlaying =
         state.playerState == AudioPlayerState.playing ||
         state.playerState == AudioPlayerState.loading;
-    final queuePosition = state.currentQueueIndex >= 0
-        ? '${state.currentQueueIndex + 1}/${state.downloadedQueue.length}'
-        : '--/--';
+    final progress = state.isSeekReady
+        ? _progressValue(state.position, total)
+        : null;
+    final remaining = state.isSeekReady
+        ? _safeRemaining(total, state.position)
+        : Duration.zero;
 
     final cardDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(28),
@@ -292,7 +298,7 @@ class _CenterNowPlayingCard extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 260),
         decoration: cardDecoration,
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+        padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -315,7 +321,13 @@ class _CenterNowPlayingCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
+            _SurahArtwork(
+              surahNumber: state.surahNumber,
+              isPlaying: isPlaying,
+              tokens: tokens,
+            ),
+            const SizedBox(height: 18),
             Text(
               surahTitle,
               maxLines: 2,
@@ -327,7 +339,7 @@ class _CenterNowPlayingCard extends StatelessWidget {
                 height: 1.15,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               state.surahNumber != null
                   ? quran.getSurahNameArabic(state.surahNumber!)
@@ -338,7 +350,42 @@ class _CenterNowPlayingCard extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 18),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                minHeight: 6,
+                value: progress,
+                color: tokens.accent,
+                backgroundColor: tokens.isDark
+                    ? Colors.white.withValues(alpha: 0.16)
+                    : cs.onSurface.withValues(alpha: 0.12),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _formatDuration(state.position),
+                    style: TextStyle(
+                      color: tokens.muted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Text(
+                  state.isSeekReady ? _formatDuration(total) : '--:--',
+                  style: TextStyle(
+                    color: tokens.muted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
             Divider(
               height: 1,
               thickness: 1,
@@ -360,9 +407,11 @@ class _CenterNowPlayingCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _MetaRow(
-                    icon: Icons.queue_music_rounded,
-                    label: 'File',
-                    value: queuePosition,
+                    icon: Icons.schedule_rounded,
+                    label: 'Restant',
+                    value: state.isSeekReady
+                        ? '-${_formatDuration(remaining)}'
+                        : '--:--',
                     tokens: tokens,
                   ),
                 ),
@@ -370,6 +419,98 @@ class _CenterNowPlayingCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SurahArtwork extends StatelessWidget {
+  final int? surahNumber;
+  final bool isPlaying;
+  final _ThemeTokens tokens;
+
+  const _SurahArtwork({
+    required this.surahNumber,
+    required this.isPlaying,
+    required this.tokens,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final accentSoft = tokens.isDark
+        ? Colors.white.withValues(alpha: 0.24)
+        : tokens.accent.withValues(alpha: 0.22);
+
+    return SizedBox(
+      width: 196,
+      height: 196,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 196,
+            height: 196,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: accentSoft, width: 1.2),
+            ),
+          ),
+          Container(
+            width: 166,
+            height: 166,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: tokens.isDark
+                    ? Colors.white.withValues(alpha: 0.12)
+                    : cs.onSurface.withValues(alpha: 0.08),
+                width: 1.2,
+              ),
+            ),
+          ),
+          Container(
+            width: 138,
+            height: 138,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [tokens.accent, tokens.accent.withValues(alpha: 0.62)],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: tokens.accent.withValues(alpha: 0.35),
+                  blurRadius: 26,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '${surahNumber ?? '--'}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 38,
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Icon(
+                  isPlaying
+                      ? Icons.graphic_eq_rounded
+                      : Icons.play_circle_fill_rounded,
+                  color: Colors.white.withValues(alpha: 0.92),
+                  size: 22,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -715,20 +856,37 @@ class _PlayPauseButton extends StatelessWidget {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /// Returns the surah name in the language currently selected by the user.
-String _localizedSurahName(BuildContext context, int? surahNumber) {
+String _localizedSurahName(
+  BuildContext context,
+  int? surahNumber, {
+  String? fallbackName,
+}) {
   if (surahNumber == null) return '';
-  final translation = context
-      .watch<QuranSettingsCubit>()
-      .state
-      .selectedTranslation;
+  final settingsCubit = context.read<QuranSettingsCubit?>();
+  if (settingsCubit == null) {
+    final fallback = fallbackName?.trim();
+    if (fallback != null && fallback.isNotEmpty) {
+      return fallback;
+    }
+    return quran.getSurahNameEnglish(surahNumber);
+  }
+  final translation = settingsCubit.state.selectedTranslation;
   return QuranSettingsCubit.getSurahNameInTranslation(surahNumber, translation);
 }
 
-String _surahTitleWithNumber(BuildContext context, int? surahNumber) {
+String _surahTitleWithNumber(
+  BuildContext context,
+  int? surahNumber, {
+  String? fallbackName,
+}) {
   if (surahNumber == null) {
-    return _localizedSurahName(context, surahNumber);
+    return _localizedSurahName(
+      context,
+      surahNumber,
+      fallbackName: fallbackName,
+    );
   }
-  return '$surahNumber. ${_localizedSurahName(context, surahNumber)}';
+  return '$surahNumber. ${_localizedSurahName(context, surahNumber, fallbackName: fallbackName)}';
 }
 
 String _formatDuration(Duration duration) {
@@ -742,6 +900,20 @@ String _formatDuration(Duration duration) {
   }
   return '${minutes.toString().padLeft(2, '0')}:'
       '${seconds.toString().padLeft(2, '0')}';
+}
+
+double _progressValue(Duration position, Duration? duration) {
+  if (duration == null || duration.inMilliseconds <= 0) {
+    return 0;
+  }
+  return (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0);
+}
+
+Duration _safeRemaining(Duration total, Duration position) {
+  if (total <= Duration.zero) return Duration.zero;
+  if (position <= Duration.zero) return total;
+  if (position >= total) return Duration.zero;
+  return total - position;
 }
 
 // ── Route helper ──────────────────────────────────────────────────────────────

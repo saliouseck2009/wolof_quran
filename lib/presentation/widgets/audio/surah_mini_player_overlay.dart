@@ -58,9 +58,7 @@ class SurahMiniPlayerOverlay extends StatelessWidget {
                   height: isExpanded ? expandedHeight : 76,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainerHigh,
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -103,7 +101,11 @@ class _CollapsedMiniPlayer extends StatelessWidget {
         state.playerState == AudioPlayerState.playing ||
         state.playerState == AudioPlayerState.loading;
     final isLoading = state.playerState == AudioPlayerState.loading;
-    final surahName = _localizedSurahName(context, state.surahNumber);
+    final surahName = _localizedSurahName(
+      context,
+      state.surahNumber,
+      fallbackName: state.surahName,
+    );
 
     return InkWell(
       onTap: () => context.read<SurahMiniPlayerCubit>().expand(),
@@ -234,11 +236,7 @@ class _MiniArtworkBadge extends StatelessWidget {
           ),
         ),
         if (isPlaying) ...[
-          Positioned(
-            right: -2,
-            bottom: -2,
-            child: _SoundWaveIndicator(),
-          ),
+          Positioned(right: -2, bottom: -2, child: _SoundWaveIndicator()),
         ],
       ],
     );
@@ -289,9 +287,7 @@ class _SoundWaveIndicatorState extends State<_SoundWaveIndicator>
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 _Bar(height: (4 + _ctrl.value * 6).clamp(2.0, 10.0)),
-                _Bar(
-                  height: (2 + (1 - _ctrl.value) * 8).clamp(2.0, 10.0),
-                ),
+                _Bar(height: (2 + (1 - _ctrl.value) * 8).clamp(2.0, 10.0)),
                 _Bar(height: (6 + _ctrl.value * 4).clamp(2.0, 10.0)),
               ],
             );
@@ -398,7 +394,11 @@ class _ExpandedMiniPlayer extends StatelessWidget {
         state.playerState == AudioPlayerState.loading;
     final total = state.duration ?? Duration.zero;
     final cubit = context.read<SurahMiniPlayerCubit>();
-    final surahName = _localizedSurahName(context, state.surahNumber);
+    final surahName = _localizedSurahName(
+      context,
+      state.surahNumber,
+      fallbackName: state.surahName,
+    );
 
     // SingleChildScrollView absorbs the layout overflow that occurs while the
     // AnimatedContainer is mid-transition (76 px → expanded height).
@@ -409,224 +409,230 @@ class _ExpandedMiniPlayer extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-        // ── Drag handle ────────────────────────────────────────────────────
-        GestureDetector(
-          onTap: cubit.collapse,
-          child: Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: 10, bottom: 4),
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: colorScheme.outlineVariant,
-                borderRadius: BorderRadius.circular(4),
+          // ── Drag handle ────────────────────────────────────────────────────
+          GestureDetector(
+            onTap: cubit.collapse,
+            child: Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 4),
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(4),
+                ),
               ),
             ),
           ),
-        ),
 
-        // ── Header row ─────────────────────────────────────────────────────
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 8, 0),
-          child: Row(
-            children: [
-              // Mini artwork
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      colorScheme.primary,
-                      colorScheme.primary.withValues(alpha: 0.6),
+          // ── Header row ─────────────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 8, 0),
+            child: Row(
+              children: [
+                // Mini artwork
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        colorScheme.primary,
+                        colorScheme.primary.withValues(alpha: 0.6),
+                      ],
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${state.surahNumber ?? ''}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Title
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        surahName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        state.surahNumber != null
+                            ? quran.getSurahNameArabic(state.surahNumber!)
+                            : '',
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                child: Center(
-                  child: Text(
-                    '${state.surahNumber ?? ''}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 14,
-                    ),
+                // Fullscreen button
+                IconButton(
+                  onPressed: () {
+                    context.read<SurahMiniPlayerCubit>().openFullscreen();
+                    Navigator.of(
+                      context,
+                      rootNavigator: true,
+                    ).push(buildFullscreenRoute(context));
+                  },
+                  tooltip: 'Plein écran',
+                  icon: const Icon(Icons.open_in_full_rounded, size: 20),
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                // Close button
+                IconButton(
+                  onPressed: cubit.closePlayer,
+                  tooltip: _tooltipIfOverlay(context, localizations.close),
+                  icon: const Icon(Icons.close_rounded, size: 20),
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+
+          // ── Slider ────────────────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 4,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
+                activeTrackColor: colorScheme.primary,
+                inactiveTrackColor: colorScheme.onSurface.withValues(
+                  alpha: 0.18,
+                ),
+                thumbColor: colorScheme.primary,
+                disabledActiveTrackColor: colorScheme.onSurface.withValues(
+                  alpha: 0.25,
+                ),
+                disabledInactiveTrackColor: colorScheme.onSurface.withValues(
+                  alpha: 0.12,
+                ),
+              ),
+              child: Slider(
+                value: state.position.inMilliseconds
+                    .clamp(
+                      0,
+                      total.inMilliseconds > 0 ? total.inMilliseconds : 0,
+                    )
+                    .toDouble(),
+                max: total.inMilliseconds <= 0
+                    ? 1
+                    : total.inMilliseconds.toDouble(),
+                onChanged: !state.isSeekReady || total.inMilliseconds <= 0
+                    ? null
+                    : (value) {
+                        cubit.seek(Duration(milliseconds: value.round()));
+                      },
+              ),
+            ),
+          ),
+
+          // ── Time labels ────────────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _formatDuration(state.position),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              // Title
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      surahName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      state.surahNumber != null
-                          ? quran.getSurahNameArabic(state.surahNumber!)
-                          : '',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                Text(
+                  state.isSeekReady ? _formatDuration(total) : '--:--',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-              // Fullscreen button
-              IconButton(
-                onPressed: () {
-                  context.read<SurahMiniPlayerCubit>().openFullscreen();
-                  Navigator.of(context, rootNavigator: true).push(
-                    buildFullscreenRoute(context),
-                  );
-                },
-                tooltip: 'Plein écran',
-                icon: const Icon(Icons.open_in_full_rounded, size: 20),
-                color: colorScheme.onSurfaceVariant,
-              ),
-              // Close button
-              IconButton(
-                onPressed: cubit.closePlayer,
-                tooltip: _tooltipIfOverlay(context, localizations.close),
-                icon: const Icon(Icons.close_rounded, size: 20),
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ],
-          ),
-        ),
-
-        // ── Slider ────────────────────────────────────────────────────────
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-          child: SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackHeight: 4,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
-              activeTrackColor: colorScheme.primary,
-              inactiveTrackColor: colorScheme.onSurface.withValues(alpha: 0.18),
-              thumbColor: colorScheme.primary,
-              disabledActiveTrackColor: colorScheme.onSurface.withValues(alpha: 0.25),
-              disabledInactiveTrackColor: colorScheme.onSurface.withValues(alpha: 0.12),
-            ),
-            child: Slider(
-              value: state.position.inMilliseconds
-                  .clamp(
-                    0,
-                    total.inMilliseconds > 0 ? total.inMilliseconds : 0,
-                  )
-                  .toDouble(),
-              max: total.inMilliseconds <= 0
-                  ? 1
-                  : total.inMilliseconds.toDouble(),
-              onChanged: !state.isSeekReady || total.inMilliseconds <= 0
-                  ? null
-                  : (value) {
-                      cubit.seek(Duration(milliseconds: value.round()));
-                    },
+              ],
             ),
           ),
-        ),
 
-        // ── Time labels ────────────────────────────────────────────────────
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(height: 6),
+
+          // ── Controls ──────────────────────────────────────────────────────
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                _formatDuration(state.position),
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+              IconButton(
+                onPressed: state.canGoPrevious ? cubit.playPreviousSurah : null,
+                icon: const Icon(Icons.skip_previous_rounded),
+                iconSize: 28,
               ),
-              Text(
-                state.isSeekReady ? _formatDuration(total) : '--:--',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
+              IconButton(
+                onPressed: state.isSeekReady
+                    ? () => cubit.seekBySeconds(-10)
+                    : null,
+                icon: const Icon(Icons.replay_10_rounded),
+                iconSize: 26,
+              ),
+              // Play / Pause
+              _ExpandedPlayPauseButton(
+                isPlaying: isPlaying,
+                isLoading: state.playerState == AudioPlayerState.loading,
+                onTap: cubit.togglePlayPause,
+                colorScheme: colorScheme,
+              ),
+              IconButton(
+                onPressed: state.isSeekReady
+                    ? () => cubit.seekBySeconds(10)
+                    : null,
+                icon: const Icon(Icons.forward_10_rounded),
+                iconSize: 26,
+              ),
+              IconButton(
+                onPressed: state.canGoNext ? cubit.playNextSurah : null,
+                icon: const Icon(Icons.skip_next_rounded),
+                iconSize: 28,
               ),
             ],
           ),
-        ),
 
-        const SizedBox(height: 6),
+          const SizedBox(height: 2),
 
-        // ── Controls ──────────────────────────────────────────────────────
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-              onPressed: state.canGoPrevious ? cubit.playPreviousSurah : null,
-              icon: const Icon(Icons.skip_previous_rounded),
-              iconSize: 28,
-            ),
-            IconButton(
-              onPressed: state.isSeekReady
-                  ? () => cubit.seekBySeconds(-10)
-                  : null,
-              icon: const Icon(Icons.replay_10_rounded),
-              iconSize: 26,
-            ),
-            // Play / Pause
-            _ExpandedPlayPauseButton(
-              isPlaying: isPlaying,
-              isLoading: state.playerState == AudioPlayerState.loading,
-              onTap: cubit.togglePlayPause,
-              colorScheme: colorScheme,
-            ),
-            IconButton(
-              onPressed: state.isSeekReady
-                  ? () => cubit.seekBySeconds(10)
-                  : null,
-              icon: const Icon(Icons.forward_10_rounded),
-              iconSize: 26,
-            ),
-            IconButton(
-              onPressed: state.canGoNext ? cubit.playNextSurah : null,
-              icon: const Icon(Icons.skip_next_rounded),
-              iconSize: 28,
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 2),
-
-        // ── Repeat ────────────────────────────────────────────────────────
-        Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              color: state.repeatSurah
-                  ? colorScheme.primaryContainer.withValues(alpha: 0.7)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: IconButton(
-              onPressed: cubit.toggleRepeat,
-              iconSize: 20,
-              icon: Icon(
-                Icons.repeat_rounded,
+          // ── Repeat ────────────────────────────────────────────────────────
+          Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              decoration: BoxDecoration(
                 color: state.repeatSurah
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
+                    ? colorScheme.primaryContainer.withValues(alpha: 0.7)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
               ),
-              tooltip: 'Répéter',
+              child: IconButton(
+                onPressed: cubit.toggleRepeat,
+                iconSize: 20,
+                icon: Icon(
+                  Icons.repeat_rounded,
+                  color: state.repeatSurah
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                ),
+                tooltip: 'Répéter',
+              ),
             ),
           ),
-        ),
 
-        const SizedBox(height: 6),
-      ],
+          const SizedBox(height: 6),
+        ],
       ),
     );
   }
@@ -687,10 +693,21 @@ class _ExpandedPlayPauseButton extends StatelessWidget {
 
 /// Returns the surah name in the language currently selected by the user
 /// via [QuranSettingsCubit]. Falls back to English if [surahNumber] is null.
-String _localizedSurahName(BuildContext context, int? surahNumber) {
+String _localizedSurahName(
+  BuildContext context,
+  int? surahNumber, {
+  String? fallbackName,
+}) {
   if (surahNumber == null) return '';
-  final translation =
-      context.watch<QuranSettingsCubit>().state.selectedTranslation;
+  final settingsCubit = context.read<QuranSettingsCubit?>();
+  if (settingsCubit == null) {
+    final fallback = fallbackName?.trim();
+    if (fallback != null && fallback.isNotEmpty) {
+      return fallback;
+    }
+    return quran.getSurahNameEnglish(surahNumber);
+  }
+  final translation = settingsCubit.state.selectedTranslation;
   return QuranSettingsCubit.getSurahNameInTranslation(surahNumber, translation);
 }
 
