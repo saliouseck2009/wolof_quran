@@ -3,10 +3,14 @@ import 'package:path/path.dart';
 import 'package:flutter/services.dart';
 import '../models/downloaded_surah.dart';
 import '../../domain/entities/bookmark.dart';
+import '../../domain/entities/queued_audio_download_task.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   static Database? _database;
+  static const String _downloadedSurahsTable = 'downloaded_surahs';
+  static const String _bookmarksTable = 'bookmarks';
+  static const String _downloadQueueTable = 'download_queue';
 
   DatabaseHelper._internal();
 
@@ -24,7 +28,7 @@ class DatabaseHelper {
 
       return await openDatabase(
         path,
-        version: 2,
+        version: 3,
         onCreate: _createTables,
         onUpgrade: _onUpgrade,
       );
@@ -40,8 +44,23 @@ class DatabaseHelper {
   }
 
   Future<void> _createTables(Database db, int version) async {
+    await _createDownloadedSurahsTable(db);
+    await _createBookmarksTable(db);
+    await _createDownloadQueueTable(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createBookmarksTable(db);
+    }
+    if (oldVersion < 3) {
+      await _createDownloadQueueTable(db);
+    }
+  }
+
+  Future<void> _createDownloadedSurahsTable(Database db) async {
     await db.execute('''
-      CREATE TABLE downloaded_surahs (
+      CREATE TABLE IF NOT EXISTS $_downloadedSurahsTable (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         reciter_id TEXT NOT NULL,
         surah_number INTEGER NOT NULL,
@@ -51,9 +70,11 @@ class DatabaseHelper {
         UNIQUE(reciter_id, surah_number)
       )
     ''');
+  }
 
+  Future<void> _createBookmarksTable(Database db) async {
     await db.execute('''
-      CREATE TABLE bookmarks (
+      CREATE TABLE IF NOT EXISTS $_bookmarksTable (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         surah_number INTEGER NOT NULL,
         verse_number INTEGER NOT NULL,
@@ -67,28 +88,27 @@ class DatabaseHelper {
     ''');
   }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await db.execute('''
-        CREATE TABLE bookmarks (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          surah_number INTEGER NOT NULL,
-          verse_number INTEGER NOT NULL,
-          surah_name TEXT NOT NULL,
-          arabic_text TEXT NOT NULL,
-          translation TEXT NOT NULL,
-          translation_source TEXT NOT NULL,
-          created_at INTEGER NOT NULL,
-          UNIQUE(surah_number, verse_number)
-        )
-      ''');
-    }
+  Future<void> _createDownloadQueueTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $_downloadQueueTable (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        reciter_id TEXT NOT NULL,
+        surah_number INTEGER NOT NULL,
+        status TEXT NOT NULL,
+        progress REAL NOT NULL DEFAULT 0,
+        attempt_count INTEGER NOT NULL DEFAULT 0,
+        error TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        UNIQUE(reciter_id, surah_number)
+      )
+    ''');
   }
 
   // Insert downloaded surah
   Future<int> insertDownloadedSurah(DownloadedSurah surah) async {
     final db = await database;
-    return await db.insert('downloaded_surahs', {
+    return await db.insert(_downloadedSurahsTable, {
       ...surah.toMap(),
       'downloaded_at': DateTime.now().millisecondsSinceEpoch,
     }, conflictAlgorithm: ConflictAlgorithm.replace);
@@ -98,7 +118,7 @@ class DatabaseHelper {
   Future<bool> isSurahDownloaded(String reciterId, int surahNumber) async {
     final db = await database;
     final result = await db.query(
-      'downloaded_surahs',
+      _downloadedSurahsTable,
       where: 'reciter_id = ? AND surah_number = ? AND is_complete = 1',
       whereArgs: [reciterId, surahNumber],
     );
@@ -112,7 +132,7 @@ class DatabaseHelper {
   ) async {
     final db = await database;
     final result = await db.query(
-      'downloaded_surahs',
+      _downloadedSurahsTable,
       where: 'reciter_id = ? AND surah_number = ?',
       whereArgs: [reciterId, surahNumber],
     );
@@ -127,7 +147,7 @@ class DatabaseHelper {
   Future<List<DownloadedSurah>> getDownloadedSurahs(String reciterId) async {
     final db = await database;
     final result = await db.query(
-      'downloaded_surahs',
+      _downloadedSurahsTable,
       where: 'reciter_id = ? AND is_complete = 1',
       whereArgs: [reciterId],
       orderBy: 'surah_number ASC',
@@ -140,7 +160,7 @@ class DatabaseHelper {
   Future<int> deleteDownloadedSurah(String reciterId, int surahNumber) async {
     final db = await database;
     return await db.delete(
-      'downloaded_surahs',
+      _downloadedSurahsTable,
       where: 'reciter_id = ? AND surah_number = ?',
       whereArgs: [reciterId, surahNumber],
     );
@@ -154,7 +174,7 @@ class DatabaseHelper {
   ) async {
     final db = await database;
     return await db.update(
-      'downloaded_surahs',
+      _downloadedSurahsTable,
       {'is_complete': isComplete ? 1 : 0},
       where: 'reciter_id = ? AND surah_number = ?',
       whereArgs: [reciterId, surahNumber],
@@ -169,7 +189,7 @@ class DatabaseHelper {
       SELECT 
         COUNT(*) as total_downloads,
         COUNT(CASE WHEN is_complete = 1 THEN 1 END) as completed_downloads
-      FROM downloaded_surahs 
+      FROM $_downloadedSurahsTable 
       WHERE reciter_id = ?
     ''',
       [reciterId],
@@ -184,10 +204,253 @@ class DatabaseHelper {
     return {'total': 0, 'completed': 0};
   }
 
+  Future<void> enqueueDownloadTask(String reciterId, int surahNumber) async {
+    final db = await database;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final existing = await db.query(
+      _downloadQueueTable,
+      where: 'reciter_id = ? AND surah_number = ?',
+      whereArgs: [reciterId, surahNumber],
+      limit: 1,
+    );
+
+    if (existing.isEmpty) {
+      await db.insert(_downloadQueueTable, {
+        'reciter_id': reciterId,
+        'surah_number': surahNumber,
+        'status': QueuedAudioDownloadStatus.queued.dbValue,
+        'progress': 0.0,
+        'attempt_count': 0,
+        'error': null,
+        'created_at': now,
+        'updated_at': now,
+      });
+      return;
+    }
+
+    final currentStatus = QueuedAudioDownloadStatusX.fromDb(
+      '${existing.first['status'] ?? 'queued'}',
+    );
+    if (currentStatus == QueuedAudioDownloadStatus.queued ||
+        currentStatus == QueuedAudioDownloadStatus.downloading) {
+      return;
+    }
+
+    await db.update(
+      _downloadQueueTable,
+      {
+        'status': QueuedAudioDownloadStatus.queued.dbValue,
+        'progress': 0.0,
+        'attempt_count': 0,
+        'error': null,
+        'updated_at': now,
+      },
+      where: 'reciter_id = ? AND surah_number = ?',
+      whereArgs: [reciterId, surahNumber],
+    );
+  }
+
+  Future<QueuedAudioDownloadTask?> getDownloadQueueTask(
+    String reciterId,
+    int surahNumber,
+  ) async {
+    final db = await database;
+    final result = await db.query(
+      _downloadQueueTable,
+      where: 'reciter_id = ? AND surah_number = ?',
+      whereArgs: [reciterId, surahNumber],
+      limit: 1,
+    );
+    if (result.isEmpty) {
+      return null;
+    }
+    return _mapQueueTask(result.first);
+  }
+
+  Future<List<QueuedAudioDownloadTask>> getDownloadQueueTasks({
+    String? reciterId,
+  }) async {
+    final db = await database;
+    final result = await db.query(
+      _downloadQueueTable,
+      where: reciterId == null ? null : 'reciter_id = ?',
+      whereArgs: reciterId == null ? null : [reciterId],
+      orderBy:
+          "CASE status WHEN 'downloading' THEN 0 WHEN 'queued' THEN 1 ELSE 2 END, created_at ASC",
+    );
+    return result.map(_mapQueueTask).toList();
+  }
+
+  Future<QueuedAudioDownloadTask?> getNextQueuedDownloadTask() async {
+    final db = await database;
+    final result = await db.query(
+      _downloadQueueTable,
+      where: 'status = ?',
+      whereArgs: [QueuedAudioDownloadStatus.queued.dbValue],
+      orderBy: 'created_at ASC',
+      limit: 1,
+    );
+    if (result.isEmpty) {
+      return null;
+    }
+    return _mapQueueTask(result.first);
+  }
+
+  Future<void> markQueueTaskAsQueued(
+    String reciterId,
+    int surahNumber, {
+    double progress = 0,
+    int? attemptCount,
+    String? error,
+    bool clearError = true,
+  }) async {
+    final db = await database;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final values = <String, Object?>{
+      'status': QueuedAudioDownloadStatus.queued.dbValue,
+      'progress': progress.clamp(0.0, 1.0),
+      'updated_at': now,
+    };
+    if (attemptCount != null) {
+      values['attempt_count'] = attemptCount;
+    }
+    if (clearError) {
+      values['error'] = null;
+    } else if (error != null) {
+      values['error'] = error;
+    }
+
+    await db.update(
+      _downloadQueueTable,
+      values,
+      where: 'reciter_id = ? AND surah_number = ?',
+      whereArgs: [reciterId, surahNumber],
+    );
+  }
+
+  Future<void> markQueueTaskAsDownloading(
+    String reciterId,
+    int surahNumber, {
+    double progress = 0,
+  }) async {
+    final db = await database;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db.update(
+      _downloadQueueTable,
+      {
+        'status': QueuedAudioDownloadStatus.downloading.dbValue,
+        'progress': progress.clamp(0.0, 1.0),
+        'updated_at': now,
+      },
+      where: 'reciter_id = ? AND surah_number = ?',
+      whereArgs: [reciterId, surahNumber],
+    );
+  }
+
+  Future<void> updateQueueTaskProgress(
+    String reciterId,
+    int surahNumber,
+    double progress,
+  ) async {
+    final db = await database;
+    await db.update(
+      _downloadQueueTable,
+      {
+        'progress': progress.clamp(0.0, 1.0),
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'reciter_id = ? AND surah_number = ?',
+      whereArgs: [reciterId, surahNumber],
+    );
+  }
+
+  Future<void> markQueueTaskAsFailed(
+    String reciterId,
+    int surahNumber, {
+    required int attemptCount,
+    required String error,
+  }) async {
+    final db = await database;
+    await db.update(
+      _downloadQueueTable,
+      {
+        'status': QueuedAudioDownloadStatus.failed.dbValue,
+        'attempt_count': attemptCount,
+        'progress': 0.0,
+        'error': error,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'reciter_id = ? AND surah_number = ?',
+      whereArgs: [reciterId, surahNumber],
+    );
+  }
+
+  Future<void> removeQueueTask(String reciterId, int surahNumber) async {
+    final db = await database;
+    await db.delete(
+      _downloadQueueTable,
+      where: 'reciter_id = ? AND surah_number = ?',
+      whereArgs: [reciterId, surahNumber],
+    );
+  }
+
+  Future<void> clearFailedQueueTasks({String? reciterId}) async {
+    final db = await database;
+    await db.delete(
+      _downloadQueueTable,
+      where: reciterId == null ? 'status = ?' : 'status = ? AND reciter_id = ?',
+      whereArgs: reciterId == null
+          ? [QueuedAudioDownloadStatus.failed.dbValue]
+          : [QueuedAudioDownloadStatus.failed.dbValue, reciterId],
+    );
+  }
+
+  Future<void> requeueInterruptedQueueTasks() async {
+    final db = await database;
+    await db.update(
+      _downloadQueueTable,
+      {
+        'status': QueuedAudioDownloadStatus.queued.dbValue,
+        'progress': 0.0,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'status = ?',
+      whereArgs: [QueuedAudioDownloadStatus.downloading.dbValue],
+    );
+  }
+
+  QueuedAudioDownloadTask _mapQueueTask(Map<String, Object?> row) {
+    final createdAtEpoch = row['created_at'];
+    final updatedAtEpoch = row['updated_at'];
+    final progressRaw = row['progress'];
+    final attemptRaw = row['attempt_count'];
+
+    return QueuedAudioDownloadTask(
+      reciterId: '${row['reciter_id'] ?? ''}',
+      surahNumber: row['surah_number'] as int? ?? 0,
+      status: QueuedAudioDownloadStatusX.fromDb('${row['status'] ?? 'queued'}'),
+      progress: progressRaw is num ? progressRaw.toDouble() : 0.0,
+      attemptCount: attemptRaw is int
+          ? attemptRaw
+          : int.tryParse('$attemptRaw') ?? 0,
+      error: row['error'] as String?,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(
+        createdAtEpoch is int
+            ? createdAtEpoch
+            : int.tryParse('$createdAtEpoch') ?? 0,
+      ),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(
+        updatedAtEpoch is int
+            ? updatedAtEpoch
+            : int.tryParse('$updatedAtEpoch') ?? 0,
+      ),
+    );
+  }
+
   // Bookmark operations
   Future<int> insertBookmark(BookmarkedAyah bookmark) async {
     final db = await database;
-    return await db.insert('bookmarks', {
+    return await db.insert(_bookmarksTable, {
       'surah_number': bookmark.surahNumber,
       'verse_number': bookmark.verseNumber,
       'surah_name': bookmark.surahName,
@@ -201,7 +464,7 @@ class DatabaseHelper {
   Future<bool> isBookmarked(int surahNumber, int verseNumber) async {
     final db = await database;
     final result = await db.query(
-      'bookmarks',
+      _bookmarksTable,
       where: 'surah_number = ? AND verse_number = ?',
       whereArgs: [surahNumber, verseNumber],
     );
@@ -211,7 +474,7 @@ class DatabaseHelper {
   Future<int> deleteBookmark(int surahNumber, int verseNumber) async {
     final db = await database;
     return await db.delete(
-      'bookmarks',
+      _bookmarksTable,
       where: 'surah_number = ? AND verse_number = ?',
       whereArgs: [surahNumber, verseNumber],
     );
@@ -219,7 +482,7 @@ class DatabaseHelper {
 
   Future<List<BookmarkedAyah>> getAllBookmarks() async {
     final db = await database;
-    final result = await db.query('bookmarks', orderBy: 'created_at DESC');
+    final result = await db.query(_bookmarksTable, orderBy: 'created_at DESC');
 
     return result
         .map(
@@ -240,12 +503,14 @@ class DatabaseHelper {
 
   Future<int> clearAllBookmarks() async {
     final db = await database;
-    return await db.delete('bookmarks');
+    return await db.delete(_bookmarksTable);
   }
 
   Future<int> getBookmarkCount() async {
     final db = await database;
-    final result = await db.rawQuery('SELECT COUNT(*) as count FROM bookmarks');
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM $_bookmarksTable',
+    );
     return result.first['count'] as int;
   }
 }

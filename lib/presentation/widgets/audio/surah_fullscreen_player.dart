@@ -476,18 +476,9 @@ class _SurahArtwork extends StatelessWidget {
             height: 138,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [tokens.accent, tokens.accent.withValues(alpha: 0.62)],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: tokens.accent.withValues(alpha: 0.35),
-                  blurRadius: 26,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+              color: tokens.isDark
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : cs.onSurface.withValues(alpha: 0.06),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -582,4 +582,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get downloadInProgress =>
       'Another download is already in progress. Please wait for it to finish.';
+
+  @override
+  String get queued => 'Queued';
+
+  @override
+  String get alreadyQueued => 'This surah is already in the download queue.';
+
+  @override
+  String get retryDownload => 'Retry download';
+
+  @override
+  String get downloadFailedShort => 'Download failed';
+
+  @override
+  String queuePositionLabel(int position) {
+    return 'Queued (#$position)';
+  }
 }

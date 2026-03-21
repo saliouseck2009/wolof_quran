@@ -1,15 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
 import '../../core/config/theme/app_color.dart';
+import '../../core/services/audio_download_queue_service.dart';
 import '../../core/services/audio_player_service.dart';
 import '../../domain/entities/reciter.dart';
+import '../../domain/entities/queued_audio_download_task.dart';
 import '../../domain/usecases/get_downloaded_surahs_usecase.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../service_locator.dart';
 import '../blocs/reciter_chapters_bloc.dart';
 import '../cubits/audio_availability_cubit.dart';
+import '../cubits/audio_download_queue_cubit.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_mini_player_cubit.dart';
@@ -125,36 +130,88 @@ class _SurahAudioListBody extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     final translation = context.watch<QuranSettingsCubit>().currentTranslation;
 
-    return BlocListener<AudioManagementCubit, AudioManagementState>(
-      listenWhen: (previous, current) {
-        if (previous is AudioDownloading && previous.reciterId == reciter.id) {
-          return current is AudioManagementLoaded ||
-              current is AudioManagementError;
-        }
-        return false;
-      },
-      listener: (context, audioState) {
-        if (audioState is AudioManagementLoaded) {
-          context.read<ReciterChaptersBloc>().add(
-            RefreshDownloadedSurahs(reciter.id),
-          );
-          context.read<SurahMiniPlayerCubit>().refreshQueueForReciter(
-            reciter.id,
-          );
-        }
-        if (audioState is AudioManagementError) {
-          final formatted = formatAudioError(audioState.message, localizations);
-          CustomSnackbar.showErrorSnackbar(context, formatted, duration: 3);
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ReciterChaptersBloc, ReciterChaptersState>(
+          listenWhen: (previous, current) =>
+              previous.runtimeType != current.runtimeType ||
+              (previous is ReciterChaptersLoaded &&
+                  current is ReciterChaptersLoaded &&
+                  previous.downloadedSurahNumbers !=
+                      current.downloadedSurahNumbers),
+          listener: (context, state) {
+            if (state is! ReciterChaptersLoaded) {
+              return;
+            }
+            unawaited(_maybeAutoEnqueueFirstSurah(context, state));
+          },
+        ),
+        BlocListener<AudioDownloadQueueCubit, AudioDownloadQueueState>(
+          listenWhen: (previous, current) =>
+              previous.taskCountForReciter(reciter.id) !=
+              current.taskCountForReciter(reciter.id),
+          listener: (context, _) {
+            context.read<ReciterChaptersBloc>().add(
+              RefreshDownloadedSurahs(reciter.id),
+            );
+            context.read<SurahMiniPlayerCubit>().refreshQueueForReciter(
+              reciter.id,
+            );
+          },
+        ),
+        BlocListener<AudioDownloadQueueCubit, AudioDownloadQueueState>(
+          listenWhen: (previous, current) =>
+              previous.completionVersion != current.completionVersion,
+          listener: (context, queueState) {
+            final task = queueState.lastCompletedTask;
+            if (task == null || task.reciterId != reciter.id) {
+              return;
+            }
+            final translatedName = QuranSettingsCubit.getSurahNameInTranslation(
+              task.surahNumber,
+              translation,
+            );
+            CustomSnackbar.showSnackbar(
+              context,
+              localizations.downloadedSuccessfully(translatedName),
+              duration: 2,
+            );
+          },
+        ),
+        BlocListener<AudioDownloadQueueCubit, AudioDownloadQueueState>(
+          listenWhen: (previous, current) =>
+              previous.failureVersion != current.failureVersion,
+          listener: (context, queueState) {
+            final task = queueState.lastFailedTask;
+            if (task == null || task.reciterId != reciter.id) {
+              return;
+            }
+            CustomSnackbar.showErrorSnackbar(
+              context,
+              localizations.downloadFailedShort,
+              duration: 3,
+            );
+          },
+        ),
+        BlocListener<AudioManagementCubit, AudioManagementState>(
+          listenWhen: (previous, current) => current is AudioManagementError,
+          listener: (context, audioState) {
+            if (audioState is AudioManagementError) {
+              final formatted = formatAudioError(
+                audioState.message,
+                localizations,
+              );
+              CustomSnackbar.showErrorSnackbar(context, formatted, duration: 3);
+            }
+          },
+        ),
+      ],
       child: BlocBuilder<ReciterChaptersBloc, ReciterChaptersState>(
         builder: (context, chaptersState) {
-          // ── Loading ───────────────────────────────────────────────────────
           if (chaptersState is ReciterChaptersLoading) {
             return const _LoadingPlaceholder();
           }
 
-          // ── Error ─────────────────────────────────────────────────────────
           if (chaptersState is ReciterChaptersError) {
             return Center(
               child: Padding(
@@ -182,8 +239,11 @@ class _SurahAudioListBody extends StatelessWidget {
               final remoteAvailableSet = snapshot?.availableSurahs.toSet();
               final hasAvailabilityData = snapshot != null;
 
-              return BlocBuilder<AudioManagementCubit, AudioManagementState>(
-                builder: (context, audioState) {
+              return BlocBuilder<
+                AudioDownloadQueueCubit,
+                AudioDownloadQueueState
+              >(
+                builder: (context, queueState) {
                   return BlocBuilder<
                     SurahMiniPlayerCubit,
                     SurahMiniPlayerState
@@ -196,14 +256,11 @@ class _SurahAudioListBody extends StatelessWidget {
                         child: CustomScrollView(
                           key: const PageStorageKey<String>('surah-audio-list'),
                           slivers: [
-                            // ── Sliver header ───────────────────────────────
                             _ReciterSliverHeader(
                               reciter: reciter,
                               downloadedCount: downloadedCount,
                               localizations: localizations,
                             ),
-
-                            // ── List ────────────────────────────────────────
                             SliverPadding(
                               padding: const EdgeInsets.fromLTRB(
                                 16,
@@ -223,21 +280,26 @@ class _SurahAudioListBody extends StatelessWidget {
                                             surahNumber,
                                           ) ??
                                           false);
-                                  final downloadingState =
-                                      audioState is AudioDownloading &&
-                                          audioState.reciterId == reciter.id &&
-                                          audioState.surahNumber == surahNumber
-                                      ? audioState
-                                      : null;
+                                  final queueTask = queueState.taskFor(
+                                    reciter.id,
+                                    surahNumber,
+                                  );
                                   final isDownloading =
-                                      downloadingState != null;
+                                      queueTask?.status ==
+                                      QueuedAudioDownloadStatus.downloading;
+                                  final isQueued =
+                                      queueTask?.status ==
+                                      QueuedAudioDownloadStatus.queued;
+                                  final isFailed =
+                                      queueTask?.status ==
+                                      QueuedAudioDownloadStatus.failed;
                                   final downloadProgress =
-                                      downloadingState?.progress ?? 0.0;
-                                  final isOtherDownloading =
-                                      audioState is AudioDownloading &&
-                                      (audioState.reciterId != reciter.id ||
-                                          audioState.surahNumber !=
-                                              surahNumber);
+                                      queueTask?.progress ?? 0.0;
+                                  final queuePosition = queueState
+                                      .queuedPositionFor(
+                                        reciter.id,
+                                        surahNumber,
+                                      );
                                   final isNowPlaying =
                                       playerState.hasActiveSurah &&
                                       playerState.surahNumber == surahNumber &&
@@ -260,8 +322,10 @@ class _SurahAudioListBody extends StatelessWidget {
                                     ),
                                     isDownloaded: isDownloaded,
                                     isDownloading: isDownloading,
+                                    isQueued: isQueued,
+                                    isFailed: isFailed,
+                                    queuePosition: queuePosition,
                                     downloadProgress: downloadProgress,
-                                    isOtherDownloading: isOtherDownloading,
                                     isAvailableRemotely: isAvailableRemotely,
                                     isNowPlaying: isNowPlaying,
                                     playerState: playerState,
@@ -283,6 +347,35 @@ class _SurahAudioListBody extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<void> _maybeAutoEnqueueFirstSurah(
+    BuildContext context,
+    ReciterChaptersLoaded chaptersState,
+  ) async {
+    if (chaptersState.downloadedSurahNumbers.isNotEmpty) {
+      return;
+    }
+
+    final queueState = context.read<AudioDownloadQueueCubit>().state;
+    if (queueState.hasActiveOrQueuedForReciter(reciter.id)) {
+      return;
+    }
+    final existingTaskForFirst = queueState.taskFor(reciter.id, 1);
+    if (existingTaskForFirst?.isFailed == true) {
+      return;
+    }
+
+    final availabilitySnapshot = context
+        .read<AudioAvailabilityCubit>()
+        .state
+        .snapshotForReciter(reciter.id);
+    if (availabilitySnapshot != null &&
+        !availabilitySnapshot.availableSurahs.contains(1)) {
+      return;
+    }
+
+    await context.read<AudioDownloadQueueCubit>().enqueue(reciter.id, 1);
   }
 }
 
@@ -445,8 +538,10 @@ class _SurahTrackTile extends StatelessWidget {
   final int versesCount;
   final bool isDownloaded;
   final bool isDownloading;
+  final bool isQueued;
+  final bool isFailed;
+  final int queuePosition;
   final double downloadProgress;
-  final bool isOtherDownloading;
   final bool isAvailableRemotely;
   final bool isNowPlaying;
   final SurahMiniPlayerState playerState;
@@ -460,8 +555,10 @@ class _SurahTrackTile extends StatelessWidget {
     required this.versesCount,
     required this.isDownloaded,
     required this.isDownloading,
+    required this.isQueued,
+    required this.isFailed,
+    required this.queuePosition,
     required this.downloadProgress,
-    required this.isOtherDownloading,
     required this.isAvailableRemotely,
     required this.isNowPlaying,
     required this.playerState,
@@ -481,7 +578,7 @@ class _SurahTrackTile extends StatelessWidget {
 
     // In dark mode, primary (#006E62) is too dark on dark surfaces.
     // Use tertiary (#4DB6AC) as a lighter, readable teal accent instead.
-    final accentColor = isDark ? AppColor.tertiary : colorScheme.primary;
+    final accentColor = isDark ? colorScheme.primary : colorScheme.primary;
 
     // Now-playing background:
     //  • dark  → elevated surface (surfaceContainerHigh)
@@ -574,35 +671,8 @@ class _SurahTrackTile extends StatelessWidget {
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: colorScheme.onSurfaceVariant),
                           ),
-
-                          if (isNowPlaying) ...[
-                            const SizedBox(width: 8),
-                            Text(
-                              localizations.playSurah,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: accentColor,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                          ],
                         ],
                       ),
-                      // // Download progress bar
-                      // if (isDownloading) ...[
-                      //   const SizedBox(height: 6),
-                      //   ClipRRect(
-                      //     borderRadius: BorderRadius.circular(4),
-                      //     child: LinearProgressIndicator(
-                      //       value: downloadProgress,
-                      //       minHeight: 3,
-                      //       color: colorScheme.primary,
-                      //       backgroundColor: colorScheme.primary.withValues(
-                      //         alpha: 0.2,
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ],
                     ],
                   ),
                 ),
@@ -613,8 +683,10 @@ class _SurahTrackTile extends StatelessWidget {
                 _TrackAction(
                   isDownloaded: isDownloaded,
                   isDownloading: isDownloading,
+                  isQueued: isQueued,
+                  isFailed: isFailed,
+                  queuePosition: queuePosition,
                   downloadProgress: downloadProgress,
-                  isOtherDownloading: isOtherDownloading,
                   isAvailableRemotely: isAvailableRemotely,
                   isNowPlaying: isNowPlaying,
                   isPlaying: isPlaying,
@@ -623,6 +695,7 @@ class _SurahTrackTile extends StatelessWidget {
                   localizations: localizations,
                   onPlay: () => _play(context),
                   onDownload: () => _download(context),
+                  onRetry: () => _retry(context),
                 ),
               ],
             ),
@@ -650,19 +723,36 @@ class _SurahTrackTile extends StatelessWidget {
     );
   }
 
-  void _download(BuildContext context) {
-    if (isOtherDownloading) {
-      CustomSnackbar.showSnackbar(
-        context,
-        localizations.downloadInProgress,
-        duration: 2,
-      );
-      return;
-    }
-    context.read<AudioManagementCubit>().downloadSurahAudio(
+  Future<void> _download(BuildContext context) async {
+    final result = await context.read<AudioDownloadQueueCubit>().enqueue(
       reciterId,
       surahNumber,
     );
+    if (!context.mounted) {
+      return;
+    }
+    if (result == EnqueueAudioDownloadResult.alreadyQueued) {
+      CustomSnackbar.showSnackbar(context, localizations.alreadyQueued);
+    } else if (result == EnqueueAudioDownloadResult.alreadyDownloaded) {
+      CustomSnackbar.showSnackbar(
+        context,
+        localizations.downloadedSuccessfully(surahNameTranslated),
+        duration: 2,
+      );
+      context.read<ReciterChaptersBloc>().add(
+        RefreshDownloadedSurahs(reciterId),
+      );
+    }
+  }
+
+  Future<void> _retry(BuildContext context) async {
+    final retried = await context.read<AudioDownloadQueueCubit>().retryFailed(
+      reciterId,
+      surahNumber,
+    );
+    if (!retried && context.mounted) {
+      await _download(context);
+    }
   }
 }
 
@@ -698,9 +788,9 @@ class _NumberBadge extends StatelessWidget {
         : colorScheme.onSurface.withValues(alpha: 0.07);
 
     final textColor = isNowPlaying
-        ? (isDark ? colorScheme.surface : Colors.white)
+        ? colorScheme.onPrimary
         : isDownloaded
-        ? (isDark ? accentColor : colorScheme.onPrimary)
+        ? colorScheme.onPrimary
         : colorScheme.onSurfaceVariant;
 
     return Container(
@@ -799,8 +889,10 @@ class _EqBar extends StatelessWidget {
 class _TrackAction extends StatelessWidget {
   final bool isDownloaded;
   final bool isDownloading;
+  final bool isQueued;
+  final bool isFailed;
+  final int queuePosition;
   final double downloadProgress;
-  final bool isOtherDownloading;
   final bool isAvailableRemotely;
   final bool isNowPlaying;
   final bool isPlaying;
@@ -809,12 +901,15 @@ class _TrackAction extends StatelessWidget {
   final AppLocalizations localizations;
   final VoidCallback onPlay;
   final VoidCallback onDownload;
+  final VoidCallback onRetry;
 
   const _TrackAction({
     required this.isDownloaded,
     required this.isDownloading,
+    required this.isQueued,
+    required this.isFailed,
+    required this.queuePosition,
     required this.downloadProgress,
-    required this.isOtherDownloading,
     required this.isAvailableRemotely,
     required this.isNowPlaying,
     required this.isPlaying,
@@ -823,6 +918,7 @@ class _TrackAction extends StatelessWidget {
     required this.localizations,
     required this.onPlay,
     required this.onDownload,
+    required this.onRetry,
   });
 
   @override
@@ -856,6 +952,77 @@ class _TrackAction extends StatelessWidget {
       );
     }
 
+    if (isQueued) {
+      final position = queuePosition > 0 ? queuePosition : 1;
+      return Tooltip(
+        message: localizations.queuePositionLabel(position),
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: isDark
+                ? accentColor.withValues(alpha: 0.15)
+                : colorScheme.primary,
+            shape: BoxShape.circle,
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Icon(
+                Icons.schedule_rounded,
+                size: 20,
+                color: isDark ? accentColor : colorScheme.onPrimary,
+              ),
+              Positioned(
+                right: 2,
+                top: 2,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$position',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: accentColor,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 9,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (isFailed) {
+      return Tooltip(
+        message: localizations.retryDownload,
+        child: GestureDetector(
+          onTap: onRetry,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: colorScheme.errorContainer.withValues(alpha: 0.45),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.refresh_rounded,
+              size: 20,
+              color: colorScheme.error,
+            ),
+          ),
+        ),
+      );
+    }
+
     // Downloaded: play/pause button
     if (isDownloaded) {
       // Now playing → solid accent fill with white icon
@@ -863,9 +1030,7 @@ class _TrackAction extends StatelessWidget {
       final btnBg = isNowPlaying
           ? accentColor
           : (isDark ? accentColor.withValues(alpha: 0.2) : colorScheme.primary);
-      final iconColor = isNowPlaying
-          ? (isDark ? colorScheme.surface : Colors.white)
-          : (isDark ? accentColor : colorScheme.onPrimary);
+      final iconColor = colorScheme.onPrimary;
 
       return GestureDetector(
         onTap: onPlay,
@@ -896,7 +1061,7 @@ class _TrackAction extends StatelessWidget {
           child: Icon(
             Icons.cloud_off_outlined,
             size: 20,
-            color: colorScheme.onPrimary.withValues(alpha: 0.6),
+            color: colorScheme.onPrimary,
           ),
         ),
       );
@@ -915,15 +1080,11 @@ class _TrackAction extends StatelessWidget {
               ? accentColor.withValues(alpha: 0.15)
               : colorScheme.primary,
           shape: BoxShape.circle,
-          border: Border.all(
-            color: accentColor.withValues(alpha: isDark ? 0.4 : 0.5),
-            width: 1,
-          ),
         ),
         child: Icon(
           Icons.download_rounded,
           size: 20,
-          color: isDark ? accentColor : colorScheme.onPrimary,
+          color: colorScheme.onPrimary,
         ),
       ),
     );

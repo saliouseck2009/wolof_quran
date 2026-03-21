@@ -1155,6 +1155,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Another download is already in progress. Please wait for it to finish.'**
   String get downloadInProgress;
+
+  /// Label shown when a surah download is queued
+  ///
+  /// In en, this message translates to:
+  /// **'Queued'**
+  String get queued;
+
+  /// Snackbar shown when user tries to queue an already queued surah
+  ///
+  /// In en, this message translates to:
+  /// **'This surah is already in the download queue.'**
+  String get alreadyQueued;
+
+  /// Tooltip or action label to retry a failed download
+  ///
+  /// In en, this message translates to:
+  /// **'Retry download'**
+  String get retryDownload;
+
+  /// Short generic message for failed queued download
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed'**
+  String get downloadFailedShort;
+
+  /// Tooltip with queue position for a pending surah download
+  ///
+  /// In en, this message translates to:
+  /// **'Queued (#{position})'**
+  String queuePositionLabel(int position);
 }
 
 class _AppLocalizationsDelegate

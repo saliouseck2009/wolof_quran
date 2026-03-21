@@ -575,4 +575,21 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get downloadInProgress =>
       'هناك تنزيل جارٍ بالفعل. يرجى الانتظار حتى ينتهي قبل بدء آخر.';
+
+  @override
+  String get queued => 'في الانتظار';
+
+  @override
+  String get alreadyQueued => 'هذه السورة موجودة بالفعل في قائمة التنزيل.';
+
+  @override
+  String get retryDownload => 'إعادة محاولة التنزيل';
+
+  @override
+  String get downloadFailedShort => 'فشل التنزيل';
+
+  @override
+  String queuePositionLabel(int position) {
+    return 'في الانتظار (#$position)';
+  }
 }

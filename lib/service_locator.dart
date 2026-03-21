@@ -12,11 +12,13 @@ import 'data/datasources/audio_availability_remote_data_source.dart';
 import 'data/repositories/reciter_repository_impl.dart';
 import 'data/repositories/audio_repository_impl.dart';
 import 'data/repositories/download_repository_impl.dart';
+import 'data/repositories/download_queue_repository_impl.dart';
 import 'data/repositories/bookmark_repository_impl.dart';
 import 'data/repositories/audio_availability_repository_impl.dart';
 import 'domain/repositories/reciter_repository.dart';
 import 'domain/repositories/audio_repository.dart';
 import 'domain/repositories/download_repository.dart';
+import 'domain/repositories/download_queue_repository.dart';
 import 'domain/repositories/bookmark_repository.dart';
 import 'domain/repositories/audio_availability_repository.dart';
 
@@ -33,6 +35,7 @@ import 'domain/usecases/mark_audio_updates_seen_usecase.dart';
 
 // Services
 import 'core/services/audio_player_service.dart';
+import 'core/services/audio_download_queue_service.dart';
 
 final locator = GetIt.instance;
 
@@ -71,6 +74,9 @@ Future<void> setupDependencies() async {
   );
   locator.registerLazySingleton<DownloadRepository>(
     () => DownloadRepositoryImpl(locator<DatabaseHelper>()),
+  );
+  locator.registerLazySingleton<DownloadQueueRepository>(
+    () => DownloadQueueRepositoryImpl(locator<DatabaseHelper>()),
   );
   locator.registerLazySingleton<BookmarkRepository>(
     () => BookmarkRepositoryImpl(locator<DatabaseHelper>()),
@@ -118,5 +124,13 @@ Future<void> setupDependencies() async {
   );
   locator.registerLazySingleton<MarkAudioUpdatesSeenUseCase>(
     () => MarkAudioUpdatesSeenUseCase(locator<AudioAvailabilityRepository>()),
+  );
+
+  locator.registerLazySingleton<AudioDownloadQueueService>(
+    () => AudioDownloadQueueService(
+      queueRepository: locator<DownloadQueueRepository>(),
+      audioRepository: locator<AudioRepository>(),
+      downloadRepository: locator<DownloadRepository>(),
+    ),
   );
 }

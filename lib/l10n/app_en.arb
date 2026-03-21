@@ -801,5 +801,31 @@
   "downloadInProgress": "Another download is already in progress. Please wait for it to finish.",
   "@downloadInProgress": {
     "description": "Shown when user tries to start a second download while one is active"
+  },
+  "queued": "Queued",
+  "@queued": {
+    "description": "Label shown when a surah download is queued"
+  },
+  "alreadyQueued": "This surah is already in the download queue.",
+  "@alreadyQueued": {
+    "description": "Snackbar shown when user tries to queue an already queued surah"
+  },
+  "retryDownload": "Retry download",
+  "@retryDownload": {
+    "description": "Tooltip or action label to retry a failed download"
+  },
+  "downloadFailedShort": "Download failed",
+  "@downloadFailedShort": {
+    "description": "Short generic message for failed queued download"
+  },
+  "queuePositionLabel": "Queued (#{position})",
+  "@queuePositionLabel": {
+    "description": "Tooltip with queue position for a pending surah download",
+    "placeholders": {
+      "position": {
+        "type": "int",
+        "description": "1-based queue position"
+      }
+    }
   }
 }

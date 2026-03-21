@@ -4,10 +4,11 @@ import 'package:quran/quran.dart' as quran;
 
 import '../../../domain/entities/reciter.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../cubits/audio_download_queue_cubit.dart';
 import '../../cubits/audio_management_cubit.dart';
 import '../snackbar.dart';
 import '../reciter_chapters/chapter_number_widget.dart';
-import '../../utils/audio_error_formatter.dart';
+import '../../../core/services/audio_download_queue_service.dart';
 
 class ChapterCard extends StatelessWidget {
   final Reciter reciter;
@@ -132,47 +133,12 @@ class _DownloadActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return BlocConsumer<AudioManagementCubit, AudioManagementState>(
-      listenWhen: (previous, current) {
-        if (previous is AudioDownloading &&
-            previous.reciterId == reciter.id &&
-            previous.surahNumber == surahNumber) {
-          return current is AudioManagementLoaded ||
-              current is AudioManagementError;
-        }
-        return false;
-      },
-      listener: (context, currentState) {
-        if (currentState is AudioManagementLoaded) {
-          onDownloadComplete();
-          CustomSnackbar.showSnackbar(
-            context,
-            localizations.downloadedSuccessfully(
-              getSurahDisplayName(surahNumber),
-            ),
-            duration: 2,
-          );
-        } else if (currentState is AudioManagementError) {
-          final formattedError = formatAudioError(
-            currentState.message,
-            localizations,
-          );
-          CustomSnackbar.showSnackbar(
-            context,
-            localizations.downloadFailedWithError(formattedError),
-            duration: 5,
-          );
-        }
-      },
-      builder: (context, currentState) {
-        final isOtherDownloading =
-            currentState is AudioDownloading &&
-            (currentState.reciterId != reciter.id ||
-                currentState.surahNumber != surahNumber);
+    return BlocBuilder<AudioDownloadQueueCubit, AudioDownloadQueueState>(
+      builder: (context, queueState) {
+        final task = queueState.taskFor(reciter.id, surahNumber);
 
-        if (currentState is AudioDownloading &&
-            currentState.reciterId == reciter.id &&
-            currentState.surahNumber == surahNumber) {
+        if (task?.isDownloading == true) {
+          final progress = task?.progress ?? 0.0;
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -183,14 +149,14 @@ class _DownloadActions extends StatelessWidget {
                     width: 32,
                     height: 32,
                     child: CircularProgressIndicator(
-                      value: currentState.progress,
+                      value: progress,
                       strokeWidth: 3,
                       color: accentGreen,
                       backgroundColor: accentGreen.withValues(alpha: 0.25),
                     ),
                   ),
                   Text(
-                    '${(currentState.progress * 100).toInt()}%',
+                    '${(progress * 100).toInt()}%',
                     style: textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: accentGreen,
@@ -204,6 +170,65 @@ class _DownloadActions extends StatelessWidget {
                 style: textTheme.labelSmall?.copyWith(color: accentGreen),
               ),
             ],
+          );
+        }
+
+        if (task?.isQueued == true) {
+          final position = queueState.queuedPositionFor(
+            reciter.id,
+            surahNumber,
+          );
+          return Tooltip(
+            message: localizations.queuePositionLabel(
+              position > 0 ? position : 1,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(Icons.schedule_rounded, color: accentGreen, size: 30),
+                    Positioned(
+                      top: -2,
+                      right: -8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: accentGreen,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '${position > 0 ? position : 1}',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 9,
+                              ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  localizations.queued,
+                  style: textTheme.labelSmall?.copyWith(color: accentGreen),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (task?.isFailed == true) {
+          return IconButton(
+            onPressed: () => _retryFailed(context),
+            icon: Icon(Icons.refresh_rounded, color: accentGreen, size: 30),
+            tooltip: localizations.retryDownload,
           );
         }
 
@@ -263,22 +288,42 @@ class _DownloadActions extends StatelessWidget {
         }
 
         return IconButton(
-          onPressed: () {
-            if (isOtherDownloading) {
-              CustomSnackbar.showSnackbar(
-                context,
-                localizations.downloadInProgress,
-              );
-              return;
-            }
-            context.read<AudioManagementCubit>().downloadSurahAudio(
-              reciter.id,
-              surahNumber,
-            );
-          },
+          onPressed: () => _enqueue(context),
           icon: Icon(Icons.download, color: accentGreen, size: 32),
         );
       },
     );
+  }
+
+  Future<void> _enqueue(BuildContext context) async {
+    final result = await context.read<AudioDownloadQueueCubit>().enqueue(
+      reciter.id,
+      surahNumber,
+    );
+    if (!context.mounted) {
+      return;
+    }
+    if (result == EnqueueAudioDownloadResult.alreadyQueued) {
+      CustomSnackbar.showSnackbar(context, localizations.alreadyQueued);
+      return;
+    }
+    if (result == EnqueueAudioDownloadResult.alreadyDownloaded) {
+      onDownloadComplete();
+      CustomSnackbar.showSnackbar(
+        context,
+        localizations.downloadedSuccessfully(getSurahDisplayName(surahNumber)),
+        duration: 2,
+      );
+    }
+  }
+
+  Future<void> _retryFailed(BuildContext context) async {
+    final retried = await context.read<AudioDownloadQueueCubit>().retryFailed(
+      reciter.id,
+      surahNumber,
+    );
+    if (!retried && context.mounted) {
+      await _enqueue(context);
+    }
   }
 }

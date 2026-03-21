@@ -591,4 +591,22 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get downloadInProgress =>
       'Un téléchargement est déjà en cours. Veuillez attendre la fin avant d\'en lancer un autre.';
+
+  @override
+  String get queued => 'En file';
+
+  @override
+  String get alreadyQueued =>
+      'Cette sourate est déjà dans la file de téléchargement.';
+
+  @override
+  String get retryDownload => 'Relancer le téléchargement';
+
+  @override
+  String get downloadFailedShort => 'Téléchargement échoué';
+
+  @override
+  String queuePositionLabel(int position) {
+    return 'En file (#$position)';
+  }
 }
