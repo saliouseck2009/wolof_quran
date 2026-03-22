@@ -197,11 +197,8 @@ class ReciterChaptersContent extends StatelessWidget {
               reciter: reciter,
               surahNumber: surahNumber,
               translation: translation,
-              isDark: isDark,
               isDownloaded: isDownloaded,
               isAvailableRemotely: isAvailableRemotely,
-              accentGreen: accentGreen,
-              darkSurfaceHigh: darkSurfaceHigh,
               getSurahDisplayName: (number) =>
                   _getSurahDisplayName(number, translation),
               localizations: localizations,
