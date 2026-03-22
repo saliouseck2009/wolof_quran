@@ -827,5 +827,21 @@
         "description": "1-based queue position"
       }
     }
+  },
+  "playbackModeOff": "Playback mode: Off",
+  "@playbackModeOff": {
+    "description": "Tooltip for playback mode button when looping is disabled"
+  },
+  "playbackModeRepeatOne": "Playback mode: Repeat one",
+  "@playbackModeRepeatOne": {
+    "description": "Tooltip for playback mode button when repeating the current track"
+  },
+  "playbackModeRepeatAll": "Playback mode: Repeat all",
+  "@playbackModeRepeatAll": {
+    "description": "Tooltip for playback mode button when repeating the queue"
+  },
+  "playbackModeShuffle": "Playback mode: Shuffle",
+  "@playbackModeShuffle": {
+    "description": "Tooltip for playback mode button when shuffle is active"
   }
 }

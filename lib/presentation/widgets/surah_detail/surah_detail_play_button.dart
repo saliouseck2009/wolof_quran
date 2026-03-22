@@ -623,6 +623,7 @@ class _PlaySurahButton extends StatelessWidget {
 
     await context.read<SurahMiniPlayerCubit>().attachToCurrentPlayback(
       expanded: false,
+      resetShuffleHistory: true,
     );
   }
 }

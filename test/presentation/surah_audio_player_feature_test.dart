@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:rxdart/rxdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wolof_quran/core/services/audio_download_queue_service.dart';
 import 'package:wolof_quran/core/services/audio_player_service.dart';
 import 'package:wolof_quran/data/models/downloaded_surah.dart';
@@ -30,6 +31,7 @@ import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/quran_settings_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/surah_mini_player_cubit.dart';
 import 'package:wolof_quran/presentation/views/surah_audio_list_page.dart';
+import 'package:wolof_quran/presentation/widgets/audio/surah_fullscreen_player.dart';
 import 'package:wolof_quran/presentation/widgets/audio/surah_mini_player_overlay.dart';
 import 'package:wolof_quran/presentation/widgets/home_actions_grid.dart';
 import 'package:wolof_quran/service_locator.dart';
@@ -613,13 +615,17 @@ class _SpySurahMiniPlayerCubit extends SurahMiniPlayerCubit {
     required int surahNumber,
     String surahName = 'Al-Fatihah',
     bool expanded = true,
+    SurahMiniPlayerUiState? uiState,
     bool isSeekReady = true,
+    PlaybackMode playbackMode = PlaybackMode.off,
   }) {
     emit(
       SurahMiniPlayerState(
-        uiState: expanded
-            ? SurahMiniPlayerUiState.expanded
-            : SurahMiniPlayerUiState.collapsed,
+        uiState:
+            uiState ??
+            (expanded
+                ? SurahMiniPlayerUiState.expanded
+                : SurahMiniPlayerUiState.collapsed),
         reciterId: 'imamsarr',
         surahNumber: surahNumber,
         surahName: surahName,
@@ -628,13 +634,16 @@ class _SpySurahMiniPlayerCubit extends SurahMiniPlayerCubit {
         position: const Duration(seconds: 5),
         duration: const Duration(minutes: 2),
         isSeekReady: isSeekReady,
-        repeatSurah: false,
+        playbackMode: playbackMode,
       ),
     );
   }
 
   @override
-  Future<void> attachToCurrentPlayback({bool expanded = true}) async {
+  Future<void> attachToCurrentPlayback({
+    bool expanded = true,
+    bool resetShuffleHistory = false,
+  }) async {
     attachCallCount += 1;
     showForTest(surahNumber: 1, expanded: expanded);
   }
@@ -735,6 +744,15 @@ void main() {
   );
   final allSurahs = List<int>.generate(114, (index) => index + 1);
 
+  setUp(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final service = AudioPlayerService();
+    await service.initialize();
+    await service.stop();
+    await service.reloadPlaybackModeFromPrefs();
+    await service.setPlaybackMode(PlaybackMode.off);
+  });
+
   tearDown(() {
     _unregisterLocatorDependencies();
   });
@@ -762,7 +780,7 @@ void main() {
   });
 
   test(
-    'SurahMiniPlayerCubit loads downloaded queue and toggles repeat',
+    'SurahMiniPlayerCubit loads downloaded queue and cycles playback mode',
     () async {
       final downloadRepository = _ConfigurableDownloadRepository(
         seed: {
@@ -790,7 +808,7 @@ void main() {
       );
       final audioRepository = _FakeAudioRepository();
       final audioService = AudioPlayerService();
-      await audioService.setRepeatSurah(false);
+      await audioService.setPlaybackMode(PlaybackMode.off);
 
       final cubit = SurahMiniPlayerCubit(
         audioPlayerService: audioService,
@@ -801,9 +819,9 @@ void main() {
       await cubit.refreshQueueForReciter('imamsarr');
       expect(cubit.state.downloadedQueue, [1, 9]);
 
-      await cubit.toggleRepeat();
+      await cubit.cyclePlaybackMode();
       await Future<void>.delayed(Duration.zero);
-      expect(cubit.state.repeatSurah, isTrue);
+      expect(cubit.state.playbackMode, PlaybackMode.repeatOne);
 
       await cubit.close();
     },
@@ -1343,5 +1361,112 @@ void main() {
     expect(find.text('--:--'), findsOneWidget);
     final slider = tester.widget<Slider>(find.byType(Slider));
     expect(slider.onChanged, isNull);
+  });
+
+  testWidgets('Mini-player playback mode button cycles through modes', (
+    tester,
+  ) async {
+    final downloadRepository = _ConfigurableDownloadRepository();
+    final audioRepository = _FakeAudioRepository();
+    _registerLocatorDependencies(
+      audioRepository: audioRepository,
+      downloadRepository: downloadRepository,
+    );
+
+    final audioService = AudioPlayerService();
+    await audioService.setPlaybackMode(PlaybackMode.off);
+
+    final miniPlayerCubit = _SpySurahMiniPlayerCubit(
+      audioPlayerService: audioService,
+      downloadRepository: downloadRepository,
+      audioRepository: audioRepository,
+    );
+    addTearDown(() async {
+      await miniPlayerCubit.close();
+    });
+
+    await tester.pumpWidget(
+      _buildLocalizedApp(
+        child: BlocProvider<SurahMiniPlayerCubit>.value(
+          value: miniPlayerCubit,
+          child: const Scaffold(body: SurahMiniPlayerOverlay()),
+        ),
+      ),
+    );
+
+    miniPlayerCubit.showForTest(
+      surahNumber: 1,
+      expanded: true,
+      playbackMode: PlaybackMode.off,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.repeat_rounded), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.repeat_rounded));
+    await tester.pump();
+
+    expect(miniPlayerCubit.state.playbackMode, PlaybackMode.repeatOne);
+    expect(find.byIcon(Icons.repeat_one_rounded), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.repeat_one_rounded));
+    await tester.pump();
+
+    expect(miniPlayerCubit.state.playbackMode, PlaybackMode.repeatAll);
+    expect(find.byIcon(Icons.repeat_rounded), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.repeat_rounded));
+    await tester.pump();
+
+    expect(miniPlayerCubit.state.playbackMode, PlaybackMode.shuffle);
+    expect(find.byIcon(Icons.shuffle_rounded), findsOneWidget);
+  });
+
+  testWidgets('Fullscreen player reflects persisted playback mode', (
+    tester,
+  ) async {
+    final downloadRepository = _ConfigurableDownloadRepository();
+    final audioRepository = _FakeAudioRepository();
+    _registerLocatorDependencies(
+      audioRepository: audioRepository,
+      downloadRepository: downloadRepository,
+    );
+
+    final audioService = AudioPlayerService();
+    await audioService.setPlaybackMode(PlaybackMode.shuffle);
+    await audioService.reloadPlaybackModeFromPrefs();
+
+    final miniPlayerCubit = _SpySurahMiniPlayerCubit(
+      audioPlayerService: audioService,
+      downloadRepository: downloadRepository,
+      audioRepository: audioRepository,
+    );
+    addTearDown(() async {
+      await miniPlayerCubit.close();
+    });
+
+    await tester.pumpWidget(
+      _buildLocalizedApp(
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<SurahMiniPlayerCubit>.value(value: miniPlayerCubit),
+            BlocProvider<QuranSettingsCubit>(
+              create: (_) => _TestQuranSettingsCubit(),
+            ),
+          ],
+          child: const Scaffold(body: SurahFullscreenPlayer()),
+        ),
+      ),
+    );
+
+    miniPlayerCubit.showForTest(
+      surahNumber: 1,
+      uiState: SurahMiniPlayerUiState.fullscreen,
+      playbackMode: audioService.currentPlaybackMode,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.shuffle_rounded), findsOneWidget);
+    expect(miniPlayerCubit.state.playbackMode, PlaybackMode.shuffle);
   });
 }

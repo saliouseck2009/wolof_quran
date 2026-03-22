@@ -1,8 +1,40 @@
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Enum for audio player state
 enum AudioPlayerState { idle, loading, playing, paused, stopped, error }
+
+enum PlaybackMode { off, repeatOne, repeatAll, shuffle }
+
+extension PlaybackModeX on PlaybackMode {
+  String get prefsValue {
+    switch (this) {
+      case PlaybackMode.off:
+        return 'off';
+      case PlaybackMode.repeatOne:
+        return 'repeat_one';
+      case PlaybackMode.repeatAll:
+        return 'repeat_all';
+      case PlaybackMode.shuffle:
+        return 'shuffle';
+    }
+  }
+
+  static PlaybackMode fromPrefs(String? raw) {
+    switch (raw) {
+      case 'repeat_one':
+        return PlaybackMode.repeatOne;
+      case 'repeat_all':
+        return PlaybackMode.repeatAll;
+      case 'shuffle':
+        return PlaybackMode.shuffle;
+      case 'off':
+      default:
+        return PlaybackMode.off;
+    }
+  }
+}
 
 /// Model for current playing audio info
 class PlayingAudioInfo {
@@ -42,6 +74,16 @@ class SurahSeekTarget {
   const SurahSeekTarget({required this.ayahIndex, required this.offset});
 }
 
+class PlaybackCompletedEvent {
+  final PlayingAudioInfo audioInfo;
+  final PlaybackMode playbackMode;
+
+  const PlaybackCompletedEvent({
+    required this.audioInfo,
+    required this.playbackMode,
+  });
+}
+
 /// Global audio player service using just_audio
 class AudioPlayerService {
   static final AudioPlayerService _instance = AudioPlayerService._internal();
@@ -65,14 +107,20 @@ class AudioPlayerService {
       BehaviorSubject<Duration?>.seeded(null);
   final BehaviorSubject<bool> _surahSeekReadySubject =
       BehaviorSubject<bool>.seeded(false);
-  final BehaviorSubject<bool> _repeatSurahSubject =
-      BehaviorSubject<bool>.seeded(false);
+  final BehaviorSubject<PlaybackMode> _playbackModeSubject =
+      BehaviorSubject<PlaybackMode>.seeded(PlaybackMode.off);
+  final PublishSubject<PlaybackCompletedEvent> _playbackCompletedSubject =
+      PublishSubject<PlaybackCompletedEvent>();
 
   // Playlist management
   List<String> _currentPlaylist = [];
   List<Duration?> _playlistCachedDurations = [];
   int _currentPlaylistIndex = 0;
   bool _isPlayingPlaylist = false;
+  bool _initialized = false;
+  Future<void>? _initializationFuture;
+
+  static const String _playbackModeKey = 'audio_playback_mode';
 
   // Getters for streams
   Stream<AudioPlayerState> get playerState => _playerStateSubject.stream;
@@ -84,7 +132,9 @@ class AudioPlayerService {
   Stream<Duration?> get surahGlobalDuration =>
       _surahGlobalDurationSubject.stream;
   Stream<bool> get surahSeekReady => _surahSeekReadySubject.stream;
-  Stream<bool> get repeatSurah => _repeatSurahSubject.stream;
+  Stream<PlaybackMode> get playbackMode => _playbackModeSubject.stream;
+  Stream<PlaybackCompletedEvent> get playbackCompleted =>
+      _playbackCompletedSubject.stream;
 
   // Current values
   AudioPlayerState get currentPlayerState => _playerStateSubject.value;
@@ -94,10 +144,21 @@ class AudioPlayerService {
   Duration get currentSurahGlobalPosition => _surahGlobalPositionSubject.value;
   Duration? get currentSurahGlobalDuration => _surahGlobalDurationSubject.value;
   bool get isSurahSeekReady => _surahSeekReadySubject.value;
-  bool get isRepeatSurahEnabled => _repeatSurahSubject.value;
+  PlaybackMode get currentPlaybackMode => _playbackModeSubject.value;
 
   /// Initialize the audio player service
-  void initialize() {
+  Future<void> initialize() {
+    _initializationFuture ??= _initializeInternal();
+    return _initializationFuture!;
+  }
+
+  Future<void> _initializeInternal() async {
+    if (_initialized) {
+      return;
+    }
+    _initialized = true;
+    await reloadPlaybackModeFromPrefs();
+
     // Listen to player state changes
     _audioPlayer.playerStateStream.listen((playerState) {
       switch (playerState.processingState) {
@@ -347,9 +408,41 @@ class AudioPlayerService {
     await _audioPlayer.setVolume(volume.clamp(0.0, 1.0));
   }
 
-  /// Enable/disable repeat for surah playlist.
-  Future<void> setRepeatSurah(bool enabled) async {
-    _repeatSurahSubject.add(enabled);
+  PlaybackMode nextPlaybackMode(PlaybackMode current) {
+    switch (current) {
+      case PlaybackMode.off:
+        return PlaybackMode.repeatOne;
+      case PlaybackMode.repeatOne:
+        return PlaybackMode.repeatAll;
+      case PlaybackMode.repeatAll:
+        return PlaybackMode.shuffle;
+      case PlaybackMode.shuffle:
+        return PlaybackMode.off;
+    }
+  }
+
+  Future<void> cyclePlaybackMode() async {
+    await setPlaybackMode(nextPlaybackMode(currentPlaybackMode));
+  }
+
+  Future<void> setPlaybackMode(PlaybackMode mode) async {
+    _playbackModeSubject.add(mode);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_playbackModeKey, mode.prefsValue);
+    } catch (_) {
+      // Keep the in-memory mode even if persistence fails.
+    }
+  }
+
+  Future<void> reloadPlaybackModeFromPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getString(_playbackModeKey);
+      _playbackModeSubject.add(PlaybackModeX.fromPrefs(stored));
+    } catch (_) {
+      _playbackModeSubject.add(PlaybackMode.off);
+    }
   }
 
   /// Dispose resources
@@ -362,27 +455,60 @@ class AudioPlayerService {
     await _surahGlobalPositionSubject.close();
     await _surahGlobalDurationSubject.close();
     await _surahSeekReadySubject.close();
-    await _repeatSurahSubject.close();
+    await _playbackModeSubject.close();
+    await _playbackCompletedSubject.close();
   }
 
   /// Handle playback completion
   Future<void> _handlePlaybackCompleted() async {
+    final currentAudio = _currentAudioSubject.value;
+    if (currentAudio == null) {
+      await _stop();
+      return;
+    }
+    final mode = _playbackModeSubject.value;
+
     if (_isPlayingPlaylist) {
-      if (_repeatSurahSubject.value && _currentPlaylist.isNotEmpty) {
-        _currentPlaylistIndex = 0;
-        _syncCurrentAudioAyahIndex(0);
-        await _audioPlayer.seek(Duration.zero, index: 0);
-        await _audioPlayer.play();
-        _emitSurahTimeline();
-        return;
+      switch (mode) {
+        case PlaybackMode.repeatOne:
+          if (_currentPlaylist.isEmpty) {
+            await _stop();
+            return;
+          }
+          _currentPlaylistIndex = 0;
+          _syncCurrentAudioAyahIndex(0);
+          await _audioPlayer.seek(Duration.zero, index: 0);
+          await _audioPlayer.play();
+          _emitSurahTimeline();
+          return;
+        case PlaybackMode.repeatAll:
+        case PlaybackMode.shuffle:
+          _playbackCompletedSubject.add(
+            PlaybackCompletedEvent(audioInfo: currentAudio, playbackMode: mode),
+          );
+          return;
+        case PlaybackMode.off:
+          _playbackCompletedSubject.add(
+            PlaybackCompletedEvent(audioInfo: currentAudio, playbackMode: mode),
+          );
+          _isPlayingPlaylist = false;
+          _playerStateSubject.add(AudioPlayerState.stopped);
+          _currentAudioSubject.add(null);
+          _resetSurahTimeline();
+          return;
       }
-      _isPlayingPlaylist = false;
-      _playerStateSubject.add(AudioPlayerState.stopped);
-      _currentAudioSubject.add(null);
-      _resetSurahTimeline();
+    }
+
+    if (mode == PlaybackMode.repeatOne) {
+      await _audioPlayer.seek(Duration.zero);
+      await _audioPlayer.play();
+      _emitSurahTimeline();
       return;
     }
 
+    _playbackCompletedSubject.add(
+      PlaybackCompletedEvent(audioInfo: currentAudio, playbackMode: mode),
+    );
     _playerStateSubject.add(AudioPlayerState.stopped);
     _currentAudioSubject.add(null);
     _resetSurahTimeline();

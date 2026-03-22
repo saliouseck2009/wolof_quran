@@ -592,4 +592,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String queuePositionLabel(int position) {
     return 'في الانتظار (#$position)';
   }
+
+  @override
+  String get playbackModeOff => 'وضع التشغيل: إيقاف عند النهاية';
+
+  @override
+  String get playbackModeRepeatOne => 'وضع التشغيل: تكرار المقطع الحالي';
+
+  @override
+  String get playbackModeRepeatAll => 'وضع التشغيل: تكرار القائمة';
+
+  @override
+  String get playbackModeShuffle => 'وضع التشغيل: عشوائي';
 }

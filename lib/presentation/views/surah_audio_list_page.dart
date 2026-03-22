@@ -720,6 +720,7 @@ class _SurahTrackTile extends StatelessWidget {
 
     await context.read<SurahMiniPlayerCubit>().attachToCurrentPlayback(
       expanded: true,
+      resetShuffleHistory: true,
     );
   }
 

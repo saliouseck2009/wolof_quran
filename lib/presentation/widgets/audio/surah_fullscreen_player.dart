@@ -5,6 +5,7 @@ import 'package:quran/quran.dart' as quran;
 
 import '../../../core/config/theme/app_color.dart';
 import '../../../core/services/audio_player_service.dart';
+import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../../cubits/surah_mini_player_cubit.dart';
 
@@ -136,7 +137,7 @@ class _FullscreenContent extends StatelessWidget {
                 ),
 
                 // ── Seek bar ──────────────────────────────────────────────
-                // _SeekBar(state: state, total: total, tokens: t),
+                _SeekBar(state: state, total: total, tokens: t),
                 const SizedBox(height: 12),
 
                 // ── Controls ──────────────────────────────────────────────
@@ -154,13 +155,19 @@ class _FullscreenContent extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      onPressed: () =>
-                          context.read<SurahMiniPlayerCubit>().toggleRepeat(),
+                      onPressed: () => context
+                          .read<SurahMiniPlayerCubit>()
+                          .cyclePlaybackMode(),
                       icon: Icon(
-                        Icons.repeat,
-                        color: state.repeatSurah ? t.accent : t.disabled,
+                        _playbackModeIcon(state.playbackMode),
+                        color: state.playbackMode == PlaybackMode.off
+                            ? t.disabled
+                            : t.accent,
                       ),
-                      tooltip: 'Répéter',
+                      tooltip: _playbackModeTooltip(
+                        AppLocalizations.of(context)!,
+                        state.playbackMode,
+                      ),
                     ),
                   ],
                 ),
@@ -353,40 +360,40 @@ class _CenterNowPlayingCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  minHeight: 6,
-                  value: progress,
-                  color: tokens.accent,
-                  backgroundColor: tokens.isDark
-                      ? Colors.white.withValues(alpha: 0.16)
-                      : cs.onSurface.withValues(alpha: 0.12),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _formatDuration(state.position),
-                      style: TextStyle(
-                        color: tokens.muted,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    state.isSeekReady ? _formatDuration(total) : '--:--',
-                    style: TextStyle(
-                      color: tokens.muted,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+              // ClipRRect(
+              //   borderRadius: BorderRadius.circular(999),
+              //   child: LinearProgressIndicator(
+              //     minHeight: 6,
+              //     value: progress,
+              //     color: tokens.accent,
+              //     backgroundColor: tokens.isDark
+              //         ? Colors.white.withValues(alpha: 0.16)
+              //         : cs.onSurface.withValues(alpha: 0.12),
+              //   ),
+              // ),
+              // const SizedBox(height: 8),
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: Text(
+              //         _formatDuration(state.position),
+              //         style: TextStyle(
+              //           color: tokens.muted,
+              //           fontSize: 12,
+              //           fontWeight: FontWeight.w600,
+              //         ),
+              //       ),
+              //     ),
+              //     Text(
+              //       state.isSeekReady ? _formatDuration(total) : '--:--',
+              //       style: TextStyle(
+              //         color: tokens.muted,
+              //         fontSize: 12,
+              //         fontWeight: FontWeight.w600,
+              //       ),
+              //     ),
+              //   ],
+              // ),
               const SizedBox(height: 14),
               Divider(
                 height: 1,
@@ -625,91 +632,28 @@ String _formatReciterName(String? reciterId) {
   return normalized.isEmpty ? 'Imam Sarr' : normalized;
 }
 
-// ── Seek bar ──────────────────────────────────────────────────────────────────
+IconData _playbackModeIcon(PlaybackMode mode) {
+  switch (mode) {
+    case PlaybackMode.repeatOne:
+      return Icons.repeat_one_rounded;
+    case PlaybackMode.repeatAll:
+    case PlaybackMode.off:
+      return Icons.repeat_rounded;
+    case PlaybackMode.shuffle:
+      return Icons.shuffle_rounded;
+  }
+}
 
-class _SeekBar extends StatelessWidget {
-  final SurahMiniPlayerState state;
-  final Duration total;
-  final _ThemeTokens tokens;
-
-  const _SeekBar({
-    required this.state,
-    required this.total,
-    required this.tokens,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final t = tokens;
-
-    // Dark: white track (contrast on dark bg).
-    // Light: primary-colored track (same as rest of app).
-    final activeTrack = t.isDark ? Colors.white : t.accent;
-    final inactiveTrack = t.isDark
-        ? Colors.white.withValues(alpha: 0.3)
-        : t.accent.withValues(alpha: 0.2);
-    final thumb = t.isDark ? Colors.white : t.accent;
-    final overlay = t.isDark
-        ? Colors.white.withValues(alpha: 0.15)
-        : t.accent.withValues(alpha: 0.12);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        children: [
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackHeight: 4,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
-              activeTrackColor: activeTrack,
-              inactiveTrackColor: inactiveTrack,
-              thumbColor: thumb,
-              overlayColor: overlay,
-            ),
-            child: Slider(
-              value: state.position.inMilliseconds
-                  .clamp(0, total.inMilliseconds > 0 ? total.inMilliseconds : 0)
-                  .toDouble(),
-              max: total.inMilliseconds <= 0
-                  ? 1
-                  : total.inMilliseconds.toDouble(),
-              onChanged: !state.isSeekReady || total.inMilliseconds <= 0
-                  ? null
-                  : (value) {
-                      context.read<SurahMiniPlayerCubit>().seek(
-                        Duration(milliseconds: value.round()),
-                      );
-                    },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _formatDuration(state.position),
-                  style: TextStyle(
-                    color: t.muted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Text(
-                  state.isSeekReady ? _formatDuration(total) : '--:--',
-                  style: TextStyle(
-                    color: t.muted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+String _playbackModeTooltip(AppLocalizations localizations, PlaybackMode mode) {
+  switch (mode) {
+    case PlaybackMode.off:
+      return localizations.playbackModeOff;
+    case PlaybackMode.repeatOne:
+      return localizations.playbackModeRepeatOne;
+    case PlaybackMode.repeatAll:
+      return localizations.playbackModeRepeatAll;
+    case PlaybackMode.shuffle:
+      return localizations.playbackModeShuffle;
   }
 }
 
@@ -927,4 +871,92 @@ Route<void> buildFullscreenRoute(BuildContext context) {
     transitionDuration: const Duration(milliseconds: 320),
     reverseTransitionDuration: const Duration(milliseconds: 280),
   );
+}
+
+// ── Seek bar ──────────────────────────────────────────────────────────────────
+
+class _SeekBar extends StatelessWidget {
+  final SurahMiniPlayerState state;
+  final Duration total;
+  final _ThemeTokens tokens;
+
+  const _SeekBar({
+    required this.state,
+    required this.total,
+    required this.tokens,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final t = tokens;
+
+    // Dark: white track (contrast on dark bg).
+    // Light: primary-colored track (same as rest of app).
+    final activeTrack = t.isDark ? Colors.white : t.accent;
+    final inactiveTrack = t.isDark
+        ? Colors.white.withValues(alpha: 0.3)
+        : t.accent.withValues(alpha: 0.2);
+    final thumb = t.isDark ? Colors.white : t.accent;
+    final overlay = t.isDark
+        ? Colors.white.withValues(alpha: 0.15)
+        : t.accent.withValues(alpha: 0.12);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        children: [
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackHeight: 4,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
+              activeTrackColor: activeTrack,
+              inactiveTrackColor: inactiveTrack,
+              thumbColor: thumb,
+              overlayColor: overlay,
+            ),
+            child: Slider(
+              value: state.position.inMilliseconds
+                  .clamp(0, total.inMilliseconds > 0 ? total.inMilliseconds : 0)
+                  .toDouble(),
+              max: total.inMilliseconds <= 0
+                  ? 1
+                  : total.inMilliseconds.toDouble(),
+              onChanged: !state.isSeekReady || total.inMilliseconds <= 0
+                  ? null
+                  : (value) {
+                      context.read<SurahMiniPlayerCubit>().seek(
+                        Duration(milliseconds: value.round()),
+                      );
+                    },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _formatDuration(state.position),
+                  style: TextStyle(
+                    color: t.muted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  state.isSeekReady ? _formatDuration(total) : '--:--',
+                  style: TextStyle(
+                    color: t.muted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

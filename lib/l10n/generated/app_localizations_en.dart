@@ -599,4 +599,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String queuePositionLabel(int position) {
     return 'Queued (#$position)';
   }
+
+  @override
+  String get playbackModeOff => 'Playback mode: Off';
+
+  @override
+  String get playbackModeRepeatOne => 'Playback mode: Repeat one';
+
+  @override
+  String get playbackModeRepeatAll => 'Playback mode: Repeat all';
+
+  @override
+  String get playbackModeShuffle => 'Playback mode: Shuffle';
 }

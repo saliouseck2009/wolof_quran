@@ -22,7 +22,8 @@ class SurahMiniPlayerOverlay extends StatelessWidget {
           previous.position != current.position ||
           previous.duration != current.duration ||
           previous.isSeekReady != current.isSeekReady ||
-          previous.repeatSurah != current.repeatSurah ||
+          previous.playbackMode != current.playbackMode ||
+          previous.shuffleHistoryDepth != current.shuffleHistoryDepth ||
           previous.downloadedQueue != current.downloadedQueue,
       builder: (context, state) {
         if (state.uiState == SurahMiniPlayerUiState.hidden ||
@@ -608,28 +609,33 @@ class _ExpandedMiniPlayer extends StatelessWidget {
 
           const SizedBox(height: 2),
 
-          // ── Repeat ────────────────────────────────────────────────────────
+          // ── Playback Mode ─────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Center(
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 decoration: BoxDecoration(
-                  color: state.repeatSurah
-                      ? Colors.transparent
-                      : Colors.transparent,
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: IconButton(
-                  onPressed: cubit.toggleRepeat,
+                  onPressed: cubit.cyclePlaybackMode,
                   iconSize: 20,
                   icon: Icon(
-                    Icons.repeat_rounded,
-                    color: state.repeatSurah
-                        ? colorScheme.primary
-                        : colorScheme.primary.withValues(alpha: 0.4),
+                    _playbackModeIcon(state.playbackMode),
+                    color: _playbackModeColor(
+                      colorScheme: colorScheme,
+                      playbackMode: state.playbackMode,
+                    ),
                   ),
-                  tooltip: 'Répéter',
+                  tooltip: _tooltipIfOverlay(
+                    context,
+                    _playbackModeTooltip(
+                      AppLocalizations.of(context)!,
+                      state.playbackMode,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -711,6 +717,40 @@ String _localizedSurahName(
 double _progressValue(Duration position, Duration? duration) {
   if (duration == null || duration.inMilliseconds <= 0) return 0;
   return (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0);
+}
+
+IconData _playbackModeIcon(PlaybackMode mode) {
+  switch (mode) {
+    case PlaybackMode.repeatOne:
+      return Icons.repeat_one_rounded;
+    case PlaybackMode.repeatAll:
+    case PlaybackMode.off:
+      return Icons.repeat_rounded;
+    case PlaybackMode.shuffle:
+      return Icons.shuffle_rounded;
+  }
+}
+
+Color _playbackModeColor({
+  required ColorScheme colorScheme,
+  required PlaybackMode playbackMode,
+}) {
+  return playbackMode == PlaybackMode.off
+      ? colorScheme.primary.withValues(alpha: 0.4)
+      : colorScheme.primary;
+}
+
+String _playbackModeTooltip(AppLocalizations localizations, PlaybackMode mode) {
+  switch (mode) {
+    case PlaybackMode.off:
+      return localizations.playbackModeOff;
+    case PlaybackMode.repeatOne:
+      return localizations.playbackModeRepeatOne;
+    case PlaybackMode.repeatAll:
+      return localizations.playbackModeRepeatAll;
+    case PlaybackMode.shuffle:
+      return localizations.playbackModeShuffle;
+  }
 }
 
 String _formatDuration(Duration duration) {

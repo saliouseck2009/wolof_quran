@@ -609,4 +609,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String queuePositionLabel(int position) {
     return 'En file (#$position)';
   }
+
+  @override
+  String get playbackModeOff => 'Mode de lecture : arrêt en fin de piste';
+
+  @override
+  String get playbackModeRepeatOne => 'Mode de lecture : répéter la piste';
+
+  @override
+  String get playbackModeRepeatAll => 'Mode de lecture : répéter la file';
+
+  @override
+  String get playbackModeShuffle => 'Mode de lecture : aléatoire';
 }

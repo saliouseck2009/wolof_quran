@@ -1,7 +1,48 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wolof_quran/core/services/audio_player_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final service = AudioPlayerService();
+    await service.initialize();
+    await service.stop();
+    await service.reloadPlaybackModeFromPrefs();
+    await service.setPlaybackMode(PlaybackMode.off);
+  });
+
+  group('AudioPlayerService playback mode', () {
+    test('cycles playback modes in the expected order', () async {
+      final service = AudioPlayerService();
+
+      expect(
+        service.nextPlaybackMode(PlaybackMode.off),
+        PlaybackMode.repeatOne,
+      );
+      expect(
+        service.nextPlaybackMode(PlaybackMode.repeatOne),
+        PlaybackMode.repeatAll,
+      );
+      expect(
+        service.nextPlaybackMode(PlaybackMode.repeatAll),
+        PlaybackMode.shuffle,
+      );
+      expect(service.nextPlaybackMode(PlaybackMode.shuffle), PlaybackMode.off);
+    });
+
+    test('persists playback mode changes', () async {
+      final service = AudioPlayerService();
+
+      await service.setPlaybackMode(PlaybackMode.shuffle);
+      await service.reloadPlaybackModeFromPrefs();
+
+      expect(service.currentPlaybackMode, PlaybackMode.shuffle);
+    });
+  });
+
   group('AudioPlayerService.computeSeekTarget', () {
     test('clamps negative targets to zero', () {
       final target = AudioPlayerService.computeSeekTarget(

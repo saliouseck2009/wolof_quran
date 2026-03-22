@@ -1185,6 +1185,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Queued (#{position})'**
   String queuePositionLabel(int position);
+
+  /// Tooltip for playback mode button when looping is disabled
+  ///
+  /// In en, this message translates to:
+  /// **'Playback mode: Off'**
+  String get playbackModeOff;
+
+  /// Tooltip for playback mode button when repeating the current track
+  ///
+  /// In en, this message translates to:
+  /// **'Playback mode: Repeat one'**
+  String get playbackModeRepeatOne;
+
+  /// Tooltip for playback mode button when repeating the queue
+  ///
+  /// In en, this message translates to:
+  /// **'Playback mode: Repeat all'**
+  String get playbackModeRepeatAll;
+
+  /// Tooltip for playback mode button when shuffle is active
+  ///
+  /// In en, this message translates to:
+  /// **'Playback mode: Shuffle'**
+  String get playbackModeShuffle;
 }
 
 class _AppLocalizationsDelegate

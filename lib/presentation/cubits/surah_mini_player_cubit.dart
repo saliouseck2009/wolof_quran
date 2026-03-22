@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,7 +21,8 @@ class SurahMiniPlayerState extends Equatable {
   final Duration position;
   final Duration? duration;
   final bool isSeekReady;
-  final bool repeatSurah;
+  final PlaybackMode playbackMode;
+  final int shuffleHistoryDepth;
 
   const SurahMiniPlayerState({
     this.uiState = SurahMiniPlayerUiState.hidden,
@@ -32,7 +34,8 @@ class SurahMiniPlayerState extends Equatable {
     this.position = Duration.zero,
     this.duration,
     this.isSeekReady = false,
-    this.repeatSurah = false,
+    this.playbackMode = PlaybackMode.off,
+    this.shuffleHistoryDepth = 0,
   });
 
   bool get hasActiveSurah => reciterId != null && surahNumber != null;
@@ -44,10 +47,34 @@ class SurahMiniPlayerState extends Equatable {
     return downloadedQueue.indexOf(surahNumber!);
   }
 
-  bool get canGoPrevious => currentQueueIndex > 0;
+  bool get canGoPrevious {
+    if (!hasActiveSurah || currentQueueIndex < 0) {
+      return false;
+    }
+    switch (playbackMode) {
+      case PlaybackMode.shuffle:
+        return shuffleHistoryDepth > 0;
+      case PlaybackMode.repeatAll:
+        return downloadedQueue.isNotEmpty;
+      case PlaybackMode.off:
+      case PlaybackMode.repeatOne:
+        return currentQueueIndex > 0;
+    }
+  }
 
-  bool get canGoNext =>
-      currentQueueIndex >= 0 && currentQueueIndex < downloadedQueue.length - 1;
+  bool get canGoNext {
+    if (!hasActiveSurah || currentQueueIndex < 0) {
+      return false;
+    }
+    switch (playbackMode) {
+      case PlaybackMode.shuffle:
+      case PlaybackMode.repeatAll:
+        return downloadedQueue.isNotEmpty;
+      case PlaybackMode.off:
+      case PlaybackMode.repeatOne:
+        return currentQueueIndex < downloadedQueue.length - 1;
+    }
+  }
 
   SurahMiniPlayerState copyWith({
     SurahMiniPlayerUiState? uiState,
@@ -60,7 +87,8 @@ class SurahMiniPlayerState extends Equatable {
     Duration? duration,
     bool clearDuration = false,
     bool? isSeekReady,
-    bool? repeatSurah,
+    PlaybackMode? playbackMode,
+    int? shuffleHistoryDepth,
     bool clearTrack = false,
   }) {
     return SurahMiniPlayerState(
@@ -73,7 +101,8 @@ class SurahMiniPlayerState extends Equatable {
       position: position ?? this.position,
       duration: clearDuration ? null : (duration ?? this.duration),
       isSeekReady: isSeekReady ?? this.isSeekReady,
-      repeatSurah: repeatSurah ?? this.repeatSurah,
+      playbackMode: playbackMode ?? this.playbackMode,
+      shuffleHistoryDepth: shuffleHistoryDepth ?? this.shuffleHistoryDepth,
     );
   }
 
@@ -88,7 +117,8 @@ class SurahMiniPlayerState extends Equatable {
     position,
     duration,
     isSeekReady,
-    repeatSurah,
+    playbackMode,
+    shuffleHistoryDepth,
   ];
 }
 
@@ -102,22 +132,28 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
   StreamSubscription<Duration>? _globalPositionSub;
   StreamSubscription<Duration?>? _globalDurationSub;
   StreamSubscription<bool>? _seekReadySub;
-  StreamSubscription<bool>? _repeatSub;
+  StreamSubscription<PlaybackMode>? _playbackModeSub;
+  StreamSubscription<PlaybackCompletedEvent>? _playbackCompletedSub;
+  final int Function(int max) _nextRandomInt;
+  final List<int> _shuffleHistory = <int>[];
+  bool _isAdvancingQueue = false;
 
   SurahMiniPlayerCubit({
     required AudioPlayerService audioPlayerService,
     required DownloadRepository downloadRepository,
     required AudioRepository audioRepository,
+    int Function(int max)? randomIndexGenerator,
   }) : _audioPlayerService = audioPlayerService,
        _downloadRepository = downloadRepository,
        _audioRepository = audioRepository,
+       _nextRandomInt = randomIndexGenerator ?? Random().nextInt,
        super(
          SurahMiniPlayerState(
            playerState: audioPlayerService.currentPlayerState,
            position: audioPlayerService.currentSurahGlobalPosition,
            duration: audioPlayerService.currentSurahGlobalDuration,
            isSeekReady: audioPlayerService.isSurahSeekReady,
-           repeatSurah: audioPlayerService.isRepeatSurahEnabled,
+           playbackMode: audioPlayerService.currentPlaybackMode,
          ),
        ) {
     _listenToPlayerStreams();
@@ -126,10 +162,16 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
   void _listenToPlayerStreams() {
     _audioSub = _audioPlayerService.currentAudio.listen(_handleCurrentAudio);
     _playerStateSub = _audioPlayerService.playerState.listen((playerState) {
+      if (_isAdvancingQueue &&
+          (playerState == AudioPlayerState.stopped ||
+              playerState == AudioPlayerState.idle)) {
+        return;
+      }
       if ((playerState == AudioPlayerState.stopped ||
               playerState == AudioPlayerState.idle) &&
           _audioPlayerService.currentPlayingAudio == null &&
           state.hasActiveSurah) {
+        _clearShuffleHistory();
         emit(
           state.copyWith(
             uiState: SurahMiniPlayerUiState.hidden,
@@ -137,6 +179,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
             clearTrack: true,
             position: Duration.zero,
             clearDuration: true,
+            shuffleHistoryDepth: 0,
           ),
         );
         return;
@@ -156,13 +199,19 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     _seekReadySub = _audioPlayerService.surahSeekReady.listen((isSeekReady) {
       emit(state.copyWith(isSeekReady: isSeekReady));
     });
-    _repeatSub = _audioPlayerService.repeatSurah.listen((repeatEnabled) {
-      emit(state.copyWith(repeatSurah: repeatEnabled));
+    _playbackModeSub = _audioPlayerService.playbackMode.listen((playbackMode) {
+      emit(state.copyWith(playbackMode: playbackMode));
     });
+    _playbackCompletedSub = _audioPlayerService.playbackCompleted.listen(
+      handlePlaybackCompleted,
+    );
   }
 
   Future<void> _handleCurrentAudio(PlayingAudioInfo? audioInfo) async {
     if (audioInfo == null) {
+      if (_isAdvancingQueue) {
+        return;
+      }
       final currentPlayerState = _audioPlayerService.currentPlayerState;
       final hasTransientPlaybackState =
           currentPlayerState == AudioPlayerState.playing ||
@@ -174,28 +223,37 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
       if (hasTransientPlaybackState && state.hasActiveSurah) {
         return;
       }
+      _clearShuffleHistory();
       emit(
         state.copyWith(
           uiState: SurahMiniPlayerUiState.hidden,
           clearTrack: true,
           position: Duration.zero,
           clearDuration: true,
+          shuffleHistoryDepth: 0,
         ),
       );
       return;
     }
 
     if (!audioInfo.isPlaylist) {
+      if (_isAdvancingQueue) {
+        return;
+      }
+      _clearShuffleHistory();
       emit(
         state.copyWith(
           uiState: SurahMiniPlayerUiState.hidden,
           clearTrack: true,
           position: Duration.zero,
           clearDuration: true,
+          shuffleHistoryDepth: 0,
         ),
       );
       return;
     }
+
+    _isAdvancingQueue = false;
 
     final resolvedName =
         audioInfo.surahName ?? quran.getSurahNameEnglish(audioInfo.surahNumber);
@@ -209,16 +267,24 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         reciterId: audioInfo.reciterId,
         surahNumber: audioInfo.surahNumber,
         surahName: resolvedName,
+        shuffleHistoryDepth: _shuffleHistory.length,
       ),
     );
 
     await refreshQueueForReciter(audioInfo.reciterId);
   }
 
-  Future<void> attachToCurrentPlayback({bool expanded = true}) async {
+  Future<void> attachToCurrentPlayback({
+    bool expanded = true,
+    bool resetShuffleHistory = false,
+  }) async {
     final current = _audioPlayerService.currentPlayingAudio;
     if (current == null || !current.isPlaylist) {
       return;
+    }
+
+    if (resetShuffleHistory) {
+      _clearShuffleHistory();
     }
 
     final resolvedName =
@@ -231,6 +297,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         reciterId: current.reciterId,
         surahNumber: current.surahNumber,
         surahName: resolvedName,
+        shuffleHistoryDepth: _shuffleHistory.length,
       ),
     );
 
@@ -262,6 +329,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
   }
 
   Future<void> closePlayer() async {
+    _clearShuffleHistory();
     await _audioPlayerService.stop();
     emit(
       state.copyWith(
@@ -269,6 +337,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         clearTrack: true,
         position: Duration.zero,
         clearDuration: true,
+        shuffleHistoryDepth: 0,
       ),
     );
   }
@@ -296,8 +365,8 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     await _audioPlayerService.seekBy(Duration(seconds: seconds));
   }
 
-  Future<void> toggleRepeat() async {
-    await _audioPlayerService.setRepeatSurah(!state.repeatSurah);
+  Future<void> cyclePlaybackMode() async {
+    await _audioPlayerService.cyclePlaybackMode();
   }
 
   Future<void> refreshQueueForReciter(String reciterId) async {
@@ -310,7 +379,12 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
             .toList()
           ..sort();
 
-    emit(state.copyWith(downloadedQueue: queue));
+    emit(
+      state.copyWith(
+        downloadedQueue: queue,
+        shuffleHistoryDepth: _shuffleHistory.length,
+      ),
+    );
   }
 
   Future<void> playPreviousSurah() async {
@@ -318,8 +392,18 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
       return;
     }
 
-    final target = state.downloadedQueue[state.currentQueueIndex - 1];
-    await _playSurahFromQueue(target);
+    switch (state.playbackMode) {
+      case PlaybackMode.shuffle:
+        await _playPreviousShuffledSurah();
+        return;
+      case PlaybackMode.repeatAll:
+        await _playLinearSurah(forward: false, wrap: true);
+        return;
+      case PlaybackMode.off:
+      case PlaybackMode.repeatOne:
+        await _playLinearSurah(forward: false, wrap: false);
+        return;
+    }
   }
 
   Future<void> playNextSurah() async {
@@ -327,60 +411,232 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
       return;
     }
 
-    final target = state.downloadedQueue[state.currentQueueIndex + 1];
-    await _playSurahFromQueue(target);
+    switch (state.playbackMode) {
+      case PlaybackMode.shuffle:
+        await _playNextShuffledSurah(recordHistory: true);
+        return;
+      case PlaybackMode.repeatAll:
+        await _playLinearSurah(forward: true, wrap: true);
+        return;
+      case PlaybackMode.off:
+      case PlaybackMode.repeatOne:
+        await _playLinearSurah(forward: true, wrap: false);
+        return;
+    }
   }
 
-  Future<void> _playSurahFromQueue(int surahNumber) async {
+  Future<void> handlePlaybackCompleted(PlaybackCompletedEvent event) async {
+    if (!event.audioInfo.isPlaylist ||
+        state.reciterId != event.audioInfo.reciterId ||
+        state.surahNumber != event.audioInfo.surahNumber) {
+      return;
+    }
+
+    switch (event.playbackMode) {
+      case PlaybackMode.repeatAll:
+        await _playLinearSurah(forward: true, wrap: true, isQueueAdvance: true);
+        return;
+      case PlaybackMode.shuffle:
+        await _playNextShuffledSurah(recordHistory: true, isQueueAdvance: true);
+        return;
+      case PlaybackMode.off:
+      case PlaybackMode.repeatOne:
+        return;
+    }
+  }
+
+  static int? computeLinearQueueTarget({
+    required int currentIndex,
+    required int queueLength,
+    required bool forward,
+    required bool wrap,
+  }) {
+    if (queueLength <= 0 || currentIndex < 0 || currentIndex >= queueLength) {
+      return null;
+    }
+
+    final candidate = forward ? currentIndex + 1 : currentIndex - 1;
+    if (candidate >= 0 && candidate < queueLength) {
+      return candidate;
+    }
+    if (!wrap) {
+      return null;
+    }
+    return forward ? 0 : queueLength - 1;
+  }
+
+  static int? selectShuffleTarget({
+    required List<int> queue,
+    required int currentSurah,
+    required int Function(int max) nextInt,
+  }) {
+    if (queue.isEmpty) {
+      return null;
+    }
+
+    final candidates = queue.where((surah) => surah != currentSurah).toList();
+    if (candidates.isEmpty) {
+      return queue.first;
+    }
+    return candidates[nextInt(candidates.length)];
+  }
+
+  Future<void> playSurahFromQueue(
+    int surahNumber, {
+    bool resetShuffleHistory = false,
+    bool isQueueAdvance = false,
+  }) async {
     final reciterId = state.reciterId;
     if (reciterId == null) {
       return;
     }
 
-    final ayahAudios = await _audioRepository.getAyahAudios(
-      reciterId,
-      surahNumber,
+    final targetUiState = state.uiState == SurahMiniPlayerUiState.hidden
+        ? SurahMiniPlayerUiState.expanded
+        : state.uiState;
+
+    if (resetShuffleHistory) {
+      _clearShuffleHistory();
+    }
+    if (isQueueAdvance) {
+      _beginQueueAdvance();
+    }
+
+    try {
+      final ayahAudios = await _audioRepository.getAyahAudios(
+        reciterId,
+        surahNumber,
+      );
+      if (ayahAudios.isEmpty) {
+        if (isQueueAdvance) {
+          _isAdvancingQueue = false;
+        }
+        return;
+      }
+
+      final filePaths = ayahAudios.map((audio) => audio.localPath).toList();
+      var ayahDurations = ayahAudios.map((audio) => audio.duration).toList();
+      final hasMissingDurations = ayahDurations.any(
+        (duration) => duration == null || duration.inMilliseconds <= 0,
+      );
+
+      // Warmup durations before playback so the UI has them immediately.
+      if (hasMissingDurations) {
+        try {
+          await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
+          final warmedAyahs = await _audioRepository.getAyahAudios(
+            reciterId,
+            surahNumber,
+          );
+          ayahDurations = warmedAyahs.map((audio) => audio.duration).toList();
+        } catch (_) {
+          // Continue with partial durations.
+        }
+      }
+
+      await _audioPlayerService.playSurahPlaylist(
+        filePaths: filePaths,
+        surahNumber: surahNumber,
+        reciterId: reciterId,
+        surahName: quran.getSurahNameEnglish(surahNumber),
+        ayahDurations: ayahDurations,
+        startIndex: 0,
+      );
+
+      emit(
+        state.copyWith(
+          uiState: targetUiState,
+          surahNumber: surahNumber,
+          surahName: quran.getSurahNameEnglish(surahNumber),
+          playerState: AudioPlayerState.loading,
+          shuffleHistoryDepth: _shuffleHistory.length,
+        ),
+      );
+    } catch (_) {
+      _isAdvancingQueue = false;
+      rethrow;
+    }
+  }
+
+  Future<void> _playLinearSurah({
+    required bool forward,
+    required bool wrap,
+    bool isQueueAdvance = false,
+  }) async {
+    final targetIndex = computeLinearQueueTarget(
+      currentIndex: state.currentQueueIndex,
+      queueLength: state.downloadedQueue.length,
+      forward: forward,
+      wrap: wrap,
     );
-    if (ayahAudios.isEmpty) {
+    if (targetIndex == null) {
+      if (isQueueAdvance) {
+        _isAdvancingQueue = false;
+        await _audioPlayerService.stop();
+      }
+      return;
+    }
+    await playSurahFromQueue(
+      state.downloadedQueue[targetIndex],
+      isQueueAdvance: isQueueAdvance,
+    );
+  }
+
+  Future<void> _playNextShuffledSurah({
+    required bool recordHistory,
+    bool isQueueAdvance = false,
+  }) async {
+    final currentSurah = state.surahNumber;
+    if (currentSurah == null || state.downloadedQueue.isEmpty) {
+      if (isQueueAdvance) {
+        _isAdvancingQueue = false;
+        await _audioPlayerService.stop();
+      }
       return;
     }
 
-    final filePaths = ayahAudios.map((audio) => audio.localPath).toList();
-    var ayahDurations = ayahAudios.map((audio) => audio.duration).toList();
-    final hasMissingDurations = ayahDurations.any(
-      (duration) => duration == null || duration.inMilliseconds <= 0,
+    final target = selectShuffleTarget(
+      queue: state.downloadedQueue,
+      currentSurah: currentSurah,
+      nextInt: _nextRandomInt,
     );
-
-    // Warmup durations before playback so the UI has them immediately.
-    if (hasMissingDurations) {
-      try {
-        await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
-        final warmedAyahs = await _audioRepository.getAyahAudios(
-          reciterId,
-          surahNumber,
-        );
-        ayahDurations = warmedAyahs.map((audio) => audio.duration).toList();
-      } catch (_) {
-        // Continue with partial durations.
+    if (target == null) {
+      if (isQueueAdvance) {
+        _isAdvancingQueue = false;
+        await _audioPlayerService.stop();
       }
+      return;
     }
 
-    await _audioPlayerService.playSurahPlaylist(
-      filePaths: filePaths,
-      surahNumber: surahNumber,
-      reciterId: reciterId,
-      surahName: quran.getSurahNameEnglish(surahNumber),
-      ayahDurations: ayahDurations,
-      startIndex: 0,
-    );
+    if (recordHistory) {
+      _shuffleHistory.add(currentSurah);
+      _syncShuffleHistoryDepth();
+    }
 
-    emit(
-      state.copyWith(
-        uiState: SurahMiniPlayerUiState.expanded,
-        surahNumber: surahNumber,
-        surahName: quran.getSurahNameEnglish(surahNumber),
-      ),
-    );
+    await playSurahFromQueue(target, isQueueAdvance: isQueueAdvance);
+  }
+
+  Future<void> _playPreviousShuffledSurah() async {
+    if (_shuffleHistory.isEmpty) {
+      return;
+    }
+
+    final target = _shuffleHistory.removeLast();
+    _syncShuffleHistoryDepth();
+    await playSurahFromQueue(target, isQueueAdvance: true);
+  }
+
+  void _beginQueueAdvance() {
+    _isAdvancingQueue = true;
+    emit(state.copyWith(playerState: AudioPlayerState.loading));
+  }
+
+  void _clearShuffleHistory() {
+    _shuffleHistory.clear();
+  }
+
+  void _syncShuffleHistoryDepth() {
+    emit(state.copyWith(shuffleHistoryDepth: _shuffleHistory.length));
   }
 
   @override
@@ -390,7 +646,8 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     await _globalPositionSub?.cancel();
     await _globalDurationSub?.cancel();
     await _seekReadySub?.cancel();
-    await _repeatSub?.cancel();
+    await _playbackModeSub?.cancel();
+    await _playbackCompletedSub?.cancel();
     return super.close();
   }
 }

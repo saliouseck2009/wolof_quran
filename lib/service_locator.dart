@@ -44,11 +44,9 @@ Future<void> setupDependencies() async {
   locator.registerLazySingleton<Dio>(() => Dio());
 
   // Services
-  locator.registerLazySingleton<AudioPlayerService>(() {
-    final service = AudioPlayerService();
-    service.initialize();
-    return service;
-  });
+  final audioPlayerService = AudioPlayerService();
+  await audioPlayerService.initialize();
+  locator.registerSingleton<AudioPlayerService>(audioPlayerService);
 
   // Data Sources
   locator.registerLazySingleton<ReciterLocalDataSource>(
