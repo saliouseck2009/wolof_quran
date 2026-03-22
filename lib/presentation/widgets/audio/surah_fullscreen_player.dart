@@ -275,9 +275,6 @@ class _CenterNowPlayingCard extends StatelessWidget {
     final isPlaying =
         state.playerState == AudioPlayerState.playing ||
         state.playerState == AudioPlayerState.loading;
-    final progress = state.isSeekReady
-        ? _progressValue(state.position, total)
-        : null;
     final remaining = state.isSeekReady
         ? _safeRemaining(total, state.position)
         : Duration.zero;
@@ -825,13 +822,6 @@ String _formatDuration(Duration duration) {
   }
   return '${minutes.toString().padLeft(2, '0')}:'
       '${seconds.toString().padLeft(2, '0')}';
-}
-
-double _progressValue(Duration position, Duration? duration) {
-  if (duration == null || duration.inMilliseconds <= 0) {
-    return 0;
-  }
-  return (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0);
 }
 
 Duration _safeRemaining(Duration total, Duration position) {

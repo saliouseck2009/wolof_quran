@@ -217,8 +217,7 @@ class AudioPlayerService {
     String? surahName,
   }) async {
     try {
-      await _stop();
-      _isPlayingPlaylist = false;
+      await _replaceCurrentPlayback();
 
       _currentAudioSubject.add(
         PlayingAudioInfo(
@@ -249,7 +248,7 @@ class AudioPlayerService {
     int startIndex = 0,
   }) async {
     try {
-      await _stop();
+      await _replaceCurrentPlayback();
       if (filePaths.isEmpty) {
         return;
       }
@@ -517,15 +516,38 @@ class AudioPlayerService {
   /// Internal stop method
   Future<void> _stop() async {
     await _audioPlayer.stop();
+    _clearPlaybackSession(
+      clearCurrentAudio: true,
+      emitStoppedState: true,
+    );
+  }
+
+  Future<void> _replaceCurrentPlayback() async {
+    await _audioPlayer.stop();
+    _clearPlaybackSession(
+      clearCurrentAudio: false,
+      emitStoppedState: false,
+    );
+  }
+
+  void _clearPlaybackSession({
+    required bool clearCurrentAudio,
+    required bool emitStoppedState,
+  }) {
     _isPlayingPlaylist = false;
     _currentPlaylist.clear();
     _playlistCachedDurations.clear();
     _currentPlaylistIndex = 0;
-    _currentAudioSubject.add(null);
-    _playerStateSubject.add(AudioPlayerState.stopped);
     _positionSubject.add(Duration.zero);
     _durationSubject.add(null);
     _resetSurahTimeline();
+
+    if (clearCurrentAudio) {
+      _currentAudioSubject.add(null);
+    }
+    if (emitStoppedState) {
+      _playerStateSubject.add(AudioPlayerState.stopped);
+    }
   }
 
   void _syncCurrentAudioAyahIndex(int ayahIndex) {
