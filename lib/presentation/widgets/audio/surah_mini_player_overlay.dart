@@ -436,14 +436,15 @@ class _ExpandedMiniPlayer extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        colorScheme.primary,
-                        colorScheme.primary.withValues(alpha: 0.6),
-                      ],
-                    ),
+                    color: colorScheme.primary,
+                    // gradient: LinearGradient(
+                    //   begin: Alignment.topLeft,
+                    //   end: Alignment.bottomRight,
+                    //   colors: [
+                    //     colorScheme.primary,
+                    //     colorScheme.primary.withValues(alpha: 0.6),
+                    //   ],
+                    // ),
                   ),
                   child: Center(
                     child: Text(
@@ -674,13 +675,6 @@ class _ExpandedPlayPauseButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.primary,
           shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.primary.withValues(alpha: 0.35),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Icon(
           isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,

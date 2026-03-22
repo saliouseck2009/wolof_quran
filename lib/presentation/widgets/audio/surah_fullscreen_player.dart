@@ -136,8 +136,7 @@ class _FullscreenContent extends StatelessWidget {
                 ),
 
                 // ── Seek bar ──────────────────────────────────────────────
-                _SeekBar(state: state, total: total, tokens: t),
-
+                // _SeekBar(state: state, total: total, tokens: t),
                 const SizedBox(height: 12),
 
                 // ── Controls ──────────────────────────────────────────────
@@ -301,125 +300,127 @@ class _CenterNowPlayingCard extends StatelessWidget {
         duration: const Duration(milliseconds: 260),
         decoration: cardDecoration,
         padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _InfoChip(
-                  icon: Icons.menu_book_rounded,
-                  label: state.surahNumber != null
-                      ? 'Sourate ${state.surahNumber}'
-                      : 'Sourate --',
-                  tokens: tokens,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _InfoChip(
+                    icon: Icons.menu_book_rounded,
+                    label: state.surahNumber != null
+                        ? 'Sourate ${state.surahNumber}'
+                        : 'Sourate --',
+                    tokens: tokens,
+                  ),
+                  _InfoChip(
+                    icon: isPlaying
+                        ? Icons.multitrack_audio_rounded
+                        : Icons.pause_circle_outline_rounded,
+                    label: isPlaying ? 'Lecture' : 'Pause',
+                    tokens: tokens,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _SurahArtwork(
+                surahNumber: state.surahNumber,
+                isPlaying: isPlaying,
+                tokens: tokens,
+              ),
+              const SizedBox(height: 18),
+              Text(
+                surahTitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: tokens.content,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
                 ),
-                _InfoChip(
-                  icon: isPlaying
-                      ? Icons.multitrack_audio_rounded
-                      : Icons.pause_circle_outline_rounded,
-                  label: isPlaying ? 'Lecture' : 'Pause',
-                  tokens: tokens,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                state.surahNumber != null
+                    ? quran.getSurahNameArabic(state.surahNumber!)
+                    : '',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: tokens.muted,
+                  fontWeight: FontWeight.w500,
                 ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _SurahArtwork(
-              surahNumber: state.surahNumber,
-              isPlaying: isPlaying,
-              tokens: tokens,
-            ),
-            const SizedBox(height: 18),
-            Text(
-              surahTitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: tokens.content,
-                fontWeight: FontWeight.w800,
-                height: 1.15,
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              state.surahNumber != null
-                  ? quran.getSurahNameArabic(state.surahNumber!)
-                  : '',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: tokens.muted,
-                fontWeight: FontWeight.w500,
+              const SizedBox(height: 18),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: LinearProgressIndicator(
+                  minHeight: 6,
+                  value: progress,
+                  color: tokens.accent,
+                  backgroundColor: tokens.isDark
+                      ? Colors.white.withValues(alpha: 0.16)
+                      : cs.onSurface.withValues(alpha: 0.12),
+                ),
               ),
-            ),
-            const SizedBox(height: 18),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
-                minHeight: 6,
-                value: progress,
-                color: tokens.accent,
-                backgroundColor: tokens.isDark
-                    ? Colors.white.withValues(alpha: 0.16)
-                    : cs.onSurface.withValues(alpha: 0.12),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _formatDuration(state.position),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _formatDuration(state.position),
+                      style: TextStyle(
+                        color: tokens.muted,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    state.isSeekReady ? _formatDuration(total) : '--:--',
                     style: TextStyle(
                       color: tokens.muted,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-                Text(
-                  state.isSeekReady ? _formatDuration(total) : '--:--',
-                  style: TextStyle(
-                    color: tokens.muted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                ],
+              ),
+              const SizedBox(height: 14),
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: tokens.isDark
+                    ? Colors.white.withValues(alpha: 0.12)
+                    : cs.onSurface.withValues(alpha: 0.1),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: _MetaRow(
+                      icon: Icons.person_rounded,
+                      label: 'Interprète',
+                      value: reciterName,
+                      tokens: tokens,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Divider(
-              height: 1,
-              thickness: 1,
-              color: tokens.isDark
-                  ? Colors.white.withValues(alpha: 0.12)
-                  : cs.onSurface.withValues(alpha: 0.1),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _MetaRow(
-                    icon: Icons.person_rounded,
-                    label: 'Interprète',
-                    value: reciterName,
-                    tokens: tokens,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _MetaRow(
+                      icon: Icons.schedule_rounded,
+                      label: 'Restant',
+                      value: state.isSeekReady
+                          ? '-${_formatDuration(remaining)}'
+                          : '--:--',
+                      tokens: tokens,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _MetaRow(
-                    icon: Icons.schedule_rounded,
-                    label: 'Restant',
-                    value: state.isSeekReady
-                        ? '-${_formatDuration(remaining)}'
-                        : '--:--',
-                    tokens: tokens,
-                  ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -816,26 +817,13 @@ class _PlayPauseButton extends StatelessWidget {
     // Light: teal circle with white icon (standard FilledButton look).
     final circleBg = t.isDark ? Colors.white : t.accent;
     final iconColor = t.isDark ? AppColor.primary : Colors.white;
-    final shadowColor = t.isDark
-        ? Colors.black.withValues(alpha: 0.3)
-        : t.accent.withValues(alpha: 0.35);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 68,
         height: 68,
-        decoration: BoxDecoration(
-          color: circleBg,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: shadowColor,
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        decoration: BoxDecoration(color: circleBg, shape: BoxShape.circle),
         child: Icon(
           isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
           size: 38,
