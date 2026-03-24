@@ -8,7 +8,6 @@ class HomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final accentGreen = colorScheme.primary;
 
     return Row(
       children: [
@@ -21,11 +20,7 @@ class HomeHeader extends StatelessWidget {
             color: colorScheme.primary,
           ),
         ),
-        //  Image.asset(
-        //   'assets/icon/app_icon.png',
-        //   width: 40,
-        //   height: 40,
-        // ),
+
         const SizedBox(width: 12),
         Expanded(
           child: Text(
