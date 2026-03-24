@@ -50,11 +50,7 @@ class HomePage extends StatelessWidget {
                   audioState.message,
                   AppLocalizations.of(context)!,
                 );
-                CustomSnackbar.showErrorSnackbar(
-                  context,
-                  message,
-                  duration: 3,
-                );
+                CustomSnackbar.showErrorSnackbar(context, message, duration: 3);
               }
             },
           ),
