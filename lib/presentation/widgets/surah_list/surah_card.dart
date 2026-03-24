@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/helpers/revelation_place_enum.dart';
-import '../../widgets/reciter_chapters/chapter_number_widget.dart';
 
 class SurahCard extends StatelessWidget {
   const SurahCard({
@@ -28,69 +27,106 @@ class SurahCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
     final isMeccan = revelationPlace == RevelationPlaceEnum.meccan;
+    final accentColor = colorScheme.primary;
+    final tileColor = isDark
+        ? colorScheme.surfaceContainerLow
+        : colorScheme.onPrimary;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 220),
+      margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surfaceContainer : colorScheme.onPrimary,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: tileColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: colorScheme.onSurface.withValues(alpha: isDark ? 0.08 : 0.06),
+        ),
       ),
       child: Material(
-        color: Colors.transparent,
+        type: MaterialType.transparency,
+        borderRadius: BorderRadius.circular(14),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
-                ChapterNumberWidget(
-                  color: colorScheme.primary,
-                  surahNumber: surahNumber,
-                  textTheme: Theme.of(context).textTheme,
+                _NumberBadge(
+                  number: surahNumber,
+                  accentColor: accentColor,
+                  colorScheme: colorScheme,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        translatedName,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: colorScheme.primary,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          Flexible(
-                            child: _InfoChip(
-                              label: versesLabel,
-                              icon: Icons.format_list_numbered,
-                              color: colorScheme.secondary,
+                          Expanded(
+                            child: Text(
+                              translatedName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: accentColor,
+                                  ),
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 8),
                           Flexible(
+                            child: Text(
+                              arabicName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: 'Hafs',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              textDirection: TextDirection.rtl,
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.graphic_eq_rounded,
+                            size: 12,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          _InfoChip(
+                            label: versesLabel,
+                            icon: Icons.format_list_numbered_rounded,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            width: 3,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.5,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
                             child: _InfoChip(
                               label: revelationLabel,
                               icon: isMeccan
                                   ? Icons.location_on
                                   : Icons.location_city,
-                              color: isMeccan
-                                  ? colorScheme.secondary
-                                  : colorScheme.primary,
+                              color: colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
@@ -99,17 +135,20 @@ class SurahCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  arabicName,
-                  style: TextStyle(
-                    fontFamily: 'Hafs',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: colorScheme.primary,
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? accentColor.withValues(alpha: 0.2)
+                        : accentColor,
+                    shape: BoxShape.circle,
                   ),
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.rtl,
-                  overflow: TextOverflow.ellipsis,
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 15,
+                    color: colorScheme.onPrimary,
+                  ),
                 ),
               ],
             ),
@@ -134,27 +173,56 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 1),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 12, color: color),
-          const SizedBox(width: 4),
+          const SizedBox(width: 3),
           Flexible(
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w500,
-                  ),
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _NumberBadge extends StatelessWidget {
+  const _NumberBadge({
+    required this.number,
+    required this.accentColor,
+    required this.colorScheme,
+  });
+
+  final int number;
+  final Color accentColor;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: accentColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$number',
+        style: TextStyle(
+          color: colorScheme.onPrimary,
+          fontWeight: FontWeight.w800,
+          fontSize: 15,
+        ),
       ),
     );
   }
