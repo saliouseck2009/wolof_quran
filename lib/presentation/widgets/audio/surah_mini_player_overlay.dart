@@ -107,6 +107,7 @@ class _CollapsedMiniPlayer extends StatelessWidget {
       state.surahNumber,
       fallbackName: state.surahName,
     );
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return InkWell(
       onTap: () => context.read<SurahMiniPlayerCubit>().expand(),
@@ -176,7 +177,7 @@ class _CollapsedMiniPlayer extends StatelessWidget {
                       isPlaying
                           ? Icons.pause_circle_filled_rounded
                           : Icons.play_circle_filled_rounded,
-                      color: colorScheme.primary,
+                      color: isDark ? Colors.white : colorScheme.primary,
                     ),
                   ),
 
@@ -188,7 +189,7 @@ class _CollapsedMiniPlayer extends StatelessWidget {
               iconSize: 20,
               icon: Icon(
                 Icons.close_rounded,
-                color: colorScheme.onSurfaceVariant,
+                color: isDark ? colorScheme.onPrimary : colorScheme.primary,
               ),
             ),
           ],

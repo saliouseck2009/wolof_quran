@@ -345,8 +345,11 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
   Future<void> togglePlayPause() async {
     switch (state.playerState) {
       case AudioPlayerState.playing:
-      case AudioPlayerState.loading:
         await _audioPlayerService.pause();
+        break;
+      case AudioPlayerState.loading:
+        // Calling pause() while just_audio is loading a source interrupts the
+        // platform activation and throws "Loading interrupted". Ignore the tap.
         break;
       case AudioPlayerState.paused:
       case AudioPlayerState.stopped:
@@ -543,12 +546,15 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         startIndex: 0,
       );
 
+      // Do not override playerState here — the service streams already emitted
+      // the correct state (playing/loading) during playSurahPlaylist. Emitting
+      // loading again would permanently stick the cubit at loading even though
+      // audio has already started playing.
       emit(
         state.copyWith(
           uiState: targetUiState,
           surahNumber: surahNumber,
           surahName: quran.getSurahNameEnglish(surahNumber),
-          playerState: AudioPlayerState.loading,
           shuffleHistoryDepth: _shuffleHistory.length,
         ),
       );
