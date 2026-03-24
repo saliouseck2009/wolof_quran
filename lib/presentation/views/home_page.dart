@@ -20,7 +20,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final settingsCubit = context.read<QuranSettingsCubit>();
     final currentTranslation = settingsCubit.state.selectedTranslation;
@@ -57,57 +56,28 @@ class HomePage extends StatelessWidget {
         ],
         child: Scaffold(
           backgroundColor: colorScheme.surface,
-          body: Container(
-            height: double.infinity,
-            decoration: colorScheme.brightness == Brightness.dark
-                ? BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        colorScheme.surfaceContainerLowest,
-                        colorScheme.surfaceDim,
-                      ],
-                    ),
-                  )
-                : null, // No gradient for light theme
-            child: SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header Section
-                      const HomeHeader(),
-                      const SizedBox(height: 32),
-
-                      // Daily Inspiration Card (merged greeting + random ayah)
-                      const DailyInspirationCard(),
-                      const SizedBox(height: 32),
-
-                      // Quick Actions Title
-                      Text(
-                        localizations.features,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Main Actions Grid
-                      const HomeActionsGrid(),
-                    ],
-                  ),
+          body: SafeArea(
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                  sliver: SliverToBoxAdapter(child: const HomeHeader()),
                 ),
-              ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
+                  sliver: SliverToBoxAdapter(child: const DailyInspirationCard()),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(24, 36, 24, 0),
+                  sliver: SliverToBoxAdapter(child: const HomeActionsGrid()),
+                ),
+                const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
+              ],
             ),
-          ), // Scaffold
-        ), // MultiBlocListener
+          ),
+        ),
       ),
-    ); // MultiBlocProvider
+    );
   }
 }

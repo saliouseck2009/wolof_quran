@@ -8,136 +8,173 @@ class HomeActionsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const spacing = 16.0;
-        // Ensure we don't get negative width by using max
-        final cardWidth = ((constraints.maxWidth - spacing) / 2).clamp(
-          0.0,
-          double.infinity,
-        );
-
-        return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          localizations.features,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onSurfaceVariant,
+            letterSpacing: 0.4,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
           children: [
-            SizedBox(
-              width: cardWidth,
-              child: _ModernActionCard(
-                icon: Icons.menu_book_outlined,
+            Expanded(
+              child: _GridCard(
+                icon: Icons.menu_book_rounded,
                 title: localizations.quran,
                 subtitle: localizations.readSurahs,
                 onTap: () => Navigator.pushNamed(context, '/surahs'),
               ),
             ),
-            SizedBox(
-              width: cardWidth,
-              child: _ModernActionCard(
-                icon: Icons.headphones_outlined,
+            const SizedBox(width: 12),
+            Expanded(
+              child: _GridCard(
+                icon: Icons.headphones_rounded,
                 title: localizations.recitation,
                 subtitle: localizations.listenAudio,
                 onTap: () =>
                     Navigator.pushNamed(context, SurahAudioListPage.routeName),
               ),
             ),
-            SizedBox(
-              width: cardWidth,
-              child: _ModernActionCard(
-                icon: Icons.explore_outlined,
-                title: 'Explorer',
-                subtitle:
-                    '${localizations.search} & ${localizations.bookmarks}',
-                onTap: () => Navigator.pushNamed(context, '/search'),
-              ),
-            ),
           ],
-        );
-      },
+        ),
+        const SizedBox(height: 12),
+        _GridCard(
+          icon: Icons.search_rounded,
+          title: localizations.explorer,
+          subtitle: '${localizations.search} & ${localizations.bookmarks}',
+          onTap: () => Navigator.pushNamed(context, '/search'),
+          wide: true,
+        ),
+      ],
     );
   }
 }
 
-class _ModernActionCard extends StatelessWidget {
+class _GridCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
+  final bool wide;
 
-  const _ModernActionCard({
+  const _GridCard({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.wide = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
+
+    final content = wide
+        ? _buildWideLayout(colorScheme)
+        : _buildSquareLayout(colorScheme);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.all(20),
+        borderRadius: BorderRadius.circular(18),
+        child: Ink(
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: isDark
-                ? colorScheme.surfaceContainer
-                : colorScheme.onPrimary,
-            borderRadius: BorderRadius.circular(20),
-            // border: Border.all(
-            //   color: colorScheme.outline.withValues(alpha: 0.2),
-            // ),
-            boxShadow: colorScheme.brightness == Brightness.dark
-                ? [
-                    BoxShadow(
-                      color: colorScheme.shadow.withValues(alpha: 0.1),
-                      blurRadius: 18,
-                      offset: const Offset(0, 6),
-                    ),
-                  ]
-                : null,
+            color: colorScheme.onSurface.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(18),
           ),
+          child: content,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSquareLayout(ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, size: 20, color: colorScheme.primary),
+        ),
+        const SizedBox(height: 18),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onSurface,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 3),
+        Text(
+          subtitle,
+          style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWideLayout(ColorScheme colorScheme) {
+    return Row(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, size: 20, color: colorScheme.primary),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, size: 24, color: colorScheme.primary),
-              ),
-              const SizedBox(height: 16),
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: colorScheme.onSurface,
-                  fontFamily: 'Hafs',
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
                 style: TextStyle(
                   fontSize: 12,
                   color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
         ),
-      ),
+        Icon(
+          Icons.chevron_right_rounded,
+          color: colorScheme.onSurface.withValues(alpha: 0.2),
+          size: 20,
+        ),
+      ],
     );
   }
 }

@@ -8,7 +8,6 @@ import '../cubits/bookmark_cubit.dart';
 import '../../domain/entities/bookmark.dart';
 import '../../core/navigation/surah_detail_arguments.dart';
 import 'ayah_play_button.dart';
-import 'home_header.dart'; // For AppIcon
 import 'daily_inspiration_share_modal.dart';
 
 class DailyInspirationCard extends StatelessWidget {
@@ -34,34 +33,29 @@ class DailyInspirationCard extends StatelessWidget {
   Widget _buildLoadingCard(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final localizations = AppLocalizations.of(context)!;
-    final isDark = colorScheme.brightness == Brightness.dark;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surfaceContainer : colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: colorScheme.brightness == Brightness.dark
-            ? [
-                BoxShadow(
-                  color: colorScheme.shadow.withValues(alpha: 0.1),
-                  blurRadius: 24,
-                  offset: const Offset(0, 10),
-                ),
-              ]
-            : null,
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+        color: colorScheme.onSurface.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         children: [
-          CircularProgressIndicator(color: colorScheme.primary),
+          SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: 16),
           Text(
             localizations.loadingDailyInspiration,
             style: TextStyle(
-              fontSize: 16,
-              color: colorScheme.onSurface,
-              fontFamily: 'Hafs',
+              fontSize: 13,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -74,7 +68,6 @@ class DailyInspirationCard extends StatelessWidget {
     AppLocalizations localizations,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final accentGreen = colorScheme.primary;
     return GestureDetector(
       onTap: () {
         final settingsCubit = context.read<QuranSettingsCubit>();
@@ -87,85 +80,55 @@ class DailyInspirationCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: colorScheme.brightness == Brightness.dark
-              ? [
-                  BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: 0.2),
-                    blurRadius: 28,
-                    offset: const Offset(0, 12),
-                  ),
-                ]
-              : null,
-          border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+          color: colorScheme.onSurface.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                AppIcon(accentGreen: accentGreen, colorScheme: colorScheme),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        localizations.dailyInspirationTitle,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: colorScheme.onSurface,
-                          fontFamily: 'Hafs',
-                        ),
-                      ),
-                      Text(
-                        localizations.holyQuran,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: accentGreen,
-                          fontFamily: 'Hafs',
-                        ),
-                      ),
-                    ],
+                Icon(
+                  Icons.auto_awesome_outlined,
+                  size: 18,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  localizations.dailyInspirationTitle,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             Text(
               localizations.tapForDailyVerse,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 color: colorScheme.onSurfaceVariant,
-                height: 1.6,
-                fontWeight: FontWeight.w500,
+                height: 1.5,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Icon(
+                  Icons.touch_app_outlined,
+                  size: 16,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: 6),
                 Text(
                   localizations.tapAnywhereToStart,
                   style: TextStyle(
                     fontSize: 12,
-                    color: accentGreen,
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.w500,
                   ),
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.play_disabled,
-                      color: colorScheme.onSurfaceVariant,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(Icons.touch_app, color: accentGreen, size: 20),
-                  ],
                 ),
               ],
             ),
@@ -181,64 +144,50 @@ class DailyInspirationCard extends StatelessWidget {
     DailyInspirationLoaded state,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final accentGreen = colorScheme.primary;
-    final isDark = colorScheme.brightness == Brightness.dark;
     return GestureDetector(
       onTap: () => context.read<DailyInspirationCubit>().toggleExpansion(),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark ? colorScheme.surfaceContainer : colorScheme.onPrimary,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: colorScheme.brightness == Brightness.dark
-              ? [
-                  BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: 0.2),
-                    blurRadius: 28,
-                    offset: const Offset(0, 12),
-                  ),
-                ]
-              : null,
-          //border: Border.all(color: colorScheme.outline.withValues(alpha: 0.2)),
+          color: colorScheme.onSurface.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with Islamic logo and title
+            // Surah tag + actions row
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                Icon(
+                  Icons.auto_awesome_outlined,
+                  size: 16,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
                   child: Text(
                     '${state.surahName} : ${state.verseNumber}',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 13,
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
-                AyahPlayButton(
-                  surahNumber: state.surahNumber,
-                  ayahNumber: state.verseNumber,
-                  surahName: state.surahName,
-                  size: 18.0,
-                  color: accentGreen,
+                _ActionIcon(
+                  child: AyahPlayButton(
+                    surahNumber: state.surahNumber,
+                    ayahNumber: state.verseNumber,
+                    surahName: state.surahName,
+                    size: 16.0,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () {
+                const SizedBox(width: 4),
+                _ActionIcon(
+                  onTap: () {
                     showDailyInspirationShareModal(
                       context,
                       state.verseNumber,
@@ -249,12 +198,15 @@ class DailyInspirationCard extends StatelessWidget {
                       state.surahNumber,
                     );
                   },
-                  icon: Icon(Icons.share, color: accentGreen, size: 18),
+                  child: Icon(
+                    Icons.share_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 16,
+                  ),
                 ),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () {
+                const SizedBox(width: 4),
+                _ActionIcon(
+                  onTap: () {
                     final settingsCubit = context.read<QuranSettingsCubit>();
                     final currentTranslation =
                         settingsCubit.state.selectedTranslation;
@@ -262,33 +214,37 @@ class DailyInspirationCard extends StatelessWidget {
                       currentTranslation,
                     );
                   },
-                  icon: Icon(Icons.refresh, color: accentGreen, size: 18),
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 16,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
+
+            // Translation text
             Text(
               state.isExpanded || state.translation.length <= 150
                   ? state.translation
                   : '${state.translation.substring(0, 150)}...',
               style: TextStyle(
-                fontSize: state.isExpanded ? 14 : 12,
+                fontSize: state.isExpanded ? 14 : 13,
                 color: colorScheme.onSurface,
                 height: 1.6,
-                fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 16),
-            // Arabic text (shown when expanded)
+
+            // Expanded content
             if (state.isExpanded) ...[
+              const SizedBox(height: 20),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? colorScheme.surface
-                      : accentGreen.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
+                  color: colorScheme.onSurface.withValues(alpha: 0.03),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   state.arabicText,
@@ -297,7 +253,6 @@ class DailyInspirationCard extends StatelessWidget {
                     fontFamily: 'Hafs',
                     color: colorScheme.onSurface,
                     height: 1.8,
-                    fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.right,
                 ),
@@ -306,8 +261,10 @@ class DailyInspirationCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
+                    child: _FlatActionButton(
+                      icon: Icons.open_in_new_rounded,
+                      label: localizations.openSurah,
+                      onTap: () {
                         Navigator.pushNamed(
                           context,
                           '/surah-detail',
@@ -317,19 +274,6 @@ class DailyInspirationCard extends StatelessWidget {
                           ),
                         );
                       },
-                      icon: const Icon(Icons.open_in_new, size: 16),
-                      label: Text(
-                        localizations.openSurah,
-                        style: const TextStyle(fontSize: 11),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        foregroundColor: accentGreen,
-                        side: BorderSide(color: accentGreen),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -340,8 +284,15 @@ class DailyInspirationCard extends StatelessWidget {
                             .read<BookmarkCubit>()
                             .isBookmarked(state.surahNumber, state.verseNumber);
 
-                        return OutlinedButton.icon(
-                          onPressed: () {
+                        return _FlatActionButton(
+                          icon: isBookmarked
+                              ? Icons.bookmark_rounded
+                              : Icons.bookmark_outline_rounded,
+                          label: isBookmarked
+                              ? localizations.bookmarked
+                              : localizations.bookmark,
+                          filled: isBookmarked,
+                          onTap: () {
                             final bookmarkCubit = context.read<BookmarkCubit>();
                             final bookmark = BookmarkedAyah(
                               surahNumber: state.surahNumber,
@@ -354,34 +305,8 @@ class DailyInspirationCard extends StatelessWidget {
                               ),
                               createdAt: DateTime.now(),
                             );
-
                             bookmarkCubit.toggleBookmark(bookmark);
                           },
-                          icon: Icon(
-                            isBookmarked
-                                ? Icons.bookmark
-                                : Icons.bookmark_outline,
-                            size: 16,
-                          ),
-                          label: Text(
-                            isBookmarked
-                                ? localizations.bookmarked
-                                : localizations.bookmark,
-                            style: const TextStyle(fontSize: 11),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            side: BorderSide(color: accentGreen),
-                            backgroundColor: isBookmarked
-                                ? accentGreen
-                                : Colors.transparent,
-                            foregroundColor: isBookmarked
-                                ? colorScheme.onPrimary
-                                : accentGreen,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
                         );
                       },
                     ),
@@ -389,19 +314,23 @@ class DailyInspirationCard extends StatelessWidget {
                 ],
               ),
             ] else ...[
-              // Tap to expand hint
+              const SizedBox(height: 14),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     localizations.tapToReadArabicMore,
                     style: TextStyle(
                       fontSize: 12,
-                      color: accentGreen,
+                      color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Icon(Icons.expand_more, color: accentGreen, size: 20),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 16,
+                  ),
                 ],
               ),
             ],
@@ -421,40 +350,30 @@ class DailyInspirationCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: colorScheme.error.withValues(alpha: 0.3)),
+        color: colorScheme.error.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.error_outline, color: colorScheme.error, size: 24),
-              const SizedBox(width: 12),
-              Text(
-                localizations.dailyInspirationTitle,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onErrorContainer,
-                  fontFamily: 'Hafs',
+              Icon(Icons.error_outline, color: colorScheme.error, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  errorMessage,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: colorScheme.error,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Text(
-            errorMessage,
-            style: TextStyle(
-              fontSize: 14,
-              color: colorScheme.onErrorContainer,
-              fontFamily: 'Hafs',
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               final settingsCubit = context.read<QuranSettingsCubit>();
               final currentTranslation =
                   settingsCubit.state.selectedTranslation;
@@ -462,11 +381,13 @@ class DailyInspirationCard extends StatelessWidget {
                 currentTranslation,
               );
             },
-            icon: Icon(Icons.refresh),
-            label: Text(localizations.tryAgain),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
+            child: Text(
+              localizations.tryAgain,
+              style: TextStyle(
+                fontSize: 13,
+                color: colorScheme.error,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -503,5 +424,72 @@ class DailyInspirationCard extends StatelessWidget {
       default:
         return 'Translation';
     }
+  }
+}
+
+/// Small tappable icon wrapper used in the card header row.
+class _ActionIcon extends StatelessWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+
+  const _ActionIcon({required this.child, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final widget = SizedBox(width: 32, height: 32, child: Center(child: child));
+    if (onTap != null) {
+      return GestureDetector(onTap: onTap, child: widget);
+    }
+    return widget;
+  }
+}
+
+/// Flat text button used in the expanded inspiration card.
+class _FlatActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool filled;
+
+  const _FlatActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.filled = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final fg = filled ? colorScheme.onPrimary : colorScheme.onSurface;
+    final bg = filled
+        ? colorScheme.primary
+        : colorScheme.onSurface.withValues(alpha: 0.06);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 15, color: fg),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: fg,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

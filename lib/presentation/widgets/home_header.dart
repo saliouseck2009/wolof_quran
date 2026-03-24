@@ -11,33 +11,61 @@ class HomeHeader extends StatelessWidget {
     final accentGreen = colorScheme.primary;
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        AppIcon(accentGreen: accentGreen, colorScheme: colorScheme),
+        // AppIcon(accentGreen: accentGreen, colorScheme: colorScheme),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Icon(
+            Icons.auto_stories_outlined,
+            size: 50,
+            color: colorScheme.primary,
+          ),
+        ),
+        //  Image.asset(
+        //   'assets/icon/app_icon.png',
+        //   width: 40,
+        //   height: 40,
+        // ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             localizations.appTitle,
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
               color: colorScheme.onSurface,
+              letterSpacing: -0.3,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
         ),
-        IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/settings');
-          },
-          icon: Icon(
-            Icons.settings_outlined,
-            color: colorScheme.onSurface,
-            size: 24,
-          ),
-        ),
+        _SettingsButton(colorScheme: colorScheme),
       ],
+    );
+  }
+}
+
+class _SettingsButton extends StatelessWidget {
+  final ColorScheme colorScheme;
+
+  const _SettingsButton({required this.colorScheme});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, '/settings'),
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: colorScheme.onSurface.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          Icons.settings_outlined,
+          color: colorScheme.onSurfaceVariant,
+          size: 20,
+        ),
+      ),
     );
   }
 }
@@ -62,9 +90,7 @@ class AppIcon extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [accentGreen, accentGreen.withValues(alpha: 0.8)],
-        ),
+        color: accentGreen,
         borderRadius: BorderRadius.circular(width / 2),
       ),
       child: Icon(
