@@ -18,6 +18,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get quran => 'Coran';
 
   @override
+  String get mushaf => 'Mushaf';
+
+  @override
   String get surah => 'Sourate';
 
   @override
@@ -452,6 +455,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get readSurahs => 'Lire les sourates';
 
   @override
+  String get readByPage => 'Lire page par page';
+
+  @override
   String get listenAudio => 'Écouter l\'audio';
 
   @override
@@ -621,4 +627,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get playbackModeShuffle => 'Mode de lecture : aléatoire';
+
+  @override
+  String get selectSurah => 'Sélectionner une sourate';
+
+  @override
+  String pageNumberLabel(int page) {
+    return 'Page $page';
+  }
 }

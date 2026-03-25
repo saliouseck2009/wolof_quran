@@ -12,6 +12,10 @@
   "@quran": {
     "description": "Quran text"
   },
+  "mushaf": "Mushaf",
+  "@mushaf": {
+    "description": "Mushaf reader title"
+  },
   "surah": "Surah",
   "@surah": {
     "description": "Surah text"
@@ -608,6 +612,10 @@
   "@readSurahs": {
     "description": "Subtitle for surah list action"
   },
+  "readByPage": "Read page by page",
+  "@readByPage": {
+    "description": "Subtitle for mushaf home action"
+  },
   "listenAudio": "Listen Audio",
   "@listenAudio": {
     "description": "Subtitle for audio recitation action"
@@ -843,5 +851,20 @@
   "playbackModeShuffle": "Playback mode: Shuffle",
   "@playbackModeShuffle": {
     "description": "Tooltip for playback mode button when shuffle is active"
+  }
+  ,
+  "selectSurah": "Select a surah",
+  "@selectSurah": {
+    "description": "Title for mushaf surah picker"
+  },
+  "pageNumberLabel": "Page {page}",
+  "@pageNumberLabel": {
+    "description": "Mushaf page number label",
+    "placeholders": {
+      "page": {
+        "type": "int",
+        "description": "The page number"
+      }
+    }
   }
 }

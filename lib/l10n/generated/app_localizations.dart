@@ -118,6 +118,12 @@ abstract class AppLocalizations {
   /// **'Quran'**
   String get quran;
 
+  /// Mushaf reader title
+  ///
+  /// In en, this message translates to:
+  /// **'Mushaf'**
+  String get mushaf;
+
   /// Surah text
   ///
   /// In en, this message translates to:
@@ -910,6 +916,12 @@ abstract class AppLocalizations {
   /// **'Read Surahs'**
   String get readSurahs;
 
+  /// Subtitle for mushaf home action
+  ///
+  /// In en, this message translates to:
+  /// **'Read page by page'**
+  String get readByPage;
+
   /// Subtitle for audio recitation action
   ///
   /// In en, this message translates to:
@@ -1209,6 +1221,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Playback mode: Shuffle'**
   String get playbackModeShuffle;
+
+  /// Title for mushaf surah picker
+  ///
+  /// In en, this message translates to:
+  /// **'Select a surah'**
+  String get selectSurah;
+
+  /// Mushaf page number label
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page}'**
+  String pageNumberLabel(int page);
 }
 
 class _AppLocalizationsDelegate

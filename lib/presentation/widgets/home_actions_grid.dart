@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../views/surah_audio_list_page.dart';
+import '../views/mushaf_page.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 class HomeActionsGrid extends StatelessWidget {
@@ -46,12 +47,27 @@ class HomeActionsGrid extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        _GridCard(
-          icon: Icons.search_rounded,
-          title: localizations.explorer,
-          subtitle: '${localizations.search} & ${localizations.bookmarks}',
-          onTap: () => Navigator.pushNamed(context, '/search'),
-          wide: true,
+        Row(
+          children: [
+            Expanded(
+              child: _GridCard(
+                icon: Icons.auto_stories_rounded,
+                title: localizations.mushaf,
+                subtitle: localizations.readByPage,
+                onTap: () => Navigator.pushNamed(context, MushafPage.routeName),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _GridCard(
+                icon: Icons.search_rounded,
+                title: localizations.explorer,
+                subtitle:
+                    '${localizations.search} & ${localizations.bookmarks}',
+                onTap: () => Navigator.pushNamed(context, '/search'),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -63,23 +79,17 @@ class _GridCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final bool wide;
 
   const _GridCard({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
-    this.wide = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    final content = wide
-        ? _buildWideLayout(colorScheme)
-        : _buildSquareLayout(colorScheme);
 
     return Material(
       color: Colors.transparent,
@@ -92,7 +102,7 @@ class _GridCard extends StatelessWidget {
             color: colorScheme.onSurface.withValues(alpha: 0.04),
             borderRadius: BorderRadius.circular(18),
           ),
-          child: content,
+          child: _buildSquareLayout(colorScheme),
         ),
       ),
     );
@@ -128,51 +138,6 @@ class _GridCard extends StatelessWidget {
           style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWideLayout(ColorScheme colorScheme) {
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, size: 20, color: colorScheme.primary),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Icon(
-          Icons.chevron_right_rounded,
-          color: colorScheme.onSurface.withValues(alpha: 0.2),
-          size: 20,
         ),
       ],
     );

@@ -18,6 +18,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get quran => 'القرآن';
 
   @override
+  String get mushaf => 'المصحف';
+
+  @override
   String get surah => 'سورة';
 
   @override
@@ -438,6 +441,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get readSurahs => 'قراءة السور';
 
   @override
+  String get readByPage => 'قراءة صفحة بصفحة';
+
+  @override
   String get listenAudio => 'استمع إلى الصوت';
 
   @override
@@ -604,4 +610,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get playbackModeShuffle => 'وضع التشغيل: عشوائي';
+
+  @override
+  String get selectSurah => 'اختر سورة';
+
+  @override
+  String pageNumberLabel(int page) {
+    return 'الصفحة $page';
+  }
 }
