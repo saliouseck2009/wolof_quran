@@ -143,7 +143,7 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
   const _MushafAppBar({required this.onSurahTap});
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(50);
 
   @override
   Widget build(BuildContext context) {
@@ -155,16 +155,17 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
         final theme = state.theme;
 
         return AppBar(
+          toolbarHeight: 50,
           backgroundColor: theme.appBarBackground,
           foregroundColor: theme.appBarForeground,
           centerTitle: true,
-          leadingWidth: 72,
+          leadingWidth: 64,
           leading: Padding(
-            padding: const EdgeInsets.only(left: 12),
+            padding: const EdgeInsets.only(left: 8),
             child: Center(
               child: Text(
                 pageInfo != null ? 'Juz ${pageInfo.juzNumber}' : '',
-                style: TextStyle(fontSize: 13, color: theme.bottomBarSubtext),
+                style: TextStyle(fontSize: 12, color: theme.bottomBarSubtext),
               ),
             ),
           ),
@@ -177,7 +178,7 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Text(
                     pageInfo?.surahNameArabic ?? localizations.mushaf,
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontFamily: 'Hafs',
                       color: theme.appBarForeground,
                     ),
@@ -188,7 +189,7 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
                 const SizedBox(width: 6),
                 Icon(
                   Icons.arrow_drop_down,
-                  size: 20,
+                  size: 18,
                   color: theme.appBarForeground,
                 ),
               ],
@@ -333,10 +334,11 @@ class _MushafBottomBar extends StatelessWidget {
         final theme = state.theme;
 
         return Container(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
           decoration: BoxDecoration(color: theme.bottomBarBackground),
           child: SafeArea(
             top: false,
+            minimum: const EdgeInsets.only(bottom: 2),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -345,7 +347,7 @@ class _MushafBottomBar extends StatelessWidget {
                     pageInfo!.hizbInfo!.displayText,
                     style: TextStyle(
                       color: theme.bottomBarSubtext,
-                      fontSize: 13,
+                      fontSize: 12,
                     ),
                   )
                 else
@@ -354,7 +356,7 @@ class _MushafBottomBar extends StatelessWidget {
                   localizations.pageNumberLabel(pageInfo?.pageNumber ?? 1),
                   style: TextStyle(
                     color: theme.bottomBarText,
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
