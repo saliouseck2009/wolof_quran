@@ -119,8 +119,17 @@ class _MushafPageViewState extends State<_MushafPageView> {
   }
 
   Future<void> _openSurahList() async {
+    final currentSurahNumber = context
+        .read<MushafBloc>()
+        .state
+        .pageInfo
+        ?.primarySurahNumber;
+
     final surahNumber = await Navigator.of(context).push<int>(
-      MaterialPageRoute(builder: (_) => const MushafSurahPickerPage()),
+      MaterialPageRoute(
+        builder: (_) =>
+            MushafSurahPickerPage(currentSurahNumber: currentSurahNumber),
+      ),
     );
     if (surahNumber != null && mounted) {
       context.read<MushafBloc>().add(MushafNavigateToSurah(surahNumber));

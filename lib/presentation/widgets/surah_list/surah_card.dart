@@ -12,6 +12,7 @@ class SurahCard extends StatelessWidget {
     required this.revelationLabel,
     required this.revelationPlace,
     required this.onTap,
+    this.isHighlighted = false,
   });
 
   final int surahNumber;
@@ -21,6 +22,7 @@ class SurahCard extends StatelessWidget {
   final String revelationLabel;
   final String revelationPlace;
   final VoidCallback onTap;
+  final bool isHighlighted;
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +30,11 @@ class SurahCard extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
     final isMeccan = revelationPlace == RevelationPlaceEnum.meccan;
     final accentColor = colorScheme.primary;
-    final tileColor = isDark
-        ? colorScheme.surfaceContainerLow
-        : colorScheme.onPrimary;
+    final tileColor = isHighlighted
+        ? (isDark
+              ? accentColor.withValues(alpha: 0.18)
+              : accentColor.withValues(alpha: 0.1))
+        : (isDark ? colorScheme.surfaceContainerLow : colorScheme.onPrimary);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 220),
@@ -39,7 +43,10 @@ class SurahCard extends StatelessWidget {
         color: tileColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: colorScheme.onSurface.withValues(alpha: isDark ? 0.08 : 0.06),
+          color: isHighlighted
+              ? accentColor.withValues(alpha: isDark ? 0.55 : 0.45)
+              : colorScheme.onSurface.withValues(alpha: isDark ? 0.08 : 0.06),
+          width: isHighlighted ? 1.2 : 1,
         ),
       ),
       child: Material(
