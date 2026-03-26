@@ -200,6 +200,7 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
   void _showThemePicker(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -221,70 +222,88 @@ class _ThemePickerSheet extends StatelessWidget {
         final themes = MushafThemeData.allThemes;
         final selectedIndex = state.theme.index;
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 20),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1,
-                ),
-                itemCount: themes.length,
-                itemBuilder: (context, index) {
-                  final theme = themes[index];
-                  final isSelected = index == selectedIndex;
-                  final pageBackground = theme.qcfTheme.pageBackgroundColor;
-                  final textColor = theme.qcfTheme.verseTextColor;
+        final maxHeight = MediaQuery.of(context).size.height * 0.7;
 
-                  return GestureDetector(
-                    onTap: () {
-                      context.read<MushafBloc>().add(MushafThemeChanged(index));
-                      Navigator.pop(context);
-                    },
-                    child: Container(
+        return SafeArea(
+          top: false,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: maxHeight),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 4,
                       decoration: BoxDecoration(
-                        color: pageBackground,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : Colors.grey.withAlpha(60),
-                          width: isSelected ? 2.5 : 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: isSelected
-                            ? Icon(Icons.check, color: textColor, size: 24)
-                            : Container(
-                                width: 16,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: textColor,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                  );
-                },
+                    const SizedBox(height: 20),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 1,
+                          ),
+                      itemCount: themes.length,
+                      itemBuilder: (context, index) {
+                        final theme = themes[index];
+                        final isSelected = index == selectedIndex;
+                        final pageBackground =
+                            theme.qcfTheme.pageBackgroundColor;
+                        final textColor = theme.qcfTheme.verseTextColor;
+
+                        return GestureDetector(
+                          onTap: () {
+                            context.read<MushafBloc>().add(
+                              MushafThemeChanged(index),
+                            );
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: pageBackground,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.grey.withAlpha(60),
+                                width: isSelected ? 2.5 : 1,
+                              ),
+                            ),
+                            child: Center(
+                              child: isSelected
+                                  ? Icon(
+                                      Icons.check,
+                                      color: textColor,
+                                      size: 24,
+                                    )
+                                  : Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: textColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         );
       },
