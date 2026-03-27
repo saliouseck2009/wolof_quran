@@ -155,7 +155,7 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
         final theme = state.theme;
 
         return AppBar(
-          toolbarHeight: 50,
+          toolbarHeight: 40,
           backgroundColor: theme.appBarBackground,
           foregroundColor: theme.appBarForeground,
           centerTitle: true,
@@ -176,7 +176,8 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 Flexible(
                   child: Text(
-                    pageInfo?.surahNameArabic ?? localizations.mushaf,
+                    '${pageInfo?.primarySurahNumber} - ${pageInfo?.surahNameArabic ?? localizations.mushaf}',
+
                     style: TextStyle(
                       fontSize: 18,
                       fontFamily: 'Hafs',

@@ -55,10 +55,8 @@ class SurahDetailAppBar extends StatelessWidget {
             variant: SurahPlayButtonVariant.icon,
           ),
           PopupMenuButton<AyahDisplayMode>(
-            icon: Icon(
-              _getDisplayModeIcon(state.displayMode),
-              color: colorScheme.onPrimary,
-            ),
+            tooltip: localizations.arabicAndTranslation,
+            icon: Icon(Icons.g_translate, color: colorScheme.onPrimary),
             color: colorScheme.surface,
             onSelected: (mode) {
               context.read<SurahDetailCubit>().changeDisplayMode(mode);
@@ -183,17 +181,6 @@ class SurahDetailAppBar extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  IconData _getDisplayModeIcon(AyahDisplayMode mode) {
-    switch (mode) {
-      case AyahDisplayMode.both:
-        return Icons.view_headline;
-      case AyahDisplayMode.arabicOnly:
-        return Icons.format_textdirection_r_to_l;
-      case AyahDisplayMode.translationOnly:
-        return Icons.translate;
-    }
   }
 }
 

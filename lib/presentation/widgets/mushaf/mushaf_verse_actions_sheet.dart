@@ -43,11 +43,26 @@ class MushafVerseActionsSheet extends StatefulWidget {
       shouldDisposeCubit = true;
     }
 
+    Color? modalBackgroundColor;
+    try {
+      final mushafTheme = context.read<MushafBloc>().state.theme;
+      final pageBackground = mushafTheme.qcfTheme.pageBackgroundColor;
+      final isDark =
+          ThemeData.estimateBrightnessForColor(pageBackground) ==
+          Brightness.dark;
+      modalBackgroundColor = isDark
+          ? Color.alphaBlend(Colors.white.withAlpha(22), pageBackground)
+          : Color.alphaBlend(Colors.black.withAlpha(10), pageBackground);
+    } catch (_) {
+      modalBackgroundColor = null;
+    }
+
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       enableDrag: true,
+      backgroundColor: modalBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
