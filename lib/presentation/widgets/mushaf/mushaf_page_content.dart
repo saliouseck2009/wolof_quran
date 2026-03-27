@@ -37,7 +37,7 @@ class _MushafClassTuning {
 
 // Easy tuning constants by screen class.
 const _smallTuning = _MushafClassTuning(
-  safetyHeightPx: 14,
+  safetyHeightPx: 0,
   viewportBoost: 0.02,
   viewportBonus: 0.0,
   minTextScale: 0.82,
@@ -47,7 +47,7 @@ const _smallTuning = _MushafClassTuning(
 );
 
 const _mediumTuning = _MushafClassTuning(
-  safetyHeightPx: 12,
+  safetyHeightPx: 0,
   viewportBoost: 0.012,
   viewportBonus: 0.0,
   minTextScale: 0.82,
@@ -59,7 +59,7 @@ const _mediumTuning = _MushafClassTuning(
 const _largeTuning = _MushafClassTuning(
   safetyHeightPx: 8,
   viewportBoost: 0.0,
-  viewportBonus: 0.04,
+  viewportBonus: 0.055,
   minTextScale: 0.84,
   maxTextScale: 1.06,
   minLineScale: 0.82,
@@ -69,7 +69,7 @@ const _largeTuning = _MushafClassTuning(
 const _xlargeTuning = _MushafClassTuning(
   safetyHeightPx: 6,
   viewportBoost: 0.0,
-  viewportBonus: 0.05,
+  viewportBonus: 0.06,
   minTextScale: 0.86,
   maxTextScale: 1.08,
   minLineScale: 0.84,
@@ -81,7 +81,7 @@ const _xlargeTuning = _MushafClassTuning(
 const _tabletPortraitTuning = _MushafClassTuning(
   safetyHeightPx: 1,
   viewportBoost: 0.0,
-  viewportBonus: 0.58,
+  viewportBonus: 0.48,
   minTextScale: 1.45,
   maxTextScale: 2.00,
   minLineScale: 1.18,
