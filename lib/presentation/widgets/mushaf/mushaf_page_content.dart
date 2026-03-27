@@ -28,7 +28,9 @@ class MushafPageContent extends StatelessWidget {
                 ? 14.0
                 : constraints.maxHeight <= 760
                 ? 12.0
-                : 10.0;
+                : constraints.maxHeight <= 860
+                ? 8.0
+                : 6.0;
             final effectiveHeight = (constraints.maxHeight - safetyHeightPx)
                 .clamp(0.0, constraints.maxHeight);
             final viewportSize = Size(constraints.maxWidth, effectiveHeight);
@@ -89,14 +91,23 @@ class MushafPageContent extends StatelessWidget {
                     constraints.maxHeight <= 840
                 ? 0.03
                 : 0.0;
+            final largeViewportBonus = constraints.maxHeight >= 900
+                ? 0.05
+                : constraints.maxHeight >= 820
+                ? 0.04
+                : constraints.maxHeight >= 760
+                ? 0.06
+                : 0.0;
             final totalViewportBoost =
                 tinyViewportBoost + mediumViewportBoost + stubbornViewportBoost;
-            final finalTextScale = (textScale - totalViewportBoost)
-                .clamp(0.82, 1.02)
-                .toDouble();
-            final finalLineScale = (lineScale - totalViewportBoost)
-                .clamp(0.80, 1.0)
-                .toDouble();
+            final finalTextScale =
+                (textScale - totalViewportBoost + largeViewportBonus)
+                    .clamp(0.82, 1.05)
+                    .toDouble();
+            final finalLineScale =
+                (lineScale - totalViewportBoost + largeViewportBonus * 0.85)
+                    .clamp(0.80, 1.03)
+                    .toDouble();
 
             return ColoredBox(
               color: qcfTheme.pageBackgroundColor,
