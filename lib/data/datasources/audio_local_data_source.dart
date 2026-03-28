@@ -401,7 +401,7 @@ class AudioLocalDataSource implements AudioDataSource {
         () => parseMp3DurationsInIsolate(uncachedPaths),
       );
       final successCount = parsed.where((d) => d != null && d > 0).length;
-      log('MP3 header parsing: ${successCount}/${uncachedPaths.length} files '
+        log('MP3 header parsing: $successCount/${uncachedPaths.length} files '
           'parsed in ${sw.elapsedMilliseconds}ms');
       for (var j = 0; j < uncachedIndices.length; j++) {
         if (parsed[j] != null && parsed[j]! > 0) {
