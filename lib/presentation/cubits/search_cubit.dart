@@ -77,7 +77,8 @@ class SearchCubit extends Cubit<SearchState> {
   SearchCubit() : super(SearchInitial());
 
   void searchWords(String query) async {
-    if (query.trim().isEmpty) {
+    final normalizedQuery = query.trim();
+    if (normalizedQuery.isEmpty) {
       emit(SearchInitial());
       return;
     }
@@ -85,12 +86,6 @@ class SearchCubit extends Cubit<SearchState> {
     emit(SearchLoading());
 
     try {
-      final words = query
-          .trim()
-          .split(' ')
-          .where((word) => word.isNotEmpty)
-          .toList();
-
       // Get current translation from settings
       final currentTranslation =
           await QuranSettingsCubit.getCurrentTranslation();
@@ -103,11 +98,23 @@ class SearchCubit extends Cubit<SearchState> {
       List<SearchResult> results = [];
       int totalOccurrences = 0;
 
-      // Search in translation using searchWordsInTranslation
-      final searchResults = quran.searchWordsInTranslation(
-        words,
+      // First, search the full phrase exactly as typed by the user.
+      var searchResults = quran.searchWordsInTranslation(
+        [normalizedQuery],
         translation: currentTranslation,
       );
+
+      // If no phrase match, fallback to word-by-word search.
+      if ((searchResults['occurences'] as int? ?? 0) == 0) {
+        final words = normalizedQuery
+            .split(RegExp(r'\s+'))
+            .where((word) => word.isNotEmpty)
+            .toList();
+        searchResults = quran.searchWordsInTranslation(
+          words,
+          translation: currentTranslation,
+        );
+      }
 
       if (searchResults.containsKey('result')) {
         final resultList = searchResults['result'] as List;
@@ -147,7 +154,7 @@ class SearchCubit extends Cubit<SearchState> {
         SearchLoaded(
           results: results,
           totalOccurrences: totalOccurrences,
-          searchQuery: query,
+          searchQuery: normalizedQuery,
           translationSource: translationSource,
         ),
       );

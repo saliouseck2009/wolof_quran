@@ -64,6 +64,13 @@ class AudioLocalDataSource implements AudioDataSource {
           // Process only audio files
           if (_isAudioFile(filename)) {
             final data = file.content as List<int>;
+
+            // Validate audio file has minimum size and basic header
+            if (data.length < 1024 || !_hasValidAudioHeader(data)) {
+              print('Skipping invalid audio file: $filename');
+              continue;
+            }
+
             final outputFile = File(
               p.join(surahDir.path, p.basename(filename)),
             );
@@ -220,6 +227,57 @@ class AudioLocalDataSource implements AudioDataSource {
   bool _isAudioFile(String filename) {
     final extension = p.extension(filename).toLowerCase();
     return ['.mp3', '.wav', '.m4a', '.aac', '.ogg'].contains(extension);
+  }
+
+  /// Check if data has a valid audio file header
+  bool _hasValidAudioHeader(List<int> data) {
+    if (data.length < 4) return false;
+
+    // Check for MP3 header (ID3 tag or MPEG frame sync)
+    // ID3v2 starts with "ID3"
+    if (data[0] == 0x49 && data[1] == 0x44 && data[2] == 0x33) {
+      return true;
+    }
+    // MPEG frame sync: starts with 0xFF 0xFB, 0xFF 0xFA, or 0xFF 0xF3
+    if (data[0] == 0xFF &&
+        (data[1] == 0xFB ||
+            data[1] == 0xFA ||
+            data[1] == 0xF3 ||
+            data[1] == 0xF2)) {
+      return true;
+    }
+
+    // Check for WAV header (RIFF....WAVE)
+    if (data.length >= 12 &&
+        data[0] == 0x52 &&
+        data[1] == 0x49 &&
+        data[2] == 0x46 &&
+        data[3] == 0x46 &&
+        data[8] == 0x57 &&
+        data[9] == 0x41 &&
+        data[10] == 0x56 &&
+        data[11] == 0x45) {
+      return true;
+    }
+
+    // Check for OGG header (OggS)
+    if (data[0] == 0x4F &&
+        data[1] == 0x67 &&
+        data[2] == 0x67 &&
+        data[3] == 0x53) {
+      return true;
+    }
+
+    // Check for M4A/AAC (ftyp or free/mdat box)
+    if (data.length >= 8 &&
+        data[4] == 0x66 &&
+        data[5] == 0x74 &&
+        data[6] == 0x79 &&
+        data[7] == 0x70) {
+      return true;
+    }
+
+    return false;
   }
 
   /// Get the download status map for a reciter

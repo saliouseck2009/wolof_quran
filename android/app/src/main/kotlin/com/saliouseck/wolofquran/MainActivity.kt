@@ -1,4 +1,4 @@
-package com.example.wolof_quran
+package com.saliouseck.wolofquran
 
 import io.flutter.embedding.android.FlutterActivity
 

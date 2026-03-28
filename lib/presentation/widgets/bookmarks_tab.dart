@@ -167,62 +167,73 @@ class BookmarksTab extends StatelessWidget {
                                 index,
                               ) {
                                 final bookmark = section.bookmarks[index];
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  child: AyahCard(
-                                    verseNumber: bookmark.verseNumber,
-                                    arabicText: bookmark.arabicText,
-                                    translationSource:
-                                        bookmark.translationSource,
-                                    translation: bookmark.translation,
-                                    surahNumber: bookmark.surahNumber,
-                                    surahName: bookmark.surahName,
-                                    actions: [
-                                      AyahPlayButton(
-                                        surahNumber: bookmark.surahNumber,
-                                        ayahNumber: bookmark.verseNumber,
-                                        surahName: bookmark.surahName,
-                                      ),
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.bookmark,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
+                                return Dismissible(
+                                  key: ValueKey<String>(bookmark.key),
+                                  direction: DismissDirection.endToStart,
+                                  dismissThresholds: const {
+                                    DismissDirection.endToStart: 0.35,
+                                  },
+                                  background: _buildDismissBackground(
+                                    context,
+                                    localizations,
+                                  ),
+                                  onDismissed: (_) => _removeBookmark(
+                                    context,
+                                    localizations,
+                                    bookmark,
+                                  ),
+                                  child: Container(
+                                    margin: const EdgeInsets.only(bottom: 12),
+                                    child: AyahCard(
+                                      verseNumber: bookmark.verseNumber,
+                                      arabicText: bookmark.arabicText,
+                                      translationSource:
+                                          bookmark.translationSource,
+                                      translation: bookmark.translation,
+                                      surahNumber: bookmark.surahNumber,
+                                      surahName: bookmark.surahName,
+                                      actions: [
+                                        AyahPlayButton(
+                                          surahNumber: bookmark.surahNumber,
+                                          ayahNumber: bookmark.verseNumber,
+                                          surahName: bookmark.surahName,
                                         ),
-                                        onPressed: () {
-                                          context
-                                              .read<BookmarkCubit>()
-                                              .removeBookmark(
-                                                bookmark.surahNumber,
-                                                bookmark.verseNumber,
-                                              );
-                                          CustomSnackbar.showSnackbar(
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.delete_outline,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.error,
+                                          ),
+                                          tooltip: localizations.clear,
+                                          onPressed: () => _removeBookmark(
                                             context,
-                                            localizations.bookmarkRemoved,
-                                          );
-                                        },
-                                      ),
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.open_in_new,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
+                                            localizations,
+                                            bookmark,
+                                          ),
                                         ),
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            '/surah-detail',
-                                            arguments: SurahDetailArguments(
-                                              surahNumber: bookmark.surahNumber,
-                                              initialAyahNumber:
-                                                  bookmark.verseNumber,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.open_in_new,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              '/surah-detail',
+                                              arguments: SurahDetailArguments(
+                                                surahNumber:
+                                                    bookmark.surahNumber,
+                                                initialAyahNumber:
+                                                    bookmark.verseNumber,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
                               }, childCount: section.bookmarks.length),
@@ -329,6 +340,48 @@ class BookmarksTab extends StatelessWidget {
         );
       },
     );
+  }
+
+  Widget _buildDismissBackground(
+    BuildContext context,
+    AppLocalizations localizations,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      alignment: Alignment.centerRight,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Icon(Icons.delete_forever, color: colorScheme.error, size: 24),
+          const SizedBox(width: 8),
+          Text(
+            localizations.clear,
+            style: TextStyle(
+              color: colorScheme.error,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _removeBookmark(
+    BuildContext context,
+    AppLocalizations localizations,
+    BookmarkedAyah bookmark,
+  ) {
+    context.read<BookmarkCubit>().removeBookmark(
+      bookmark.surahNumber,
+      bookmark.verseNumber,
+    );
+    CustomSnackbar.showSnackbar(context, localizations.bookmarkRemoved);
   }
 
   List<_BookmarkSurahSection> _groupBookmarksBySurah(
