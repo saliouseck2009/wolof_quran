@@ -29,6 +29,15 @@ class MushafNavigateToSurah extends MushafEvent {
   List<Object?> get props => [surahNumber];
 }
 
+class MushafNavigateToPage extends MushafEvent {
+  final int page;
+
+  const MushafNavigateToPage(this.page);
+
+  @override
+  List<Object?> get props => [page];
+}
+
 class MushafThemeChanged extends MushafEvent {
   final int themeIndex;
 

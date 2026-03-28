@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:qcf_quran/qcf_quran.dart' as qcf;
 import 'package:quran/quran.dart' as quran;
 
 import '../../../domain/entities/bookmark.dart';
@@ -8,6 +9,7 @@ import '../../../domain/repositories/bookmark_repository.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../service_locator.dart';
 import '../../blocs/mushaf/mushaf_bloc.dart';
+import '../../blocs/mushaf/mushaf_event.dart';
 import '../../cubits/bookmark_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../ayah_play_button.dart';
@@ -92,12 +94,20 @@ class MushafVerseActionsSheet extends StatefulWidget {
 
 class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
   late final PageController _pageController;
+  late final MushafBloc _mushafBloc;
+  late final QuranSettingsCubit _quranSettingsCubit;
   int _currentPage = 0;
+  late int _currentSurahNumber;
+  late int _currentVerseNumber;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
+    _mushafBloc = widget.pageContext.read<MushafBloc>();
+    _quranSettingsCubit = widget.pageContext.read<QuranSettingsCubit>();
+    _currentSurahNumber = widget.surahNumber;
+    _currentVerseNumber = widget.verseNumber;
   }
 
   @override
@@ -106,11 +116,73 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
     super.dispose();
   }
 
+  bool get _hasPreviousVerse {
+    return !(_currentSurahNumber == 1 && _currentVerseNumber == 1);
+  }
+
+  bool get _hasNextVerse {
+    final currentSurahVerseCount = quran.getVerseCount(_currentSurahNumber);
+    return !(_currentSurahNumber == 114 &&
+        _currentVerseNumber >= currentSurahVerseCount);
+  }
+
+  _VerseReference? _adjacentVerse({required bool next}) {
+    if (next) {
+      final verseCount = quran.getVerseCount(_currentSurahNumber);
+      if (_currentVerseNumber < verseCount) {
+        return _VerseReference(_currentSurahNumber, _currentVerseNumber + 1);
+      }
+      if (_currentSurahNumber < 114) {
+        return _VerseReference(_currentSurahNumber + 1, 1);
+      }
+      return null;
+    }
+
+    if (_currentVerseNumber > 1) {
+      return _VerseReference(_currentSurahNumber, _currentVerseNumber - 1);
+    }
+    if (_currentSurahNumber > 1) {
+      final previousSurah = _currentSurahNumber - 1;
+      return _VerseReference(previousSurah, quran.getVerseCount(previousSurah));
+    }
+    return null;
+  }
+
+  void _navigateToAdjacentVerse({required bool next}) {
+    final target = _adjacentVerse(next: next);
+    if (target == null) {
+      return;
+    }
+
+    final previousPage = qcf.getPageNumber(
+      _currentSurahNumber,
+      _currentVerseNumber,
+    );
+    final targetPage = qcf.getPageNumber(
+      target.surahNumber,
+      target.verseNumber,
+    );
+
+    setState(() {
+      _currentSurahNumber = target.surahNumber;
+      _currentVerseNumber = target.verseNumber;
+      _currentPage = 0;
+    });
+
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+
+    if (targetPage != previousPage) {
+      _mushafBloc.add(MushafNavigateToPage(targetPage));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final mushafTheme = widget.pageContext.read<MushafBloc>().state.theme;
+    final mushafTheme = _mushafBloc.state.theme;
     final baseBackground = mushafTheme.qcfTheme.pageBackgroundColor;
     final baseText = mushafTheme.qcfTheme.verseTextColor;
     final isDark =
@@ -127,21 +199,21 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
     final outlineColor = baseText.withAlpha(100);
     final secondaryText = baseText.withAlpha(190);
     final primaryAccent = mushafTheme.appBarForeground;
-    final settingsState = widget.pageContext.read<QuranSettingsCubit>().state;
+    final settingsState = _quranSettingsCubit.state;
     final selectedTranslation = settingsState.selectedTranslation;
 
-    final surahNameEnglish = quran.getSurahName(widget.surahNumber);
-    final surahNameArabic = quran.getSurahNameArabic(widget.surahNumber);
+    final surahNameEnglish = quran.getSurahName(_currentSurahNumber);
+    final surahNameArabic = quran.getSurahNameArabic(_currentSurahNumber);
     final arabicText = quran.getVerse(
-      widget.surahNumber,
-      widget.verseNumber,
+      _currentSurahNumber,
+      _currentVerseNumber,
       verseEndSymbol: false,
     );
     final pages = _buildTranslationPages(
       localizations: localizations,
       selectedTranslation: selectedTranslation,
-      surahNumber: widget.surahNumber,
-      verseNumber: widget.verseNumber,
+      surahNumber: _currentSurahNumber,
+      verseNumber: _currentVerseNumber,
     );
     final currentPageIndex = _currentPage.clamp(0, pages.length - 1);
     final activePage = pages[currentPageIndex];
@@ -154,8 +226,8 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
           bloc: widget.bookmarkCubit,
           builder: (context, bookmarkState) {
             final isBookmarked = widget.bookmarkCubit.isBookmarked(
-              widget.surahNumber,
-              widget.verseNumber,
+              _currentSurahNumber,
+              _currentVerseNumber,
             );
 
             return Column(
@@ -186,12 +258,39 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  '$surahNameArabic • ${localizations.surah} ${widget.surahNumber}:${widget.verseNumber}',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: baseText,
-                  ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: _hasPreviousVerse
+                          ? () => _navigateToAdjacentVerse(next: false)
+                          : null,
+                      tooltip: 'Previous verse',
+                      icon: const Icon(Icons.chevron_left_rounded),
+                      color: baseText,
+                      disabledColor: secondaryText,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    Expanded(
+                      child: Text(
+                        '$surahNameArabic • ${localizations.surah} $_currentSurahNumber:$_currentVerseNumber',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: baseText,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: _hasNextVerse
+                          ? () => _navigateToAdjacentVerse(next: true)
+                          : null,
+                      tooltip: 'Next verse',
+                      icon: const Icon(Icons.chevron_right_rounded),
+                      color: baseText,
+                      disabledColor: secondaryText,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10),
                 _StickyActionBar(
@@ -199,15 +298,15 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
                   iconColor: primaryAccent,
                   onPlay: () {},
                   playChild: AyahPlayButton(
-                    surahNumber: widget.surahNumber,
-                    ayahNumber: widget.verseNumber,
+                    surahNumber: _currentSurahNumber,
+                    ayahNumber: _currentVerseNumber,
                     surahName: surahNameEnglish,
                     size: 24,
                   ),
                   onBookmark: () async {
                     final bookmark = BookmarkedAyah(
-                      surahNumber: widget.surahNumber,
-                      verseNumber: widget.verseNumber,
+                      surahNumber: _currentSurahNumber,
+                      verseNumber: _currentVerseNumber,
                       surahName: surahNameEnglish,
                       arabicText: arabicText,
                       translation: activePage.text,
@@ -224,19 +323,19 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
                       }
                       showDailyInspirationShareModal(
                         widget.pageContext,
-                        widget.verseNumber,
+                        _currentVerseNumber,
                         arabicText,
                         activePage.text,
                         activePage.title,
                         surahNameEnglish,
-                        widget.surahNumber,
+                        _currentSurahNumber,
                       );
                     });
                   },
                   onCopy: () async {
                     final content =
                         '$surahNameArabic ($surahNameEnglish)\n'
-                        '${localizations.surah} ${widget.surahNumber}:${widget.verseNumber}\n\n'
+                        '${localizations.surah} $_currentSurahNumber:$_currentVerseNumber\n\n'
                         '${activePage.title}\n'
                         '${activePage.text}';
                     await Clipboard.setData(
@@ -408,6 +507,13 @@ class _TranslationPage {
   final String text;
 
   const _TranslationPage({required this.title, required this.text});
+}
+
+class _VerseReference {
+  final int surahNumber;
+  final int verseNumber;
+
+  const _VerseReference(this.surahNumber, this.verseNumber);
 }
 
 class _StickyActionBar extends StatelessWidget {

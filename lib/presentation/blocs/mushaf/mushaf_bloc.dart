@@ -13,6 +13,7 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     on<MushafLoaded>(_onLoaded);
     on<MushafPageChanged>(_onPageChanged);
     on<MushafNavigateToSurah>(_onNavigateToSurah);
+    on<MushafNavigateToPage>(_onNavigateToPage);
     on<MushafThemeChanged>(_onThemeChanged);
   }
 
@@ -55,6 +56,20 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
         currentPage: page,
         pageInfo: getPageInfo(page),
         navigateToPage: () => page,
+      ),
+    );
+  }
+
+  Future<void> _onNavigateToPage(
+    MushafNavigateToPage event,
+    Emitter<MushafState> emit,
+  ) async {
+    await _repository.saveLastReadPage(event.page);
+    emit(
+      state.copyWith(
+        currentPage: event.page,
+        pageInfo: getPageInfo(event.page),
+        navigateToPage: () => event.page,
       ),
     );
   }
