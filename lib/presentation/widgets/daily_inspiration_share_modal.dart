@@ -484,6 +484,7 @@ class _DailyInspirationShareModalState
     final localizations = AppLocalizations.of(context)!;
     await _shareWithGuard(
       originKey: _shareImageButtonKey,
+      isVideoShare: false,
       prepareFiles: () async {
         final imageFile = await _capturePreviewToFile();
         if (imageFile == null) {
@@ -504,6 +505,7 @@ class _DailyInspirationShareModalState
     final localizations = AppLocalizations.of(context)!;
     await _shareWithGuard(
       originKey: _shareVideoButtonKey,
+      isVideoShare: true,
       prepareFiles: () async {
         final imageFile = await _capturePreviewToFile(jpeg: true);
         if (imageFile == null) {
@@ -535,6 +537,7 @@ class _DailyInspirationShareModalState
 
   Future<void> _shareWithGuard({
     required GlobalKey originKey,
+    required bool isVideoShare,
     required Future<List<XFile>?> Function() prepareFiles,
     required String shareText,
     required String fallbackMessage,
@@ -551,8 +554,10 @@ class _DailyInspirationShareModalState
         context: context,
         barrierDismissible: false,
         useRootNavigator: true,
-        builder: (dialogContext) => Center(
-          child: CircularProgressIndicator(color: colorScheme.primary),
+        builder: (dialogContext) => _buildShareLoadingDialog(
+          colorScheme: colorScheme,
+          localizations: localizations,
+          isVideoShare: isVideoShare,
         ),
       );
 
@@ -589,6 +594,104 @@ class _DailyInspirationShareModalState
     }
   }
 
+  Widget _buildShareLoadingDialog({
+    required ColorScheme colorScheme,
+    required AppLocalizations localizations,
+    required bool isVideoShare,
+  }) {
+    final icon = isVideoShare
+        ? Icons.movie_creation_outlined
+        : Icons.image_outlined;
+    final title = isVideoShare
+        ? localizations.shareVideo
+        : localizations.shareImage;
+    final statusText = _shareLoadingStatusText(isVideoShare);
+
+    return Dialog(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 28),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.45),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.18),
+              blurRadius: 24,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: colorScheme.primary, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              statusText,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.25,
+              ),
+            ),
+            const SizedBox(height: 14),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: LinearProgressIndicator(
+                minHeight: 7,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                color: colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _shareLoadingStatusText(bool isVideoShare) {
+    final languageCode = Localizations.localeOf(context).languageCode;
+
+    if (isVideoShare) {
+      if (languageCode == 'fr') {
+        return 'Generation de la video en cours...';
+      }
+      return 'Video generation in progress...';
+    }
+
+    if (languageCode == 'fr') {
+      return 'Preparation du partage...';
+    }
+    return 'Preparing share content...';
+  }
+
   ui.Rect _shareOrigin(GlobalKey key) {
     final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null && renderBox.hasSize) {
@@ -613,7 +716,7 @@ class _DailyInspirationShareModalState
         }
         break;
       case ShareResultStatus.dismissed:
-        _showMessage(localizations.shareDismissed);
+        // User intentionally closed the share sheet: no toast needed.
         break;
       case ShareResultStatus.unavailable:
         _showMessage(localizations.shareUnavailable);
@@ -727,8 +830,9 @@ class _DailyInspirationShareModalState
     required String audioPath,
   }) async {
     final tempDir = await getTemporaryDirectory();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
     final outputPath =
-        '${tempDir.path}/ayah_video_${DateTime.now().millisecondsSinceEpoch}.mp4';
+        '${tempDir.path}/chapter_${widget.surahNumber}_verse_${widget.verseNumber}_$timestamp.mp4';
 
     final command =
         '-y -loop 1 -i "$imagePath" -i "$audioPath" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(1080-iw)/2:(1920-ih)/2,format=yuv420p" -c:v libx264 -preset veryfast -tune stillimage -c:a aac -b:a 192k -shortest "$outputPath"';
@@ -759,7 +863,6 @@ class _AdaptiveText extends StatelessWidget {
     required this.maxFontSize,
     this.textAlign = TextAlign.start,
     this.textDirection,
-    this.maxLines,
   });
 
   final String text;
@@ -768,7 +871,6 @@ class _AdaptiveText extends StatelessWidget {
   final double maxFontSize;
   final TextAlign textAlign;
   final TextDirection? textDirection;
-  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -785,10 +887,7 @@ class _AdaptiveText extends StatelessWidget {
             textAlign: textAlign,
             textDirection: textDirection,
             style: style.copyWith(fontSize: fittedFontSize),
-            maxLines: maxLines,
-            overflow: maxLines != null
-                ? TextOverflow.ellipsis
-                : TextOverflow.fade,
+            overflow: TextOverflow.fade,
             softWrap: true,
           ),
         );
@@ -816,7 +915,6 @@ class _AdaptiveText extends StatelessWidget {
         textAlign: textAlign,
         textDirection: direction,
         textScaleFactor: scale,
-        maxLines: maxLines,
       )..layout(maxWidth: availableWidth);
       return painter.height;
     }

@@ -185,7 +185,7 @@ class AyahPlayButton extends StatelessWidget {
       shape: commonButtonShape,
       textStyle: commonButtonTextStyle,
       backgroundColor: colorScheme.surfaceContainerHighest,
-      foregroundColor: colorScheme.onSurface,
+      foregroundColor: colorScheme.error,
     );
     final primaryButtonStyle = FilledButton.styleFrom(
       minimumSize: const Size.fromHeight(48),
@@ -259,16 +259,18 @@ class AyahPlayButton extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: FilledButton.icon(
+                        flex: 4,
+                        child: FilledButton(
                           style: secondaryButtonStyle,
                           onPressed: () => Navigator.of(sheetContext).pop(),
-                          icon: const Icon(Icons.close_rounded, size: 18),
-                          label: Text(localizations.cancel),
+                          //icon: const Icon(Icons.close_rounded, size: 18),
+                          child: Text(localizations.cancel),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: FilledButton.icon(
+                        flex: 5,
+                        child: FilledButton(
                           style: primaryButtonStyle,
                           onPressed: () {
                             Navigator.of(sheetContext).pop();
@@ -294,13 +296,13 @@ class AyahPlayButton extends StatelessWidget {
                                 .read<AudioManagementCubit>()
                                 .downloadSurahAudio(reciterId, surahNumber);
                           },
-                          icon: Icon(
-                            isAvailableRemotely
-                                ? Icons.download_outlined
-                                : Icons.check_circle_outline,
-                            size: 18,
-                          ),
-                          label: Text(
+                          // icon: Icon(
+                          //   isAvailableRemotely
+                          //       ? Icons.download_outlined
+                          //       : Icons.check_circle_outline,
+                          //   size: 18,
+                          // ),
+                          child: Text(
                             isAvailableRemotely
                                 ? localizations.downloadLabel
                                 : localizations.close,
