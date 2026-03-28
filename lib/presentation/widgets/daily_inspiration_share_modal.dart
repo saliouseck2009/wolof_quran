@@ -70,6 +70,9 @@ class DailyInspirationShareModal extends StatefulWidget {
 
 class _DailyInspirationShareModalState
     extends State<DailyInspirationShareModal> {
+  static const String _playStoreUrl =
+      'https://play.google.com/store/apps/details?id=com.saliouseck.wolofquran&hl=fr';
+
   final GlobalKey _captureKey = GlobalKey();
   final GlobalKey _shareImageButtonKey = GlobalKey();
   final GlobalKey _shareVideoButtonKey = GlobalKey();
@@ -512,10 +515,7 @@ class _DailyInspirationShareModalState
         }
         return [XFile(imageFile.path, mimeType: 'image/png')];
       },
-      shareText: localizations.shareDefaultText(
-        widget.surahName,
-        widget.verseNumber,
-      ),
+      shareText: _buildShareText(localizations),
       fallbackMessage: localizations.shareActionCancelled,
     );
   }
@@ -546,12 +546,17 @@ class _DailyInspirationShareModalState
 
         return [XFile(videoPath, mimeType: 'video/mp4')];
       },
-      shareText: localizations.shareDefaultText(
-        widget.surahName,
-        widget.verseNumber,
-      ),
+      shareText: _buildShareText(localizations),
       fallbackMessage: localizations.shareActionCancelled,
     );
+  }
+
+  String _buildShareText(AppLocalizations localizations) {
+    final baseText = localizations.shareDefaultText(
+      widget.surahName,
+      widget.verseNumber,
+    );
+    return '$baseText\n\n$_playStoreUrl';
   }
 
   Future<void> _shareWithGuard({
