@@ -11,9 +11,11 @@ import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:wolof_quran/core/mushaf/mushaf_theme.dart';
 import 'package:wolof_quran/core/utils/constants/constants.dart';
 import '../../domain/entities/ayah_audio.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../blocs/mushaf/mushaf_bloc.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
@@ -96,20 +98,37 @@ class _DailyInspirationShareModalState
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_didConfigureTheme) return;
+
+    MushafBloc? mushafBloc;
+    try {
+      mushafBloc = BlocProvider.of<MushafBloc>(context);
+    } catch (_) {
+      mushafBloc = null;
+    }
+    final mushafThemeColor =
+        mushafBloc?.state.theme.qcfTheme.pageBackgroundColor;
+    final mushafPalette = MushafThemeData.allThemes
+        .map((theme) => theme.qcfTheme.pageBackgroundColor)
+        .toSet()
+        .toList(growable: false);
+
     final colorScheme = Theme.of(context).colorScheme;
-    _selectedBackgroundColor = colorScheme.primary;
-    _backgroundColors = <Color>{
-      colorScheme.primary,
-      colorScheme.primaryContainer,
-      colorScheme.secondary,
-      colorScheme.secondaryContainer,
-      colorScheme.tertiary,
-      colorScheme.tertiaryContainer,
-      colorScheme.surface,
-      colorScheme.surfaceContainerHighest,
-      colorScheme.inverseSurface,
-      colorScheme.error,
-    }.toList();
+    _backgroundColors = mushafPalette.isNotEmpty
+        ? mushafPalette
+        : <Color>{
+            colorScheme.primary,
+            colorScheme.primaryContainer,
+            colorScheme.secondary,
+            colorScheme.secondaryContainer,
+            colorScheme.tertiary,
+            colorScheme.tertiaryContainer,
+            colorScheme.surface,
+            colorScheme.surfaceContainerHighest,
+            colorScheme.inverseSurface,
+            colorScheme.error,
+          }.toList();
+
+    _selectedBackgroundColor = mushafThemeColor ?? _backgroundColors.first;
     _didConfigureTheme = true;
   }
 

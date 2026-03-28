@@ -401,16 +401,20 @@ class AudioLocalDataSource implements AudioDataSource {
         () => parseMp3DurationsInIsolate(uncachedPaths),
       );
       final successCount = parsed.where((d) => d != null && d > 0).length;
-        log('MP3 header parsing: $successCount/${uncachedPaths.length} files '
-          'parsed in ${sw.elapsedMilliseconds}ms');
+      log(
+        'MP3 header parsing: $successCount/${uncachedPaths.length} files '
+        'parsed in ${sw.elapsedMilliseconds}ms',
+      );
       for (var j = 0; j < uncachedIndices.length; j++) {
         if (parsed[j] != null && parsed[j]! > 0) {
           durationsMs[uncachedIndices[j]] = parsed[j];
         }
       }
     } catch (e) {
-      log('MP3 header parsing failed in ${sw.elapsedMilliseconds}ms, '
-          'falling back to AudioPlayer: $e');
+      log(
+        'MP3 header parsing failed in ${sw.elapsedMilliseconds}ms, '
+        'falling back to AudioPlayer: $e',
+      );
     }
 
     // Fallback: use AudioPlayer for any files the parser could not handle.
@@ -543,5 +547,4 @@ class AudioLocalDataSource implements AudioDataSource {
     final cacheFile = File(p.join(surahDir.path, _durationCacheFileName));
     await cacheFile.writeAsString(json.encode(payload), flush: true);
   }
-
 }
