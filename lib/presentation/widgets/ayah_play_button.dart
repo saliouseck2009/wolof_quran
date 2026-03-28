@@ -174,6 +174,26 @@ class AyahPlayButton extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final commonButtonShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(14),
+    );
+    final commonButtonTextStyle = theme.textTheme.labelLarge?.copyWith(
+      fontWeight: FontWeight.w700,
+    );
+    final secondaryButtonStyle = FilledButton.styleFrom(
+      minimumSize: const Size.fromHeight(48),
+      shape: commonButtonShape,
+      textStyle: commonButtonTextStyle,
+      backgroundColor: colorScheme.surfaceContainerHighest,
+      foregroundColor: colorScheme.onSurface,
+    );
+    final primaryButtonStyle = FilledButton.styleFrom(
+      minimumSize: const Size.fromHeight(48),
+      shape: commonButtonShape,
+      textStyle: commonButtonTextStyle,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
+    );
 
     await showModalBottomSheet<void>(
       context: context,
@@ -239,16 +259,17 @@ class AyahPlayButton extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        flex: isAvailableRemotely ? 3 : 2,
-                        child: OutlinedButton(
+                        child: FilledButton.icon(
+                          style: secondaryButtonStyle,
                           onPressed: () => Navigator.of(sheetContext).pop(),
-                          child: Text(localizations.cancel),
+                          icon: const Icon(Icons.close_rounded, size: 18),
+                          label: Text(localizations.cancel),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        flex: isAvailableRemotely ? 5 : 3,
                         child: FilledButton.icon(
+                          style: primaryButtonStyle,
                           onPressed: () {
                             Navigator.of(sheetContext).pop();
                             if (!isAvailableRemotely) {
@@ -273,7 +294,12 @@ class AyahPlayButton extends StatelessWidget {
                                 .read<AudioManagementCubit>()
                                 .downloadSurahAudio(reciterId, surahNumber);
                           },
-                          icon: const Icon(Icons.download_outlined, size: 18),
+                          icon: Icon(
+                            isAvailableRemotely
+                                ? Icons.download_outlined
+                                : Icons.check_circle_outline,
+                            size: 18,
+                          ),
                           label: Text(
                             isAvailableRemotely
                                 ? localizations.downloadLabel
