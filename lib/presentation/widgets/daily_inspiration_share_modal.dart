@@ -904,7 +904,7 @@ class _AdaptiveText extends StatelessWidget {
         : double.infinity;
 
     final direction = textDirection ?? Directionality.of(context);
-    final scale = MediaQuery.textScaleFactorOf(context);
+    final textScaler = MediaQuery.textScalerOf(context);
 
     double measure(double size) {
       final painter = TextPainter(
@@ -914,7 +914,7 @@ class _AdaptiveText extends StatelessWidget {
         ),
         textAlign: textAlign,
         textDirection: direction,
-        textScaleFactor: scale,
+        textScaler: textScaler,
       )..layout(maxWidth: availableWidth);
       return painter.height;
     }
@@ -974,7 +974,7 @@ class _AyahTexts extends StatelessWidget {
     required double maxWidth,
     required TextAlign textAlign,
     required TextDirection textDirection,
-    required double textScale,
+    required TextScaler textScaler,
   }) {
     final painter = TextPainter(
       text: TextSpan(
@@ -983,7 +983,7 @@ class _AyahTexts extends StatelessWidget {
       ),
       textAlign: textAlign,
       textDirection: textDirection,
-      textScaleFactor: textScale,
+      textScaler: textScaler,
       maxLines: null,
     )..layout(maxWidth: maxWidth);
     return painter.size.height;
@@ -995,7 +995,7 @@ class _AyahTexts extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final textScale = MediaQuery.textScaleFactorOf(context);
+    final textScaler = MediaQuery.textScalerOf(context);
     final baseDirection = Directionality.of(context);
     const dividerHeight = 2.0;
     const dividerPadding = 12.0;
@@ -1053,7 +1053,7 @@ class _AyahTexts extends StatelessWidget {
             maxWidth: maxWidth,
             textAlign: TextAlign.justify,
             textDirection: TextDirection.rtl,
-            textScale: textScale,
+            textScaler: textScaler,
           );
           final tHeight = _measureHeight(
             text: translationText,
@@ -1062,7 +1062,7 @@ class _AyahTexts extends StatelessWidget {
             maxWidth: maxWidth,
             textAlign: TextAlign.justify,
             textDirection: baseDirection,
-            textScale: textScale,
+            textScaler: textScaler,
           );
           return aHeight + tHeight;
         }
@@ -1127,7 +1127,7 @@ class _AyahTexts extends StatelessWidget {
           maxWidth: maxWidth,
           textAlign: TextAlign.justify,
           textDirection: TextDirection.rtl,
-          textScale: textScale,
+          textScaler: textScaler,
         );
         final currentTranslationHeight = _measureHeight(
           text: translationText,
@@ -1136,7 +1136,7 @@ class _AyahTexts extends StatelessWidget {
           maxWidth: maxWidth,
           textAlign: TextAlign.justify,
           textDirection: baseDirection,
-          textScale: textScale,
+          textScaler: textScaler,
         );
 
         final remainingSpace =
