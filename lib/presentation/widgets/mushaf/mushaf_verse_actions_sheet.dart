@@ -264,7 +264,7 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
                       onPressed: _hasPreviousVerse
                           ? () => _navigateToAdjacentVerse(next: false)
                           : null,
-                      tooltip: 'Previous verse',
+                      tooltip: localizations.previousVerse,
                       icon: const Icon(Icons.chevron_left_rounded),
                       color: baseText,
                       disabledColor: secondaryText,
@@ -284,7 +284,7 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
                       onPressed: _hasNextVerse
                           ? () => _navigateToAdjacentVerse(next: true)
                           : null,
-                      tooltip: 'Next verse',
+                      tooltip: localizations.nextVerse,
                       icon: const Icon(Icons.chevron_right_rounded),
                       color: baseText,
                       disabledColor: secondaryText,
@@ -607,6 +607,16 @@ class _IconActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final fallbackColorScheme = Theme.of(context).colorScheme;
 
+    // When a custom child is provided (e.g. AyahPlayButton), render it
+    // directly without an outer InkWell so the child's own tap handler works.
+    if (child != null) {
+      return SizedBox(
+        width: 44,
+        height: 44,
+        child: Center(child: child),
+      );
+    }
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -616,13 +626,11 @@ class _IconActionButton extends StatelessWidget {
           width: 44,
           height: 44,
           child: Center(
-            child:
-                child ??
-                Icon(
-                  icon,
-                  size: 24,
-                  color: iconColor ?? fallbackColorScheme.primary,
-                ),
+            child: Icon(
+              icon,
+              size: 24,
+              color: iconColor ?? fallbackColorScheme.primary,
+            ),
           ),
         ),
       ),

@@ -38,7 +38,7 @@ abstract class DownloadQueueRepository {
     String reciterId,
     int surahNumber, {
     required int attemptCount,
-    required String error,
+    required String? error,
   });
 
   Future<void> removeTask(String reciterId, int surahNumber);

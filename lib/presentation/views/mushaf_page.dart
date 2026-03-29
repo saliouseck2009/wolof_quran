@@ -164,7 +164,7 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.only(left: 8),
             child: Center(
               child: Text(
-                pageInfo != null ? 'Juz ${pageInfo.juzNumber}' : '',
+                pageInfo != null ? localizations.juzLabel(pageInfo.juzNumber) : '',
                 style: TextStyle(fontSize: 12, color: theme.bottomBarSubtext),
               ),
             ),
@@ -345,7 +345,7 @@ class _MushafBottomBar extends StatelessWidget {
               children: [
                 if (pageInfo?.hizbInfo != null)
                   Text(
-                    pageInfo!.hizbInfo!.displayText,
+                    pageInfo!.hizbInfo!.localizedText(localizations),
                     style: TextStyle(
                       color: theme.bottomBarSubtext,
                       fontSize: 12,

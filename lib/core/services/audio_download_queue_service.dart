@@ -191,7 +191,7 @@ class AudioDownloadQueueService {
       _lastPersistedAt.remove(task.key);
       _completedSubject.add(
         task.copyWith(
-          status: QueuedAudioDownloadStatus.downloading,
+          status: QueuedAudioDownloadStatus.completed,
           progress: 1.0,
           attemptCount: nextAttemptCount,
           updatedAt: DateTime.now(),
@@ -270,10 +270,10 @@ class AudioDownloadQueueService {
     _tasksSubject.add(tasks);
   }
 
-  String _normalizeError(Object error) {
+  String? _normalizeError(Object error) {
     final raw = '$error'.trim();
     if (raw.isEmpty) {
-      return 'Download failed';
+      return null;
     }
     if (raw.length <= 280) {
       return raw;

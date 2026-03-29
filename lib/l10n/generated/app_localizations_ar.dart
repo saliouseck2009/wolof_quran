@@ -621,4 +621,41 @@ class AppLocalizationsAr extends AppLocalizations {
   String pageNumberLabel(int page) {
     return 'الصفحة $page';
   }
+
+  @override
+  String get shareGeneratingVideo => 'جارٍ إنشاء الفيديو...';
+
+  @override
+  String get sharePreparingContent => 'جارٍ تحضير محتوى المشاركة...';
+
+  @override
+  String get previousVerse => 'الآية السابقة';
+
+  @override
+  String get nextVerse => 'الآية التالية';
+
+  @override
+  String juzLabel(int juz) {
+    return 'الجزء $juz';
+  }
+
+  @override
+  String hizbFull(int n) {
+    return 'حزب $n';
+  }
+
+  @override
+  String hizbOneQuarter(int n) {
+    return 'ربع حزب $n';
+  }
+
+  @override
+  String hizbHalf(int n) {
+    return 'نصف حزب $n';
+  }
+
+  @override
+  String hizbThreeQuarter(int n) {
+    return 'ثلاثة أرباع حزب $n';
+  }
 }

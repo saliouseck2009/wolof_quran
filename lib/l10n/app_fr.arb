@@ -198,5 +198,14 @@
   "explorer": "Explorer",
   "errorLoadingBookmarks": "Erreur lors du chargement des signets",
   "noBookmarks": "Aucun signet",
-  "allBookmarksCleared": "Tous les signets ont été supprimés"
+  "allBookmarksCleared": "Tous les signets ont été supprimés",
+  "shareGeneratingVideo": "Génération de la vidéo en cours...",
+  "sharePreparingContent": "Préparation du partage...",
+  "previousVerse": "Verset précédent",
+  "nextVerse": "Verset suivant",
+  "juzLabel": "Juz {juz}",
+  "hizbFull": "Hizb {n}",
+  "hizbOneQuarter": "1/4 Hizb {n}",
+  "hizbHalf": "1/2 Hizb {n}",
+  "hizbThreeQuarter": "3/4 Hizb {n}"
 }

@@ -57,7 +57,7 @@ class DownloadQueueRepositoryImpl implements DownloadQueueRepository {
     String reciterId,
     int surahNumber, {
     required int attemptCount,
-    required String error,
+    required String? error,
   }) {
     return _databaseHelper.markQueueTaskAsFailed(
       reciterId,

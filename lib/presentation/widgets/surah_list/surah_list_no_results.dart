@@ -13,7 +13,7 @@ class SurahListNoResults extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (asSliver) {
-      return SliverFillRemaining(child: _NoResultsContent());
+      return SliverFillRemaining(child: const _NoResultsContent());
     }
 
     return const _NoResultsContent();

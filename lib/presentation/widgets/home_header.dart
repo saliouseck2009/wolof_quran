@@ -33,33 +33,30 @@ class HomeHeader extends StatelessWidget {
             ),
           ),
         ),
-        _SettingsButton(colorScheme: colorScheme),
+        const _SettingsButton(),
       ],
     );
   }
 }
 
 class _SettingsButton extends StatelessWidget {
-  final ColorScheme colorScheme;
-
-  const _SettingsButton({required this.colorScheme});
+  const _SettingsButton();
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/settings'),
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: colorScheme.onSurface.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(
-          Icons.settings_outlined,
-          color: colorScheme.onSurfaceVariant,
-          size: 20,
-        ),
+    final localizations = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return IconButton(
+      onPressed: () => Navigator.pushNamed(context, '/settings'),
+      tooltip: localizations.settings,
+      icon: Icon(Icons.settings_outlined, color: colorScheme.onSurfaceVariant, size: 20),
+      style: IconButton.styleFrom(
+        backgroundColor: colorScheme.onSurface.withValues(alpha: 0.06),
+        minimumSize: const Size(40, 40),
+        maximumSize: const Size(40, 40),
+        padding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:qcf_quran/qcf_quran.dart' as qcf;
 import 'package:quran/quran.dart' as quran;
 
+import '../../l10n/generated/app_localizations.dart';
+
 const List<int> juzStartPages = [
   1,
   22,
@@ -43,16 +45,16 @@ class HizbInfo extends Equatable {
 
   const HizbInfo({required this.hizbNumber, required this.quarter});
 
-  String get displayText {
+  String localizedText(AppLocalizations l10n) {
     switch (quarter) {
       case HizbQuarter.full:
-        return 'Hizb $hizbNumber';
+        return l10n.hizbFull(hizbNumber);
       case HizbQuarter.oneQuarter:
-        return '1/4 Hizb $hizbNumber';
+        return l10n.hizbOneQuarter(hizbNumber);
       case HizbQuarter.half:
-        return '1/2 Hizb $hizbNumber';
+        return l10n.hizbHalf(hizbNumber);
       case HizbQuarter.threeQuarter:
-        return '3/4 Hizb $hizbNumber';
+        return l10n.hizbThreeQuarter(hizbNumber);
     }
   }
 

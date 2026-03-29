@@ -151,7 +151,7 @@ class _InMemoryDownloadQueueRepository implements DownloadQueueRepository {
     String reciterId,
     int surahNumber, {
     required int attemptCount,
-    required String error,
+    required String? error,
   }) async {
     final existing = _storage[_key(reciterId, surahNumber)];
     if (existing == null) {

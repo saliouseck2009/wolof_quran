@@ -870,5 +870,71 @@
         "description": "The page number"
       }
     }
+  },
+  "shareGeneratingVideo": "Generating video...",
+  "@shareGeneratingVideo": {
+    "description": "Loading text while a share video is being generated"
+  },
+  "sharePreparingContent": "Preparing share content...",
+  "@sharePreparingContent": {
+    "description": "Loading text while share content is being prepared"
+  },
+  "previousVerse": "Previous verse",
+  "@previousVerse": {
+    "description": "Tooltip for the previous verse navigation button"
+  },
+  "nextVerse": "Next verse",
+  "@nextVerse": {
+    "description": "Tooltip for the next verse navigation button"
+  },
+  "juzLabel": "Juz {juz}",
+  "@juzLabel": {
+    "description": "Juz number label shown in the mushaf app bar",
+    "placeholders": {
+      "juz": {
+        "type": "int",
+        "description": "The juz number"
+      }
+    }
+  },
+  "hizbFull": "Hizb {n}",
+  "@hizbFull": {
+    "description": "Full hizb label shown in the mushaf bottom bar",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "description": "The hizb number"
+      }
+    }
+  },
+  "hizbOneQuarter": "1/4 Hizb {n}",
+  "@hizbOneQuarter": {
+    "description": "Quarter hizb label shown in the mushaf bottom bar",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "description": "The hizb number"
+      }
+    }
+  },
+  "hizbHalf": "1/2 Hizb {n}",
+  "@hizbHalf": {
+    "description": "Half hizb label shown in the mushaf bottom bar",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "description": "The hizb number"
+      }
+    }
+  },
+  "hizbThreeQuarter": "3/4 Hizb {n}",
+  "@hizbThreeQuarter": {
+    "description": "Three-quarter hizb label shown in the mushaf bottom bar",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "description": "The hizb number"
+      }
+    }
   }
 }

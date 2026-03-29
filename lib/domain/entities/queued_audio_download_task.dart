@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-enum QueuedAudioDownloadStatus { queued, downloading, failed }
+enum QueuedAudioDownloadStatus { queued, downloading, failed, completed }
 
 extension QueuedAudioDownloadStatusX on QueuedAudioDownloadStatus {
   String get dbValue {
@@ -11,6 +11,8 @@ extension QueuedAudioDownloadStatusX on QueuedAudioDownloadStatus {
         return 'downloading';
       case QueuedAudioDownloadStatus.failed:
         return 'failed';
+      case QueuedAudioDownloadStatus.completed:
+        return 'completed';
     }
   }
 
@@ -20,6 +22,8 @@ extension QueuedAudioDownloadStatusX on QueuedAudioDownloadStatus {
         return QueuedAudioDownloadStatus.downloading;
       case 'failed':
         return QueuedAudioDownloadStatus.failed;
+      case 'completed':
+        return QueuedAudioDownloadStatus.completed;
       case 'queued':
       default:
         return QueuedAudioDownloadStatus.queued;
@@ -51,6 +55,7 @@ class QueuedAudioDownloadTask extends Equatable {
   bool get isQueued => status == QueuedAudioDownloadStatus.queued;
   bool get isDownloading => status == QueuedAudioDownloadStatus.downloading;
   bool get isFailed => status == QueuedAudioDownloadStatus.failed;
+  bool get isCompleted => status == QueuedAudioDownloadStatus.completed;
 
   String get key => '${reciterId}_$surahNumber';
 

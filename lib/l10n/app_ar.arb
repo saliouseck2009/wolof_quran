@@ -207,5 +207,14 @@
   "explorer": "استكشاف",
   "errorLoadingBookmarks": "خطأ في تحميل العلامات المرجعية",
   "noBookmarks": "لا توجد علامات مرجعية",
-  "allBookmarksCleared": "تم مسح جميع العلامات المرجعية"
+  "allBookmarksCleared": "تم مسح جميع العلامات المرجعية",
+  "shareGeneratingVideo": "جارٍ إنشاء الفيديو...",
+  "sharePreparingContent": "جارٍ تحضير محتوى المشاركة...",
+  "previousVerse": "الآية السابقة",
+  "nextVerse": "الآية التالية",
+  "juzLabel": "الجزء {juz}",
+  "hizbFull": "حزب {n}",
+  "hizbOneQuarter": "ربع حزب {n}",
+  "hizbHalf": "نصف حزب {n}",
+  "hizbThreeQuarter": "ثلاثة أرباع حزب {n}"
 }

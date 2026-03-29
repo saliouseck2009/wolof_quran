@@ -1239,6 +1239,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Page {page}'**
   String pageNumberLabel(int page);
+
+  /// Loading text while a share video is being generated
+  ///
+  /// In en, this message translates to:
+  /// **'Generating video...'**
+  String get shareGeneratingVideo;
+
+  /// Loading text while share content is being prepared
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing share content...'**
+  String get sharePreparingContent;
+
+  /// Tooltip for the previous verse navigation button
+  ///
+  /// In en, this message translates to:
+  /// **'Previous verse'**
+  String get previousVerse;
+
+  /// Tooltip for the next verse navigation button
+  ///
+  /// In en, this message translates to:
+  /// **'Next verse'**
+  String get nextVerse;
+
+  /// Juz number label shown in the mushaf app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Juz {juz}'**
+  String juzLabel(int juz);
+
+  /// Full hizb label shown in the mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'Hizb {n}'**
+  String hizbFull(int n);
+
+  /// Quarter hizb label shown in the mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'1/4 Hizb {n}'**
+  String hizbOneQuarter(int n);
+
+  /// Half hizb label shown in the mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'1/2 Hizb {n}'**
+  String hizbHalf(int n);
+
+  /// Three-quarter hizb label shown in the mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'3/4 Hizb {n}'**
+  String hizbThreeQuarter(int n);
 }
 
 class _AppLocalizationsDelegate

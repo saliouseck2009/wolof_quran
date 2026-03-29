@@ -701,19 +701,10 @@ class _DailyInspirationShareModalState
   }
 
   String _shareLoadingStatusText(bool isVideoShare) {
-    final languageCode = Localizations.localeOf(context).languageCode;
-
-    if (isVideoShare) {
-      if (languageCode == 'fr') {
-        return 'Generation de la video en cours...';
-      }
-      return 'Video generation in progress...';
-    }
-
-    if (languageCode == 'fr') {
-      return 'Preparation du partage...';
-    }
-    return 'Preparing share content...';
+    final localizations = AppLocalizations.of(context)!;
+    return isVideoShare
+        ? localizations.shareGeneratingVideo
+        : localizations.sharePreparingContent;
   }
 
   ui.Rect _shareOrigin(GlobalKey key) {

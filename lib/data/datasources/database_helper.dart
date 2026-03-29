@@ -368,7 +368,7 @@ class DatabaseHelper {
     String reciterId,
     int surahNumber, {
     required int attemptCount,
-    required String error,
+    required String? error,
   }) async {
     final db = await database;
     await db.update(

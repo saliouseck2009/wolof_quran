@@ -638,4 +638,41 @@ class AppLocalizationsFr extends AppLocalizations {
   String pageNumberLabel(int page) {
     return 'Page $page';
   }
+
+  @override
+  String get shareGeneratingVideo => 'Génération de la vidéo en cours...';
+
+  @override
+  String get sharePreparingContent => 'Préparation du partage...';
+
+  @override
+  String get previousVerse => 'Verset précédent';
+
+  @override
+  String get nextVerse => 'Verset suivant';
+
+  @override
+  String juzLabel(int juz) {
+    return 'Juz $juz';
+  }
+
+  @override
+  String hizbFull(int n) {
+    return 'Hizb $n';
+  }
+
+  @override
+  String hizbOneQuarter(int n) {
+    return '1/4 Hizb $n';
+  }
+
+  @override
+  String hizbHalf(int n) {
+    return '1/2 Hizb $n';
+  }
+
+  @override
+  String hizbThreeQuarter(int n) {
+    return '3/4 Hizb $n';
+  }
 }
