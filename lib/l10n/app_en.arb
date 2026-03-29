@@ -822,6 +822,10 @@
   "@retryDownload": {
     "description": "Tooltip or action label to retry a failed download"
   },
+  "deleteAudioLabel": "Delete audio",
+  "@deleteAudioLabel": {
+    "description": "Tooltip or action label to delete a downloaded surah audio"
+  },
   "downloadFailedShort": "Download failed",
   "@downloadFailedShort": {
     "description": "Short generic message for failed queued download"

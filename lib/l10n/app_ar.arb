@@ -187,6 +187,7 @@
   "queued": "في الانتظار",
   "alreadyQueued": "هذه السورة موجودة بالفعل في قائمة التنزيل.",
   "retryDownload": "إعادة محاولة التنزيل",
+  "deleteAudioLabel": "حذف الصوت",
   "downloadFailedShort": "فشل التنزيل",
   "queuePositionLabel": "في الانتظار (#{position})",
   "playbackModeOff": "وضع التشغيل: إيقاف عند النهاية",

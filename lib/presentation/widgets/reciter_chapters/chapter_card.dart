@@ -294,23 +294,16 @@ class _DownloadActions extends StatelessWidget {
         }
 
         if (isFailed) {
-          return Tooltip(
-            message: localizations.retryDownload,
-            child: GestureDetector(
-              onTap: () => _retryFailed(context),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: colorScheme.errorContainer.withValues(alpha: 0.45),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.refresh_rounded,
-                  size: 20,
-                  color: colorScheme.error,
-                ),
-              ),
+          return IconButton(
+            onPressed: () => _retryFailed(context),
+            tooltip: localizations.retryDownload,
+            icon: Icon(Icons.refresh_rounded, size: 20, color: colorScheme.error),
+            style: IconButton.styleFrom(
+              backgroundColor: colorScheme.errorContainer.withValues(alpha: 0.45),
+              minimumSize: const Size(40, 40),
+              maximumSize: const Size(40, 40),
+              padding: EdgeInsets.zero,
+              shape: const CircleBorder(),
             ),
           );
         }
@@ -320,8 +313,8 @@ class _DownloadActions extends StatelessWidget {
               ? accentColor.withValues(alpha: 0.2)
               : colorScheme.primary;
           final iconColor = isDark ? accentColor : colorScheme.onPrimary;
-          return GestureDetector(
-            onTap: () async {
+          return IconButton(
+            onPressed: () async {
               await context.read<AudioManagementCubit>().deleteSurahAudio(
                 reciter.id,
                 surahNumber,
@@ -337,15 +330,14 @@ class _DownloadActions extends StatelessWidget {
                 );
               }
             },
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(color: btnBg, shape: BoxShape.circle),
-              child: Icon(
-                Icons.delete_outline_rounded,
-                size: 22,
-                color: iconColor,
-              ),
+            tooltip: localizations.deleteAudioLabel,
+            icon: Icon(Icons.delete_outline_rounded, size: 22, color: iconColor),
+            style: IconButton.styleFrom(
+              backgroundColor: btnBg,
+              minimumSize: const Size(40, 40),
+              maximumSize: const Size(40, 40),
+              padding: EdgeInsets.zero,
+              shape: const CircleBorder(),
             ),
           );
         }
@@ -369,25 +361,26 @@ class _DownloadActions extends StatelessWidget {
           );
         }
 
-        return GestureDetector(
-          onTap: () => _enqueue(context),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? accentColor.withValues(alpha: 0.15)
-                  : colorScheme.primary,
-              shape: BoxShape.circle,
-              border: Border.all(
+        return IconButton(
+          onPressed: () => _enqueue(context),
+          tooltip: localizations.downloadLabel,
+          icon: Icon(
+            Icons.download_rounded,
+            size: 20,
+            color: isDark ? accentColor : colorScheme.onPrimary,
+          ),
+          style: IconButton.styleFrom(
+            backgroundColor: isDark
+                ? accentColor.withValues(alpha: 0.15)
+                : colorScheme.primary,
+            minimumSize: const Size(40, 40),
+            maximumSize: const Size(40, 40),
+            padding: EdgeInsets.zero,
+            shape: CircleBorder(
+              side: BorderSide(
                 color: accentColor.withValues(alpha: isDark ? 0.4 : 0.5),
                 width: 1,
               ),
-            ),
-            child: Icon(
-              Icons.download_rounded,
-              size: 20,
-              color: isDark ? accentColor : colorScheme.onPrimary,
             ),
           ),
         );

@@ -609,6 +609,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get retryDownload => 'Relancer le téléchargement';
 
   @override
+  String get deleteAudioLabel => 'Supprimer l\'audio';
+
+  @override
   String get downloadFailedShort => 'Téléchargement échoué';
 
   @override

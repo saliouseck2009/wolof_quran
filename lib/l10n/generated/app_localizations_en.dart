@@ -599,6 +599,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retryDownload => 'Retry download';
 
   @override
+  String get deleteAudioLabel => 'Delete audio';
+
+  @override
   String get downloadFailedShort => 'Download failed';
 
   @override

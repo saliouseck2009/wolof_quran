@@ -592,6 +592,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get retryDownload => 'إعادة محاولة التنزيل';
 
   @override
+  String get deleteAudioLabel => 'حذف الصوت';
+
+  @override
   String get downloadFailedShort => 'فشل التنزيل';
 
   @override

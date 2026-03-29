@@ -178,6 +178,7 @@
   "queued": "En file",
   "alreadyQueued": "Cette sourate est déjà dans la file de téléchargement.",
   "retryDownload": "Relancer le téléchargement",
+  "deleteAudioLabel": "Supprimer l'audio",
   "downloadFailedShort": "Téléchargement échoué",
   "queuePositionLabel": "En file (#{position})",
   "playbackModeOff": "Mode de lecture : arrêt en fin de piste",

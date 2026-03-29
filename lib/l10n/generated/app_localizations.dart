@@ -1186,6 +1186,12 @@ abstract class AppLocalizations {
   /// **'Retry download'**
   String get retryDownload;
 
+  /// Tooltip or action label to delete a downloaded surah audio
+  ///
+  /// In en, this message translates to:
+  /// **'Delete audio'**
+  String get deleteAudioLabel;
+
   /// Short generic message for failed queued download
   ///
   /// In en, this message translates to:
