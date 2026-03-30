@@ -355,6 +355,9 @@ class _DailyInspirationShareModalState
                 showTranslation: showTranslation,
                 arabicText: widget.arabicText,
                 translationText: widget.translation,
+                translationSource: widget.translationSource,
+                surahNumber: widget.surahNumber,
+                verseNumber: widget.verseNumber,
                 onBackground: onBackground,
                 onBackgroundMuted: onBackgroundMuted,
               ),
@@ -971,6 +974,9 @@ class _AyahTexts extends StatelessWidget {
     required this.showTranslation,
     required this.arabicText,
     required this.translationText,
+    required this.translationSource,
+    required this.surahNumber,
+    required this.verseNumber,
     required this.onBackground,
     required this.onBackgroundMuted,
   });
@@ -979,8 +985,30 @@ class _AyahTexts extends StatelessWidget {
   final bool showTranslation;
   final String arabicText;
   final String translationText;
+  final String translationSource;
+  final int surahNumber;
+  final int verseNumber;
   final Color onBackground;
   final Color onBackgroundMuted;
+
+  bool get _isLongestQuranVerse => surahNumber == 2 && verseNumber == 282;
+
+  bool get _isFrenchTranslation {
+    final source = translationSource.toLowerCase();
+    return source.contains('fr') ||
+        source.contains('french') ||
+        source.contains('francais');
+  }
+
+  int get _normalizedTranslationLength {
+    final normalized = translationText.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return normalized.length;
+  }
+
+  bool get _needsAggressiveTranslationShrink {
+    if (_isLongestQuranVerse) return false;
+    return _normalizedTranslationLength >= 330;
+  }
 
   double _measureHeight({
     required String text,
@@ -1059,6 +1087,7 @@ class _AyahTexts extends StatelessWidget {
         final maxHeight = (constraints.maxHeight - dividerSpace - layoutSafety)
             .clamp(0.0, double.infinity)
             .toDouble();
+        final needsAggressiveShrink = _needsAggressiveTranslationShrink;
 
         double measureTotal(double aSize, double tSize) {
           final aHeight = _measureHeight(
@@ -1133,6 +1162,36 @@ class _AyahTexts extends StatelessWidget {
             absoluteFloor,
             translationMaxFont,
           );
+        }
+
+        // Some very long translations (especially FR) need extra reduction.
+        // Keep 2:282 unchanged because it already renders correctly.
+        if (needsAggressiveShrink) {
+          final aggressiveFloor = _isFrenchTranslation ? 4.6 : 5.2;
+          final shrinkFactor = _isFrenchTranslation ? 0.72 : 0.84;
+          translationFont = (translationFont * shrinkFactor).clamp(
+            aggressiveFloor,
+            translationMaxFont,
+          );
+
+          final totalAfterAggressive = measureTotal(
+            arabicFont,
+            translationFont,
+          );
+          if (totalAfterAggressive > maxHeight && maxHeight > 0) {
+            final finalFactor = (maxHeight / totalAfterAggressive).clamp(
+              0.1,
+              1.0,
+            );
+            arabicFont = (arabicFont * finalFactor).clamp(
+              absoluteFloor,
+              arabicMaxFont,
+            );
+            translationFont = (translationFont * finalFactor).clamp(
+              aggressiveFloor,
+              translationMaxFont,
+            );
+          }
         }
 
         final currentArabicHeight = _measureHeight(
