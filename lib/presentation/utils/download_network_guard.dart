@@ -7,6 +7,15 @@ import '../widgets/snackbar.dart';
 class DownloadNetworkGuard {
   const DownloadNetworkGuard._();
 
+  static Future<List<ConnectivityResult>> Function()? _statusLoaderOverride;
+
+  @visibleForTesting
+  static void debugOverrideStatusLoader(
+    Future<List<ConnectivityResult>> Function()? loader,
+  ) {
+    _statusLoaderOverride = loader;
+  }
+
   static Future<bool> confirmManualDownload(BuildContext context) async {
     final status = await _currentStatus();
     if (!context.mounted) {
@@ -150,7 +159,8 @@ class DownloadNetworkGuard {
   }
 
   static Future<_DownloadConnectionStatus> _currentStatus() async {
-    final results = await Connectivity().checkConnectivity();
+    final results = await (_statusLoaderOverride?.call() ??
+        Connectivity().checkConnectivity());
 
     if (results.contains(ConnectivityResult.wifi) ||
         results.contains(ConnectivityResult.ethernet)) {

@@ -1,16 +1,20 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran/quran.dart' as quran;
+import 'package:wolof_quran/core/services/audio_download_queue_service.dart';
 import 'package:wolof_quran/core/services/audio_player_service.dart';
 import 'package:wolof_quran/data/models/downloaded_surah.dart';
 import 'package:wolof_quran/domain/entities/audio_availability_snapshot.dart';
 import 'package:wolof_quran/domain/entities/ayah_audio.dart';
+import 'package:wolof_quran/domain/entities/queued_audio_download_task.dart';
 import 'package:wolof_quran/domain/entities/reciter.dart';
 import 'package:wolof_quran/domain/entities/surah_audio_status.dart';
 import 'package:wolof_quran/domain/repositories/audio_availability_repository.dart';
 import 'package:wolof_quran/domain/repositories/audio_repository.dart';
+import 'package:wolof_quran/domain/repositories/download_queue_repository.dart';
 import 'package:wolof_quran/domain/repositories/download_repository.dart';
 import 'package:wolof_quran/domain/usecases/download_surah_audio_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_ayah_audios_usecase.dart';
@@ -22,10 +26,12 @@ import 'package:wolof_quran/domain/usecases/refresh_audio_availability_usecase.d
 import 'package:wolof_quran/l10n/generated/app_localizations.dart';
 import 'package:wolof_quran/presentation/blocs/surah_download_status_bloc.dart';
 import 'package:wolof_quran/presentation/cubits/audio_availability_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/audio_download_queue_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/ayah_playback_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/quran_settings_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/surah_detail_cubit.dart';
+import 'package:wolof_quran/presentation/utils/download_network_guard.dart';
 import 'package:wolof_quran/presentation/widgets/ayah_play_button.dart';
 import 'package:wolof_quran/presentation/widgets/quran_settings/quran_settings_menu.dart';
 import 'package:wolof_quran/presentation/widgets/reciter_chapters/chapter_card.dart';
@@ -157,6 +163,72 @@ class _FakeDownloadRepository implements DownloadRepository {
   Future<void> removeSurahDownload(String reciterId, int surahNumber) async {}
 }
 
+class _EmptyDownloadQueueRepository implements DownloadQueueRepository {
+  @override
+  Future<void> clearFailed({String? reciterId}) async {}
+
+  @override
+  Future<void> enqueue(String reciterId, int surahNumber) async {}
+
+  @override
+  Future<void> enqueueMany(String reciterId, List<int> surahNumbers) async {}
+
+  @override
+  Future<List<QueuedAudioDownloadTask>> getAllTasks() async => const [];
+
+  @override
+  Future<QueuedAudioDownloadTask?> getNextQueuedTask() async => null;
+
+  @override
+  Future<QueuedAudioDownloadTask?> getTask(
+    String reciterId,
+    int surahNumber,
+  ) async => null;
+
+  @override
+  Future<List<QueuedAudioDownloadTask>> getTasksForReciter(
+    String reciterId,
+  ) async => const [];
+
+  @override
+  Future<void> markAsDownloading(
+    String reciterId,
+    int surahNumber, {
+    double progress = 0,
+  }) async {}
+
+  @override
+  Future<void> markAsFailed(
+    String reciterId,
+    int surahNumber, {
+    required int attemptCount,
+    required String? error,
+  }) async {}
+
+  @override
+  Future<void> markAsQueued(
+    String reciterId,
+    int surahNumber, {
+    double progress = 0,
+    int? attemptCount,
+    String? error,
+    bool clearError = true,
+  }) async {}
+
+  @override
+  Future<void> removeTask(String reciterId, int surahNumber) async {}
+
+  @override
+  Future<void> requeueInterruptedDownloads() async {}
+
+  @override
+  Future<void> updateProgress(
+    String reciterId,
+    int surahNumber,
+    double progress,
+  ) async {}
+}
+
 class _TestQuranSettingsCubit extends QuranSettingsCubit {
   void setSelectedReciter(Reciter reciter) {
     emit(state.copyWith(selectedReciter: reciter));
@@ -236,12 +308,33 @@ Widget _buildLocalizedApp(Widget child) {
       GlobalWidgetsLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
     ],
-    home: Scaffold(body: child),
+    home: Scaffold(
+      body: BlocProvider<AudioDownloadQueueCubit>(
+        create: (_) => AudioDownloadQueueCubit(
+          queueService: AudioDownloadQueueService(
+            queueRepository: _EmptyDownloadQueueRepository(),
+            audioRepository: _FakeAudioRepository(),
+            downloadRepository: _FakeDownloadRepository(),
+          ),
+        ),
+        child: child,
+      ),
+    ),
   );
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    DownloadNetworkGuard.debugOverrideStatusLoader(
+      () async => const [ConnectivityResult.wifi],
+    );
+  });
+
+  tearDown(() {
+    DownloadNetworkGuard.debugOverrideStatusLoader(null);
+  });
 
   group('Audio availability widgets', () {
     const reciter = Reciter(
@@ -342,8 +435,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Not yet available'), findsOneWidget);
-      expect(find.byIcon(Icons.download_for_offline_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.cloud_off_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.download_rounded), findsNothing);
       await audioManagementCubit.close();
       if (locator.isRegistered<AudioRepository>()) {
         locator.unregister<AudioRepository>();
@@ -541,12 +634,11 @@ void main() {
         expect(find.text('Download to play'), findsNothing);
         expect(find.text('Play Surah'), findsNothing);
         expect(audioManagementCubit.downloadCallCount, 0);
-        final button = tester.widget<IconButton>(
-          find.byKey(SurahPlayButton.iconActionKey),
-        );
+        final buttonFinder = find.byKey(SurahPlayButton.iconActionKey);
+        final button = tester.widget<IconButton>(buttonFinder);
         expect(button.onPressed, isNotNull);
-        button.onPressed!.call();
-        await tester.pump();
+        await tester.tap(buttonFinder);
+        await tester.pumpAndSettle();
         expect(audioManagementCubit.downloadCallCount, 1);
         expect(audioManagementCubit.lastReciterId, reciter.id);
         expect(audioManagementCubit.lastSurahNumber, 2);

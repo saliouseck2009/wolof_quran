@@ -1,3 +1,4 @@
+import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -158,6 +159,7 @@ class AudioPlayerService {
     }
     _initialized = true;
     await reloadPlaybackModeFromPrefs();
+    await _configureAudioSession();
 
     // Listen to player state changes
     _audioPlayer.playerStateStream.listen((playerState) {
@@ -441,6 +443,16 @@ class AudioPlayerService {
       _playbackModeSubject.add(PlaybackModeX.fromPrefs(stored));
     } catch (_) {
       _playbackModeSubject.add(PlaybackMode.off);
+    }
+  }
+
+  Future<void> _configureAudioSession() async {
+    try {
+      final session = await AudioSession.instance;
+      await session.configure(const AudioSessionConfiguration.music());
+    } catch (_) {
+      // Audio playback still works without explicit session configuration,
+      // but iOS background behavior is more reliable when this succeeds.
     }
   }
 

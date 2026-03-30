@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -30,6 +31,7 @@ import 'package:wolof_quran/presentation/cubits/audio_download_queue_cubit.dart'
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/quran_settings_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/surah_mini_player_cubit.dart';
+import 'package:wolof_quran/presentation/utils/download_network_guard.dart';
 import 'package:wolof_quran/presentation/views/surah_audio_list_page.dart';
 import 'package:wolof_quran/presentation/widgets/audio/surah_fullscreen_player.dart';
 import 'package:wolof_quran/presentation/widgets/audio/surah_mini_player_overlay.dart';
@@ -746,6 +748,9 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
+    DownloadNetworkGuard.debugOverrideStatusLoader(
+      () async => const [ConnectivityResult.wifi],
+    );
     final service = AudioPlayerService();
     await service.initialize();
     await service.stop();
@@ -754,6 +759,7 @@ void main() {
   });
 
   tearDown(() {
+    DownloadNetworkGuard.debugOverrideStatusLoader(null);
     _unregisterLocatorDependencies();
   });
 
