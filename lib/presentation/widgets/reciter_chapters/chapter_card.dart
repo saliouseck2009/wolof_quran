@@ -9,6 +9,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/audio_download_queue_cubit.dart';
 import '../../cubits/audio_management_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
+import '../../utils/download_network_guard.dart';
 import '../snackbar.dart';
 
 class ChapterCard extends StatelessWidget {
@@ -297,9 +298,15 @@ class _DownloadActions extends StatelessWidget {
           return IconButton(
             onPressed: () => _retryFailed(context),
             tooltip: localizations.retryDownload,
-            icon: Icon(Icons.refresh_rounded, size: 20, color: colorScheme.error),
+            icon: Icon(
+              Icons.refresh_rounded,
+              size: 20,
+              color: colorScheme.error,
+            ),
             style: IconButton.styleFrom(
-              backgroundColor: colorScheme.errorContainer.withValues(alpha: 0.45),
+              backgroundColor: colorScheme.errorContainer.withValues(
+                alpha: 0.45,
+              ),
               minimumSize: const Size(40, 40),
               maximumSize: const Size(40, 40),
               padding: EdgeInsets.zero,
@@ -331,7 +338,11 @@ class _DownloadActions extends StatelessWidget {
               }
             },
             tooltip: localizations.deleteAudioLabel,
-            icon: Icon(Icons.delete_outline_rounded, size: 22, color: iconColor),
+            icon: Icon(
+              Icons.delete_outline_rounded,
+              size: 22,
+              color: iconColor,
+            ),
             style: IconButton.styleFrom(
               backgroundColor: btnBg,
               minimumSize: const Size(40, 40),
@@ -389,6 +400,13 @@ class _DownloadActions extends StatelessWidget {
   }
 
   Future<void> _enqueue(BuildContext context) async {
+    final canProceed = await DownloadNetworkGuard.confirmManualDownload(
+      context,
+    );
+    if (!canProceed || !context.mounted) {
+      return;
+    }
+
     final result = await context.read<AudioDownloadQueueCubit>().enqueue(
       reciter.id,
       surahNumber,

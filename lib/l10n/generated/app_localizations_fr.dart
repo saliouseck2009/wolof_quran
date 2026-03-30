@@ -259,6 +259,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get downloadLabel => 'Télécharger';
 
   @override
+  String get continueDownload => 'Continuer';
+
+  @override
+  String get mobileDataDownloadTitle => 'Télécharger sans Wi-Fi';
+
+  @override
+  String get mobileDataDownloadMessage =>
+      'Le Wi-Fi n\'est pas disponible. Télécharger avec les données mobiles peut consommer votre forfait. Voulez-vous continuer ?';
+
+  @override
   String get audioNotYetAvailable =>
       'L\'audio de cette sourate n\'est pas encore disponible.';
 

@@ -7,6 +7,7 @@ import '../../l10n/generated/app_localizations.dart';
 import '../cubits/audio_availability_cubit.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
+import '../utils/download_network_guard.dart';
 import '../widgets/snackbar.dart';
 
 class ReciterAudioUpdatesPage extends StatefulWidget {
@@ -211,13 +212,20 @@ class _NewAudioSurahTile extends StatelessWidget {
                 }
 
                 return ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     if (isOtherDownloading) {
                       CustomSnackbar.showSnackbar(
                         context,
                         localizations.downloadInProgress,
                         duration: 2,
                       );
+                      return;
+                    }
+                    final canProceed =
+                        await DownloadNetworkGuard.confirmManualDownload(
+                          context,
+                        );
+                    if (!canProceed || !context.mounted) {
                       return;
                     }
                     context.read<AudioManagementCubit>().downloadSurahAudio(

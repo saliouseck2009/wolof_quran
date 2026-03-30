@@ -562,6 +562,24 @@ abstract class AppLocalizations {
   /// **'Download'**
   String get downloadLabel;
 
+  /// Continue button label for mobile data warning
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueDownload;
+
+  /// Title for mobile data warning before downloading
+  ///
+  /// In en, this message translates to:
+  /// **'Download without Wi-Fi'**
+  String get mobileDataDownloadTitle;
+
+  /// Message shown when user starts a download without Wi-Fi
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi is not available. Downloading with mobile data may consume your data plan. Do you want to continue?'**
+  String get mobileDataDownloadMessage;
+
   /// Shown when a surah is not present in the remote manifest yet
   ///
   /// In en, this message translates to:

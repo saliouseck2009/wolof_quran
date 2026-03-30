@@ -254,6 +254,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get downloadLabel => 'تحميل';
 
   @override
+  String get continueDownload => 'متابعة';
+
+  @override
+  String get mobileDataDownloadTitle => 'تحميل بدون Wi‑Fi';
+
+  @override
+  String get mobileDataDownloadMessage =>
+      'شبكة Wi‑Fi غير متوفرة. قد يؤدي التحميل عبر بيانات الهاتف إلى استهلاك باقتك. هل تريد المتابعة؟';
+
+  @override
   String get audioNotYetAvailable => 'صوت هذه السورة غير متاح بعد.';
 
   @override

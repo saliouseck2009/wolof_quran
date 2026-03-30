@@ -10,6 +10,7 @@ import '../../cubits/audio_management_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../../cubits/surah_mini_player_cubit.dart';
 import '../../utils/audio_error_formatter.dart';
+import '../../utils/download_network_guard.dart';
 import '../snackbar.dart';
 
 enum SurahPlayButtonVariant { pill, icon }
@@ -407,7 +408,14 @@ class _DownloadSurahButton extends StatelessWidget {
     );
   }
 
-  void _handleDownloadPressed(BuildContext context) {
+  Future<void> _handleDownloadPressed(BuildContext context) async {
+    final canProceed = await DownloadNetworkGuard.confirmManualDownload(
+      context,
+    );
+    if (!canProceed || !context.mounted) {
+      return;
+    }
+
     final audioState = context.read<AudioManagementCubit>().state;
     if (audioState is AudioDownloading &&
         (audioState.reciterId != reciterId ||

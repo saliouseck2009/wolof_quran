@@ -19,6 +19,7 @@ import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_mini_player_cubit.dart';
 import '../utils/audio_error_formatter.dart';
+import '../utils/download_network_guard.dart';
 import '../widgets/snackbar.dart';
 
 class SurahAudioListPage extends StatelessWidget {
@@ -375,6 +376,11 @@ class _SurahAudioListBody extends StatelessWidget {
       return;
     }
 
+    final canAutoDownload = await DownloadNetworkGuard.canAutoDownload();
+    if (!canAutoDownload || !context.mounted) {
+      return;
+    }
+
     await context.read<AudioDownloadQueueCubit>().enqueue(reciter.id, 1);
   }
 }
@@ -725,6 +731,13 @@ class _SurahTrackTile extends StatelessWidget {
   }
 
   Future<void> _download(BuildContext context) async {
+    final canProceed = await DownloadNetworkGuard.confirmManualDownload(
+      context,
+    );
+    if (!canProceed || !context.mounted) {
+      return;
+    }
+
     final result = await context.read<AudioDownloadQueueCubit>().enqueue(
       reciterId,
       surahNumber,

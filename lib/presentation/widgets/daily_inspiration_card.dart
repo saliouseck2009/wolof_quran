@@ -53,10 +53,7 @@ class DailyInspirationCard extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             localizations.loadingDailyInspiration,
-            style: TextStyle(
-              fontSize: 13,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
           ),
         ],
       ),
@@ -363,10 +360,7 @@ class DailyInspirationCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   errorMessage,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: colorScheme.error,
-                  ),
+                  style: TextStyle(fontSize: 13, color: colorScheme.error),
                 ),
               ),
             ],

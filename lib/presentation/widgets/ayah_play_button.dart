@@ -6,6 +6,7 @@ import '../cubits/audio_availability_cubit.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/ayah_playback_cubit.dart';
+import '../utils/download_network_guard.dart';
 import 'snackbar.dart';
 
 /// A reusable play button widget for ayah audio playback
@@ -272,9 +273,17 @@ class AyahPlayButton extends StatelessWidget {
                         flex: 5,
                         child: FilledButton(
                           style: primaryButtonStyle,
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.of(sheetContext).pop();
                             if (!isAvailableRemotely) {
+                              return;
+                            }
+
+                            final canProceed =
+                                await DownloadNetworkGuard.confirmManualDownload(
+                                  context,
+                                );
+                            if (!canProceed || !context.mounted) {
                               return;
                             }
 

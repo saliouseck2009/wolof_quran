@@ -348,6 +348,18 @@
   "@downloadLabel": {
     "description": "Short download button label"
   },
+  "continueDownload": "Continue",
+  "@continueDownload": {
+    "description": "Continue button label for mobile data warning"
+  },
+  "mobileDataDownloadTitle": "Download without Wi-Fi",
+  "@mobileDataDownloadTitle": {
+    "description": "Title for mobile data warning before downloading"
+  },
+  "mobileDataDownloadMessage": "Wi-Fi is not available. Downloading with mobile data may consume your data plan. Do you want to continue?",
+  "@mobileDataDownloadMessage": {
+    "description": "Message shown when user starts a download without Wi-Fi"
+  },
   "audioNotYetAvailable": "Audio for this surah is not yet available.",
   "@audioNotYetAvailable": {
     "description": "Shown when a surah is not present in the remote manifest yet"
