@@ -1,1 +1,2 @@
 "CFBundleDisplayName" = "Coran Wolof";
+"NSMicrophoneUsageDescription" = "L’accès au microphone peut être demandé par le système audio iOS utilisé par l’application pour la lecture et le routage audio. L’application n’enregistre pas de son.";

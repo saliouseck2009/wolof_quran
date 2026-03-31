@@ -1,1 +1,2 @@
 "CFBundleDisplayName" = "القرآن الولوف";
+"NSMicrophoneUsageDescription" = "قد يطلب نظام الصوت في iOS الوصول إلى الميكروفون لدعم تشغيل الصوت وتوجيهه. التطبيق لا يسجل أي صوت.";

@@ -1,1 +1,2 @@
 "CFBundleDisplayName" = "Wolof Quran";
+"NSMicrophoneUsageDescription" = "Microphone access may be requested by the iOS audio system used by the app for audio playback and audio routing. The app does not record audio.";
