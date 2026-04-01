@@ -476,6 +476,10 @@
   "@shareVideoGenerationFailed": {
     "description": "Error shown when video creation fails"
   },
+  "shareVideoUnavailableInScreenshotMode": "Video sharing is unavailable in screenshot mode.",
+  "@shareVideoUnavailableInScreenshotMode": {
+    "description": "Message shown when video sharing is disabled for simulator screenshot mode"
+  },
   "shareActionCancelled": "Action cancelled.",
   "@shareActionCancelled": {
     "description": "Message shown when user cancels a share action"

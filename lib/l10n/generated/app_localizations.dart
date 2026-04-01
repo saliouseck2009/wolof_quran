@@ -736,6 +736,12 @@ abstract class AppLocalizations {
   /// **'Failed to generate video.'**
   String get shareVideoGenerationFailed;
 
+  /// Message shown when video sharing is disabled for simulator screenshot mode
+  ///
+  /// In en, this message translates to:
+  /// **'Video sharing is unavailable in screenshot mode.'**
+  String get shareVideoUnavailableInScreenshotMode;
+
   /// Message shown when user cancels a share action
   ///
   /// In en, this message translates to:

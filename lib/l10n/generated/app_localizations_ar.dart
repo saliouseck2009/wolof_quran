@@ -346,6 +346,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareVideoGenerationFailed => 'فشل إنشاء الفيديو.';
 
   @override
+  String get shareVideoUnavailableInScreenshotMode =>
+      'مشاركة الفيديو غير متاحة في وضع لقطات الشاشة.';
+
+  @override
   String get shareActionCancelled => 'تم إلغاء العملية.';
 
   @override

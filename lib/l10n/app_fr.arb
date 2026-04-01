@@ -98,6 +98,7 @@
   "shareVideo": "Partager la Vidéo",
   "shareCaptureFailed": "Impossible de capturer l’image.",
   "shareVideoGenerationFailed": "Échec de la génération vidéo.",
+  "shareVideoUnavailableInScreenshotMode": "Le partage vidéo est indisponible en mode captures d’écran.",
   "shareActionCancelled": "Action annulée.",
   "shareSelectReciterForVideo": "Veuillez sélectionner un récitateur pour générer la vidéo.",
   "shareAudioUnavailableForSurah": "Audio non disponible pour cette sourate.",

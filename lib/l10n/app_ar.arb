@@ -107,6 +107,7 @@
   "shareVideo": "مشاركة فيديو",
   "shareCaptureFailed": "تعذّر التقاط الصورة.",
   "shareVideoGenerationFailed": "فشل إنشاء الفيديو.",
+  "shareVideoUnavailableInScreenshotMode": "مشاركة الفيديو غير متاحة في وضع لقطات الشاشة.",
   "shareActionCancelled": "تم إلغاء العملية.",
   "shareSelectReciterForVideo": "يرجى اختيار قارئ لإنشاء الفيديو.",
   "shareAudioUnavailableForSurah": "الصوت غير متوفر لهذه السورة.",

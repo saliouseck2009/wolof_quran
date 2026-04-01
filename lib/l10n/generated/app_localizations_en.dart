@@ -350,6 +350,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareVideoGenerationFailed => 'Failed to generate video.';
 
   @override
+  String get shareVideoUnavailableInScreenshotMode =>
+      'Video sharing is unavailable in screenshot mode.';
+
+  @override
   String get shareActionCancelled => 'Action cancelled.';
 
   @override
