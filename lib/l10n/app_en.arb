@@ -12,6 +12,10 @@
   "@quran": {
     "description": "Quran text"
   },
+  "mushaf": "Mushaf",
+  "@mushaf": {
+    "description": "Mushaf reader title"
+  },
   "surah": "Surah",
   "@surah": {
     "description": "Surah text"
@@ -344,6 +348,18 @@
   "@downloadLabel": {
     "description": "Short download button label"
   },
+  "continueDownload": "Continue",
+  "@continueDownload": {
+    "description": "Continue button label for mobile data warning"
+  },
+  "mobileDataDownloadTitle": "Download without Wi-Fi",
+  "@mobileDataDownloadTitle": {
+    "description": "Title for mobile data warning before downloading"
+  },
+  "mobileDataDownloadMessage": "Wi-Fi is not available. Downloading with mobile data may consume your data plan. Do you want to continue?",
+  "@mobileDataDownloadMessage": {
+    "description": "Message shown when user starts a download without Wi-Fi"
+  },
   "audioNotYetAvailable": "Audio for this surah is not yet available.",
   "@audioNotYetAvailable": {
     "description": "Shown when a surah is not present in the remote manifest yet"
@@ -608,6 +624,10 @@
   "@readSurahs": {
     "description": "Subtitle for surah list action"
   },
+  "readByPage": "Read page by page",
+  "@readByPage": {
+    "description": "Subtitle for mushaf home action"
+  },
   "listenAudio": "Listen Audio",
   "@listenAudio": {
     "description": "Subtitle for audio recitation action"
@@ -801,5 +821,132 @@
   "downloadInProgress": "Another download is already in progress. Please wait for it to finish.",
   "@downloadInProgress": {
     "description": "Shown when user tries to start a second download while one is active"
+  },
+  "queued": "Queued",
+  "@queued": {
+    "description": "Label shown when a surah download is queued"
+  },
+  "alreadyQueued": "This surah is already in the download queue.",
+  "@alreadyQueued": {
+    "description": "Snackbar shown when user tries to queue an already queued surah"
+  },
+  "retryDownload": "Retry download",
+  "@retryDownload": {
+    "description": "Tooltip or action label to retry a failed download"
+  },
+  "deleteAudioLabel": "Delete audio",
+  "@deleteAudioLabel": {
+    "description": "Tooltip or action label to delete a downloaded surah audio"
+  },
+  "downloadFailedShort": "Download failed",
+  "@downloadFailedShort": {
+    "description": "Short generic message for failed queued download"
+  },
+  "queuePositionLabel": "Queued (#{position})",
+  "@queuePositionLabel": {
+    "description": "Tooltip with queue position for a pending surah download",
+    "placeholders": {
+      "position": {
+        "type": "int",
+        "description": "1-based queue position"
+      }
+    }
+  },
+  "playbackModeOff": "Playback mode: Off",
+  "@playbackModeOff": {
+    "description": "Tooltip for playback mode button when looping is disabled"
+  },
+  "playbackModeRepeatOne": "Playback mode: Repeat one",
+  "@playbackModeRepeatOne": {
+    "description": "Tooltip for playback mode button when repeating the current track"
+  },
+  "playbackModeRepeatAll": "Playback mode: Repeat all",
+  "@playbackModeRepeatAll": {
+    "description": "Tooltip for playback mode button when repeating the queue"
+  },
+  "playbackModeShuffle": "Playback mode: Shuffle",
+  "@playbackModeShuffle": {
+    "description": "Tooltip for playback mode button when shuffle is active"
+  }
+  ,
+  "selectSurah": "Select a surah",
+  "@selectSurah": {
+    "description": "Title for mushaf surah picker"
+  },
+  "pageNumberLabel": "Page {page}",
+  "@pageNumberLabel": {
+    "description": "Mushaf page number label",
+    "placeholders": {
+      "page": {
+        "type": "int",
+        "description": "The page number"
+      }
+    }
+  },
+  "shareGeneratingVideo": "Generating video...",
+  "@shareGeneratingVideo": {
+    "description": "Loading text while a share video is being generated"
+  },
+  "sharePreparingContent": "Preparing share content...",
+  "@sharePreparingContent": {
+    "description": "Loading text while share content is being prepared"
+  },
+  "previousVerse": "Previous verse",
+  "@previousVerse": {
+    "description": "Tooltip for the previous verse navigation button"
+  },
+  "nextVerse": "Next verse",
+  "@nextVerse": {
+    "description": "Tooltip for the next verse navigation button"
+  },
+  "juzLabel": "Juz {juz}",
+  "@juzLabel": {
+    "description": "Juz number label shown in the mushaf app bar",
+    "placeholders": {
+      "juz": {
+        "type": "int",
+        "description": "The juz number"
+      }
+    }
+  },
+  "hizbFull": "Hizb {n}",
+  "@hizbFull": {
+    "description": "Full hizb label shown in the mushaf bottom bar",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "description": "The hizb number"
+      }
+    }
+  },
+  "hizbOneQuarter": "1/4 Hizb {n}",
+  "@hizbOneQuarter": {
+    "description": "Quarter hizb label shown in the mushaf bottom bar",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "description": "The hizb number"
+      }
+    }
+  },
+  "hizbHalf": "1/2 Hizb {n}",
+  "@hizbHalf": {
+    "description": "Half hizb label shown in the mushaf bottom bar",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "description": "The hizb number"
+      }
+    }
+  },
+  "hizbThreeQuarter": "3/4 Hizb {n}",
+  "@hizbThreeQuarter": {
+    "description": "Three-quarter hizb label shown in the mushaf bottom bar",
+    "placeholders": {
+      "n": {
+        "type": "int",
+        "description": "The hizb number"
+      }
+    }
   }
 }

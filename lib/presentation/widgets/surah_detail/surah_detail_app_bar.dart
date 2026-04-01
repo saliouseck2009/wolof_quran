@@ -28,9 +28,11 @@ class SurahDetailAppBar extends StatelessWidget {
         getDownloadedSurahsUseCase: locator<GetDownloadedSurahsUseCase>(),
       ),
       child: SliverAppBar(
-        expandedHeight: 220,
+        expandedHeight: 150,
         floating: false,
         pinned: true,
+        centerTitle: false,
+        titleSpacing: 0,
         elevation: 0,
         backgroundColor: colorScheme.brightness == Brightness.dark
             ? AppColor.surfaceDark
@@ -43,7 +45,7 @@ class SurahDetailAppBar extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: colorScheme.onPrimary,
-            fontSize: 18,
+            fontSize: 15,
           ),
         ),
         actions: [
@@ -53,10 +55,8 @@ class SurahDetailAppBar extends StatelessWidget {
             variant: SurahPlayButtonVariant.icon,
           ),
           PopupMenuButton<AyahDisplayMode>(
-            icon: Icon(
-              _getDisplayModeIcon(state.displayMode),
-              color: colorScheme.onPrimary,
-            ),
+            tooltip: localizations.arabicAndTranslation,
+            icon: Icon(Icons.g_translate, color: colorScheme.onPrimary),
             color: colorScheme.surface,
             onSelected: (mode) {
               context.read<SurahDetailCubit>().changeDisplayMode(mode);
@@ -169,7 +169,7 @@ class SurahDetailAppBar extends StatelessWidget {
             ),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                 child: SurahHeaderContent(
                   state: state,
                   localizations: localizations,
@@ -181,17 +181,6 @@ class SurahDetailAppBar extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  IconData _getDisplayModeIcon(AyahDisplayMode mode) {
-    switch (mode) {
-      case AyahDisplayMode.both:
-        return Icons.view_headline;
-      case AyahDisplayMode.arabicOnly:
-        return Icons.format_textdirection_r_to_l;
-      case AyahDisplayMode.translationOnly:
-        return Icons.translate;
-    }
   }
 }
 
@@ -216,14 +205,14 @@ class SurahHeaderContent extends StatelessWidget {
           state.surahNameArabic,
           style: const TextStyle(
             fontFamily: 'Hafs',
-            fontSize: 32,
+            fontSize: 24,
             fontWeight: FontWeight.w500,
             color: Colors.white,
           ),
           textAlign: TextAlign.center,
           textDirection: TextDirection.rtl,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 10),
         SurahInfoChips(
           versesCount: state.versesCount,
           localizations: localizations,
@@ -278,7 +267,7 @@ class SurahInfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
@@ -286,14 +275,14 @@ class SurahInfoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: Colors.white),
-          const SizedBox(width: 6),
+          Icon(icon, size: 12, color: Colors.white),
+          const SizedBox(width: 5),
           Text(
             label,
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w500,
-              fontSize: 12,
+              fontSize: 11,
             ),
           ),
         ],

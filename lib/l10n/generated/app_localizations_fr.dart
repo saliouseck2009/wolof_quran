@@ -18,6 +18,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get quran => 'Coran';
 
   @override
+  String get mushaf => 'Mushaf';
+
+  @override
   String get surah => 'Sourate';
 
   @override
@@ -256,6 +259,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get downloadLabel => 'Télécharger';
 
   @override
+  String get continueDownload => 'Continuer';
+
+  @override
+  String get mobileDataDownloadTitle => 'Télécharger sans Wi-Fi';
+
+  @override
+  String get mobileDataDownloadMessage =>
+      'Le Wi-Fi n\'est pas disponible. Télécharger avec les données mobiles peut consommer votre forfait. Voulez-vous continuer ?';
+
+  @override
   String get audioNotYetAvailable =>
       'L\'audio de cette sourate n\'est pas encore disponible.';
 
@@ -452,6 +465,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get readSurahs => 'Lire les sourates';
 
   @override
+  String get readByPage => 'Lire page par page';
+
+  @override
   String get listenAudio => 'Écouter l\'audio';
 
   @override
@@ -591,4 +607,82 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get downloadInProgress =>
       'Un téléchargement est déjà en cours. Veuillez attendre la fin avant d\'en lancer un autre.';
+
+  @override
+  String get queued => 'En file';
+
+  @override
+  String get alreadyQueued =>
+      'Cette sourate est déjà dans la file de téléchargement.';
+
+  @override
+  String get retryDownload => 'Relancer le téléchargement';
+
+  @override
+  String get deleteAudioLabel => 'Supprimer l\'audio';
+
+  @override
+  String get downloadFailedShort => 'Téléchargement échoué';
+
+  @override
+  String queuePositionLabel(int position) {
+    return 'En file (#$position)';
+  }
+
+  @override
+  String get playbackModeOff => 'Mode de lecture : arrêt en fin de piste';
+
+  @override
+  String get playbackModeRepeatOne => 'Mode de lecture : répéter la piste';
+
+  @override
+  String get playbackModeRepeatAll => 'Mode de lecture : répéter la file';
+
+  @override
+  String get playbackModeShuffle => 'Mode de lecture : aléatoire';
+
+  @override
+  String get selectSurah => 'Sélectionner une sourate';
+
+  @override
+  String pageNumberLabel(int page) {
+    return 'Page $page';
+  }
+
+  @override
+  String get shareGeneratingVideo => 'Génération de la vidéo en cours...';
+
+  @override
+  String get sharePreparingContent => 'Préparation du partage...';
+
+  @override
+  String get previousVerse => 'Verset précédent';
+
+  @override
+  String get nextVerse => 'Verset suivant';
+
+  @override
+  String juzLabel(int juz) {
+    return 'Juz $juz';
+  }
+
+  @override
+  String hizbFull(int n) {
+    return 'Hizb $n';
+  }
+
+  @override
+  String hizbOneQuarter(int n) {
+    return '1/4 Hizb $n';
+  }
+
+  @override
+  String hizbHalf(int n) {
+    return '1/2 Hizb $n';
+  }
+
+  @override
+  String hizbThreeQuarter(int n) {
+    return '3/4 Hizb $n';
+  }
 }

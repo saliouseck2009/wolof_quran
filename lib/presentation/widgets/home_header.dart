@@ -8,36 +8,56 @@ class HomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final accentGreen = colorScheme.primary;
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        AppIcon(accentGreen: accentGreen, colorScheme: colorScheme),
+        // AppIcon(accentGreen: accentGreen, colorScheme: colorScheme),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Icon(
+            Icons.auto_stories_outlined,
+            size: 50,
+            color: colorScheme.primary,
+          ),
+        ),
+
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             localizations.appTitle,
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
               color: colorScheme.onSurface,
+              letterSpacing: -0.3,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
         ),
-        IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/settings');
-          },
-          icon: Icon(
-            Icons.settings_outlined,
-            color: colorScheme.onSurface,
-            size: 24,
-          ),
-        ),
+        const _SettingsButton(),
       ],
+    );
+  }
+}
+
+class _SettingsButton extends StatelessWidget {
+  const _SettingsButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return IconButton(
+      onPressed: () => Navigator.pushNamed(context, '/settings'),
+      tooltip: localizations.settings,
+      icon: Icon(Icons.settings_outlined, color: colorScheme.onSurfaceVariant, size: 20),
+      style: IconButton.styleFrom(
+        backgroundColor: colorScheme.onSurface.withValues(alpha: 0.06),
+        minimumSize: const Size(40, 40),
+        maximumSize: const Size(40, 40),
+        padding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
     );
   }
 }
@@ -62,9 +82,7 @@ class AppIcon extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [accentGreen, accentGreen.withValues(alpha: 0.8)],
-        ),
+        color: accentGreen,
         borderRadius: BorderRadius.circular(width / 2),
       ),
       child: Icon(

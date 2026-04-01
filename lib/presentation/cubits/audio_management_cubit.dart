@@ -457,12 +457,44 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
         }
 
         final filePaths = ayahAudios.map((audio) => audio.localPath).toList();
+        var ayahDurations = ayahAudios
+            .map((audio) => audio.duration)
+            .toList();
+        final hasMissingDurations = ayahDurations.any(
+          (duration) => duration == null || duration.inMilliseconds <= 0,
+        );
+
+        // Warmup durations before playback so the UI has them immediately.
+        if (hasMissingDurations) {
+          try {
+            await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
+            final warmedAyahs = await _audioRepository.getAyahAudios(
+              reciterId,
+              surahNumber,
+            );
+            ayahDurations = warmedAyahs
+                .map((audio) => audio.duration)
+                .toList();
+
+            final currentState2 = state;
+            if (currentState2 is AudioManagementLoaded) {
+              final updatedMap = Map<String, List<AyahAudio>>.from(
+                currentState2.ayahAudiosMap,
+              );
+              updatedMap['${reciterId}_$surahNumber'] = warmedAyahs;
+              emit(currentState2.copyWith(ayahAudiosMap: updatedMap));
+            }
+          } catch (e) {
+            log('Pre-play warmup failed, continuing with partial durations: $e');
+          }
+        }
 
         await audioPlayerService.playSurahPlaylist(
           filePaths: filePaths,
           surahNumber: surahNumber,
           reciterId: reciterId,
           surahName: surahName,
+          ayahDurations: ayahDurations,
           startIndex: startAyahIndex,
         );
       }
@@ -500,4 +532,5 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
     }
     return [];
   }
+
 }

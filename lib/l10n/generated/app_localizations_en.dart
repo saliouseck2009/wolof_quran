@@ -18,6 +18,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quran => 'Quran';
 
   @override
+  String get mushaf => 'Mushaf';
+
+  @override
   String get surah => 'Surah';
 
   @override
@@ -254,6 +257,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadLabel => 'Download';
 
   @override
+  String get continueDownload => 'Continue';
+
+  @override
+  String get mobileDataDownloadTitle => 'Download without Wi-Fi';
+
+  @override
+  String get mobileDataDownloadMessage =>
+      'Wi-Fi is not available. Downloading with mobile data may consume your data plan. Do you want to continue?';
+
+  @override
   String get audioNotYetAvailable =>
       'Audio for this surah is not yet available.';
 
@@ -444,6 +457,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readSurahs => 'Read Surahs';
 
   @override
+  String get readByPage => 'Read page by page';
+
+  @override
   String get listenAudio => 'Listen Audio';
 
   @override
@@ -582,4 +598,81 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get downloadInProgress =>
       'Another download is already in progress. Please wait for it to finish.';
+
+  @override
+  String get queued => 'Queued';
+
+  @override
+  String get alreadyQueued => 'This surah is already in the download queue.';
+
+  @override
+  String get retryDownload => 'Retry download';
+
+  @override
+  String get deleteAudioLabel => 'Delete audio';
+
+  @override
+  String get downloadFailedShort => 'Download failed';
+
+  @override
+  String queuePositionLabel(int position) {
+    return 'Queued (#$position)';
+  }
+
+  @override
+  String get playbackModeOff => 'Playback mode: Off';
+
+  @override
+  String get playbackModeRepeatOne => 'Playback mode: Repeat one';
+
+  @override
+  String get playbackModeRepeatAll => 'Playback mode: Repeat all';
+
+  @override
+  String get playbackModeShuffle => 'Playback mode: Shuffle';
+
+  @override
+  String get selectSurah => 'Select a surah';
+
+  @override
+  String pageNumberLabel(int page) {
+    return 'Page $page';
+  }
+
+  @override
+  String get shareGeneratingVideo => 'Generating video...';
+
+  @override
+  String get sharePreparingContent => 'Preparing share content...';
+
+  @override
+  String get previousVerse => 'Previous verse';
+
+  @override
+  String get nextVerse => 'Next verse';
+
+  @override
+  String juzLabel(int juz) {
+    return 'Juz $juz';
+  }
+
+  @override
+  String hizbFull(int n) {
+    return 'Hizb $n';
+  }
+
+  @override
+  String hizbOneQuarter(int n) {
+    return '1/4 Hizb $n';
+  }
+
+  @override
+  String hizbHalf(int n) {
+    return '1/2 Hizb $n';
+  }
+
+  @override
+  String hizbThreeQuarter(int n) {
+    return '3/4 Hizb $n';
+  }
 }

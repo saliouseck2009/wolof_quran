@@ -4,8 +4,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:wolof_quran/core/helpers/bloc_observer.dart';
 import 'package:wolof_quran/core/services/audio_player_service.dart';
+import 'package:wolof_quran/core/services/audio_download_queue_service.dart';
 import 'package:wolof_quran/domain/repositories/reciter_repository.dart';
 import 'package:wolof_quran/domain/repositories/download_repository.dart';
+import 'package:wolof_quran/domain/repositories/audio_repository.dart';
 import 'package:wolof_quran/domain/usecases/download_surah_audio_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_ayah_audios_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_reciters_usecase.dart';
@@ -18,6 +20,8 @@ import 'package:wolof_quran/presentation/cubits/audio_availability_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/quran_settings_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/reciter_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/ayah_playback_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/audio_download_queue_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/surah_mini_player_cubit.dart';
 import 'package:wolof_quran/service_locator.dart';
 
 import 'core/navigation/app_routes.dart';
@@ -80,6 +84,20 @@ class MyApp extends StatelessWidget {
             audioManagementCubit: context.read<AudioManagementCubit>(),
           ),
         ),
+        BlocProvider(
+          lazy: false,
+          create: (context) => AudioDownloadQueueCubit(
+            queueService: locator<AudioDownloadQueueService>(),
+          ),
+        ),
+        BlocProvider(
+          lazy: false,
+          create: (context) => SurahMiniPlayerCubit(
+            audioPlayerService: locator<AudioPlayerService>(),
+            downloadRepository: locator<DownloadRepository>(),
+            audioRepository: locator<AudioRepository>(),
+          ),
+        ),
       ],
       child: Builder(
         builder: (ctx) {
@@ -126,7 +144,6 @@ class MyApp extends StatelessWidget {
                       theme: MaterialTheme().light(),
                       darkTheme: MaterialTheme().dark(),
                       themeMode: themeMode,
-
                       onGenerateRoute: AppRoutes.onGenerateRoutes,
                     );
                   },

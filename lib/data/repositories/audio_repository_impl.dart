@@ -49,6 +49,11 @@ class AudioRepositoryImpl implements AudioRepository {
   }
 
   @override
+  Future<void> warmUpAyahDurations(String reciterId, int surahNumber) async {
+    await localDataSource.warmUpAyahDurations(reciterId, surahNumber);
+  }
+
+  @override
   Future<void> deleteSurahAudio(String reciterId, int surahNumber) async {
     await localDataSource.deleteSurahAudio(reciterId, surahNumber);
   }

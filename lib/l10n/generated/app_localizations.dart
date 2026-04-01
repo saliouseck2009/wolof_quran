@@ -118,6 +118,12 @@ abstract class AppLocalizations {
   /// **'Quran'**
   String get quran;
 
+  /// Mushaf reader title
+  ///
+  /// In en, this message translates to:
+  /// **'Mushaf'**
+  String get mushaf;
+
   /// Surah text
   ///
   /// In en, this message translates to:
@@ -556,6 +562,24 @@ abstract class AppLocalizations {
   /// **'Download'**
   String get downloadLabel;
 
+  /// Continue button label for mobile data warning
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueDownload;
+
+  /// Title for mobile data warning before downloading
+  ///
+  /// In en, this message translates to:
+  /// **'Download without Wi-Fi'**
+  String get mobileDataDownloadTitle;
+
+  /// Message shown when user starts a download without Wi-Fi
+  ///
+  /// In en, this message translates to:
+  /// **'Wi-Fi is not available. Downloading with mobile data may consume your data plan. Do you want to continue?'**
+  String get mobileDataDownloadMessage;
+
   /// Shown when a surah is not present in the remote manifest yet
   ///
   /// In en, this message translates to:
@@ -910,6 +934,12 @@ abstract class AppLocalizations {
   /// **'Read Surahs'**
   String get readSurahs;
 
+  /// Subtitle for mushaf home action
+  ///
+  /// In en, this message translates to:
+  /// **'Read page by page'**
+  String get readByPage;
+
   /// Subtitle for audio recitation action
   ///
   /// In en, this message translates to:
@@ -1155,6 +1185,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Another download is already in progress. Please wait for it to finish.'**
   String get downloadInProgress;
+
+  /// Label shown when a surah download is queued
+  ///
+  /// In en, this message translates to:
+  /// **'Queued'**
+  String get queued;
+
+  /// Snackbar shown when user tries to queue an already queued surah
+  ///
+  /// In en, this message translates to:
+  /// **'This surah is already in the download queue.'**
+  String get alreadyQueued;
+
+  /// Tooltip or action label to retry a failed download
+  ///
+  /// In en, this message translates to:
+  /// **'Retry download'**
+  String get retryDownload;
+
+  /// Tooltip or action label to delete a downloaded surah audio
+  ///
+  /// In en, this message translates to:
+  /// **'Delete audio'**
+  String get deleteAudioLabel;
+
+  /// Short generic message for failed queued download
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed'**
+  String get downloadFailedShort;
+
+  /// Tooltip with queue position for a pending surah download
+  ///
+  /// In en, this message translates to:
+  /// **'Queued (#{position})'**
+  String queuePositionLabel(int position);
+
+  /// Tooltip for playback mode button when looping is disabled
+  ///
+  /// In en, this message translates to:
+  /// **'Playback mode: Off'**
+  String get playbackModeOff;
+
+  /// Tooltip for playback mode button when repeating the current track
+  ///
+  /// In en, this message translates to:
+  /// **'Playback mode: Repeat one'**
+  String get playbackModeRepeatOne;
+
+  /// Tooltip for playback mode button when repeating the queue
+  ///
+  /// In en, this message translates to:
+  /// **'Playback mode: Repeat all'**
+  String get playbackModeRepeatAll;
+
+  /// Tooltip for playback mode button when shuffle is active
+  ///
+  /// In en, this message translates to:
+  /// **'Playback mode: Shuffle'**
+  String get playbackModeShuffle;
+
+  /// Title for mushaf surah picker
+  ///
+  /// In en, this message translates to:
+  /// **'Select a surah'**
+  String get selectSurah;
+
+  /// Mushaf page number label
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page}'**
+  String pageNumberLabel(int page);
+
+  /// Loading text while a share video is being generated
+  ///
+  /// In en, this message translates to:
+  /// **'Generating video...'**
+  String get shareGeneratingVideo;
+
+  /// Loading text while share content is being prepared
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing share content...'**
+  String get sharePreparingContent;
+
+  /// Tooltip for the previous verse navigation button
+  ///
+  /// In en, this message translates to:
+  /// **'Previous verse'**
+  String get previousVerse;
+
+  /// Tooltip for the next verse navigation button
+  ///
+  /// In en, this message translates to:
+  /// **'Next verse'**
+  String get nextVerse;
+
+  /// Juz number label shown in the mushaf app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Juz {juz}'**
+  String juzLabel(int juz);
+
+  /// Full hizb label shown in the mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'Hizb {n}'**
+  String hizbFull(int n);
+
+  /// Quarter hizb label shown in the mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'1/4 Hizb {n}'**
+  String hizbOneQuarter(int n);
+
+  /// Half hizb label shown in the mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'1/2 Hizb {n}'**
+  String hizbHalf(int n);
+
+  /// Three-quarter hizb label shown in the mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'3/4 Hizb {n}'**
+  String hizbThreeQuarter(int n);
 }
 
 class _AppLocalizationsDelegate

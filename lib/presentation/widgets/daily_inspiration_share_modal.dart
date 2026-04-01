@@ -11,9 +11,11 @@ import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:wolof_quran/core/mushaf/mushaf_theme.dart';
 import 'package:wolof_quran/core/utils/constants/constants.dart';
 import '../../domain/entities/ayah_audio.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../blocs/mushaf/mushaf_bloc.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
@@ -68,6 +70,9 @@ class DailyInspirationShareModal extends StatefulWidget {
 
 class _DailyInspirationShareModalState
     extends State<DailyInspirationShareModal> {
+  static const String _playStoreUrl =
+      'https://play.google.com/store/apps/details?id=com.saliouseck.wolofquran&hl=fr';
+
   final GlobalKey _captureKey = GlobalKey();
   final GlobalKey _shareImageButtonKey = GlobalKey();
   final GlobalKey _shareVideoButtonKey = GlobalKey();
@@ -96,20 +101,37 @@ class _DailyInspirationShareModalState
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_didConfigureTheme) return;
+
+    MushafBloc? mushafBloc;
+    try {
+      mushafBloc = BlocProvider.of<MushafBloc>(context);
+    } catch (_) {
+      mushafBloc = null;
+    }
+    final mushafThemeColor =
+        mushafBloc?.state.theme.qcfTheme.pageBackgroundColor;
+    final mushafPalette = MushafThemeData.allThemes
+        .map((theme) => theme.qcfTheme.pageBackgroundColor)
+        .toSet()
+        .toList(growable: false);
+
     final colorScheme = Theme.of(context).colorScheme;
-    _selectedBackgroundColor = colorScheme.primary;
-    _backgroundColors = <Color>{
-      colorScheme.primary,
-      colorScheme.primaryContainer,
-      colorScheme.secondary,
-      colorScheme.secondaryContainer,
-      colorScheme.tertiary,
-      colorScheme.tertiaryContainer,
-      colorScheme.surface,
-      colorScheme.surfaceContainerHighest,
-      colorScheme.inverseSurface,
-      colorScheme.error,
-    }.toList();
+    _backgroundColors = mushafPalette.isNotEmpty
+        ? mushafPalette
+        : <Color>{
+            colorScheme.primary,
+            colorScheme.primaryContainer,
+            colorScheme.secondary,
+            colorScheme.secondaryContainer,
+            colorScheme.tertiary,
+            colorScheme.tertiaryContainer,
+            colorScheme.surface,
+            colorScheme.surfaceContainerHighest,
+            colorScheme.inverseSurface,
+            colorScheme.error,
+          }.toList();
+
+    _selectedBackgroundColor = mushafThemeColor ?? _backgroundColors.first;
     _didConfigureTheme = true;
   }
 
@@ -333,6 +355,9 @@ class _DailyInspirationShareModalState
                 showTranslation: showTranslation,
                 arabicText: widget.arabicText,
                 translationText: widget.translation,
+                translationSource: widget.translationSource,
+                surahNumber: widget.surahNumber,
+                verseNumber: widget.verseNumber,
                 onBackground: onBackground,
                 onBackgroundMuted: onBackgroundMuted,
               ),
@@ -484,6 +509,7 @@ class _DailyInspirationShareModalState
     final localizations = AppLocalizations.of(context)!;
     await _shareWithGuard(
       originKey: _shareImageButtonKey,
+      isVideoShare: false,
       prepareFiles: () async {
         final imageFile = await _capturePreviewToFile();
         if (imageFile == null) {
@@ -492,10 +518,7 @@ class _DailyInspirationShareModalState
         }
         return [XFile(imageFile.path, mimeType: 'image/png')];
       },
-      shareText: localizations.shareDefaultText(
-        widget.surahName,
-        widget.verseNumber,
-      ),
+      shareText: _buildShareText(localizations),
       fallbackMessage: localizations.shareActionCancelled,
     );
   }
@@ -504,6 +527,7 @@ class _DailyInspirationShareModalState
     final localizations = AppLocalizations.of(context)!;
     await _shareWithGuard(
       originKey: _shareVideoButtonKey,
+      isVideoShare: true,
       prepareFiles: () async {
         final imageFile = await _capturePreviewToFile(jpeg: true);
         if (imageFile == null) {
@@ -525,16 +549,22 @@ class _DailyInspirationShareModalState
 
         return [XFile(videoPath, mimeType: 'video/mp4')];
       },
-      shareText: localizations.shareDefaultText(
-        widget.surahName,
-        widget.verseNumber,
-      ),
+      shareText: _buildShareText(localizations),
       fallbackMessage: localizations.shareActionCancelled,
     );
   }
 
+  String _buildShareText(AppLocalizations localizations) {
+    final baseText = localizations.shareDefaultText(
+      widget.surahName,
+      widget.verseNumber,
+    );
+    return '$baseText\n\n$_playStoreUrl';
+  }
+
   Future<void> _shareWithGuard({
     required GlobalKey originKey,
+    required bool isVideoShare,
     required Future<List<XFile>?> Function() prepareFiles,
     required String shareText,
     required String fallbackMessage,
@@ -551,8 +581,10 @@ class _DailyInspirationShareModalState
         context: context,
         barrierDismissible: false,
         useRootNavigator: true,
-        builder: (dialogContext) => Center(
-          child: CircularProgressIndicator(color: colorScheme.primary),
+        builder: (dialogContext) => _buildShareLoadingDialog(
+          colorScheme: colorScheme,
+          localizations: localizations,
+          isVideoShare: isVideoShare,
         ),
       );
 
@@ -589,6 +621,95 @@ class _DailyInspirationShareModalState
     }
   }
 
+  Widget _buildShareLoadingDialog({
+    required ColorScheme colorScheme,
+    required AppLocalizations localizations,
+    required bool isVideoShare,
+  }) {
+    final icon = isVideoShare
+        ? Icons.movie_creation_outlined
+        : Icons.image_outlined;
+    final title = isVideoShare
+        ? localizations.shareVideo
+        : localizations.shareImage;
+    final statusText = _shareLoadingStatusText(isVideoShare);
+
+    return Dialog(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 28),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.45),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.18),
+              blurRadius: 24,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: colorScheme.primary, size: 22),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              statusText,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.25,
+              ),
+            ),
+            const SizedBox(height: 14),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: LinearProgressIndicator(
+                minHeight: 7,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                color: colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _shareLoadingStatusText(bool isVideoShare) {
+    final localizations = AppLocalizations.of(context)!;
+    return isVideoShare
+        ? localizations.shareGeneratingVideo
+        : localizations.sharePreparingContent;
+  }
+
   ui.Rect _shareOrigin(GlobalKey key) {
     final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null && renderBox.hasSize) {
@@ -613,7 +734,7 @@ class _DailyInspirationShareModalState
         }
         break;
       case ShareResultStatus.dismissed:
-        _showMessage(localizations.shareDismissed);
+        // User intentionally closed the share sheet: no toast needed.
         break;
       case ShareResultStatus.unavailable:
         _showMessage(localizations.shareUnavailable);
@@ -727,8 +848,9 @@ class _DailyInspirationShareModalState
     required String audioPath,
   }) async {
     final tempDir = await getTemporaryDirectory();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
     final outputPath =
-        '${tempDir.path}/ayah_video_${DateTime.now().millisecondsSinceEpoch}.mp4';
+        '${tempDir.path}/chapter_${widget.surahNumber}_verse_${widget.verseNumber}_$timestamp.mp4';
 
     final command =
         '-y -loop 1 -i "$imagePath" -i "$audioPath" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(1080-iw)/2:(1920-ih)/2,format=yuv420p" -c:v libx264 -preset veryfast -tune stillimage -c:a aac -b:a 192k -shortest "$outputPath"';
@@ -759,7 +881,6 @@ class _AdaptiveText extends StatelessWidget {
     required this.maxFontSize,
     this.textAlign = TextAlign.start,
     this.textDirection,
-    this.maxLines,
   });
 
   final String text;
@@ -768,7 +889,6 @@ class _AdaptiveText extends StatelessWidget {
   final double maxFontSize;
   final TextAlign textAlign;
   final TextDirection? textDirection;
-  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -785,10 +905,7 @@ class _AdaptiveText extends StatelessWidget {
             textAlign: textAlign,
             textDirection: textDirection,
             style: style.copyWith(fontSize: fittedFontSize),
-            maxLines: maxLines,
-            overflow: maxLines != null
-                ? TextOverflow.ellipsis
-                : TextOverflow.fade,
+            overflow: TextOverflow.fade,
             softWrap: true,
           ),
         );
@@ -805,7 +922,7 @@ class _AdaptiveText extends StatelessWidget {
         : double.infinity;
 
     final direction = textDirection ?? Directionality.of(context);
-    final scale = MediaQuery.textScaleFactorOf(context);
+    final textScaler = MediaQuery.textScalerOf(context);
 
     double measure(double size) {
       final painter = TextPainter(
@@ -815,8 +932,7 @@ class _AdaptiveText extends StatelessWidget {
         ),
         textAlign: textAlign,
         textDirection: direction,
-        textScaleFactor: scale,
-        maxLines: maxLines,
+        textScaler: textScaler,
       )..layout(maxWidth: availableWidth);
       return painter.height;
     }
@@ -858,6 +974,9 @@ class _AyahTexts extends StatelessWidget {
     required this.showTranslation,
     required this.arabicText,
     required this.translationText,
+    required this.translationSource,
+    required this.surahNumber,
+    required this.verseNumber,
     required this.onBackground,
     required this.onBackgroundMuted,
   });
@@ -866,8 +985,30 @@ class _AyahTexts extends StatelessWidget {
   final bool showTranslation;
   final String arabicText;
   final String translationText;
+  final String translationSource;
+  final int surahNumber;
+  final int verseNumber;
   final Color onBackground;
   final Color onBackgroundMuted;
+
+  bool get _isLongestQuranVerse => surahNumber == 2 && verseNumber == 282;
+
+  bool get _isFrenchTranslation {
+    final source = translationSource.toLowerCase();
+    return source.contains('fr') ||
+        source.contains('french') ||
+        source.contains('francais');
+  }
+
+  int get _normalizedTranslationLength {
+    final normalized = translationText.replaceAll(RegExp(r'\s+'), ' ').trim();
+    return normalized.length;
+  }
+
+  bool get _needsAggressiveTranslationShrink {
+    if (_isLongestQuranVerse) return false;
+    return _normalizedTranslationLength >= 330;
+  }
 
   double _measureHeight({
     required String text,
@@ -876,7 +1017,7 @@ class _AyahTexts extends StatelessWidget {
     required double maxWidth,
     required TextAlign textAlign,
     required TextDirection textDirection,
-    required double textScale,
+    required TextScaler textScaler,
   }) {
     final painter = TextPainter(
       text: TextSpan(
@@ -885,7 +1026,7 @@ class _AyahTexts extends StatelessWidget {
       ),
       textAlign: textAlign,
       textDirection: textDirection,
-      textScaleFactor: textScale,
+      textScaler: textScaler,
       maxLines: null,
     )..layout(maxWidth: maxWidth);
     return painter.size.height;
@@ -897,7 +1038,7 @@ class _AyahTexts extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final textScale = MediaQuery.textScaleFactorOf(context);
+    final textScaler = MediaQuery.textScalerOf(context);
     final baseDirection = Directionality.of(context);
     const dividerHeight = 2.0;
     const dividerPadding = 12.0;
@@ -946,6 +1087,7 @@ class _AyahTexts extends StatelessWidget {
         final maxHeight = (constraints.maxHeight - dividerSpace - layoutSafety)
             .clamp(0.0, double.infinity)
             .toDouble();
+        final needsAggressiveShrink = _needsAggressiveTranslationShrink;
 
         double measureTotal(double aSize, double tSize) {
           final aHeight = _measureHeight(
@@ -955,7 +1097,7 @@ class _AyahTexts extends StatelessWidget {
             maxWidth: maxWidth,
             textAlign: TextAlign.justify,
             textDirection: TextDirection.rtl,
-            textScale: textScale,
+            textScaler: textScaler,
           );
           final tHeight = _measureHeight(
             text: translationText,
@@ -964,7 +1106,7 @@ class _AyahTexts extends StatelessWidget {
             maxWidth: maxWidth,
             textAlign: TextAlign.justify,
             textDirection: baseDirection,
-            textScale: textScale,
+            textScaler: textScaler,
           );
           return aHeight + tHeight;
         }
@@ -1022,6 +1164,36 @@ class _AyahTexts extends StatelessWidget {
           );
         }
 
+        // Some very long translations (especially FR) need extra reduction.
+        // Keep 2:282 unchanged because it already renders correctly.
+        if (needsAggressiveShrink) {
+          final aggressiveFloor = _isFrenchTranslation ? 4.6 : 5.2;
+          final shrinkFactor = _isFrenchTranslation ? 0.72 : 0.84;
+          translationFont = (translationFont * shrinkFactor).clamp(
+            aggressiveFloor,
+            translationMaxFont,
+          );
+
+          final totalAfterAggressive = measureTotal(
+            arabicFont,
+            translationFont,
+          );
+          if (totalAfterAggressive > maxHeight && maxHeight > 0) {
+            final finalFactor = (maxHeight / totalAfterAggressive).clamp(
+              0.1,
+              1.0,
+            );
+            arabicFont = (arabicFont * finalFactor).clamp(
+              absoluteFloor,
+              arabicMaxFont,
+            );
+            translationFont = (translationFont * finalFactor).clamp(
+              aggressiveFloor,
+              translationMaxFont,
+            );
+          }
+        }
+
         final currentArabicHeight = _measureHeight(
           text: arabicText,
           style: arabicStyle,
@@ -1029,7 +1201,7 @@ class _AyahTexts extends StatelessWidget {
           maxWidth: maxWidth,
           textAlign: TextAlign.justify,
           textDirection: TextDirection.rtl,
-          textScale: textScale,
+          textScaler: textScaler,
         );
         final currentTranslationHeight = _measureHeight(
           text: translationText,
@@ -1038,7 +1210,7 @@ class _AyahTexts extends StatelessWidget {
           maxWidth: maxWidth,
           textAlign: TextAlign.justify,
           textDirection: baseDirection,
-          textScale: textScale,
+          textScaler: textScaler,
         );
 
         final remainingSpace =

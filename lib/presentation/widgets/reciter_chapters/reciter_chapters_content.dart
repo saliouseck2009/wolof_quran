@@ -6,8 +6,10 @@ import '../../../domain/entities/reciter.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../blocs/reciter_chapters_bloc.dart';
 import '../../cubits/audio_availability_cubit.dart';
+import '../../cubits/audio_download_queue_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../../utils/audio_error_formatter.dart';
+import '../snackbar.dart';
 import 'chapter_card.dart';
 import 'reciter_chapters_summary.dart';
 
@@ -88,22 +90,74 @@ class ReciterChaptersContent extends StatelessWidget {
               .read<QuranSettingsCubit>()
               .currentTranslation;
 
-          return BlocBuilder<AudioAvailabilityCubit, AudioAvailabilityState>(
-            builder: (context, availabilityState) {
-              final snapshot = availabilityState.snapshotForReciter(reciter.id);
-              final remoteAvailableSet = snapshot?.availableSurahs.toSet();
-              final hasAvailabilityData = snapshot != null;
+          return MultiBlocListener(
+            listeners: [
+              BlocListener<AudioDownloadQueueCubit, AudioDownloadQueueState>(
+                listenWhen: (previous, current) =>
+                    previous.taskCountForReciter(reciter.id) !=
+                    current.taskCountForReciter(reciter.id),
+                listener: (context, _) {
+                  context.read<ReciterChaptersBloc>().add(
+                    RefreshDownloadedSurahs(reciter.id),
+                  );
+                },
+              ),
+              BlocListener<AudioDownloadQueueCubit, AudioDownloadQueueState>(
+                listenWhen: (previous, current) =>
+                    previous.completionVersion != current.completionVersion,
+                listener: (context, queueState) {
+                  final task = queueState.lastCompletedTask;
+                  if (task == null || task.reciterId != reciter.id) {
+                    return;
+                  }
+                  CustomSnackbar.showSnackbar(
+                    context,
+                    localizations.downloadedSuccessfully(
+                      _getSurahDisplayName(task.surahNumber, translation),
+                    ),
+                    duration: 2,
+                  );
+                },
+              ),
+              BlocListener<AudioDownloadQueueCubit, AudioDownloadQueueState>(
+                listenWhen: (previous, current) =>
+                    previous.failureVersion != current.failureVersion,
+                listener: (context, queueState) {
+                  final task = queueState.lastFailedTask;
+                  if (task == null || task.reciterId != reciter.id) {
+                    return;
+                  }
+                  final formattedError = formatAudioError(
+                    task.error ?? localizations.downloadFailed,
+                    localizations,
+                  );
+                  CustomSnackbar.showSnackbar(
+                    context,
+                    localizations.downloadFailedWithError(formattedError),
+                    duration: 4,
+                  );
+                },
+              ),
+            ],
+            child: BlocBuilder<AudioAvailabilityCubit, AudioAvailabilityState>(
+              builder: (context, availabilityState) {
+                final snapshot = availabilityState.snapshotForReciter(
+                  reciter.id,
+                );
+                final remoteAvailableSet = snapshot?.availableSurahs.toSet();
+                final hasAvailabilityData = snapshot != null;
 
-              return _buildChaptersList(
-                context,
-                isDark,
-                state,
-                translation,
-                localizations,
-                remoteAvailableSet,
-                hasAvailabilityData,
-              );
-            },
+                return _buildChaptersList(
+                  context,
+                  isDark,
+                  state,
+                  translation,
+                  localizations,
+                  remoteAvailableSet,
+                  hasAvailabilityData,
+                );
+              },
+            ),
           );
         }
         return const SizedBox.shrink();
@@ -143,11 +197,8 @@ class ReciterChaptersContent extends StatelessWidget {
               reciter: reciter,
               surahNumber: surahNumber,
               translation: translation,
-              isDark: isDark,
               isDownloaded: isDownloaded,
               isAvailableRemotely: isAvailableRemotely,
-              accentGreen: accentGreen,
-              darkSurfaceHigh: darkSurfaceHigh,
               getSurahDisplayName: (number) =>
                   _getSurahDisplayName(number, translation),
               localizations: localizations,

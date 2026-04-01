@@ -87,18 +87,17 @@ class _SurahListViewState extends State<_SurahListView> {
                   collapsedToolbarHeight: _collapsedToolbarHeight,
                   colorScheme: colorScheme,
                   localizations: localizations,
-                  searchBarBuilder: (isCollapsed) => _buildSearchBar(
-                    context,
-                    state,
-                    isInAppBar: isCollapsed,
-                  ),
+                  searchBarBuilder: (isCollapsed) =>
+                      _buildSearchBar(context, state, isInAppBar: isCollapsed),
                   onSettingsTap: () async {
                     final result = await Navigator.pushNamed(
                       context,
                       '/quran-settings',
                     );
                     if (result == true && context.mounted) {
-                      context.read<SurahListCubit>().reloadTranslationSettings();
+                      context
+                          .read<SurahListCubit>()
+                          .reloadTranslationSettings();
                     }
                   },
                 ),
@@ -106,12 +105,7 @@ class _SurahListViewState extends State<_SurahListView> {
                 state.filteredSurahs.isEmpty && state.isSearching
                     ? const SurahListNoResults()
                     : SliverPadding(
-                        padding: const EdgeInsets.only(
-                          left: 16,
-                          right: 16,
-                          top: 16,
-                          bottom: 48,
-                        ),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate((
                             context,
@@ -185,11 +179,7 @@ class _SurahListViewState extends State<_SurahListView> {
           ? RevelationPlaceEnum.meccan
           : RevelationPlaceEnum.medinan,
       onTap: () {
-        Navigator.pushNamed(
-          context,
-          '/surah-detail',
-          arguments: surahNumber,
-        );
+        Navigator.pushNamed(context, '/surah-detail', arguments: surahNumber);
       },
     );
   }

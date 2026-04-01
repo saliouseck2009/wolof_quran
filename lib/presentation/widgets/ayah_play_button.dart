@@ -6,6 +6,7 @@ import '../cubits/audio_availability_cubit.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/ayah_playback_cubit.dart';
+import '../utils/download_network_guard.dart';
 import 'snackbar.dart';
 
 /// A reusable play button widget for ayah audio playback
@@ -174,6 +175,26 @@ class AyahPlayButton extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final commonButtonShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(14),
+    );
+    final commonButtonTextStyle = theme.textTheme.labelLarge?.copyWith(
+      fontWeight: FontWeight.w700,
+    );
+    final secondaryButtonStyle = FilledButton.styleFrom(
+      minimumSize: const Size.fromHeight(48),
+      shape: commonButtonShape,
+      textStyle: commonButtonTextStyle,
+      backgroundColor: colorScheme.surfaceContainerHighest,
+      foregroundColor: colorScheme.error,
+    );
+    final primaryButtonStyle = FilledButton.styleFrom(
+      minimumSize: const Size.fromHeight(48),
+      shape: commonButtonShape,
+      textStyle: commonButtonTextStyle,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
+    );
 
     await showModalBottomSheet<void>(
       context: context,
@@ -239,19 +260,30 @@ class AyahPlayButton extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        flex: isAvailableRemotely ? 3 : 2,
-                        child: OutlinedButton(
+                        flex: 4,
+                        child: FilledButton(
+                          style: secondaryButtonStyle,
                           onPressed: () => Navigator.of(sheetContext).pop(),
+                          //icon: const Icon(Icons.close_rounded, size: 18),
                           child: Text(localizations.cancel),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        flex: isAvailableRemotely ? 5 : 3,
-                        child: FilledButton.icon(
-                          onPressed: () {
+                        flex: 5,
+                        child: FilledButton(
+                          style: primaryButtonStyle,
+                          onPressed: () async {
                             Navigator.of(sheetContext).pop();
                             if (!isAvailableRemotely) {
+                              return;
+                            }
+
+                            final canProceed =
+                                await DownloadNetworkGuard.confirmManualDownload(
+                                  context,
+                                );
+                            if (!canProceed || !context.mounted) {
                               return;
                             }
 
@@ -273,8 +305,13 @@ class AyahPlayButton extends StatelessWidget {
                                 .read<AudioManagementCubit>()
                                 .downloadSurahAudio(reciterId, surahNumber);
                           },
-                          icon: const Icon(Icons.download_outlined, size: 18),
-                          label: Text(
+                          // icon: Icon(
+                          //   isAvailableRemotely
+                          //       ? Icons.download_outlined
+                          //       : Icons.check_circle_outline,
+                          //   size: 18,
+                          // ),
+                          child: Text(
                             isAvailableRemotely
                                 ? localizations.downloadLabel
                                 : localizations.close,

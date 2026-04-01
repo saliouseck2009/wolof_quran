@@ -18,6 +18,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get quran => 'القرآن';
 
   @override
+  String get mushaf => 'المصحف';
+
+  @override
   String get surah => 'سورة';
 
   @override
@@ -251,6 +254,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get downloadLabel => 'تحميل';
 
   @override
+  String get continueDownload => 'متابعة';
+
+  @override
+  String get mobileDataDownloadTitle => 'تحميل بدون Wi‑Fi';
+
+  @override
+  String get mobileDataDownloadMessage =>
+      'شبكة Wi‑Fi غير متوفرة. قد يؤدي التحميل عبر بيانات الهاتف إلى استهلاك باقتك. هل تريد المتابعة؟';
+
+  @override
   String get audioNotYetAvailable => 'صوت هذه السورة غير متاح بعد.';
 
   @override
@@ -438,6 +451,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get readSurahs => 'قراءة السور';
 
   @override
+  String get readByPage => 'قراءة صفحة بصفحة';
+
+  @override
   String get listenAudio => 'استمع إلى الصوت';
 
   @override
@@ -575,4 +591,81 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get downloadInProgress =>
       'هناك تنزيل جارٍ بالفعل. يرجى الانتظار حتى ينتهي قبل بدء آخر.';
+
+  @override
+  String get queued => 'في الانتظار';
+
+  @override
+  String get alreadyQueued => 'هذه السورة موجودة بالفعل في قائمة التنزيل.';
+
+  @override
+  String get retryDownload => 'إعادة محاولة التنزيل';
+
+  @override
+  String get deleteAudioLabel => 'حذف الصوت';
+
+  @override
+  String get downloadFailedShort => 'فشل التنزيل';
+
+  @override
+  String queuePositionLabel(int position) {
+    return 'في الانتظار (#$position)';
+  }
+
+  @override
+  String get playbackModeOff => 'وضع التشغيل: إيقاف عند النهاية';
+
+  @override
+  String get playbackModeRepeatOne => 'وضع التشغيل: تكرار المقطع الحالي';
+
+  @override
+  String get playbackModeRepeatAll => 'وضع التشغيل: تكرار القائمة';
+
+  @override
+  String get playbackModeShuffle => 'وضع التشغيل: عشوائي';
+
+  @override
+  String get selectSurah => 'اختر سورة';
+
+  @override
+  String pageNumberLabel(int page) {
+    return 'الصفحة $page';
+  }
+
+  @override
+  String get shareGeneratingVideo => 'جارٍ إنشاء الفيديو...';
+
+  @override
+  String get sharePreparingContent => 'جارٍ تحضير محتوى المشاركة...';
+
+  @override
+  String get previousVerse => 'الآية السابقة';
+
+  @override
+  String get nextVerse => 'الآية التالية';
+
+  @override
+  String juzLabel(int juz) {
+    return 'الجزء $juz';
+  }
+
+  @override
+  String hizbFull(int n) {
+    return 'حزب $n';
+  }
+
+  @override
+  String hizbOneQuarter(int n) {
+    return 'ربع حزب $n';
+  }
+
+  @override
+  String hizbHalf(int n) {
+    return 'نصف حزب $n';
+  }
+
+  @override
+  String hizbThreeQuarter(int n) {
+    return 'ثلاثة أرباع حزب $n';
+  }
 }
