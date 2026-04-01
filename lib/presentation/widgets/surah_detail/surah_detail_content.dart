@@ -71,10 +71,7 @@ class _SurahDetailContentState extends State<SurahDetailContent> {
   }
 
   void _buildAyahKeys() {
-    _ayahKeys = List.generate(
-      widget.state.ayahs.length,
-      (_) => GlobalKey(),
-    );
+    _ayahKeys = List.generate(widget.state.ayahs.length, (_) => GlobalKey());
   }
 
   void _initializeAudioManagement() {
@@ -161,7 +158,7 @@ class _SurahDetailContentState extends State<SurahDetailContent> {
         controller: _scrollController,
         slivers: [
           SurahDetailAppBar(state: widget.state),
-          if (widget.surahNumber != 9 &&
+          if ((widget.surahNumber != 9 && widget.surahNumber != 1) &&
               (widget.state.displayMode == AyahDisplayMode.both ||
                   widget.state.displayMode == AyahDisplayMode.arabicOnly))
             const SurahBasmalaWidget(),
