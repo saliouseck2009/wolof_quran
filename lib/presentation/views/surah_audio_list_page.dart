@@ -37,7 +37,7 @@ class SurahAudioListPage extends StatelessWidget {
 
         if (selectedReciter == null) {
           return Scaffold(
-            appBar: AppBar(title: Text(localizations.audioDownloads)),
+            appBar: AppBar(title: Text(localizations.recitation)),
             body: _NoReciterSelectedState(localizations: localizations),
           );
         }
@@ -406,8 +406,17 @@ class _ReciterSliverHeader extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SliverAppBar(
-      expandedHeight: 180,
+      expandedHeight: 150,
       pinned: true,
+      centerTitle: false,
+      title: Text(
+        localizations.recitation,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
       backgroundColor: isDark
           ? colorScheme.surfaceContainerLowest
           : colorScheme.primary,
@@ -486,15 +495,6 @@ class _ReciterSliverHeader extends StatelessWidget {
             ),
           ),
         ),
-        title: Text(
-          reciter.name,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        titlePadding: const EdgeInsets.only(left: 56, bottom: 14),
       ),
     );
   }

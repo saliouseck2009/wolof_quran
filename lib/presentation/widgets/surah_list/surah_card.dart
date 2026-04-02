@@ -70,8 +70,9 @@ class SurahCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Expanded(
+                          Flexible(
                             child: Text(
                               translatedName,
                               maxLines: 1,
@@ -84,20 +85,18 @@ class SurahCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              arabicName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontFamily: 'Hafs',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
+                          Text(
+                            arabicName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: 'Hafs',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.onSurfaceVariant,
                             ),
+                            textDirection: TextDirection.rtl,
+                            textAlign: TextAlign.right,
                           ),
                         ],
                       ),
@@ -141,7 +140,7 @@ class SurahCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 Container(
                   width: 36,
                   height: 36,

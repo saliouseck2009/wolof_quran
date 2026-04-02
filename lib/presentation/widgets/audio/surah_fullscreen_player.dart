@@ -287,15 +287,15 @@ class _CenterNowPlayingCard extends StatelessWidget {
             ? Colors.white.withValues(alpha: 0.08)
             : cs.primary.withValues(alpha: 0.12),
       ),
-      boxShadow: [
-        BoxShadow(
-          color: tokens.isDark
-              ? Colors.black.withValues(alpha: 0.22)
-              : cs.shadow.withValues(alpha: 0.08),
-          blurRadius: 18,
-          offset: const Offset(0, 8),
-        ),
-      ],
+      // boxShadow: [
+      //   BoxShadow(
+      //     color: tokens.isDark
+      //         ? Colors.black.withValues(alpha: 0.22)
+      //         : cs.shadow.withValues(alpha: 0.08),
+      //     // blurRadius: 18,
+      //     offset: const Offset(0, 8),
+      //   ),
+      // ],
     );
 
     return ConstrainedBox(
@@ -444,72 +444,89 @@ class _SurahArtwork extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final accentSoft = tokens.isDark
-        ? Colors.white.withValues(alpha: 0.24)
-        : tokens.accent.withValues(alpha: 0.22);
-
-    return SizedBox(
-      width: 196,
-      height: 196,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 196,
-            height: 196,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: accentSoft, width: 1.2),
-            ),
-          ),
-          Container(
-            width: 166,
-            height: 166,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: tokens.isDark
-                    ? Colors.white.withValues(alpha: 0.12)
-                    : cs.onSurface.withValues(alpha: 0.08),
-                width: 1.2,
-              ),
-            ),
-          ),
-          Container(
-            width: 138,
-            height: 138,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: tokens.isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : cs.onSurface.withValues(alpha: 0.06),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '${surahNumber ?? '--'}',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 38,
-                    fontWeight: FontWeight.w800,
-                    height: 1,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Icon(
-                  isPlaying
-                      ? Icons.graphic_eq_rounded
-                      : Icons.play_circle_fill_rounded,
-                  color: Colors.white.withValues(alpha: 0.92),
-                  size: 22,
-                ),
-              ],
-            ),
-          ),
-        ],
+    return Container(
+      width: 260,
+      height: 260,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF006E62), Color(0xFF00201B)],
+        ),
       ),
+      child: Center(child: _AnimatedMusicNote(isPlaying: isPlaying)),
+    );
+  }
+}
+
+class _AnimatedMusicNote extends StatefulWidget {
+  final bool isPlaying;
+
+  const _AnimatedMusicNote({required this.isPlaying});
+
+  @override
+  State<_AnimatedMusicNote> createState() => _AnimatedMusicNoteState();
+}
+
+class _AnimatedMusicNoteState extends State<_AnimatedMusicNote>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _scale;
+  late final Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 1.12,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+    _opacity = Tween<double>(
+      begin: 0.7,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+    if (widget.isPlaying) _ctrl.repeat(reverse: true);
+  }
+
+  @override
+  void didUpdateWidget(_AnimatedMusicNote oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isPlaying && !_ctrl.isAnimating) {
+      _ctrl.repeat(reverse: true);
+    } else if (!widget.isPlaying && _ctrl.isAnimating) {
+      _ctrl.stop();
+      _ctrl.animateTo(0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) {
+        return Transform.scale(
+          scale: _scale.value,
+          child: Opacity(
+            opacity: _opacity.value,
+            child: const Icon(
+              Icons.music_note_rounded,
+              color: Colors.white,
+              size: 96,
+            ),
+          ),
+        );
+      },
     );
   }
 }
