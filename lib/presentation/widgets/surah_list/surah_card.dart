@@ -42,12 +42,6 @@ class SurahCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: tileColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isHighlighted
-              ? accentColor.withValues(alpha: isDark ? 0.55 : 0.45)
-              : colorScheme.onSurface.withValues(alpha: isDark ? 0.08 : 0.06),
-          width: isHighlighted ? 1.2 : 1,
-        ),
       ),
       child: Material(
         type: MaterialType.transparency,
