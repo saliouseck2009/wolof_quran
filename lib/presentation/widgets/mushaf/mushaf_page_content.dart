@@ -9,7 +9,9 @@ import 'mushaf_verse_actions_sheet.dart';
 enum _MushafViewportClass {
   small,
   medium,
+  mediumLarge,
   large,
+  largeXlarge,
   xlarge,
   tabletPortrait,
   tabletLandscape,
@@ -56,6 +58,16 @@ const _mediumTuning = _MushafClassTuning(
   maxLineScale: 1.0,
 );
 
+const _mediumLargeTuning = _MushafClassTuning(
+  safetyHeightPx: 1,
+  viewportBoost: 0.016,
+  viewportBonus: 0.07,
+  minTextScale: 0.83,
+  maxTextScale: 1.045,
+  minLineScale: 0.81,
+  maxLineScale: 1.02,
+);
+
 const _largeTuning = _MushafClassTuning(
   safetyHeightPx: 2,
   viewportBoost: 0.02,
@@ -64,6 +76,16 @@ const _largeTuning = _MushafClassTuning(
   maxTextScale: 1.06,
   minLineScale: 0.82,
   maxLineScale: 1.04,
+);
+
+const _largeXlargeTuning = _MushafClassTuning(
+  safetyHeightPx: 4,
+  viewportBoost: 0.01,
+  viewportBonus: 0.057,
+  minTextScale: 0.85,
+  maxTextScale: 1.07,
+  minLineScale: 0.83,
+  maxLineScale: 1.05,
 );
 
 const _xlargeTuning = _MushafClassTuning(
@@ -254,8 +276,14 @@ _MushafViewportClass _resolveViewportClass({
   if (height <= 760) {
     return _MushafViewportClass.medium;
   }
+  if (height <= 830) {
+    return _MushafViewportClass.mediumLarge;
+  }
   if (height <= 900) {
     return _MushafViewportClass.large;
+  }
+  if (height <= 960) {
+    return _MushafViewportClass.largeXlarge;
   }
   return _MushafViewportClass.xlarge;
 }
@@ -266,8 +294,12 @@ _MushafClassTuning _tuningForClass(_MushafViewportClass viewportClass) {
       return _smallTuning;
     case _MushafViewportClass.medium:
       return _mediumTuning;
+    case _MushafViewportClass.mediumLarge:
+      return _mediumLargeTuning;
     case _MushafViewportClass.large:
       return _largeTuning;
+    case _MushafViewportClass.largeXlarge:
+      return _largeXlargeTuning;
     case _MushafViewportClass.xlarge:
       return _xlargeTuning;
     case _MushafViewportClass.tabletPortrait:
