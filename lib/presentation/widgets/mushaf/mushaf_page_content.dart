@@ -51,7 +51,7 @@ const _smallTuning = _MushafClassTuning(
 const _mediumTuning = _MushafClassTuning(
   safetyHeightPx: 0,
   viewportBoost: 0.012,
-  viewportBonus: 0.0,
+  viewportBonus: 0.0, //
   minTextScale: 0.82,
   maxTextScale: 1.03,
   minLineScale: 0.80,
@@ -61,7 +61,7 @@ const _mediumTuning = _MushafClassTuning(
 const _mediumLargeTuning = _MushafClassTuning(
   safetyHeightPx: 1,
   viewportBoost: 0.016,
-  viewportBonus: 0.07,
+  viewportBonus: 0.05,
   minTextScale: 0.83,
   maxTextScale: 1.045,
   minLineScale: 0.81,
