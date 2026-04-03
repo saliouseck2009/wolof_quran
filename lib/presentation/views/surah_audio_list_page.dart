@@ -1069,13 +1069,15 @@ class _TrackAction extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: colorScheme.primary,
+            color: isDark
+                ? colorScheme.primaryContainer.withValues(alpha: 0.9)
+                : accentColor.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
           child: Icon(
             Icons.cloud_off_outlined,
             size: 20,
-            color: colorScheme.onPrimary,
+            color: colorScheme.primary,
           ),
         ),
       );
@@ -1090,9 +1092,7 @@ class _TrackAction extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: isDark
-              ? accentColor.withValues(alpha: 0.15)
-              : colorScheme.primary,
+          color: colorScheme.primary,
           shape: BoxShape.circle,
         ),
         child: Icon(

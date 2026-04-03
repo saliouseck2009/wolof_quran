@@ -71,9 +71,12 @@ class AyahCard extends StatelessWidget {
             Row(
               children: [
                 ChapterNumberWidget(
-                  color: colorScheme.primary,
+                  color: isDark ? colorScheme.onPrimary : colorScheme.primary,
                   surahNumber: verseNumber,
                   textTheme: textTheme,
+                  backgroundColor: isDark
+                      ? colorScheme.surface
+                      : colorScheme.surface,
                 ),
 
                 const Spacer(),
@@ -125,21 +128,13 @@ class AyahCard extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: displayMode == AyahDisplayMode.translationOnly
-                      ? Colors.transparent
-                      : colorScheme.surfaceContainerHigh,
+                      ? colorScheme.surface
+                      : colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Text(
-                    //   translationSource,
-                    //   textAlign: TextAlign.justify,
-                    //   style: textTheme.labelMedium?.copyWith(
-                    //     color: colorScheme.primary,
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 4),
                     Text(
                       translation,
                       textAlign: TextAlign.justify,

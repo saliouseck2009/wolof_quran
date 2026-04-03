@@ -6,11 +6,13 @@ class ChapterNumberWidget extends StatelessWidget {
     required this.color,
     required this.surahNumber,
     required this.textTheme,
+    required this.backgroundColor,
   });
 
   final Color color;
   final int surahNumber;
   final TextTheme textTheme;
+  final Color backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class ChapterNumberWidget extends StatelessWidget {
       width: 42,
       height: 42,
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(40),
       ),
       child: Center(

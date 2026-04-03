@@ -269,21 +269,25 @@ class SurahInfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final color = isDark
+        ? Theme.of(context).colorScheme.onPrimary
+        : Theme.of(context).colorScheme.primary;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: Colors.white),
+          Icon(icon, size: 12, color: color),
           const SizedBox(width: 5),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: color,
               fontWeight: FontWeight.w500,
               fontSize: 11,
             ),
