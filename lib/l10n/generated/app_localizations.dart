@@ -241,7 +241,7 @@ abstract class AppLocalizations {
   /// Recitation text
   ///
   /// In en, this message translates to:
-  /// **'Recitation'**
+  /// **'Listen'**
   String get recitation;
 
   /// Translation text

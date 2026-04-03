@@ -78,7 +78,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get bookmarks => 'Signets';
 
   @override
-  String get recitation => 'Récitation';
+  String get recitation => 'Écoute';
 
   @override
   String get translation => 'Traduction';

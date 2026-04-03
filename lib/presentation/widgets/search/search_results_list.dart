@@ -234,7 +234,7 @@ class _SurahHeader extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: accentGreen.withValues(alpha: 0.2),
+                color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
@@ -243,7 +243,7 @@ class _SurahHeader extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: accentGreen,
+                    color: isDark ? colorScheme.onPrimary : accentGreen,
                   ),
                 ),
               ),
@@ -254,7 +254,7 @@ class _SurahHeader extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: accentGreen,
+                color: isDark ? colorScheme.onPrimary : colorScheme.primary,
               ),
             ),
           ],

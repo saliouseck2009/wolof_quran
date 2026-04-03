@@ -124,8 +124,6 @@ class _FullscreenContent extends StatelessWidget {
                       child: _CenterNowPlayingCard(
                         state: state,
                         tokens: t,
-                        reciterName: activeReciterName,
-                        total: total,
                         surahTitle: _surahTitleWithNumber(
                           context,
                           state.surahNumber,
@@ -257,175 +255,54 @@ class _FullscreenHeader extends StatelessWidget {
 class _CenterNowPlayingCard extends StatelessWidget {
   final SurahMiniPlayerState state;
   final _ThemeTokens tokens;
-  final String reciterName;
-  final Duration total;
   final String surahTitle;
 
   const _CenterNowPlayingCard({
     required this.state,
     required this.tokens,
-    required this.reciterName,
-    required this.total,
     required this.surahTitle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final isPlaying =
         state.playerState == AudioPlayerState.playing ||
         state.playerState == AudioPlayerState.loading;
-    final remaining = state.isSeekReady
-        ? _safeRemaining(total, state.position)
-        : Duration.zero;
-
-    final cardDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(28),
-      color: tokens.isDark ? cs.surfaceContainerHigh : cs.surfaceContainerLow,
-      border: Border.all(
-        color: tokens.isDark
-            ? Colors.white.withValues(alpha: 0.08)
-            : cs.primary.withValues(alpha: 0.12),
-      ),
-      // boxShadow: [
-      //   BoxShadow(
-      //     color: tokens.isDark
-      //         ? Colors.black.withValues(alpha: 0.22)
-      //         : cs.shadow.withValues(alpha: 0.08),
-      //     // blurRadius: 18,
-      //     offset: const Offset(0, 8),
-      //   ),
-      // ],
-    );
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 520),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 260),
-        decoration: cardDecoration,
-        padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _InfoChip(
-                    icon: Icons.menu_book_rounded,
-                    label: state.surahNumber != null
-                        ? 'Sourate ${state.surahNumber}'
-                        : 'Sourate --',
-                    tokens: tokens,
-                  ),
-                  _InfoChip(
-                    icon: isPlaying
-                        ? Icons.multitrack_audio_rounded
-                        : Icons.pause_circle_outline_rounded,
-                    label: isPlaying ? 'Lecture' : 'Pause',
-                    tokens: tokens,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _SurahArtwork(
-                surahNumber: state.surahNumber,
-                isPlaying: isPlaying,
-                tokens: tokens,
-              ),
-              const SizedBox(height: 18),
-              Text(
-                surahTitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: tokens.content,
-                  fontWeight: FontWeight.w800,
-                  height: 1.15,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                state.surahNumber != null
-                    ? quran.getSurahNameArabic(state.surahNumber!)
-                    : '',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: tokens.muted,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 18),
-              // ClipRRect(
-              //   borderRadius: BorderRadius.circular(999),
-              //   child: LinearProgressIndicator(
-              //     minHeight: 6,
-              //     value: progress,
-              //     color: tokens.accent,
-              //     backgroundColor: tokens.isDark
-              //         ? Colors.white.withValues(alpha: 0.16)
-              //         : cs.onSurface.withValues(alpha: 0.12),
-              //   ),
-              // ),
-              // const SizedBox(height: 8),
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: Text(
-              //         _formatDuration(state.position),
-              //         style: TextStyle(
-              //           color: tokens.muted,
-              //           fontSize: 12,
-              //           fontWeight: FontWeight.w600,
-              //         ),
-              //       ),
-              //     ),
-              //     Text(
-              //       state.isSeekReady ? _formatDuration(total) : '--:--',
-              //       style: TextStyle(
-              //         color: tokens.muted,
-              //         fontSize: 12,
-              //         fontWeight: FontWeight.w600,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              const SizedBox(height: 14),
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: tokens.isDark
-                    ? Colors.white.withValues(alpha: 0.12)
-                    : cs.onSurface.withValues(alpha: 0.1),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: _MetaRow(
-                      icon: Icons.person_rounded,
-                      label: 'Interprète',
-                      value: reciterName,
-                      tokens: tokens,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _MetaRow(
-                      icon: Icons.schedule_rounded,
-                      label: 'Restant',
-                      value: state.isSeekReady
-                          ? '-${_formatDuration(remaining)}'
-                          : '--:--',
-                      tokens: tokens,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _SurahArtwork(
+            surahNumber: state.surahNumber,
+            isPlaying: isPlaying,
+            tokens: tokens,
           ),
-        ),
+          const SizedBox(height: 20),
+          Text(
+            surahTitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              color: tokens.content,
+              fontWeight: FontWeight.w800,
+              height: 1.15,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            state.surahNumber != null
+                ? quran.getSurahNameArabic(state.surahNumber!)
+                : '',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: tokens.muted,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -527,99 +404,6 @@ class _AnimatedMusicNoteState extends State<_AnimatedMusicNote>
           ),
         );
       },
-    );
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final _ThemeTokens tokens;
-
-  const _InfoChip({
-    required this.icon,
-    required this.label,
-    required this.tokens,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: tokens.isDark
-            ? Colors.white.withValues(alpha: 0.1)
-            : cs.surface.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 15, color: tokens.content),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              color: tokens.content,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MetaRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final _ThemeTokens tokens;
-
-  const _MetaRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.tokens,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: tokens.muted),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: tokens.muted,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 1),
-              Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: tokens.content,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
@@ -839,13 +623,6 @@ String _formatDuration(Duration duration) {
   }
   return '${minutes.toString().padLeft(2, '0')}:'
       '${seconds.toString().padLeft(2, '0')}';
-}
-
-Duration _safeRemaining(Duration total, Duration position) {
-  if (total <= Duration.zero) return Duration.zero;
-  if (position <= Duration.zero) return total;
-  if (position >= total) return Duration.zero;
-  return total - position;
 }
 
 // ── Route helper ──────────────────────────────────────────────────────────────

@@ -78,7 +78,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookmarks => 'العلامات المرجعية';
 
   @override
-  String get recitation => 'التلاوة';
+  String get recitation => 'استماع';
 
   @override
   String get translation => 'الترجمة';

@@ -92,7 +92,7 @@
   "@bookmarks": {
     "description": "Bookmarks text"
   },
-  "recitation": "Recitation",
+  "recitation": "Listen",
   "@recitation": {
     "description": "Recitation text"
   },

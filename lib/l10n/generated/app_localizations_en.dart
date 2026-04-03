@@ -78,7 +78,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarks => 'Bookmarks';
 
   @override
-  String get recitation => 'Recitation';
+  String get recitation => 'Listen';
 
   @override
   String get translation => 'Translation';

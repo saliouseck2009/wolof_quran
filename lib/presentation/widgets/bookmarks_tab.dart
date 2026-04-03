@@ -35,6 +35,7 @@ class BookmarksTab extends StatelessWidget {
             fontSize: 18,
           ),
         ),
+        centerTitle: false,
         backgroundColor: colorScheme.brightness == Brightness.dark
             ? AppColor.surfaceDark
             : colorScheme.primary,
@@ -118,7 +119,9 @@ class BookmarksTab extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: colorScheme.primary,
+                                color: isDark
+                                    ? colorScheme.onPrimary
+                                    : colorScheme.primary,
                               ),
                             ),
                           ],

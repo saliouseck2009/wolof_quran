@@ -109,6 +109,7 @@ class DailyInspirationCard extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant,
                 height: 1.5,
               ),
+              textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 20),
             Row(
@@ -231,6 +232,7 @@ class DailyInspirationCard extends StatelessWidget {
                 color: colorScheme.onSurface,
                 height: 1.6,
               ),
+              textAlign: TextAlign.justify,
             ),
 
             // Expanded content
@@ -251,7 +253,8 @@ class DailyInspirationCard extends StatelessWidget {
                     color: colorScheme.onSurface,
                     height: 1.8,
                   ),
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.justify,
+                  textDirection: TextDirection.rtl,
                 ),
               ),
               const SizedBox(height: 20),
