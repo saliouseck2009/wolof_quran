@@ -317,9 +317,11 @@ class _DownloadActions extends StatelessWidget {
 
         if (isDownloaded) {
           final btnBg = isDark
-              ? accentColor.withValues(alpha: 0.2)
-              : colorScheme.primary;
-          final iconColor = isDark ? accentColor : colorScheme.onPrimary;
+              ? colorScheme.error.withValues(alpha: 0.18)
+              : colorScheme.errorContainer;
+          final iconColor = isDark
+              ? colorScheme.error
+              : colorScheme.onErrorContainer;
           return IconButton(
             onPressed: () async {
               await context.read<AudioManagementCubit>().deleteSurahAudio(
@@ -387,12 +389,12 @@ class _DownloadActions extends StatelessWidget {
             minimumSize: const Size(40, 40),
             maximumSize: const Size(40, 40),
             padding: EdgeInsets.zero,
-            shape: CircleBorder(
-              side: BorderSide(
-                color: accentColor.withValues(alpha: isDark ? 0.4 : 0.5),
-                width: 1,
-              ),
-            ),
+            // shape: CircleBorder(
+            //   side: BorderSide(
+            //     color: accentColor.withValues(alpha: isDark ? 0.4 : 0.5),
+            //     width: 1,
+            //   ),
+            // ),
           ),
         );
       },

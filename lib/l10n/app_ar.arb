@@ -220,5 +220,11 @@
   "hizbFull": "حزب {n}",
   "hizbOneQuarter": "ربع حزب {n}",
   "hizbHalf": "نصف حزب {n}",
-  "hizbThreeQuarter": "ثلاثة أرباع حزب {n}"
+  "hizbThreeQuarter": "ثلاثة أرباع حزب {n}",
+  "nowPlaying": "قيد التشغيل",
+  "collapsePlayer": "تصغير",
+  "previousSurah": "السابق",
+  "nextSurah": "التالي",
+  "rewind10s": "10 ثوانٍ للخلف",
+  "forward10s": "10 ثوانٍ للأمام"
 }

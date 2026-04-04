@@ -213,7 +213,7 @@ class _FullscreenHeader extends StatelessWidget {
               size: 32,
               color: tokens.content,
             ),
-            tooltip: 'Réduire',
+            tooltip: AppLocalizations.of(context)!.collapsePlayer,
           ),
           Expanded(
             child: Center(
@@ -221,7 +221,7 @@ class _FullscreenHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'En cours de lecture',
+                    AppLocalizations.of(context)!.nowPlaying,
                     style: TextStyle(
                       color: tokens.muted,
                       fontSize: 13,
@@ -489,7 +489,7 @@ class _FullscreenControls extends StatelessWidget {
               color: state.canGoPrevious ? t.content : t.disabled,
             ),
             iconSize: 36,
-            tooltip: 'Précédent',
+            tooltip: AppLocalizations.of(context)!.previousSurah,
           ),
           // Rewind 10s
           IconButton(
@@ -501,7 +501,7 @@ class _FullscreenControls extends StatelessWidget {
               color: state.isSeekReady ? t.content : t.disabled,
             ),
             iconSize: 32,
-            tooltip: 'Reculer 10s',
+            tooltip: AppLocalizations.of(context)!.rewind10s,
           ),
           // Play / Pause
           _PlayPauseButton(
@@ -518,7 +518,7 @@ class _FullscreenControls extends StatelessWidget {
               color: state.isSeekReady ? t.content : t.disabled,
             ),
             iconSize: 32,
-            tooltip: 'Avancer 10s',
+            tooltip: AppLocalizations.of(context)!.forward10s,
           ),
           // Next
           IconButton(
@@ -528,7 +528,7 @@ class _FullscreenControls extends StatelessWidget {
               color: state.canGoNext ? t.content : t.disabled,
             ),
             iconSize: 36,
-            tooltip: 'Suivant',
+            tooltip: AppLocalizations.of(context)!.nextSurah,
           ),
         ],
       ),

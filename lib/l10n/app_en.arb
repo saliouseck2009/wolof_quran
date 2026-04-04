@@ -943,6 +943,12 @@
       }
     }
   },
+  "nowPlaying": "Now Playing",
+  "collapsePlayer": "Collapse",
+  "previousSurah": "Previous",
+  "nextSurah": "Next",
+  "rewind10s": "Rewind 10s",
+  "forward10s": "Forward 10s",
   "hizbThreeQuarter": "3/4 Hizb {n}",
   "@hizbThreeQuarter": {
     "description": "Three-quarter hizb label shown in the mushaf bottom bar",

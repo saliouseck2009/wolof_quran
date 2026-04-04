@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/navigation/surah_detail_arguments.dart';
 import 'package:wolof_quran/presentation/widgets/search/search_results_list.dart';
@@ -8,6 +9,7 @@ import 'package:wolof_quran/presentation/widgets/snackbar.dart';
 import '../../domain/entities/bookmark.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/bookmark_cubit.dart';
+import '../cubits/quran_settings_cubit.dart';
 import '../widgets/ayah_card.dart';
 import '../widgets/ayah_play_button.dart';
 
@@ -43,7 +45,10 @@ class BookmarksTab extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: BlocBuilder<BookmarkCubit, BookmarkState>(
+      body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
+        builder: (context, settingsState) {
+          final currentTranslation = settingsState.selectedTranslation;
+          return BlocBuilder<BookmarkCubit, BookmarkState>(
         builder: (context, state) {
           if (state is BookmarkLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -190,9 +195,13 @@ class BookmarksTab extends StatelessWidget {
                                     child: AyahCard(
                                       verseNumber: bookmark.verseNumber,
                                       arabicText: bookmark.arabicText,
-                                      translationSource:
-                                          bookmark.translationSource,
-                                      translation: bookmark.translation,
+                                      translationSource: _translationSourceName(
+                                        currentTranslation,
+                                      ),
+                                      translation: _liveTranslation(
+                                        bookmark,
+                                        currentTranslation,
+                                      ),
                                       surahNumber: bookmark.surahNumber,
                                       surahName: bookmark.surahName,
                                       actions: [
@@ -252,8 +261,56 @@ class BookmarksTab extends StatelessWidget {
 
           return const SizedBox.shrink();
         },
+          );
+        },
       ),
     );
+  }
+
+  String _liveTranslation(
+    BookmarkedAyah bookmark,
+    quran.Translation translation,
+  ) {
+    try {
+      return quran.getVerseTranslation(
+        bookmark.surahNumber,
+        bookmark.verseNumber,
+        translation: translation,
+      );
+    } catch (_) {
+      return bookmark.translation;
+    }
+  }
+
+  String _translationSourceName(quran.Translation translation) {
+    switch (translation) {
+      case quran.Translation.enSaheeh:
+        return 'Saheeh International';
+      case quran.Translation.enClearQuran:
+        return 'Clear Quran';
+      case quran.Translation.frHamidullah:
+        return 'Muhammad Hamidullah';
+      case quran.Translation.trSaheeh:
+        return 'Türkçe';
+      case quran.Translation.mlAbdulHameed:
+        return 'Malayalam';
+      case quran.Translation.faHusseinDari:
+        return 'Farsi';
+      case quran.Translation.portuguese:
+        return 'Português';
+      case quran.Translation.itPiccardo:
+        return 'Italiano';
+      case quran.Translation.nlSiregar:
+        return 'Nederlands';
+      case quran.Translation.ruKuliev:
+        return 'Русский';
+      case quran.Translation.bengali:
+        return 'Bengali';
+      case quran.Translation.chinese:
+        return 'Chinese';
+      default:
+        return 'Translation';
+    }
   }
 
   Widget _buildEmptyState(

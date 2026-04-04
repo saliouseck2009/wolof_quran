@@ -58,10 +58,14 @@ class ReciterListItem extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: accentGreen.withValues(alpha: 0.12),
+                      color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.person, color: accentGreen, size: 24),
+                    child: Icon(
+                      Icons.person,
+                      color: isDark ? colorScheme.onPrimary : accentGreen,
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -99,14 +103,6 @@ class ReciterListItem extends StatelessWidget {
                                         alpha: 0.12,
                                       ),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? accentGreen.withValues(alpha: 0.25)
-                                      : colorScheme.onSurfaceVariant.withValues(
-                                          alpha: 0.2,
-                                        ),
-                                  width: 1,
-                                ),
                               ),
                               child: Text(
                                 isSelected
@@ -115,9 +111,9 @@ class ReciterListItem extends StatelessWidget {
                                 style: Theme.of(context).textTheme.bodySmall
                                     ?.copyWith(
                                       fontWeight: FontWeight.w500,
-                                      color: isSelected
-                                          ? accentGreen
-                                          : colorScheme.onSurfaceVariant,
+                                      color: isDark
+                                          ? colorScheme.onPrimary
+                                          : accentGreen,
                                     ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -135,11 +131,6 @@ class ReciterListItem extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: colorScheme.primary,
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: colorScheme.primary.withValues(
-                                        alpha: 0.45,
-                                      ),
-                                    ),
                                   ),
                                   child: Text(
                                     localizations.newAudioBadge(unreadNewCount),
@@ -164,20 +155,14 @@ class ReciterListItem extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? accentGreen.withValues(alpha: 0.15)
-                            : colorScheme.onSurfaceVariant.withValues(
-                                alpha: 0.12,
-                              ),
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         isSelected
                             ? Icons.check_circle
                             : Icons.radio_button_unchecked,
-                        color: isSelected
-                            ? accentGreen
-                            : colorScheme.onSurfaceVariant,
+                        color: isDark ? colorScheme.onPrimary : accentGreen,
                         size: 20,
                       ),
                     ),

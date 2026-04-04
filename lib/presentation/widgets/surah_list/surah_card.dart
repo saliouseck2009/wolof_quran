@@ -55,7 +55,9 @@ class SurahCard extends StatelessWidget {
               children: [
                 _NumberBadge(
                   number: surahNumber,
-                  accentColor: accentColor,
+                  accentColor: isDark
+                      ? colorScheme.surface
+                      : colorScheme.primary,
                   colorScheme: colorScheme,
                 ),
                 const SizedBox(width: 12),
@@ -139,9 +141,7 @@ class SurahCard extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? accentColor.withValues(alpha: 0.2)
-                        : accentColor,
+                    color: isDark ? colorScheme.surface : accentColor,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

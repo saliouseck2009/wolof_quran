@@ -676,6 +676,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get nowPlaying => 'Now Playing';
+
+  @override
+  String get collapsePlayer => 'Collapse';
+
+  @override
+  String get previousSurah => 'Previous';
+
+  @override
+  String get nextSurah => 'Next';
+
+  @override
+  String get rewind10s => 'Rewind 10s';
+
+  @override
+  String get forward10s => 'Forward 10s';
+
+  @override
   String hizbThreeQuarter(int n) {
     return '3/4 Hizb $n';
   }

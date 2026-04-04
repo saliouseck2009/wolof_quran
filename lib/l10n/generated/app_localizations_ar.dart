@@ -669,6 +669,24 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get nowPlaying => 'قيد التشغيل';
+
+  @override
+  String get collapsePlayer => 'تصغير';
+
+  @override
+  String get previousSurah => 'السابق';
+
+  @override
+  String get nextSurah => 'التالي';
+
+  @override
+  String get rewind10s => '10 ثوانٍ للخلف';
+
+  @override
+  String get forward10s => '10 ثوانٍ للأمام';
+
+  @override
   String hizbThreeQuarter(int n) {
     return 'ثلاثة أرباع حزب $n';
   }

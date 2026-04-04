@@ -1312,6 +1312,42 @@ abstract class AppLocalizations {
   /// **'1/2 Hizb {n}'**
   String hizbHalf(int n);
 
+  /// No description provided for @nowPlaying.
+  ///
+  /// In en, this message translates to:
+  /// **'Now Playing'**
+  String get nowPlaying;
+
+  /// No description provided for @collapsePlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get collapsePlayer;
+
+  /// No description provided for @previousSurah.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previousSurah;
+
+  /// No description provided for @nextSurah.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextSurah;
+
+  /// No description provided for @rewind10s.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewind 10s'**
+  String get rewind10s;
+
+  /// No description provided for @forward10s.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward 10s'**
+  String get forward10s;
+
   /// Three-quarter hizb label shown in the mushaf bottom bar
   ///
   /// In en, this message translates to:
