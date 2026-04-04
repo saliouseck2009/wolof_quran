@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -5,13 +6,18 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:wolof_quran/core/mushaf/mushaf_theme.dart';
 import 'package:wolof_quran/core/utils/constants/constants.dart';
+import '../../domain/entities/ayah_audio.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../blocs/mushaf/mushaf_bloc.dart';
+import '../cubits/audio_management_cubit.dart';
+import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
 import 'snackbar.dart';
 
@@ -519,7 +525,33 @@ class _DailyInspirationShareModalState
 
   Future<void> _shareVideo() async {
     final localizations = AppLocalizations.of(context)!;
-    _showMessage(localizations.shareVideoUnavailableInScreenshotMode);
+    await _shareWithGuard(
+      originKey: _shareVideoButtonKey,
+      isVideoShare: true,
+      prepareFiles: () async {
+        final imageFile = await _capturePreviewToFile(jpeg: true);
+        if (imageFile == null) {
+          _showMessage(localizations.shareCaptureFailed);
+          return null;
+        }
+
+        final audioPath = await _getAyahAudioPath();
+        if (audioPath == null) return null;
+
+        final videoPath = await _generateVideoFromAssets(
+          imagePath: imageFile.path,
+          audioPath: audioPath,
+        );
+        if (videoPath == null) {
+          _showMessage(localizations.shareVideoGenerationFailed);
+          return null;
+        }
+
+        return [XFile(videoPath, mimeType: 'video/mp4')];
+      },
+      shareText: _buildShareText(localizations),
+      fallbackMessage: localizations.shareActionCancelled,
+    );
   }
 
   String _buildShareText(AppLocalizations localizations) {
@@ -747,6 +779,92 @@ class _DailyInspirationShareModalState
     );
     await file.writeAsBytes(uint8List);
     return file;
+  }
+
+  Future<String?> _getAyahAudioPath() async {
+    final localizations = AppLocalizations.of(context)!;
+    final quranSettings = context.read<QuranSettingsCubit>();
+    final selectedReciter = quranSettings.state.selectedReciter;
+    if (selectedReciter == null) {
+      _showMessage(localizations.shareSelectReciterForVideo);
+      return null;
+    }
+
+    final audioCubit = context.read<AudioManagementCubit>();
+    if (audioCubit.state is! AudioManagementLoaded &&
+        audioCubit.state is! AudioDownloading) {
+      audioCubit.initialize();
+    }
+
+    await audioCubit.loadAyahAudios(selectedReciter.id, widget.surahNumber);
+
+    final audioState = audioCubit.state;
+
+    List<AyahAudio> ayahAudios = [];
+    if (audioState is AudioManagementLoaded) {
+      ayahAudios = audioState.getAyahAudios(
+        selectedReciter.id,
+        widget.surahNumber,
+      );
+    } else if (audioState is AudioDownloading) {
+      final key = '${selectedReciter.id}_${widget.surahNumber}';
+      ayahAudios = audioState.previousAyahAudiosMap[key] ?? [];
+    } else {
+      _showMessage(localizations.shareAudioUnavailableForSurah);
+      return null;
+    }
+
+    if (ayahAudios.isEmpty) {
+      _showMessage(localizations.shareAudioNotDownloaded);
+      return null;
+    }
+
+    final AyahAudio ayahAudio = ayahAudios.firstWhere(
+      (audio) => audio.ayahNumber == widget.verseNumber,
+      orElse: () => const AyahAudio(
+        surahNumber: -1,
+        ayahNumber: -1,
+        reciterId: '',
+        localPath: '',
+      ),
+    );
+
+    if ((ayahAudio.surahNumber == -1 || ayahAudio.localPath.isEmpty)) {
+      _showMessage(localizations.shareAudioFileMissingAyah);
+      return null;
+    }
+
+    final file = File(ayahAudio.localPath);
+    if (!await file.exists()) {
+      _showMessage(localizations.shareAudioFileMissingDevice);
+      return null;
+    }
+
+    return file.path;
+  }
+
+  Future<String?> _generateVideoFromAssets({
+    required String imagePath,
+    required String audioPath,
+  }) async {
+    final tempDir = await getTemporaryDirectory();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final outputPath =
+        '${tempDir.path}/chapter_${widget.surahNumber}_verse_${widget.verseNumber}_$timestamp.mp4';
+
+    final command =
+        '-y -loop 1 -i "$imagePath" -i "$audioPath" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(1080-iw)/2:(1920-ih)/2,format=yuv420p" -c:v libx264 -preset veryfast -tune stillimage -c:a aac -b:a 192k -shortest "$outputPath"';
+
+    final session = await FFmpegKit.execute(command);
+    final returnCode = await session.getReturnCode();
+
+    if (!ReturnCode.isSuccess(returnCode)) {
+      final output = await session.getOutput();
+      log('FFmpeg command failed with output: $output');
+      return null;
+    }
+
+    return outputPath;
   }
 
   void _showMessage(String message) {
