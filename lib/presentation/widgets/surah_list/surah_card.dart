@@ -13,6 +13,7 @@ class SurahCard extends StatelessWidget {
     required this.revelationPlace,
     required this.onTap,
     this.isHighlighted = false,
+    this.pageNumber,
   });
 
   final int surahNumber;
@@ -23,6 +24,7 @@ class SurahCard extends StatelessWidget {
   final String revelationPlace;
   final VoidCallback onTap;
   final bool isHighlighted;
+  final int? pageNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -137,19 +139,40 @@ class SurahCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: isDark ? colorScheme.surface : accentColor,
-                    shape: BoxShape.circle,
+                if (pageNumber != null)
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? colorScheme.surface
+                          : accentColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '$pageNumber',
+                      style: TextStyle(
+                        color: accentColor,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: isDark ? colorScheme.surface : accentColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 15,
+                      color: colorScheme.onPrimary,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 15,
-                    color: colorScheme.onPrimary,
-                  ),
-                ),
               ],
             ),
           ),
