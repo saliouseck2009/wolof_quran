@@ -713,4 +713,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copyId => 'Copy ID';
+
+  @override
+  String get supportValue => 'Jazaakumullaahu khairan';
 }

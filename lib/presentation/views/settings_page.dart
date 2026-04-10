@@ -140,7 +140,7 @@ class _SettingsMenu extends StatelessWidget {
           icon: Icons.favorite_outline,
           title: localizations.supportProject,
           subtitle: localizations.supportSubtitle,
-          value: '',
+          value: localizations.supportValue,
           onTap: onShowSupport,
           showArrow: true,
         ),

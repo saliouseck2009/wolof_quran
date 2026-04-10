@@ -73,10 +73,10 @@ class SupportPage extends StatelessWidget {
                   Text(
                     localizations.supportPageTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: colorScheme.onSurface,
-                          letterSpacing: -0.3,
-                        ),
+                      fontWeight: FontWeight.w800,
+                      color: colorScheme.onSurface,
+                      letterSpacing: -0.3,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 12),
@@ -86,9 +86,9 @@ class SupportPage extends StatelessWidget {
                     config.messageForLocale(languageCode),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          height: 1.65,
-                        ),
+                      color: colorScheme.onSurfaceVariant,
+                      height: 1.65,
+                    ),
                   ),
                 ],
               ),
@@ -251,10 +251,7 @@ class _PaymentMethodCardState extends State<_PaymentMethodCard> {
                       padding: const EdgeInsets.all(6),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          widget.iconAsset,
-                          fit: BoxFit.cover,
-                        ),
+                        child: Image.asset(widget.iconAsset, fit: BoxFit.cover),
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -266,9 +263,7 @@ class _PaymentMethodCardState extends State<_PaymentMethodCard> {
                         children: [
                           Text(
                             widget.title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: cs.onSurface,
@@ -278,13 +273,11 @@ class _PaymentMethodCardState extends State<_PaymentMethodCard> {
                           Text(
                             _expanded
                                 ? (widget.copyableId != null
-                                    ? widget.copyLabel ?? ''
-                                    : widget.actionLabel ?? '')
+                                      ? widget.copyLabel ?? ''
+                                      : widget.actionLabel ?? '')
                                 : widget.subtitle,
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: cs.onSurfaceVariant,
-                                    ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: cs.onSurfaceVariant),
                           ),
                         ],
                       ),
@@ -318,8 +311,9 @@ class _PaymentMethodCardState extends State<_PaymentMethodCard> {
           AnimatedCrossFade(
             firstChild: const SizedBox.shrink(),
             secondChild: _buildExpandedContent(context, cs, accent),
-            crossFadeState:
-                _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            crossFadeState: _expanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
             duration: const Duration(milliseconds: 280),
             sizeCurve: Curves.easeOutCubic,
           ),
@@ -350,9 +344,7 @@ class _PaymentMethodCardState extends State<_PaymentMethodCard> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: cs.onSurface.withValues(alpha: 0.06),
-              ),
+              border: Border.all(color: cs.onSurface.withValues(alpha: 0.06)),
             ),
             child: QrImageView(
               data: widget.qrData,
@@ -409,11 +401,11 @@ class _PaymentMethodCardState extends State<_PaymentMethodCard> {
                     child: Text(
                       widget.copyableId!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontFamily: 'monospace',
-                            color: cs.onSurfaceVariant,
-                            letterSpacing: 0.3,
-                            fontSize: 11,
-                          ),
+                        fontFamily: 'monospace',
+                        color: cs.onSurfaceVariant,
+                        letterSpacing: 0.3,
+                        fontSize: 11,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -433,17 +425,11 @@ class _PaymentMethodCardState extends State<_PaymentMethodCard> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
-                                Icons.copy_rounded,
-                                size: 14,
-                                color: accent,
-                              ),
+                              Icon(Icons.copy_rounded, size: 14, color: accent),
                               const SizedBox(width: 4),
                               Text(
                                 widget.copyLabel ?? '',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
+                                style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
                                       color: accent,
                                       fontWeight: FontWeight.w700,

@@ -986,5 +986,9 @@
   "copyId": "Copy ID",
   "@copyId": {
     "description": "Button label to copy PI SPI identifier"
+  },
+  "supportValue": "Jazaakumullaahu khairan",
+  "@supportValue": {
+    "description": "Short value text shown on the support settings card"
   }
 }

@@ -706,4 +706,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get copyId => 'نسخ المعرّف';
+
+  @override
+  String get supportValue => 'جزاكم الله خيرًا';
 }

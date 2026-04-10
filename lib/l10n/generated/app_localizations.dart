@@ -1389,6 +1389,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copy ID'**
   String get copyId;
+
+  /// Short value text shown on the support settings card
+  ///
+  /// In en, this message translates to:
+  /// **'Jazaakumullaahu khairan'**
+  String get supportValue;
 }
 
 class _AppLocalizationsDelegate
