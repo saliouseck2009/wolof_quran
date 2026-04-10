@@ -528,9 +528,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get copyLabel => 'Copier';
 
   @override
-  String copiedToClipboard(String label) {
-    return '$label copié';
-  }
+  String get copiedToClipboard => 'Copie dans le presse-papiers';
 
   @override
   String appVersion(String version) {
@@ -707,4 +705,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String hizbThreeQuarter(int n) {
     return '3/4 Hizb $n';
   }
+
+  @override
+  String get supportProject => 'Soutenir le projet';
+
+  @override
+  String get supportSubtitle => 'Contribuez au maintien de l\'application';
+
+  @override
+  String get supportPageTitle => 'Soutenir Coran Wolof';
+
+  @override
+  String get payWithWave => 'Wave';
+
+  @override
+  String get piSpiPayment => 'PI SPI';
+
+  @override
+  String get copyId => 'Copier l\'identifiant';
 }

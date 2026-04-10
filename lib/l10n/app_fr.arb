@@ -217,5 +217,12 @@
   "previousSurah": "Précédent",
   "nextSurah": "Suivant",
   "rewind10s": "Reculer 10s",
-  "forward10s": "Avancer 10s"
+  "forward10s": "Avancer 10s",
+  "supportProject": "Soutenir le projet",
+  "supportSubtitle": "Contribuez au maintien de l'application",
+  "supportPageTitle": "Soutenir Coran Wolof",
+  "payWithWave": "Wave",
+  "piSpiPayment": "PI SPI",
+  "copiedToClipboard": "Copie dans le presse-papiers",
+  "copyId": "Copier l'identifiant"
 }

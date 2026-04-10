@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Data Sources
 import 'data/datasources/reciter_local_data_source.dart';
@@ -36,6 +37,7 @@ import 'domain/usecases/mark_audio_updates_seen_usecase.dart';
 // Services
 import 'core/services/audio_player_service.dart';
 import 'core/services/audio_download_queue_service.dart';
+import 'data/datasources/remote_config_service.dart';
 
 final locator = GetIt.instance;
 
@@ -131,4 +133,14 @@ Future<void> setupDependencies() async {
       downloadRepository: locator<DownloadRepository>(),
     ),
   );
+
+  // Remote Config
+  final prefs = await SharedPreferences.getInstance();
+  final remoteConfigService = RemoteConfigService(
+    dio: locator<Dio>(),
+    prefs: prefs,
+  );
+  // Non-blocking init — fetches config in background.
+  remoteConfigService.init();
+  locator.registerSingleton<RemoteConfigService>(remoteConfigService);
 }

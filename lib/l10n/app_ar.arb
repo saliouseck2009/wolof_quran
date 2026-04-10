@@ -226,5 +226,12 @@
   "previousSurah": "السابق",
   "nextSurah": "التالي",
   "rewind10s": "10 ثوانٍ للخلف",
-  "forward10s": "10 ثوانٍ للأمام"
+  "forward10s": "10 ثوانٍ للأمام",
+  "supportProject": "دعم المشروع",
+  "supportSubtitle": "ساهم في استمرارية التطبيق",
+  "supportPageTitle": "دعم القرآن بالولوف",
+  "payWithWave": "Wave",
+  "piSpiPayment": "PI SPI",
+  "copiedToClipboard": "تم النسخ",
+  "copyId": "نسخ المعرّف"
 }

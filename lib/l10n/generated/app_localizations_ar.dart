@@ -514,9 +514,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get copyLabel => 'نسخ';
 
   @override
-  String copiedToClipboard(String label) {
-    return 'تم نسخ $label';
-  }
+  String get copiedToClipboard => 'تم النسخ';
 
   @override
   String appVersion(String version) {
@@ -690,4 +688,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String hizbThreeQuarter(int n) {
     return 'ثلاثة أرباع حزب $n';
   }
+
+  @override
+  String get supportProject => 'دعم المشروع';
+
+  @override
+  String get supportSubtitle => 'ساهم في استمرارية التطبيق';
+
+  @override
+  String get supportPageTitle => 'دعم القرآن بالولوف';
+
+  @override
+  String get payWithWave => 'Wave';
+
+  @override
+  String get piSpiPayment => 'PI SPI';
+
+  @override
+  String get copyId => 'نسخ المعرّف';
 }

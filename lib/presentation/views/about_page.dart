@@ -114,7 +114,7 @@ class AboutPage extends StatelessWidget {
     if (context.mounted) {
       CustomSnackbar.showSnackbar(
         context,
-        localizations.copiedToClipboard(label),
+        localizations.copiedToClipboard,
         duration: 2,
       );
     }

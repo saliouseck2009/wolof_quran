@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/config/localization/localization_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import 'about_page.dart';
+import 'support_page.dart';
 import '../cubits/language_cubit.dart';
 import '../cubits/theme_cubit.dart';
 import '../widgets/settings/language_selector_sheet.dart';
@@ -53,6 +54,8 @@ class SettingsPage extends StatelessWidget {
               onShowTheme: () => _showThemeSelector(context, localizations),
               onShowAbout: () =>
                   Navigator.pushNamed(context, AboutPage.routeName),
+              onShowSupport: () =>
+                  Navigator.pushNamed(context, SupportPage.routeName),
             ),
             const SizedBox(height: 54),
           ],
@@ -91,12 +94,14 @@ class _SettingsMenu extends StatelessWidget {
   final VoidCallback onShowLanguage;
   final VoidCallback onShowTheme;
   final VoidCallback onShowAbout;
+  final VoidCallback onShowSupport;
 
   const _SettingsMenu({
     required this.localizations,
     required this.onShowLanguage,
     required this.onShowTheme,
     required this.onShowAbout,
+    required this.onShowSupport,
   });
 
   @override
@@ -132,6 +137,15 @@ class _SettingsMenu extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         SettingsMenuItem(
+          icon: Icons.favorite_outline,
+          title: localizations.supportProject,
+          subtitle: localizations.supportSubtitle,
+          value: '',
+          onTap: onShowSupport,
+          showArrow: true,
+        ),
+        const SizedBox(height: 16),
+        SettingsMenuItem(
           icon: Icons.info_outline,
           title: localizations.about,
           subtitle: localizations.aboutSubtitle,
@@ -139,7 +153,7 @@ class _SettingsMenu extends StatelessWidget {
           onTap: onShowAbout,
           showArrow: true,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
       ],
     );
   }

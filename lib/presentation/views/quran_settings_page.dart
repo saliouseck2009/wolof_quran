@@ -11,6 +11,8 @@ import '../widgets/quran_settings/font_size_selector_sheet.dart';
 import '../widgets/quran_settings/quran_settings_header.dart';
 import '../widgets/quran_settings/quran_settings_menu.dart';
 import '../widgets/quran_settings/translation_selector_sheet.dart';
+import '../widgets/settings/settings_menu_item.dart';
+import 'support_page.dart';
 
 class QuranSettingsPage extends StatelessWidget {
   static const String routeName = "/quran-settings";
@@ -79,9 +81,17 @@ class _QuranSettingsView extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 24),
-
-                // Future settings sections can be added here
-                // Example: Audio settings, font size, etc.
+                SettingsMenuItem(
+                  icon: Icons.favorite_outline,
+                  title: localizations.supportProject,
+                  subtitle: localizations.supportSubtitle,
+                  value: '',
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    SupportPage.routeName,
+                  ),
+                  showArrow: true,
+                ),
                 const SizedBox(height: 32),
               ],
             ),

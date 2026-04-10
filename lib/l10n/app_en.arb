@@ -958,5 +958,33 @@
         "description": "The hizb number"
       }
     }
+  },
+  "supportProject": "Support the project",
+  "@supportProject": {
+    "description": "Settings menu item title for support page"
+  },
+  "supportSubtitle": "Help keep the app free and growing",
+  "@supportSubtitle": {
+    "description": "Settings menu item subtitle for support page"
+  },
+  "supportPageTitle": "Support Wolof Quran",
+  "@supportPageTitle": {
+    "description": "Title of the support/donation page"
+  },
+  "payWithWave": "Wave",
+  "@payWithWave": {
+    "description": "Title for Wave payment section"
+  },
+  "piSpiPayment": "PI SPI",
+  "@piSpiPayment": {
+    "description": "Title for PI SPI payment section"
+  },
+  "copiedToClipboard": "Copied to clipboard",
+  "@copiedToClipboard": {
+    "description": "Snackbar message when text is copied"
+  },
+  "copyId": "Copy ID",
+  "@copyId": {
+    "description": "Button label to copy PI SPI identifier"
   }
 }

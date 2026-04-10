@@ -1054,11 +1054,11 @@ abstract class AppLocalizations {
   /// **'Copy'**
   String get copyLabel;
 
-  /// Snackbar message after copying a value
+  /// Snackbar message when text is copied
   ///
   /// In en, this message translates to:
-  /// **'{label} copied'**
-  String copiedToClipboard(String label);
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
 
   /// App version label with number
   ///
@@ -1353,6 +1353,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'3/4 Hizb {n}'**
   String hizbThreeQuarter(int n);
+
+  /// Settings menu item title for support page
+  ///
+  /// In en, this message translates to:
+  /// **'Support the project'**
+  String get supportProject;
+
+  /// Settings menu item subtitle for support page
+  ///
+  /// In en, this message translates to:
+  /// **'Help keep the app free and growing'**
+  String get supportSubtitle;
+
+  /// Title of the support/donation page
+  ///
+  /// In en, this message translates to:
+  /// **'Support Wolof Quran'**
+  String get supportPageTitle;
+
+  /// Title for Wave payment section
+  ///
+  /// In en, this message translates to:
+  /// **'Wave'**
+  String get payWithWave;
+
+  /// Title for PI SPI payment section
+  ///
+  /// In en, this message translates to:
+  /// **'PI SPI'**
+  String get piSpiPayment;
+
+  /// Button label to copy PI SPI identifier
+  ///
+  /// In en, this message translates to:
+  /// **'Copy ID'**
+  String get copyId;
 }
 
 class _AppLocalizationsDelegate
