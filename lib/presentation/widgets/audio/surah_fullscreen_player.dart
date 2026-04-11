@@ -271,38 +271,50 @@ class _CenterNowPlayingCard extends StatelessWidget {
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 520),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _SurahArtwork(
-            surahNumber: state.surahNumber,
-            isPlaying: isPlaying,
-            tokens: tokens,
-          ),
-          const SizedBox(height: 20),
-          Text(
-            surahTitle,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: tokens.content,
-              fontWeight: FontWeight.w800,
-              height: 1.15,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            state.surahNumber != null
-                ? quran.getSurahNameArabic(state.surahNumber!)
-                : '',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: tokens.muted,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final availableHeight = constraints.maxHeight.isFinite
+              ? constraints.maxHeight
+              : 420.0;
+          final artworkSize = (availableHeight - 124).clamp(140.0, 260.0);
+          final spacingAfterArtwork = artworkSize >= 220 ? 20.0 : 12.0;
+          final spacingBeforeArabic = artworkSize >= 220 ? 6.0 : 4.0;
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _SurahArtwork(
+                surahNumber: state.surahNumber,
+                isPlaying: isPlaying,
+                tokens: tokens,
+                size: artworkSize.toDouble(),
+              ),
+              SizedBox(height: spacingAfterArtwork),
+              Text(
+                surahTitle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: tokens.content,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                ),
+              ),
+              SizedBox(height: spacingBeforeArabic),
+              Text(
+                state.surahNumber != null
+                    ? quran.getSurahNameArabic(state.surahNumber!)
+                    : '',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: tokens.muted,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -312,18 +324,20 @@ class _SurahArtwork extends StatelessWidget {
   final int? surahNumber;
   final bool isPlaying;
   final _ThemeTokens tokens;
+  final double size;
 
   const _SurahArtwork({
     required this.surahNumber,
     required this.isPlaying,
     required this.tokens,
+    required this.size,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 260,
-      height: 260,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
@@ -332,15 +346,21 @@ class _SurahArtwork extends StatelessWidget {
           colors: [Color(0xFF006E62), Color(0xFF00201B)],
         ),
       ),
-      child: Center(child: _AnimatedMusicNote(isPlaying: isPlaying)),
+      child: Center(
+        child: _AnimatedMusicNote(
+          isPlaying: isPlaying,
+          iconSize: (size * 0.37).clamp(56.0, 96.0).toDouble(),
+        ),
+      ),
     );
   }
 }
 
 class _AnimatedMusicNote extends StatefulWidget {
   final bool isPlaying;
+  final double iconSize;
 
-  const _AnimatedMusicNote({required this.isPlaying});
+  const _AnimatedMusicNote({required this.isPlaying, required this.iconSize});
 
   @override
   State<_AnimatedMusicNote> createState() => _AnimatedMusicNoteState();
@@ -396,10 +416,10 @@ class _AnimatedMusicNoteState extends State<_AnimatedMusicNote>
           scale: _scale.value,
           child: Opacity(
             opacity: _opacity.value,
-            child: const Icon(
+            child: Icon(
               Icons.music_note_rounded,
               color: Colors.white,
-              size: 96,
+              size: widget.iconSize,
             ),
           ),
         );

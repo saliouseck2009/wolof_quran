@@ -1066,6 +1066,132 @@ abstract class AppLocalizations {
   /// **'Version {version}'**
   String appVersion(String version);
 
+  /// Settings menu title
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// Settings menu subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Your privacy matters'**
+  String get privacyPolicySubtitle;
+
+  /// Value label
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get privacyPolicyValue;
+
+  /// Page title
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyPageTitle;
+
+  /// Last updated label
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated: {date}'**
+  String privacyPolicyLastUpdated(String date);
+
+  /// Intro text
+  ///
+  /// In en, this message translates to:
+  /// **'Wolof Quran does not collect, store, or transmit any personal data. Your privacy is fully respected.'**
+  String get privacyPolicyIntro;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Data stored on your device'**
+  String get privacyPolicyLocalDataTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'All your data stays on your device and is never sent to any server:\n\n- Your preferences (language, theme, font size, selected reciter)\n- Downloaded audio files\n- Bookmarks and reading progress'**
+  String get privacyPolicyLocalDataBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Internet access'**
+  String get privacyPolicyInternetTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'The app uses an internet connection solely to:\n\n- Download Quran audio recitations\n- Check for app updates\n\nNo personal information is sent during these operations.'**
+  String get privacyPolicyInternetBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions'**
+  String get privacyPolicyPermissionsTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'The app requests only the permissions strictly necessary for its features:\n\n- Internet: to download audio content\n- Audio playback: to play Quran recitations, including in the background'**
+  String get privacyPolicyPermissionsBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'External links'**
+  String get privacyPolicyThirdPartyTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'The support page contains links to external payment services (Wave, PI SPI). These services have their own privacy policies. We do not receive or store any payment information.'**
+  String get privacyPolicyThirdPartyBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Suitable for all ages'**
+  String get privacyPolicyChildrenTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'Since the app does not collect any personal data, it is safe for users of all ages, including children.'**
+  String get privacyPolicyChildrenBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get privacyPolicyContactTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'For any question regarding this policy: {email}'**
+  String privacyPolicyContactBody(String email);
+
+  /// Publisher legal name
+  ///
+  /// In en, this message translates to:
+  /// **'Publisher: {name}'**
+  String privacyPolicyPublisher(String name);
+
+  /// Age rating statement
+  ///
+  /// In en, this message translates to:
+  /// **'This app is rated for all audiences (all ages).'**
+  String get privacyPolicyAgeRating;
+
+  /// Link label for online privacy policy
+  ///
+  /// In en, this message translates to:
+  /// **'Full policy online'**
+  String get privacyPolicyOnlineVersion;
+
   /// Header subtitle on Quran settings page
   ///
   /// In en, this message translates to:

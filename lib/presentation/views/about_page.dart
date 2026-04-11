@@ -1,20 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/services/app_info_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../widgets/snackbar.dart';
 
-class AboutPage extends StatelessWidget {
+class AboutPage extends StatefulWidget {
   static const String routeName = '/about';
 
-  static const String _appVersion = '1.0.0';
+  const AboutPage({super.key});
+
+  @override
+  State<AboutPage> createState() => _AboutPageState();
+}
+
+class _AboutPageState extends State<AboutPage> {
   static const String _quranSourceUrl =
       'https://tanzil.net/docs/tanzil_project';
   // static const String _audioManifestUrl =
   //     'https://github.com/saliouseck2009/algo-practice/raw/refs/heads/main/availability.json';
   static const String _contactEmail = 'saliouseck2009@gmail.com';
 
-  const AboutPage({super.key});
+  late final Future<String> _appVersionFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _appVersionFuture = AppInfoService.getAppVersionLabel();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,67 +52,74 @@ class AboutPage extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _HeaderCard(
-              appName: localizations.appTitle,
-              versionLabel: localizations.appVersion(_appVersion),
-              description: localizations.aboutDescription,
-            ),
-            const SizedBox(height: 16),
-            _SectionCard(
-              title: localizations.aboutContentSourcesTitle,
+      body: FutureBuilder<String>(
+        future: _appVersionFuture,
+        builder: (context, snapshot) {
+          final appVersion = snapshot.data ?? '--';
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SourceRow(
-                  label: localizations.quranTextSourceTitle,
-                  value: "package: quran -> TANZIL \n$_quranSourceUrl",
-                  onCopy: () => _copyValue(
-                    context,
-                    localizations,
-                    _quranSourceUrl,
-                    localizations.quranTextSourceTitle,
-                  ),
+                _HeaderCard(
+                  appName: localizations.appTitle,
+                  versionLabel: localizations.appVersion(appVersion),
+                  description: localizations.aboutDescription,
                 ),
-                // const SizedBox(height: 12),
-                // _SourceRow(
-                //   label: localizations.audioManifestSourceTitle,
-                //   value: _audioManifestUrl,
-                //   onCopy: () => _copyValue(
-                //     context,
-                //     localizations,
-                //     _audioManifestUrl,
-                //     localizations.audioManifestSourceTitle,
-                //   ),
-                // ),
-                const SizedBox(height: 12),
-                _SourceRow(
-                  label: localizations.tafsirAudioSourceTitle,
-                  value: localizations.tafsirAudioSourceDetails,
-                  onCopy: null,
+                const SizedBox(height: 16),
+                _SectionCard(
+                  title: localizations.aboutContentSourcesTitle,
+                  children: [
+                    _SourceRow(
+                      label: localizations.quranTextSourceTitle,
+                      value: "package: quran -> TANZIL \n$_quranSourceUrl",
+                      onCopy: () => _copyValue(
+                        context,
+                        localizations,
+                        _quranSourceUrl,
+                        localizations.quranTextSourceTitle,
+                      ),
+                    ),
+                    // const SizedBox(height: 12),
+                    // _SourceRow(
+                    //   label: localizations.audioManifestSourceTitle,
+                    //   value: _audioManifestUrl,
+                    //   onCopy: () => _copyValue(
+                    //     context,
+                    //     localizations,
+                    //     _audioManifestUrl,
+                    //     localizations.audioManifestSourceTitle,
+                    //   ),
+                    // ),
+                    const SizedBox(height: 12),
+                    _SourceRow(
+                      label: localizations.tafsirAudioSourceTitle,
+                      value: localizations.tafsirAudioSourceDetails,
+                      onCopy: null,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _SectionCard(
+                  title: localizations.aboutContactTitle,
+                  children: [
+                    _SourceRow(
+                      label: localizations.contactEmailLabel,
+                      value: _contactEmail,
+                      onCopy: () => _copyValue(
+                        context,
+                        localizations,
+                        _contactEmail,
+                        localizations.contactEmailLabel,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            _SectionCard(
-              title: localizations.aboutContactTitle,
-              children: [
-                _SourceRow(
-                  label: localizations.contactEmailLabel,
-                  value: _contactEmail,
-                  onCopy: () => _copyValue(
-                    context,
-                    localizations,
-                    _contactEmail,
-                    localizations.contactEmailLabel,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

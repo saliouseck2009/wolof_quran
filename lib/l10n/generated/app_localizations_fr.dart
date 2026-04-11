@@ -78,7 +78,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get bookmarks => 'Signets';
 
   @override
-  String get recitation => 'Écoute';
+  String get recitation => 'Lecteur audio';
 
   @override
   String get translation => 'Traduction';
@@ -534,6 +534,83 @@ class AppLocalizationsFr extends AppLocalizations {
   String appVersion(String version) {
     return 'Version $version';
   }
+
+  @override
+  String get privacyPolicy => 'Politique de confidentialité';
+
+  @override
+  String get privacyPolicySubtitle => 'Votre vie privée compte';
+
+  @override
+  String get privacyPolicyValue => 'Consulter';
+
+  @override
+  String get privacyPolicyPageTitle => 'Politique de confidentialité';
+
+  @override
+  String privacyPolicyLastUpdated(String date) {
+    return 'Dernière mise à jour : $date';
+  }
+
+  @override
+  String get privacyPolicyIntro =>
+      'Coran Wolof ne collecte, ne stocke et ne transmet aucune donnée personnelle. Votre vie privée est entièrement respectée.';
+
+  @override
+  String get privacyPolicyLocalDataTitle =>
+      'Données stockées sur votre appareil';
+
+  @override
+  String get privacyPolicyLocalDataBody =>
+      'Toutes vos données restent sur votre appareil et ne sont jamais envoyées à un serveur :\n\n- Vos préférences (langue, thème, taille de police, récitateur choisi)\n- Les fichiers audio téléchargés\n- Les signets et la progression de lecture';
+
+  @override
+  String get privacyPolicyInternetTitle => 'Accès Internet';
+
+  @override
+  String get privacyPolicyInternetBody =>
+      'L\'application utilise une connexion Internet uniquement pour :\n\n- Télécharger les récitations audio du Coran\n- Vérifier les mises à jour de l\'application\n\nAucune information personnelle n\'est envoyée lors de ces opérations.';
+
+  @override
+  String get privacyPolicyPermissionsTitle => 'Permissions';
+
+  @override
+  String get privacyPolicyPermissionsBody =>
+      'L\'application ne demande que les permissions strictement nécessaires :\n\n- Internet : pour télécharger le contenu audio\n- Lecture audio : pour jouer les récitations du Coran, y compris en arrière-plan';
+
+  @override
+  String get privacyPolicyThirdPartyTitle => 'Liens externes';
+
+  @override
+  String get privacyPolicyThirdPartyBody =>
+      'La page de soutien contient des liens vers des services de paiement externes (Wave, PI SPI). Ces services ont leurs propres politiques de confidentialité. Nous ne recevons ni ne stockons aucune information de paiement.';
+
+  @override
+  String get privacyPolicyChildrenTitle => 'Adapté à tous les âges';
+
+  @override
+  String get privacyPolicyChildrenBody =>
+      'Puisque l\'application ne collecte aucune donnée personnelle, elle est sûre pour les utilisateurs de tous âges, y compris les enfants.';
+
+  @override
+  String get privacyPolicyContactTitle => 'Contact';
+
+  @override
+  String privacyPolicyContactBody(String email) {
+    return 'Pour toute question concernant cette politique : $email';
+  }
+
+  @override
+  String privacyPolicyPublisher(String name) {
+    return 'Éditeur : $name';
+  }
+
+  @override
+  String get privacyPolicyAgeRating =>
+      'Cette application est destinée à tous les publics (tout âge).';
+
+  @override
+  String get privacyPolicyOnlineVersion => 'Politique complète en ligne';
 
   @override
   String get quranSettingsDescription => 'Personnalisez votre lecture du Coran';

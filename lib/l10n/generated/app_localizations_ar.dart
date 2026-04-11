@@ -522,6 +522,82 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get privacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get privacyPolicySubtitle => 'خصوصيتك تهمنا';
+
+  @override
+  String get privacyPolicyValue => 'عرض';
+
+  @override
+  String get privacyPolicyPageTitle => 'سياسة الخصوصية';
+
+  @override
+  String privacyPolicyLastUpdated(String date) {
+    return 'آخر تحديث: $date';
+  }
+
+  @override
+  String get privacyPolicyIntro =>
+      'تطبيق القرآن بالولوف لا يجمع ولا يخزن ولا ينقل أي بيانات شخصية. خصوصيتك محترمة بالكامل.';
+
+  @override
+  String get privacyPolicyLocalDataTitle => 'البيانات المخزنة على جهازك';
+
+  @override
+  String get privacyPolicyLocalDataBody =>
+      'جميع بياناتك تبقى على جهازك ولا تُرسل أبداً إلى أي خادم:\n\n- تفضيلاتك (اللغة، المظهر، حجم الخط، القارئ المختار)\n- ملفات الصوت المحملة\n- العلامات المرجعية وتقدم القراءة';
+
+  @override
+  String get privacyPolicyInternetTitle => 'الاتصال بالإنترنت';
+
+  @override
+  String get privacyPolicyInternetBody =>
+      'يستخدم التطبيق الاتصال بالإنترنت فقط من أجل:\n\n- تحميل تلاوات القرآن الصوتية\n- التحقق من تحديثات التطبيق\n\nلا يتم إرسال أي معلومات شخصية أثناء هذه العمليات.';
+
+  @override
+  String get privacyPolicyPermissionsTitle => 'الأذونات';
+
+  @override
+  String get privacyPolicyPermissionsBody =>
+      'لا يطلب التطبيق سوى الأذونات الضرورية لعمله:\n\n- الإنترنت: لتحميل المحتوى الصوتي\n- تشغيل الصوت: لقراءة تلاوات القرآن، بما في ذلك في الخلفية';
+
+  @override
+  String get privacyPolicyThirdPartyTitle => 'الروابط الخارجية';
+
+  @override
+  String get privacyPolicyThirdPartyBody =>
+      'تحتوي صفحة الدعم على روابط لخدمات دفع خارجية (Wave و PI SPI). لهذه الخدمات سياسات خصوصية خاصة بها. نحن لا نستلم ولا نخزن أي معلومات دفع.';
+
+  @override
+  String get privacyPolicyChildrenTitle => 'مناسب لجميع الأعمار';
+
+  @override
+  String get privacyPolicyChildrenBody =>
+      'بما أن التطبيق لا يجمع أي بيانات شخصية، فهو آمن للمستخدمين من جميع الأعمار، بما في ذلك الأطفال.';
+
+  @override
+  String get privacyPolicyContactTitle => 'التواصل';
+
+  @override
+  String privacyPolicyContactBody(String email) {
+    return 'لأي سؤال متعلق بهذه السياسة: $email';
+  }
+
+  @override
+  String privacyPolicyPublisher(String name) {
+    return 'الناشر: $name';
+  }
+
+  @override
+  String get privacyPolicyAgeRating =>
+      'هذا التطبيق مخصص لجميع الفئات العمرية (كل الأعمار).';
+
+  @override
+  String get privacyPolicyOnlineVersion => 'السياسة الكاملة عبر الإنترنت';
+
+  @override
   String get quranSettingsDescription => 'خصص تجربة قراءة القرآن لديك';
 
   @override

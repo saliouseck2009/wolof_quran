@@ -22,8 +22,6 @@ class SettingsMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final activeColor = colorScheme.primary;
-    final activeColorWithAlpha = activeColor.withValues(alpha: 0.1);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
