@@ -997,7 +997,7 @@ abstract class AppLocalizations {
   /// About menu subtitle
   ///
   /// In en, this message translates to:
-  /// **'App version and support'**
+  /// **'App version and legal information'**
   String get aboutSubtitle;
 
   /// About dialog description
@@ -1147,7 +1147,7 @@ abstract class AppLocalizations {
   /// Section body
   ///
   /// In en, this message translates to:
-  /// **'The support page contains links to external payment services (Wave, PI SPI). These services have their own privacy policies. We do not receive or store any payment information.'**
+  /// **'The app may open external links to third-party services. These services have their own privacy policies, and we do not control their data practices.'**
   String get privacyPolicyThirdPartyBody;
 
   /// Section title
@@ -1497,6 +1497,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Support Wolof Quran'**
   String get supportPageTitle;
+
+  /// Title shown on iOS when external donation methods are disabled
+  ///
+  /// In en, this message translates to:
+  /// **'Support is unavailable on iOS'**
+  String get supportUnavailableOnIosTitle;
+
+  /// Body text shown on iOS when support page is disabled
+  ///
+  /// In en, this message translates to:
+  /// **'To comply with App Store policies, this support section is currently disabled on iOS.'**
+  String get supportUnavailableOnIosBody;
 
   /// Title for Wave payment section
   ///

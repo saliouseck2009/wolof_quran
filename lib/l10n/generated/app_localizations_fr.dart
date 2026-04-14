@@ -496,7 +496,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get about => 'À propos';
 
   @override
-  String get aboutSubtitle => 'Version de l\'application et support';
+  String get aboutSubtitle =>
+      'Version de l\'application et informations légales';
 
   @override
   String get aboutDescription =>
@@ -583,7 +584,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get privacyPolicyThirdPartyBody =>
-      'La page de soutien contient des liens vers des services de paiement externes (Wave, PI SPI). Ces services ont leurs propres politiques de confidentialité. Nous ne recevons ni ne stockons aucune information de paiement.';
+      'L\'application peut ouvrir des liens externes vers des services tiers. Ces services ont leurs propres politiques de confidentialité, et nous ne contrôlons pas leurs pratiques de données.';
 
   @override
   String get privacyPolicyChildrenTitle => 'Adapté à tous les âges';
@@ -791,6 +792,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get supportPageTitle => 'Soutenir Coran Wolof';
+
+  @override
+  String get supportUnavailableOnIosTitle =>
+      'Le soutien est indisponible sur iOS';
+
+  @override
+  String get supportUnavailableOnIosBody =>
+      'Pour respecter les règles de l\'App Store, cette section de soutien est actuellement désactivée sur iOS.';
 
   @override
   String get payWithWave => 'Wave';

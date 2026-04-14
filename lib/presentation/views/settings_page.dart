@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../core/config/localization/localization_service.dart';
 import '../../core/services/app_info_service.dart';
@@ -36,6 +37,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
+    final isIos = defaultTargetPlatform == TargetPlatform.iOS;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -75,8 +77,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       Navigator.pushNamed(context, AboutPage.routeName),
                   onShowPrivacyPolicy: () =>
                       Navigator.pushNamed(context, PrivacyPolicyPage.routeName),
-                  onShowSupport: () =>
-                      Navigator.pushNamed(context, SupportPage.routeName),
+                  showSupport: !isIos,
+                  onShowSupport: isIos
+                      ? null
+                      : () => Navigator.pushNamed(context, SupportPage.routeName),
                 );
               },
             ),
@@ -119,7 +123,8 @@ class _SettingsMenu extends StatelessWidget {
   final VoidCallback onShowTheme;
   final VoidCallback onShowAbout;
   final VoidCallback onShowPrivacyPolicy;
-  final VoidCallback onShowSupport;
+  final bool showSupport;
+  final VoidCallback? onShowSupport;
 
   const _SettingsMenu({
     required this.localizations,
@@ -128,6 +133,7 @@ class _SettingsMenu extends StatelessWidget {
     required this.onShowTheme,
     required this.onShowAbout,
     required this.onShowPrivacyPolicy,
+    required this.showSupport,
     required this.onShowSupport,
   });
 
@@ -163,15 +169,17 @@ class _SettingsMenu extends StatelessWidget {
           showArrow: true,
         ),
         const SizedBox(height: 16),
-        SettingsMenuItem(
-          icon: Icons.favorite_outline,
-          title: localizations.supportProject,
-          subtitle: localizations.supportSubtitle,
-          value: localizations.supportValue,
-          onTap: onShowSupport,
-          showArrow: true,
-        ),
-        const SizedBox(height: 16),
+        if (showSupport) ...[
+          SettingsMenuItem(
+            icon: Icons.favorite_outline,
+            title: localizations.supportProject,
+            subtitle: localizations.supportSubtitle,
+            value: localizations.supportValue,
+            onTap: onShowSupport!,
+            showArrow: true,
+          ),
+          const SizedBox(height: 16),
+        ],
         SettingsMenuItem(
           icon: Icons.info_outline,
           title: localizations.about,

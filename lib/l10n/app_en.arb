@@ -664,7 +664,7 @@
   "@about": {
     "description": "About menu title"
   },
-  "aboutSubtitle": "App version and support",
+  "aboutSubtitle": "App version and legal information",
   "@aboutSubtitle": {
     "description": "About menu subtitle"
   },
@@ -750,7 +750,7 @@
   "@privacyPolicyPermissionsBody": { "description": "Section body" },
   "privacyPolicyThirdPartyTitle": "External links",
   "@privacyPolicyThirdPartyTitle": { "description": "Section title" },
-  "privacyPolicyThirdPartyBody": "The support page contains links to external payment services (Wave, PI SPI). These services have their own privacy policies. We do not receive or store any payment information.",
+  "privacyPolicyThirdPartyBody": "The app may open external links to third-party services. These services have their own privacy policies, and we do not control their data practices.",
   "@privacyPolicyThirdPartyBody": { "description": "Section body" },
   "privacyPolicyChildrenTitle": "Suitable for all ages",
   "@privacyPolicyChildrenTitle": { "description": "Section title" },
@@ -1012,6 +1012,14 @@
   "supportPageTitle": "Support Wolof Quran",
   "@supportPageTitle": {
     "description": "Title of the support/donation page"
+  },
+  "supportUnavailableOnIosTitle": "Support is unavailable on iOS",
+  "@supportUnavailableOnIosTitle": {
+    "description": "Title shown on iOS when external donation methods are disabled"
+  },
+  "supportUnavailableOnIosBody": "To comply with App Store policies, this support section is currently disabled on iOS.",
+  "@supportUnavailableOnIosBody": {
+    "description": "Body text shown on iOS when support page is disabled"
   },
   "payWithWave": "Wave",
   "@payWithWave": {

@@ -482,7 +482,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get about => 'حول التطبيق';
 
   @override
-  String get aboutSubtitle => 'إصدار التطبيق والدعم';
+  String get aboutSubtitle => 'إصدار التطبيق والمعلومات القانونية';
 
   @override
   String get aboutDescription =>
@@ -568,7 +568,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get privacyPolicyThirdPartyBody =>
-      'تحتوي صفحة الدعم على روابط لخدمات دفع خارجية (Wave و PI SPI). لهذه الخدمات سياسات خصوصية خاصة بها. نحن لا نستلم ولا نخزن أي معلومات دفع.';
+      'قد يفتح التطبيق روابط خارجية إلى خدمات طرف ثالث. لهذه الخدمات سياسات خصوصية خاصة بها، ونحن لا نتحكم في ممارسات بياناتها.';
 
   @override
   String get privacyPolicyChildrenTitle => 'مناسب لجميع الأعمار';
@@ -773,6 +773,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get supportPageTitle => 'دعم القرآن بالولوف';
+
+  @override
+  String get supportUnavailableOnIosTitle => 'الدعم غير متاح على iOS';
+
+  @override
+  String get supportUnavailableOnIosBody =>
+      'للالتزام بسياسات App Store، تم تعطيل قسم الدعم هذا حالياً على iOS.';
 
   @override
   String get payWithWave => 'Wave';

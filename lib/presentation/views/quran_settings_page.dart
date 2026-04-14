@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -39,6 +40,7 @@ class _QuranSettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
+    final isIos = defaultTargetPlatform == TargetPlatform.iOS;
 
     return Scaffold(
       backgroundColor: colorScheme.brightness == Brightness.dark
@@ -80,18 +82,20 @@ class _QuranSettingsView extends StatelessWidget {
                     Navigator.pushNamed(context, '/reciter-list');
                   },
                 ),
-                const SizedBox(height: 24),
-                SettingsMenuItem(
-                  icon: Icons.favorite_outline,
-                  title: localizations.supportProject,
-                  subtitle: localizations.supportSubtitle,
-                  value: localizations.supportValue,
-                  onTap: () => Navigator.pushNamed(
-                    context,
-                    SupportPage.routeName,
+                if (!isIos) ...[
+                  const SizedBox(height: 24),
+                  SettingsMenuItem(
+                    icon: Icons.favorite_outline,
+                    title: localizations.supportProject,
+                    subtitle: localizations.supportSubtitle,
+                    value: localizations.supportValue,
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      SupportPage.routeName,
+                    ),
+                    showArrow: true,
                   ),
-                  showArrow: true,
-                ),
+                ],
                 const SizedBox(height: 32),
               ],
             ),

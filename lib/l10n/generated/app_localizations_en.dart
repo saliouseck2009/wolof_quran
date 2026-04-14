@@ -488,7 +488,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about => 'About';
 
   @override
-  String get aboutSubtitle => 'App version and support';
+  String get aboutSubtitle => 'App version and legal information';
 
   @override
   String get aboutDescription =>
@@ -574,7 +574,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicyThirdPartyBody =>
-      'The support page contains links to external payment services (Wave, PI SPI). These services have their own privacy policies. We do not receive or store any payment information.';
+      'The app may open external links to third-party services. These services have their own privacy policies, and we do not control their data practices.';
 
   @override
   String get privacyPolicyChildrenTitle => 'Suitable for all ages';
@@ -780,6 +780,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supportPageTitle => 'Support Wolof Quran';
+
+  @override
+  String get supportUnavailableOnIosTitle => 'Support is unavailable on iOS';
+
+  @override
+  String get supportUnavailableOnIosBody =>
+      'To comply with App Store policies, this support section is currently disabled on iOS.';
 
   @override
   String get payWithWave => 'Wave';
