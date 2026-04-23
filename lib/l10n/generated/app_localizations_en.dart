@@ -678,6 +678,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Another download is already in progress. Please wait for it to finish.';
 
   @override
+  String get surahDownloadAlreadyInProgress =>
+      'This surah is already being downloaded.';
+
+  @override
   String get queued => 'Queued';
 
   @override

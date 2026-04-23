@@ -209,6 +209,7 @@
   "ayahCountLabel": "{count} آية",
   "surahAudioDeleted": "تم حذف صوت سورة {surahName}",
   "downloadInProgress": "هناك تنزيل جارٍ بالفعل. يرجى الانتظار حتى ينتهي قبل بدء آخر.",
+  "surahDownloadAlreadyInProgress": "تنزيل هذه السورة جارٍ بالفعل.",
   "queued": "في الانتظار",
   "alreadyQueued": "هذه السورة موجودة بالفعل في قائمة التنزيل.",
   "retryDownload": "إعادة محاولة التنزيل",

@@ -7,7 +7,12 @@ import '../../domain/repositories/audio_repository.dart';
 import '../../domain/repositories/download_queue_repository.dart';
 import '../../domain/repositories/download_repository.dart';
 
-enum EnqueueAudioDownloadResult { enqueued, alreadyQueued, alreadyDownloaded }
+enum EnqueueAudioDownloadResult {
+  enqueued,
+  alreadyQueued,
+  alreadyDownloaded,
+  alreadyInProgress,
+}
 
 class AudioDownloadQueueService {
   final DownloadQueueRepository _queueRepository;
@@ -58,6 +63,14 @@ class AudioDownloadQueueService {
     String reciterId,
     int surahNumber,
   ) async {
+    final isAlreadyInProgress = _downloadRepository.isSurahDownloadInProgress(
+      reciterId,
+      surahNumber,
+    );
+    if (isAlreadyInProgress) {
+      return EnqueueAudioDownloadResult.alreadyInProgress;
+    }
+
     final isAlreadyDownloaded = await _downloadRepository.isSurahDownloaded(
       reciterId,
       surahNumber,
@@ -140,6 +153,16 @@ class AudioDownloadQueueService {
   }
 
   Future<void> _runTask(QueuedAudioDownloadTask task) async {
+    final hasDownloadLock = _downloadRepository.tryStartSurahDownload(
+      task.reciterId,
+      task.surahNumber,
+    );
+    if (!hasDownloadLock) {
+      await _queueRepository.removeTask(task.reciterId, task.surahNumber);
+      await _publishTasks();
+      return;
+    }
+
     await _queueRepository.markAsDownloading(
       task.reciterId,
       task.surahNumber,
@@ -148,94 +171,98 @@ class AudioDownloadQueueService {
     await _publishTasks();
 
     try {
-      await _downloadRepository.markSurahAsInProgress(
-        task.reciterId,
-        task.surahNumber,
-        '',
-      );
-    } catch (_) {
-      // Download queue should continue even if DB progress metadata fails.
-    }
-
-    final nextAttemptCount = task.attemptCount + 1;
-
-    try {
-      await _audioRepository.downloadSurahAudio(
-        task.reciterId,
-        task.surahNumber,
-        onProgress: (progress) {
-          _onProgress(task.reciterId, task.surahNumber, progress);
-        },
-      );
-
-      final status = await _audioRepository.getSurahAudioStatus(
-        task.reciterId,
-        task.surahNumber,
-      );
-      final resolvedPath =
-          (status.localPath != null && status.localPath!.isNotEmpty)
-          ? status.localPath!
-          : await _audioRepository.getSurahAudioPath(
-              task.reciterId,
-              task.surahNumber,
-            );
-
-      await _downloadRepository.markSurahAsDownloaded(
-        task.reciterId,
-        task.surahNumber,
-        resolvedPath,
-      );
-
-      await _queueRepository.removeTask(task.reciterId, task.surahNumber);
-      _lastPersistedProgress.remove(task.key);
-      _lastPersistedAt.remove(task.key);
-      _completedSubject.add(
-        task.copyWith(
-          status: QueuedAudioDownloadStatus.completed,
-          progress: 1.0,
-          attemptCount: nextAttemptCount,
-          updatedAt: DateTime.now(),
-        ),
-      );
-      await _publishTasks();
-    } catch (error) {
       try {
-        await _downloadRepository.removeSurahDownload(
+        await _downloadRepository.markSurahAsInProgress(
           task.reciterId,
           task.surahNumber,
+          '',
         );
       } catch (_) {
-        // Keep queue resilient even if cleanup fails.
+        // Download queue should continue even if DB progress metadata fails.
       }
 
-      final errorMessage = _normalizeError(error);
-      if (nextAttemptCount < _maxAutoAttempts) {
-        await _queueRepository.markAsQueued(
+      final nextAttemptCount = task.attemptCount + 1;
+
+      try {
+        await _audioRepository.downloadSurahAudio(
           task.reciterId,
           task.surahNumber,
-          progress: 0,
-          attemptCount: nextAttemptCount,
-          error: errorMessage,
-          clearError: false,
+          onProgress: (progress) {
+            _onProgress(task.reciterId, task.surahNumber, progress);
+          },
         );
-      } else {
-        await _queueRepository.markAsFailed(
+
+        final status = await _audioRepository.getSurahAudioStatus(
           task.reciterId,
           task.surahNumber,
-          attemptCount: nextAttemptCount,
-          error: errorMessage,
         );
-        _failedSubject.add(
+        final resolvedPath =
+            (status.localPath != null && status.localPath!.isNotEmpty)
+            ? status.localPath!
+            : await _audioRepository.getSurahAudioPath(
+                task.reciterId,
+                task.surahNumber,
+              );
+
+        await _downloadRepository.markSurahAsDownloaded(
+          task.reciterId,
+          task.surahNumber,
+          resolvedPath,
+        );
+
+        await _queueRepository.removeTask(task.reciterId, task.surahNumber);
+        _lastPersistedProgress.remove(task.key);
+        _lastPersistedAt.remove(task.key);
+        _completedSubject.add(
           task.copyWith(
-            status: QueuedAudioDownloadStatus.failed,
-            progress: 0,
+            status: QueuedAudioDownloadStatus.completed,
+            progress: 1.0,
             attemptCount: nextAttemptCount,
-            error: errorMessage,
             updatedAt: DateTime.now(),
           ),
         );
+        await _publishTasks();
+      } catch (error) {
+        try {
+          await _downloadRepository.removeSurahDownload(
+            task.reciterId,
+            task.surahNumber,
+          );
+        } catch (_) {
+          // Keep queue resilient even if cleanup fails.
+        }
+
+        final errorMessage = _normalizeError(error);
+        if (nextAttemptCount < _maxAutoAttempts) {
+          await _queueRepository.markAsQueued(
+            task.reciterId,
+            task.surahNumber,
+            progress: 0,
+            attemptCount: nextAttemptCount,
+            error: errorMessage,
+            clearError: false,
+          );
+        } else {
+          await _queueRepository.markAsFailed(
+            task.reciterId,
+            task.surahNumber,
+            attemptCount: nextAttemptCount,
+            error: errorMessage,
+          );
+          _failedSubject.add(
+            task.copyWith(
+              status: QueuedAudioDownloadStatus.failed,
+              progress: 0,
+              attemptCount: nextAttemptCount,
+              error: errorMessage,
+              updatedAt: DateTime.now(),
+            ),
+          );
+        }
+        await _publishTasks();
       }
-      await _publishTasks();
+    } finally {
+      _downloadRepository.finishSurahDownload(task.reciterId, task.surahNumber);
     }
   }
 

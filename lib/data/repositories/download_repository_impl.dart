@@ -4,8 +4,32 @@ import '../datasources/database_helper.dart';
 
 class DownloadRepositoryImpl implements DownloadRepository {
   final DatabaseHelper _databaseHelper;
+  final Set<String> _activeDownloads = <String>{};
 
   DownloadRepositoryImpl(this._databaseHelper);
+
+  String _downloadKey(String reciterId, int surahNumber) =>
+      '${reciterId}_$surahNumber';
+
+  @override
+  bool tryStartSurahDownload(String reciterId, int surahNumber) {
+    final key = _downloadKey(reciterId, surahNumber);
+    if (_activeDownloads.contains(key)) {
+      return false;
+    }
+    _activeDownloads.add(key);
+    return true;
+  }
+
+  @override
+  void finishSurahDownload(String reciterId, int surahNumber) {
+    _activeDownloads.remove(_downloadKey(reciterId, surahNumber));
+  }
+
+  @override
+  bool isSurahDownloadInProgress(String reciterId, int surahNumber) {
+    return _activeDownloads.contains(_downloadKey(reciterId, surahNumber));
+  }
 
   @override
   Future<bool> isSurahDownloaded(String reciterId, int surahNumber) async {

@@ -671,6 +671,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'هناك تنزيل جارٍ بالفعل. يرجى الانتظار حتى ينتهي قبل بدء آخر.';
 
   @override
+  String get surahDownloadAlreadyInProgress => 'تنزيل هذه السورة جارٍ بالفعل.';
+
+  @override
   String get queued => 'في الانتظار';
 
   @override

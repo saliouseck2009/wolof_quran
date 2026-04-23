@@ -367,6 +367,11 @@ class _SurahAudioListBody extends StatelessWidget {
       return;
     }
 
+    final audioState = context.read<AudioManagementCubit>().state;
+    if (audioState is AudioDownloading) {
+      return;
+    }
+
     final availabilitySnapshot = context
         .read<AudioAvailabilityCubit>()
         .state
@@ -731,6 +736,21 @@ class _SurahTrackTile extends StatelessWidget {
   }
 
   Future<void> _download(BuildContext context) async {
+    final audioState = context.read<AudioManagementCubit>().state;
+    if (audioState is AudioDownloading) {
+      final isSameSurah =
+          audioState.reciterId == reciterId &&
+          audioState.surahNumber == surahNumber;
+      CustomSnackbar.showSnackbar(
+        context,
+        isSameSurah
+            ? localizations.surahDownloadAlreadyInProgress
+            : localizations.downloadInProgress,
+        duration: 2,
+      );
+      return;
+    }
+
     final canProceed = await DownloadNetworkGuard.confirmManualDownload(
       context,
     );
@@ -747,6 +767,12 @@ class _SurahTrackTile extends StatelessWidget {
     }
     if (result == EnqueueAudioDownloadResult.alreadyQueued) {
       CustomSnackbar.showSnackbar(context, localizations.alreadyQueued);
+    } else if (result == EnqueueAudioDownloadResult.alreadyInProgress) {
+      CustomSnackbar.showSnackbar(
+        context,
+        localizations.surahDownloadAlreadyInProgress,
+        duration: 2,
+      );
     } else if (result == EnqueueAudioDownloadResult.alreadyDownloaded) {
       CustomSnackbar.showSnackbar(
         context,
