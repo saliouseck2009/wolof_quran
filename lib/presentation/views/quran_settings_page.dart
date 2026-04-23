@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -11,6 +12,8 @@ import '../widgets/quran_settings/font_size_selector_sheet.dart';
 import '../widgets/quran_settings/quran_settings_header.dart';
 import '../widgets/quran_settings/quran_settings_menu.dart';
 import '../widgets/quran_settings/translation_selector_sheet.dart';
+import '../widgets/settings/settings_menu_item.dart';
+import 'support_page.dart';
 
 class QuranSettingsPage extends StatelessWidget {
   static const String routeName = "/quran-settings";
@@ -37,6 +40,7 @@ class _QuranSettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
+    final isIos = defaultTargetPlatform == TargetPlatform.iOS;
 
     return Scaffold(
       backgroundColor: colorScheme.brightness == Brightness.dark
@@ -78,10 +82,20 @@ class _QuranSettingsView extends StatelessWidget {
                     Navigator.pushNamed(context, '/reciter-list');
                   },
                 ),
-                const SizedBox(height: 24),
-
-                // Future settings sections can be added here
-                // Example: Audio settings, font size, etc.
+                if (!isIos) ...[
+                  const SizedBox(height: 24),
+                  SettingsMenuItem(
+                    icon: Icons.favorite_outline,
+                    title: localizations.supportProject,
+                    subtitle: localizations.supportSubtitle,
+                    value: localizations.supportValue,
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      SupportPage.routeName,
+                    ),
+                    showArrow: true,
+                  ),
+                ],
                 const SizedBox(height: 32),
               ],
             ),

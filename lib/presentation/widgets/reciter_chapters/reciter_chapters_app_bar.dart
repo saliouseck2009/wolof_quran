@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../domain/entities/reciter.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 class ReciterChaptersAppBar extends StatelessWidget {
   final Reciter reciter;
@@ -17,9 +18,10 @@ class ReciterChaptersAppBar extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
+    final localizations = AppLocalizations.of(context)!;
 
     return SliverAppBar(
-      expandedHeight: 150,
+      expandedHeight: 160,
       floating: false,
       pinned: true,
       backgroundColor: isDark
@@ -32,19 +34,15 @@ class ReciterChaptersAppBar extends StatelessWidget {
       shadowColor: isDark
           ? Colors.black.withValues(alpha: 0.4)
           : accentColor.withValues(alpha: 0.3),
+      title: Text(
+        reciter.name,
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: colorScheme.onPrimary,
+        ),
+      ),
       flexibleSpace: FlexibleSpaceBar(
-        centerTitle: true,
-        title: Text(
-          reciter.name,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onPrimary,
-          ),
-        ),
-        titlePadding: const EdgeInsetsDirectional.only(
-          start: 16,
-          bottom: 12,
-        ),
+        titlePadding: EdgeInsets.zero,
         background: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -58,22 +56,30 @@ class ReciterChaptersAppBar extends StatelessWidget {
                   : [accentColor.withValues(alpha: 0.85), accentColor],
             ),
           ),
-          child: Center(
-            child: Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.25),
-                  width: 1,
-                ),
-              ),
-              child: Icon(
-                Icons.person,
-                size: 40,
-                color: colorScheme.onPrimary,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    localizations.audioDownloads,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onPrimary.withValues(alpha: 0.7),
+                      letterSpacing: 0.8,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    reciter.name,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: colorScheme.onPrimary,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

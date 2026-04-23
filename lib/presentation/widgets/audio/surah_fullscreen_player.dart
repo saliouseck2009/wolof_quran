@@ -124,8 +124,6 @@ class _FullscreenContent extends StatelessWidget {
                       child: _CenterNowPlayingCard(
                         state: state,
                         tokens: t,
-                        reciterName: activeReciterName,
-                        total: total,
                         surahTitle: _surahTitleWithNumber(
                           context,
                           state.surahNumber,
@@ -215,7 +213,7 @@ class _FullscreenHeader extends StatelessWidget {
               size: 32,
               color: tokens.content,
             ),
-            tooltip: 'Réduire',
+            tooltip: AppLocalizations.of(context)!.collapsePlayer,
           ),
           Expanded(
             child: Center(
@@ -223,7 +221,7 @@ class _FullscreenHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'En cours de lecture',
+                    AppLocalizations.of(context)!.nowPlaying,
                     style: TextStyle(
                       color: tokens.muted,
                       fontSize: 13,
@@ -257,83 +255,41 @@ class _FullscreenHeader extends StatelessWidget {
 class _CenterNowPlayingCard extends StatelessWidget {
   final SurahMiniPlayerState state;
   final _ThemeTokens tokens;
-  final String reciterName;
-  final Duration total;
   final String surahTitle;
 
   const _CenterNowPlayingCard({
     required this.state,
     required this.tokens,
-    required this.reciterName,
-    required this.total,
     required this.surahTitle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final isPlaying =
         state.playerState == AudioPlayerState.playing ||
         state.playerState == AudioPlayerState.loading;
-    final remaining = state.isSeekReady
-        ? _safeRemaining(total, state.position)
-        : Duration.zero;
-
-    final cardDecoration = BoxDecoration(
-      borderRadius: BorderRadius.circular(28),
-      color: tokens.isDark ? cs.surfaceContainerHigh : cs.surfaceContainerLow,
-      border: Border.all(
-        color: tokens.isDark
-            ? Colors.white.withValues(alpha: 0.08)
-            : cs.primary.withValues(alpha: 0.12),
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: tokens.isDark
-              ? Colors.black.withValues(alpha: 0.22)
-              : cs.shadow.withValues(alpha: 0.08),
-          blurRadius: 18,
-          offset: const Offset(0, 8),
-        ),
-      ],
-    );
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 520),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 260),
-        decoration: cardDecoration,
-        padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
-        child: SingleChildScrollView(
-          child: Column(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final availableHeight = constraints.maxHeight.isFinite
+              ? constraints.maxHeight
+              : 420.0;
+          final artworkSize = (availableHeight - 124).clamp(140.0, 260.0);
+          final spacingAfterArtwork = artworkSize >= 220 ? 20.0 : 12.0;
+          final spacingBeforeArabic = artworkSize >= 220 ? 6.0 : 4.0;
+
+          return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _InfoChip(
-                    icon: Icons.menu_book_rounded,
-                    label: state.surahNumber != null
-                        ? 'Sourate ${state.surahNumber}'
-                        : 'Sourate --',
-                    tokens: tokens,
-                  ),
-                  _InfoChip(
-                    icon: isPlaying
-                        ? Icons.multitrack_audio_rounded
-                        : Icons.pause_circle_outline_rounded,
-                    label: isPlaying ? 'Lecture' : 'Pause',
-                    tokens: tokens,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
               _SurahArtwork(
                 surahNumber: state.surahNumber,
                 isPlaying: isPlaying,
                 tokens: tokens,
+                size: artworkSize.toDouble(),
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: spacingAfterArtwork),
               Text(
                 surahTitle,
                 maxLines: 2,
@@ -345,7 +301,7 @@ class _CenterNowPlayingCard extends StatelessWidget {
                   height: 1.15,
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: spacingBeforeArabic),
               Text(
                 state.surahNumber != null
                     ? quran.getSurahNameArabic(state.surahNumber!)
@@ -356,76 +312,9 @@ class _CenterNowPlayingCard extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 18),
-              // ClipRRect(
-              //   borderRadius: BorderRadius.circular(999),
-              //   child: LinearProgressIndicator(
-              //     minHeight: 6,
-              //     value: progress,
-              //     color: tokens.accent,
-              //     backgroundColor: tokens.isDark
-              //         ? Colors.white.withValues(alpha: 0.16)
-              //         : cs.onSurface.withValues(alpha: 0.12),
-              //   ),
-              // ),
-              // const SizedBox(height: 8),
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: Text(
-              //         _formatDuration(state.position),
-              //         style: TextStyle(
-              //           color: tokens.muted,
-              //           fontSize: 12,
-              //           fontWeight: FontWeight.w600,
-              //         ),
-              //       ),
-              //     ),
-              //     Text(
-              //       state.isSeekReady ? _formatDuration(total) : '--:--',
-              //       style: TextStyle(
-              //         color: tokens.muted,
-              //         fontSize: 12,
-              //         fontWeight: FontWeight.w600,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              const SizedBox(height: 14),
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: tokens.isDark
-                    ? Colors.white.withValues(alpha: 0.12)
-                    : cs.onSurface.withValues(alpha: 0.1),
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: _MetaRow(
-                      icon: Icons.person_rounded,
-                      label: 'Interprète',
-                      value: reciterName,
-                      tokens: tokens,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _MetaRow(
-                      icon: Icons.schedule_rounded,
-                      label: 'Restant',
-                      value: state.isSeekReady
-                          ? '-${_formatDuration(remaining)}'
-                          : '--:--',
-                      tokens: tokens,
-                    ),
-                  ),
-                ],
-              ),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -435,174 +324,106 @@ class _SurahArtwork extends StatelessWidget {
   final int? surahNumber;
   final bool isPlaying;
   final _ThemeTokens tokens;
+  final double size;
 
   const _SurahArtwork({
     required this.surahNumber,
     required this.isPlaying,
     required this.tokens,
+    required this.size,
   });
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final accentSoft = tokens.isDark
-        ? Colors.white.withValues(alpha: 0.24)
-        : tokens.accent.withValues(alpha: 0.22);
-
-    return SizedBox(
-      width: 196,
-      height: 196,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 196,
-            height: 196,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: accentSoft, width: 1.2),
-            ),
-          ),
-          Container(
-            width: 166,
-            height: 166,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: tokens.isDark
-                    ? Colors.white.withValues(alpha: 0.12)
-                    : cs.onSurface.withValues(alpha: 0.08),
-                width: 1.2,
-              ),
-            ),
-          ),
-          Container(
-            width: 138,
-            height: 138,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: tokens.isDark
-                  ? Colors.white.withValues(alpha: 0.08)
-                  : cs.onSurface.withValues(alpha: 0.06),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '${surahNumber ?? '--'}',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 38,
-                    fontWeight: FontWeight.w800,
-                    height: 1,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Icon(
-                  isPlaying
-                      ? Icons.graphic_eq_rounded
-                      : Icons.play_circle_fill_rounded,
-                  color: Colors.white.withValues(alpha: 0.92),
-                  size: 22,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final _ThemeTokens tokens;
-
-  const _InfoChip({
-    required this.icon,
-    required this.label,
-    required this.tokens,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      width: size,
+      height: size,
       decoration: BoxDecoration(
-        color: tokens.isDark
-            ? Colors.white.withValues(alpha: 0.1)
-            : cs.surface.withValues(alpha: 0.8),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF006E62), Color(0xFF00201B)],
+        ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 15, color: tokens.content),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              color: tokens.content,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
+      child: Center(
+        child: _AnimatedMusicNote(
+          isPlaying: isPlaying,
+          iconSize: (size * 0.37).clamp(56.0, 96.0).toDouble(),
+        ),
       ),
     );
   }
 }
 
-class _MetaRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final _ThemeTokens tokens;
+class _AnimatedMusicNote extends StatefulWidget {
+  final bool isPlaying;
+  final double iconSize;
 
-  const _MetaRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.tokens,
-  });
+  const _AnimatedMusicNote({required this.isPlaying, required this.iconSize});
+
+  @override
+  State<_AnimatedMusicNote> createState() => _AnimatedMusicNoteState();
+}
+
+class _AnimatedMusicNoteState extends State<_AnimatedMusicNote>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _scale;
+  late final Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 1.12,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+    _opacity = Tween<double>(
+      begin: 0.7,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+    if (widget.isPlaying) _ctrl.repeat(reverse: true);
+  }
+
+  @override
+  void didUpdateWidget(_AnimatedMusicNote oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isPlaying && !_ctrl.isAnimating) {
+      _ctrl.repeat(reverse: true);
+    } else if (!widget.isPlaying && _ctrl.isAnimating) {
+      _ctrl.stop();
+      _ctrl.animateTo(0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: tokens.muted),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: tokens.muted,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 1),
-              Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: tokens.content,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) {
+        return Transform.scale(
+          scale: _scale.value,
+          child: Opacity(
+            opacity: _opacity.value,
+            child: Icon(
+              Icons.music_note_rounded,
+              color: Colors.white,
+              size: widget.iconSize,
+            ),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -688,7 +509,7 @@ class _FullscreenControls extends StatelessWidget {
               color: state.canGoPrevious ? t.content : t.disabled,
             ),
             iconSize: 36,
-            tooltip: 'Précédent',
+            tooltip: AppLocalizations.of(context)!.previousSurah,
           ),
           // Rewind 10s
           IconButton(
@@ -700,7 +521,7 @@ class _FullscreenControls extends StatelessWidget {
               color: state.isSeekReady ? t.content : t.disabled,
             ),
             iconSize: 32,
-            tooltip: 'Reculer 10s',
+            tooltip: AppLocalizations.of(context)!.rewind10s,
           ),
           // Play / Pause
           _PlayPauseButton(
@@ -717,7 +538,7 @@ class _FullscreenControls extends StatelessWidget {
               color: state.isSeekReady ? t.content : t.disabled,
             ),
             iconSize: 32,
-            tooltip: 'Avancer 10s',
+            tooltip: AppLocalizations.of(context)!.forward10s,
           ),
           // Next
           IconButton(
@@ -727,7 +548,7 @@ class _FullscreenControls extends StatelessWidget {
               color: state.canGoNext ? t.content : t.disabled,
             ),
             iconSize: 36,
-            tooltip: 'Suivant',
+            tooltip: AppLocalizations.of(context)!.nextSurah,
           ),
         ],
       ),
@@ -822,13 +643,6 @@ String _formatDuration(Duration duration) {
   }
   return '${minutes.toString().padLeft(2, '0')}:'
       '${seconds.toString().padLeft(2, '0')}';
-}
-
-Duration _safeRemaining(Duration total, Duration position) {
-  if (total <= Duration.zero) return Duration.zero;
-  if (position <= Duration.zero) return total;
-  if (position >= total) return Duration.zero;
-  return total - position;
 }
 
 // ── Route helper ──────────────────────────────────────────────────────────────

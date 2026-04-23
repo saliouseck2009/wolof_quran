@@ -7,6 +7,7 @@ class SurahBasmalaWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
     return SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -23,7 +24,7 @@ class SurahBasmalaWidget extends StatelessWidget {
             fontFamily: 'Hafs',
             fontSize: 24,
             fontWeight: FontWeight.w600,
-            color: colorScheme.primary,
+            color: isDark ? colorScheme.onPrimary : colorScheme.primary,
             height: 1.8,
           ),
         ),

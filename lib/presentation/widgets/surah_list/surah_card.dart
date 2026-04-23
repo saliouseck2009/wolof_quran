@@ -13,6 +13,7 @@ class SurahCard extends StatelessWidget {
     required this.revelationPlace,
     required this.onTap,
     this.isHighlighted = false,
+    this.pageNumber,
   });
 
   final int surahNumber;
@@ -23,6 +24,7 @@ class SurahCard extends StatelessWidget {
   final String revelationPlace;
   final VoidCallback onTap;
   final bool isHighlighted;
+  final int? pageNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +44,6 @@ class SurahCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: tileColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isHighlighted
-              ? accentColor.withValues(alpha: isDark ? 0.55 : 0.45)
-              : colorScheme.onSurface.withValues(alpha: isDark ? 0.08 : 0.06),
-          width: isHighlighted ? 1.2 : 1,
-        ),
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -61,7 +57,9 @@ class SurahCard extends StatelessWidget {
               children: [
                 _NumberBadge(
                   number: surahNumber,
-                  accentColor: accentColor,
+                  accentColor: isDark
+                      ? colorScheme.surface
+                      : colorScheme.primary,
                   colorScheme: colorScheme,
                 ),
                 const SizedBox(width: 12),
@@ -70,8 +68,9 @@ class SurahCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Expanded(
+                          Flexible(
                             child: Text(
                               translatedName,
                               maxLines: 1,
@@ -84,20 +83,18 @@ class SurahCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              arabicName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontFamily: 'Hafs',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                              textDirection: TextDirection.rtl,
-                              textAlign: TextAlign.right,
+                          Text(
+                            arabicName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontFamily: 'Hafs',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: colorScheme.onSurfaceVariant,
                             ),
+                            textDirection: TextDirection.rtl,
+                            textAlign: TextAlign.right,
                           ),
                         ],
                       ),
@@ -141,22 +138,41 @@ class SurahCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? accentColor.withValues(alpha: 0.2)
-                        : accentColor,
-                    shape: BoxShape.circle,
+                const SizedBox(width: 12),
+                if (pageNumber != null)
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? colorScheme.surface
+                          : accentColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '$pageNumber',
+                      style: TextStyle(
+                        color: accentColor,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: isDark ? colorScheme.surface : accentColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 15,
+                      color: colorScheme.onPrimary,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 15,
-                    color: colorScheme.onPrimary,
-                  ),
-                ),
               ],
             ),
           ),

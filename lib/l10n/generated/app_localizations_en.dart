@@ -78,7 +78,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarks => 'Bookmarks';
 
   @override
-  String get recitation => 'Recitation';
+  String get recitation => 'Listen';
 
   @override
   String get translation => 'Translation';
@@ -350,6 +350,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareVideoGenerationFailed => 'Failed to generate video.';
 
   @override
+  String get shareVideoUnavailableInScreenshotMode =>
+      'Video sharing is unavailable in screenshot mode.';
+
+  @override
   String get shareActionCancelled => 'Action cancelled.';
 
   @override
@@ -484,7 +488,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about => 'About';
 
   @override
-  String get aboutSubtitle => 'App version and support';
+  String get aboutSubtitle => 'App version and legal information';
 
   @override
   String get aboutDescription =>
@@ -516,14 +520,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String get copyLabel => 'Copy';
 
   @override
-  String copiedToClipboard(String label) {
-    return '$label copied';
-  }
+  String get copiedToClipboard => 'Copied to clipboard';
 
   @override
   String appVersion(String version) {
     return 'Version $version';
   }
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get privacyPolicySubtitle => 'Your privacy matters';
+
+  @override
+  String get privacyPolicyValue => 'View';
+
+  @override
+  String get privacyPolicyPageTitle => 'Privacy Policy';
+
+  @override
+  String privacyPolicyLastUpdated(String date) {
+    return 'Last updated: $date';
+  }
+
+  @override
+  String get privacyPolicyIntro =>
+      'Wolof Quran does not collect, store, or transmit any personal data. Your privacy is fully respected.';
+
+  @override
+  String get privacyPolicyLocalDataTitle => 'Data stored on your device';
+
+  @override
+  String get privacyPolicyLocalDataBody =>
+      'All your data stays on your device and is never sent to any server:\n\n- Your preferences (language, theme, font size, selected reciter)\n- Downloaded audio files\n- Bookmarks and reading progress';
+
+  @override
+  String get privacyPolicyInternetTitle => 'Internet access';
+
+  @override
+  String get privacyPolicyInternetBody =>
+      'The app uses an internet connection solely to:\n\n- Download Quran audio recitations\n- Check for app updates\n\nNo personal information is sent during these operations.';
+
+  @override
+  String get privacyPolicyPermissionsTitle => 'Permissions';
+
+  @override
+  String get privacyPolicyPermissionsBody =>
+      'The app requests only the permissions strictly necessary for its features:\n\n- Internet: to download audio content\n- Audio playback: to play Quran recitations, including in the background';
+
+  @override
+  String get privacyPolicyThirdPartyTitle => 'External links';
+
+  @override
+  String get privacyPolicyThirdPartyBody =>
+      'The app may open external links to third-party services. These services have their own privacy policies, and we do not control their data practices.';
+
+  @override
+  String get privacyPolicyChildrenTitle => 'Suitable for all ages';
+
+  @override
+  String get privacyPolicyChildrenBody =>
+      'Since the app does not collect any personal data, it is safe for users of all ages, including children.';
+
+  @override
+  String get privacyPolicyContactTitle => 'Contact';
+
+  @override
+  String privacyPolicyContactBody(String email) {
+    return 'For any question regarding this policy: $email';
+  }
+
+  @override
+  String privacyPolicyPublisher(String name) {
+    return 'Publisher: $name';
+  }
+
+  @override
+  String get privacyPolicyAgeRating =>
+      'This app is rated for all audiences (all ages).';
+
+  @override
+  String get privacyPolicyOnlineVersion => 'Full policy online';
 
   @override
   String get quranSettingsDescription =>
@@ -672,7 +750,53 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get nowPlaying => 'Now Playing';
+
+  @override
+  String get collapsePlayer => 'Collapse';
+
+  @override
+  String get previousSurah => 'Previous';
+
+  @override
+  String get nextSurah => 'Next';
+
+  @override
+  String get rewind10s => 'Rewind 10s';
+
+  @override
+  String get forward10s => 'Forward 10s';
+
+  @override
   String hizbThreeQuarter(int n) {
     return '3/4 Hizb $n';
   }
+
+  @override
+  String get supportProject => 'Support the project';
+
+  @override
+  String get supportSubtitle => 'Help keep the app free and growing';
+
+  @override
+  String get supportPageTitle => 'Support Wolof Quran';
+
+  @override
+  String get supportUnavailableOnIosTitle => 'Support is unavailable on iOS';
+
+  @override
+  String get supportUnavailableOnIosBody =>
+      'To comply with App Store policies, this support section is currently disabled on iOS.';
+
+  @override
+  String get payWithWave => 'Wave';
+
+  @override
+  String get piSpiPayment => 'PI SPI';
+
+  @override
+  String get copyId => 'Copy ID';
+
+  @override
+  String get supportValue => 'Jazaakumullaahu khairan';
 }

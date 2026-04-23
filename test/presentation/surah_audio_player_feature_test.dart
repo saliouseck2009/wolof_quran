@@ -776,10 +776,13 @@ void main() {
       ),
     );
 
-    expect(find.text('Recitation'), findsOneWidget);
-    expect(find.text('Listen Audio'), findsOneWidget);
+    final context = tester.element(find.byType(HomeActionsGrid));
+    final localizations = AppLocalizations.of(context)!;
 
-    await tester.tap(find.text('Recitation'));
+    expect(find.text(localizations.recitation), findsOneWidget);
+    expect(find.text(localizations.listenAudio), findsOneWidget);
+
+    await tester.tap(find.text(localizations.recitation));
     await tester.pumpAndSettle();
 
     expect(find.text('audio-screen'), findsOneWidget);
@@ -1470,7 +1473,7 @@ void main() {
       uiState: SurahMiniPlayerUiState.fullscreen,
       playbackMode: audioService.currentPlaybackMode,
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
 
     expect(find.byIcon(Icons.shuffle_rounded), findsOneWidget);
     expect(miniPlayerCubit.state.playbackMode, PlaybackMode.shuffle);

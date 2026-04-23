@@ -241,7 +241,7 @@ abstract class AppLocalizations {
   /// Recitation text
   ///
   /// In en, this message translates to:
-  /// **'Recitation'**
+  /// **'Listen'**
   String get recitation;
 
   /// Translation text
@@ -736,6 +736,12 @@ abstract class AppLocalizations {
   /// **'Failed to generate video.'**
   String get shareVideoGenerationFailed;
 
+  /// Message shown when video sharing is disabled for simulator screenshot mode
+  ///
+  /// In en, this message translates to:
+  /// **'Video sharing is unavailable in screenshot mode.'**
+  String get shareVideoUnavailableInScreenshotMode;
+
   /// Message shown when user cancels a share action
   ///
   /// In en, this message translates to:
@@ -991,7 +997,7 @@ abstract class AppLocalizations {
   /// About menu subtitle
   ///
   /// In en, this message translates to:
-  /// **'App version and support'**
+  /// **'App version and legal information'**
   String get aboutSubtitle;
 
   /// About dialog description
@@ -1048,17 +1054,143 @@ abstract class AppLocalizations {
   /// **'Copy'**
   String get copyLabel;
 
-  /// Snackbar message after copying a value
+  /// Snackbar message when text is copied
   ///
   /// In en, this message translates to:
-  /// **'{label} copied'**
-  String copiedToClipboard(String label);
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
 
   /// App version label with number
   ///
   /// In en, this message translates to:
   /// **'Version {version}'**
   String appVersion(String version);
+
+  /// Settings menu title
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicy;
+
+  /// Settings menu subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Your privacy matters'**
+  String get privacyPolicySubtitle;
+
+  /// Value label
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get privacyPolicyValue;
+
+  /// Page title
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyPageTitle;
+
+  /// Last updated label
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated: {date}'**
+  String privacyPolicyLastUpdated(String date);
+
+  /// Intro text
+  ///
+  /// In en, this message translates to:
+  /// **'Wolof Quran does not collect, store, or transmit any personal data. Your privacy is fully respected.'**
+  String get privacyPolicyIntro;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Data stored on your device'**
+  String get privacyPolicyLocalDataTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'All your data stays on your device and is never sent to any server:\n\n- Your preferences (language, theme, font size, selected reciter)\n- Downloaded audio files\n- Bookmarks and reading progress'**
+  String get privacyPolicyLocalDataBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Internet access'**
+  String get privacyPolicyInternetTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'The app uses an internet connection solely to:\n\n- Download Quran audio recitations\n- Check for app updates\n\nNo personal information is sent during these operations.'**
+  String get privacyPolicyInternetBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions'**
+  String get privacyPolicyPermissionsTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'The app requests only the permissions strictly necessary for its features:\n\n- Internet: to download audio content\n- Audio playback: to play Quran recitations, including in the background'**
+  String get privacyPolicyPermissionsBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'External links'**
+  String get privacyPolicyThirdPartyTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'The app may open external links to third-party services. These services have their own privacy policies, and we do not control their data practices.'**
+  String get privacyPolicyThirdPartyBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Suitable for all ages'**
+  String get privacyPolicyChildrenTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'Since the app does not collect any personal data, it is safe for users of all ages, including children.'**
+  String get privacyPolicyChildrenBody;
+
+  /// Section title
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get privacyPolicyContactTitle;
+
+  /// Section body
+  ///
+  /// In en, this message translates to:
+  /// **'For any question regarding this policy: {email}'**
+  String privacyPolicyContactBody(String email);
+
+  /// Publisher legal name
+  ///
+  /// In en, this message translates to:
+  /// **'Publisher: {name}'**
+  String privacyPolicyPublisher(String name);
+
+  /// Age rating statement
+  ///
+  /// In en, this message translates to:
+  /// **'This app is rated for all audiences (all ages).'**
+  String get privacyPolicyAgeRating;
+
+  /// Link label for online privacy policy
+  ///
+  /// In en, this message translates to:
+  /// **'Full policy online'**
+  String get privacyPolicyOnlineVersion;
 
   /// Header subtitle on Quran settings page
   ///
@@ -1306,11 +1438,101 @@ abstract class AppLocalizations {
   /// **'1/2 Hizb {n}'**
   String hizbHalf(int n);
 
+  /// No description provided for @nowPlaying.
+  ///
+  /// In en, this message translates to:
+  /// **'Now Playing'**
+  String get nowPlaying;
+
+  /// No description provided for @collapsePlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get collapsePlayer;
+
+  /// No description provided for @previousSurah.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previousSurah;
+
+  /// No description provided for @nextSurah.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextSurah;
+
+  /// No description provided for @rewind10s.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewind 10s'**
+  String get rewind10s;
+
+  /// No description provided for @forward10s.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward 10s'**
+  String get forward10s;
+
   /// Three-quarter hizb label shown in the mushaf bottom bar
   ///
   /// In en, this message translates to:
   /// **'3/4 Hizb {n}'**
   String hizbThreeQuarter(int n);
+
+  /// Settings menu item title for support page
+  ///
+  /// In en, this message translates to:
+  /// **'Support the project'**
+  String get supportProject;
+
+  /// Settings menu item subtitle for support page
+  ///
+  /// In en, this message translates to:
+  /// **'Help keep the app free and growing'**
+  String get supportSubtitle;
+
+  /// Title of the support/donation page
+  ///
+  /// In en, this message translates to:
+  /// **'Support Wolof Quran'**
+  String get supportPageTitle;
+
+  /// Title shown on iOS when external donation methods are disabled
+  ///
+  /// In en, this message translates to:
+  /// **'Support is unavailable on iOS'**
+  String get supportUnavailableOnIosTitle;
+
+  /// Body text shown on iOS when support page is disabled
+  ///
+  /// In en, this message translates to:
+  /// **'To comply with App Store policies, this support section is currently disabled on iOS.'**
+  String get supportUnavailableOnIosBody;
+
+  /// Title for Wave payment section
+  ///
+  /// In en, this message translates to:
+  /// **'Wave'**
+  String get payWithWave;
+
+  /// Title for PI SPI payment section
+  ///
+  /// In en, this message translates to:
+  /// **'PI SPI'**
+  String get piSpiPayment;
+
+  /// Button label to copy PI SPI identifier
+  ///
+  /// In en, this message translates to:
+  /// **'Copy ID'**
+  String get copyId;
+
+  /// Short value text shown on the support settings card
+  ///
+  /// In en, this message translates to:
+  /// **'Jazaakumullaahu khairan'**
+  String get supportValue;
 }
 
 class _AppLocalizationsDelegate

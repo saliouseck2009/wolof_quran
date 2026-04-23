@@ -9,7 +9,9 @@ class AppColor {
   // Primary Palette (Deep Teal)
   static const Color primary = Color(0xFF006E62);
   static const Color onPrimary = Color(0xFFFFFFFF);
-  static const Color primaryContainer = Color(0xFF6FF8E0); // Lighter teal for containers
+  static const Color primaryContainer = Color(
+    0xFF6FF8E0,
+  ); // Lighter teal for containers
   static const Color onPrimaryContainer = Color(0xFF00201B);
 
   // Secondary Palette (Muted Gold)
@@ -31,18 +33,30 @@ class AppColor {
   static const Color onErrorContainer = Color(0xFF410002);
 
   // Neutral Palette (Light)
-  static const Color surfaceLight =  Color(0xFFF5F5F5);// Color(0xFFFBFDFD);
+  static const Color surfaceLight = Color(0xFFF5F5F5); // Color(0xFFFBFDFD);
   static const Color onSurfaceLight = Color(0xFF191C1C);
-  static const Color surfaceContainerLight = Color(0xFFF0F4F3); // Slightly darker background
+  static const Color surfaceContainerLight = Color(
+    0xFFF0F4F3,
+  ); // Slightly darker background
   static const Color outlineLight = Color(0xFF6F7977);
 
   // Neutral Palette (Dark)
   static const Color surfaceDark = Color(0xFF101612); // Deep charcoal
-  static const Color onSurfaceDark = Color(0xFFE6EBE5); // High-contrast, slightly warm text
-  static const Color surfaceContainerDark = Color(0xFF16201B); // Base containers
-  static const Color surfaceContainerLowDark = Color(0xFF1B2621); // Raised container
-  static const Color surfaceContainerHighDark = Color(0xFF23322C); // Higher elevation
-  static const Color surfaceContainerHighestDark = Color(0xFF2C3D35); // Chips/cards
+  static const Color onSurfaceDark = Color(
+    0xFFE6EBE5,
+  ); // High-contrast, slightly warm text
+  static const Color surfaceContainerDark = Color(
+    0xFF16201B,
+  ); // Base containers
+  static const Color surfaceContainerLowDark = Color(
+    0xFF1B2621,
+  ); // Raised container
+  static const Color surfaceContainerHighDark = Color(
+    0xFF23322C,
+  ); // Higher elevation
+  static const Color surfaceContainerHighestDark = Color(
+    0xFF2C3D35,
+  ); // Chips/cards
   static const Color outlineDark = Color(0xFF3F4B44); // Subtle outline on dark
 
   // Legacy/Compatibility colors (mapped to new palette where possible)

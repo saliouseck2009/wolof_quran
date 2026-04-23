@@ -16,8 +16,16 @@ class DailyInspirationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    return BlocBuilder<DailyInspirationCubit, DailyInspirationState>(
-      builder: (context, state) {
+    return BlocListener<QuranSettingsCubit, QuranSettingsState>(
+      listenWhen: (previous, current) =>
+          previous.selectedTranslation != current.selectedTranslation,
+      listener: (context, settingsState) {
+        context.read<DailyInspirationCubit>().updateTranslation(
+          settingsState.selectedTranslation,
+        );
+      },
+      child: BlocBuilder<DailyInspirationCubit, DailyInspirationState>(
+        builder: (context, state) {
         if (state is DailyInspirationLoading) {
           return _buildLoadingCard(context);
         } else if (state is DailyInspirationLoaded) {
@@ -27,6 +35,7 @@ class DailyInspirationCard extends StatelessWidget {
         }
         return _buildInitialCard(context, localizations);
       },
+    ),
     );
   }
 
@@ -109,6 +118,7 @@ class DailyInspirationCard extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant,
                 height: 1.5,
               ),
+              textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 20),
             Row(
@@ -231,6 +241,7 @@ class DailyInspirationCard extends StatelessWidget {
                 color: colorScheme.onSurface,
                 height: 1.6,
               ),
+              textAlign: TextAlign.justify,
             ),
 
             // Expanded content
@@ -251,7 +262,8 @@ class DailyInspirationCard extends StatelessWidget {
                     color: colorScheme.onSurface,
                     height: 1.8,
                   ),
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.justify,
+                  textDirection: TextDirection.rtl,
                 ),
               ),
               const SizedBox(height: 20),

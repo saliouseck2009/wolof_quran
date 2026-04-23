@@ -12,6 +12,8 @@ import 'package:wolof_quran/presentation/views/reciter_audio_updates_page.dart';
 import 'package:wolof_quran/presentation/views/search_page.dart';
 import 'package:wolof_quran/presentation/views/surah_audio_list_page.dart';
 import 'package:wolof_quran/presentation/views/mushaf_page.dart';
+import 'package:wolof_quran/presentation/views/privacy_policy_page.dart';
+import 'package:wolof_quran/presentation/views/support_page.dart';
 import 'package:wolof_quran/presentation/widgets/audio/global_mini_player_shell.dart';
 import 'package:wolof_quran/domain/entities/reciter.dart';
 import 'package:wolof_quran/core/navigation/surah_detail_arguments.dart';
@@ -60,6 +62,13 @@ class AppRoutes {
         return _materialRoute(view: SurahAudioListPage(), settings: settings);
       case MushafPage.routeName:
         return _materialRoute(view: MushafPage(), settings: settings);
+      case SupportPage.routeName:
+        return _materialRoute(view: const SupportPage(), settings: settings);
+      case PrivacyPolicyPage.routeName:
+        return _materialRoute(
+          view: const PrivacyPolicyPage(),
+          settings: settings,
+        );
       case '/search':
         return _materialRoute(view: SearchPage(), settings: settings);
       case '/bookmarks':

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qcf_quran/qcf_quran.dart' as qcf;
 import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 
@@ -174,13 +175,44 @@ class _MushafSurahPickerViewState extends State<_MushafSurahPickerView> {
                   return const SurahListNoResults(asSliver: false);
                 }
 
+                // Build a flat list of display items: juz headers + surahs.
+                // When searching, skip juz headers to keep results clean.
+                //
+                // A surah can span multiple juz (e.g. Al-Baqarah spans
+                // Juz 1–3). We check both the first and last verse of each
+                // surah and insert headers for every new juz encountered.
+                final items = <_DisplayItem>[];
+                int lastShownJuz = 0;
+                for (final surah in surahs) {
+                  if (state.query.isEmpty) {
+                    final lastJuz = qcf.getJuzNumber(
+                      surah.number,
+                      surah.verseCount,
+                    );
+                    for (int j = lastShownJuz + 1; j <= lastJuz; j++) {
+                      items.add(_JuzHeader(j));
+                    }
+                    lastShownJuz = lastJuz;
+                  }
+                  items.add(_SurahEntry(surah));
+                }
+
                 return ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                  itemCount: surahs.length,
+                  itemCount: items.length,
                   itemBuilder: (context, index) {
-                    final surah = surahs[index];
-                    final isCurrentSurah = surah.number == widget.currentSurahNumber;
+                    final item = items[index];
+
+                    if (item is _JuzHeader) {
+                      return _JuzHeaderWidget(
+                        label: localizations.juzLabel(item.juzNumber),
+                      );
+                    }
+
+                    final surah = (item as _SurahEntry).surah;
+                    final isCurrentSurah =
+                        surah.number == widget.currentSurahNumber;
                     final translatedName =
                         QuranSettingsCubit.getSurahNameInTranslation(
                           surah.number,
@@ -188,8 +220,8 @@ class _MushafSurahPickerViewState extends State<_MushafSurahPickerView> {
                         );
                     final revelationLabel =
                         surah.revelationType == RevelationPlaceEnum.meccan
-                        ? localizations.meccan
-                        : localizations.medinan;
+                            ? localizations.meccan
+                            : localizations.medinan;
 
                     return Container(
                       key: _keyForSurah(surah.number),
@@ -197,10 +229,12 @@ class _MushafSurahPickerViewState extends State<_MushafSurahPickerView> {
                         surahNumber: surah.number,
                         translatedName: translatedName,
                         arabicName: surah.nameArabic,
-                        versesLabel: '${surah.verseCount} ${localizations.verses}',
+                        versesLabel:
+                            '${surah.verseCount} ${localizations.verses}',
                         revelationLabel: revelationLabel,
                         revelationPlace: surah.revelationType,
                         isHighlighted: isCurrentSurah,
+                        pageNumber: qcf.getPageNumber(surah.number, 1),
                         onTap: () => Navigator.pop(context, surah.number),
                       ),
                     );
@@ -209,6 +243,55 @@ class _MushafSurahPickerViewState extends State<_MushafSurahPickerView> {
               },
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Display-item types for the mixed list ──
+
+sealed class _DisplayItem {}
+
+class _JuzHeader extends _DisplayItem {
+  final int juzNumber;
+  _JuzHeader(this.juzNumber);
+}
+
+class _SurahEntry extends _DisplayItem {
+  final MushafSurahItem surah;
+  _SurahEntry(this.surah);
+}
+
+// ── Juz header widget ──
+
+class _JuzHeaderWidget extends StatelessWidget {
+  final String label;
+
+  const _JuzHeaderWidget({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final lineColor = colorScheme.onSurface.withValues(alpha: 0.12);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 8),
+      child: Row(
+        children: [
+          Expanded(child: Divider(color: lineColor, height: 1)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+            ),
+          ),
+          Expanded(child: Divider(color: lineColor, height: 1)),
         ],
       ),
     );

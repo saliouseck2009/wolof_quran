@@ -22,20 +22,12 @@ class SettingsMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final activeColor = colorScheme.primary;
-    final activeColorWithAlpha = activeColor.withValues(alpha: 0.1);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
         color: isDark ? colorScheme.surfaceContainer : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark
-              ? colorScheme.outline.withValues(alpha: 0.1)
-              : Colors.transparent,
-          width: 1,
-        ),
       ),
       child: Material(
         color: Colors.transparent,
@@ -51,10 +43,14 @@ class SettingsMenuItem extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: activeColorWithAlpha,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: activeColor, size: 24),
+                  child: Icon(
+                    icon,
+                    color: isDark ? colorScheme.onPrimary : colorScheme.primary,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -83,17 +79,16 @@ class SettingsMenuItem extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: activeColorWithAlpha,
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: activeColor.withValues(alpha: 0.2),
-                          ),
                         ),
                         child: Text(
                           value,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
-                                color: activeColor,
+                                color: isDark
+                                    ? colorScheme.onPrimary
+                                    : colorScheme.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
@@ -105,12 +100,12 @@ class SettingsMenuItem extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: activeColorWithAlpha,
+                    color: colorScheme.surface,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     showArrow ? Icons.arrow_forward_ios : Icons.edit,
-                    color: activeColor,
+                    color: isDark ? colorScheme.onPrimary : colorScheme.primary,
                     size: 16,
                   ),
                 ),

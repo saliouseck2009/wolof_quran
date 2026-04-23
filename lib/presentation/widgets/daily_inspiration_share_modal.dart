@@ -72,6 +72,8 @@ class _DailyInspirationShareModalState
     extends State<DailyInspirationShareModal> {
   static const String _playStoreUrl =
       'https://play.google.com/store/apps/details?id=com.saliouseck.wolofquran&hl=fr';
+  static const String _appStoreUrl =
+      'https://apps.apple.com/sn/app/coran-wolof/id6761394820?l=fr-FR';
 
   final GlobalKey _captureKey = GlobalKey();
   final GlobalKey _shareImageButtonKey = GlobalKey();
@@ -559,7 +561,7 @@ class _DailyInspirationShareModalState
       widget.surahName,
       widget.verseNumber,
     );
-    return '$baseText\n\n$_playStoreUrl';
+    return '$baseText\n\nAndroid: $_playStoreUrl\niOS: $_appStoreUrl';
   }
 
   Future<void> _shareWithGuard({

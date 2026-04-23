@@ -57,97 +57,40 @@ class SurahDetailAppBar extends StatelessWidget {
           PopupMenuButton<AyahDisplayMode>(
             tooltip: localizations.arabicAndTranslation,
             icon: Icon(Icons.g_translate, color: colorScheme.onPrimary),
-            color: colorScheme.surface,
+            color: colorScheme.surfaceContainer,
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             onSelected: (mode) {
               context.read<SurahDetailCubit>().changeDisplayMode(mode);
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
-                value: AyahDisplayMode.both,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.view_headline,
-                      color: state.displayMode == AyahDisplayMode.both
-                          ? colorScheme.primary
-                          : colorScheme.onSurface,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      localizations.arabicAndTranslation,
-                      style: TextStyle(
-                        color: state.displayMode == AyahDisplayMode.both
-                            ? colorScheme.primary
-                            : colorScheme.onSurface,
-                        fontWeight: state.displayMode == AyahDisplayMode.both
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+              _buildModeItem(
+                context: context,
+                mode: AyahDisplayMode.both,
+                icon: Icons.view_headline,
+                label: localizations.arabicAndTranslation,
+                currentMode: state.displayMode,
               ),
-              PopupMenuItem(
-                value: AyahDisplayMode.arabicOnly,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.format_textdirection_r_to_l,
-                      color: state.displayMode == AyahDisplayMode.arabicOnly
-                          ? colorScheme.primary
-                          : colorScheme.onSurface,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      localizations.arabicOnly,
-                      style: TextStyle(
-                        color: state.displayMode == AyahDisplayMode.arabicOnly
-                            ? colorScheme.primary
-                            : colorScheme.onSurface,
-                        fontWeight:
-                            state.displayMode == AyahDisplayMode.arabicOnly
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+              _buildModeItem(
+                context: context,
+                mode: AyahDisplayMode.arabicOnly,
+                icon: Icons.format_textdirection_r_to_l,
+                label: localizations.arabicOnly,
+                currentMode: state.displayMode,
               ),
-              PopupMenuItem(
-                value: AyahDisplayMode.translationOnly,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.translate,
-                      color:
-                          state.displayMode == AyahDisplayMode.translationOnly
-                          ? colorScheme.primary
-                          : colorScheme.onSurface,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      localizations.translationOnly,
-                      style: TextStyle(
-                        color:
-                            state.displayMode == AyahDisplayMode.translationOnly
-                            ? colorScheme.primary
-                            : colorScheme.onSurface,
-                        fontWeight:
-                            state.displayMode == AyahDisplayMode.translationOnly
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+              _buildModeItem(
+                context: context,
+                mode: AyahDisplayMode.translationOnly,
+                icon: Icons.translate,
+                label: localizations.translationOnly,
+                currentMode: state.displayMode,
               ),
             ],
           ),
           IconButton(
-            icon: Icon(Icons.settings, color: colorScheme.onPrimary),
+            icon: Icon(Icons.tune, color: colorScheme.onPrimary),
             onPressed: () async {
               final result = await Navigator.pushNamed(
                 context,
@@ -178,6 +121,66 @@ class SurahDetailAppBar extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  PopupMenuItem<AyahDisplayMode> _buildModeItem({
+    required BuildContext context,
+    required AyahDisplayMode mode,
+    required IconData icon,
+    required String label,
+    required AyahDisplayMode currentMode,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final isSelected = currentMode == mode;
+    final backgroundColor = isDark
+        ? colorScheme.surface
+        : colorScheme.primary.withValues(alpha: 0.1);
+    return PopupMenuItem<AyahDisplayMode>(
+      value: mode,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSelected ? backgroundColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.onSurface.withValues(alpha: 0.65),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: isSelected
+                      ? colorScheme.primary
+                      : colorScheme.onSurface,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 20,
+              child: isSelected
+                  ? Icon(
+                      Icons.check_rounded,
+                      size: 18,
+                      color: colorScheme.primary,
+                    )
+                  : null,
+            ),
+          ],
         ),
       ),
     );
@@ -266,21 +269,25 @@ class SurahInfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    final color = isDark
+        ? Theme.of(context).colorScheme.onPrimary
+        : Theme.of(context).colorScheme.primary;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: Colors.white),
+          Icon(icon, size: 12, color: color),
           const SizedBox(width: 5),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: color,
               fontWeight: FontWeight.w500,
               fontSize: 11,
             ),

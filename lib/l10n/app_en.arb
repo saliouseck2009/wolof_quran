@@ -92,7 +92,7 @@
   "@bookmarks": {
     "description": "Bookmarks text"
   },
-  "recitation": "Recitation",
+  "recitation": "Listen",
   "@recitation": {
     "description": "Recitation text"
   },
@@ -476,6 +476,10 @@
   "@shareVideoGenerationFailed": {
     "description": "Error shown when video creation fails"
   },
+  "shareVideoUnavailableInScreenshotMode": "Video sharing is unavailable in screenshot mode.",
+  "@shareVideoUnavailableInScreenshotMode": {
+    "description": "Message shown when video sharing is disabled for simulator screenshot mode"
+  },
   "shareActionCancelled": "Action cancelled.",
   "@shareActionCancelled": {
     "description": "Message shown when user cancels a share action"
@@ -660,7 +664,7 @@
   "@about": {
     "description": "About menu title"
   },
-  "aboutSubtitle": "App version and support",
+  "aboutSubtitle": "App version and legal information",
   "@aboutSubtitle": {
     "description": "About menu subtitle"
   },
@@ -720,6 +724,48 @@
       }
     }
   },
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": { "description": "Settings menu title" },
+  "privacyPolicySubtitle": "Your privacy matters",
+  "@privacyPolicySubtitle": { "description": "Settings menu subtitle" },
+  "privacyPolicyValue": "View",
+  "@privacyPolicyValue": { "description": "Value label" },
+  "privacyPolicyPageTitle": "Privacy Policy",
+  "@privacyPolicyPageTitle": { "description": "Page title" },
+  "privacyPolicyLastUpdated": "Last updated: {date}",
+  "@privacyPolicyLastUpdated": { "description": "Last updated label", "placeholders": { "date": { "type": "String" } } },
+  "privacyPolicyIntro": "Wolof Quran does not collect, store, or transmit any personal data. Your privacy is fully respected.",
+  "@privacyPolicyIntro": { "description": "Intro text" },
+  "privacyPolicyLocalDataTitle": "Data stored on your device",
+  "@privacyPolicyLocalDataTitle": { "description": "Section title" },
+  "privacyPolicyLocalDataBody": "All your data stays on your device and is never sent to any server:\n\n- Your preferences (language, theme, font size, selected reciter)\n- Downloaded audio files\n- Bookmarks and reading progress",
+  "@privacyPolicyLocalDataBody": { "description": "Section body" },
+  "privacyPolicyInternetTitle": "Internet access",
+  "@privacyPolicyInternetTitle": { "description": "Section title" },
+  "privacyPolicyInternetBody": "The app uses an internet connection solely to:\n\n- Download Quran audio recitations\n- Check for app updates\n\nNo personal information is sent during these operations.",
+  "@privacyPolicyInternetBody": { "description": "Section body" },
+  "privacyPolicyPermissionsTitle": "Permissions",
+  "@privacyPolicyPermissionsTitle": { "description": "Section title" },
+  "privacyPolicyPermissionsBody": "The app requests only the permissions strictly necessary for its features:\n\n- Internet: to download audio content\n- Audio playback: to play Quran recitations, including in the background",
+  "@privacyPolicyPermissionsBody": { "description": "Section body" },
+  "privacyPolicyThirdPartyTitle": "External links",
+  "@privacyPolicyThirdPartyTitle": { "description": "Section title" },
+  "privacyPolicyThirdPartyBody": "The app may open external links to third-party services. These services have their own privacy policies, and we do not control their data practices.",
+  "@privacyPolicyThirdPartyBody": { "description": "Section body" },
+  "privacyPolicyChildrenTitle": "Suitable for all ages",
+  "@privacyPolicyChildrenTitle": { "description": "Section title" },
+  "privacyPolicyChildrenBody": "Since the app does not collect any personal data, it is safe for users of all ages, including children.",
+  "@privacyPolicyChildrenBody": { "description": "Section body" },
+  "privacyPolicyContactTitle": "Contact",
+  "@privacyPolicyContactTitle": { "description": "Section title" },
+  "privacyPolicyContactBody": "For any question regarding this policy: {email}",
+  "@privacyPolicyContactBody": { "description": "Section body", "placeholders": { "email": { "type": "String" } } },
+  "privacyPolicyPublisher": "Publisher: {name}",
+  "@privacyPolicyPublisher": { "description": "Publisher legal name", "placeholders": { "name": { "type": "String" } } },
+  "privacyPolicyAgeRating": "This app is rated for all audiences (all ages).",
+  "@privacyPolicyAgeRating": { "description": "Age rating statement" },
+  "privacyPolicyOnlineVersion": "Full policy online",
+  "@privacyPolicyOnlineVersion": { "description": "Link label for online privacy policy" },
   "quranSettingsDescription": "Customize your Quran reading experience",
   "@quranSettingsDescription": {
     "description": "Header subtitle on Quran settings page"
@@ -939,6 +985,12 @@
       }
     }
   },
+  "nowPlaying": "Now Playing",
+  "collapsePlayer": "Collapse",
+  "previousSurah": "Previous",
+  "nextSurah": "Next",
+  "rewind10s": "Rewind 10s",
+  "forward10s": "Forward 10s",
   "hizbThreeQuarter": "3/4 Hizb {n}",
   "@hizbThreeQuarter": {
     "description": "Three-quarter hizb label shown in the mushaf bottom bar",
@@ -948,5 +1000,45 @@
         "description": "The hizb number"
       }
     }
+  },
+  "supportProject": "Support the project",
+  "@supportProject": {
+    "description": "Settings menu item title for support page"
+  },
+  "supportSubtitle": "Help keep the app free and growing",
+  "@supportSubtitle": {
+    "description": "Settings menu item subtitle for support page"
+  },
+  "supportPageTitle": "Support Wolof Quran",
+  "@supportPageTitle": {
+    "description": "Title of the support/donation page"
+  },
+  "supportUnavailableOnIosTitle": "Support is unavailable on iOS",
+  "@supportUnavailableOnIosTitle": {
+    "description": "Title shown on iOS when external donation methods are disabled"
+  },
+  "supportUnavailableOnIosBody": "To comply with App Store policies, this support section is currently disabled on iOS.",
+  "@supportUnavailableOnIosBody": {
+    "description": "Body text shown on iOS when support page is disabled"
+  },
+  "payWithWave": "Wave",
+  "@payWithWave": {
+    "description": "Title for Wave payment section"
+  },
+  "piSpiPayment": "PI SPI",
+  "@piSpiPayment": {
+    "description": "Title for PI SPI payment section"
+  },
+  "copiedToClipboard": "Copied to clipboard",
+  "@copiedToClipboard": {
+    "description": "Snackbar message when text is copied"
+  },
+  "copyId": "Copy ID",
+  "@copyId": {
+    "description": "Button label to copy PI SPI identifier"
+  },
+  "supportValue": "Jazaakumullaahu khairan",
+  "@supportValue": {
+    "description": "Short value text shown on the support settings card"
   }
 }

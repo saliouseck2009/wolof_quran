@@ -78,7 +78,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get bookmarks => 'Signets';
 
   @override
-  String get recitation => 'Récitation';
+  String get recitation => 'Lecteur audio';
 
   @override
   String get translation => 'Traduction';
@@ -354,6 +354,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get shareVideoGenerationFailed => 'Échec de la génération vidéo.';
 
   @override
+  String get shareVideoUnavailableInScreenshotMode =>
+      'Le partage vidéo est indisponible en mode captures d’écran.';
+
+  @override
   String get shareActionCancelled => 'Action annulée.';
 
   @override
@@ -492,7 +496,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get about => 'À propos';
 
   @override
-  String get aboutSubtitle => 'Version de l\'application et support';
+  String get aboutSubtitle =>
+      'Version de l\'application et informations légales';
 
   @override
   String get aboutDescription =>
@@ -524,14 +529,89 @@ class AppLocalizationsFr extends AppLocalizations {
   String get copyLabel => 'Copier';
 
   @override
-  String copiedToClipboard(String label) {
-    return '$label copié';
-  }
+  String get copiedToClipboard => 'Copie dans le presse-papiers';
 
   @override
   String appVersion(String version) {
     return 'Version $version';
   }
+
+  @override
+  String get privacyPolicy => 'Politique de confidentialité';
+
+  @override
+  String get privacyPolicySubtitle => 'Votre vie privée compte';
+
+  @override
+  String get privacyPolicyValue => 'Consulter';
+
+  @override
+  String get privacyPolicyPageTitle => 'Politique de confidentialité';
+
+  @override
+  String privacyPolicyLastUpdated(String date) {
+    return 'Dernière mise à jour : $date';
+  }
+
+  @override
+  String get privacyPolicyIntro =>
+      'Coran Wolof ne collecte, ne stocke et ne transmet aucune donnée personnelle. Votre vie privée est entièrement respectée.';
+
+  @override
+  String get privacyPolicyLocalDataTitle =>
+      'Données stockées sur votre appareil';
+
+  @override
+  String get privacyPolicyLocalDataBody =>
+      'Toutes vos données restent sur votre appareil et ne sont jamais envoyées à un serveur :\n\n- Vos préférences (langue, thème, taille de police, récitateur choisi)\n- Les fichiers audio téléchargés\n- Les signets et la progression de lecture';
+
+  @override
+  String get privacyPolicyInternetTitle => 'Accès Internet';
+
+  @override
+  String get privacyPolicyInternetBody =>
+      'L\'application utilise une connexion Internet uniquement pour :\n\n- Télécharger les récitations audio du Coran\n- Vérifier les mises à jour de l\'application\n\nAucune information personnelle n\'est envoyée lors de ces opérations.';
+
+  @override
+  String get privacyPolicyPermissionsTitle => 'Permissions';
+
+  @override
+  String get privacyPolicyPermissionsBody =>
+      'L\'application ne demande que les permissions strictement nécessaires :\n\n- Internet : pour télécharger le contenu audio\n- Lecture audio : pour jouer les récitations du Coran, y compris en arrière-plan';
+
+  @override
+  String get privacyPolicyThirdPartyTitle => 'Liens externes';
+
+  @override
+  String get privacyPolicyThirdPartyBody =>
+      'L\'application peut ouvrir des liens externes vers des services tiers. Ces services ont leurs propres politiques de confidentialité, et nous ne contrôlons pas leurs pratiques de données.';
+
+  @override
+  String get privacyPolicyChildrenTitle => 'Adapté à tous les âges';
+
+  @override
+  String get privacyPolicyChildrenBody =>
+      'Puisque l\'application ne collecte aucune donnée personnelle, elle est sûre pour les utilisateurs de tous âges, y compris les enfants.';
+
+  @override
+  String get privacyPolicyContactTitle => 'Contact';
+
+  @override
+  String privacyPolicyContactBody(String email) {
+    return 'Pour toute question concernant cette politique : $email';
+  }
+
+  @override
+  String privacyPolicyPublisher(String name) {
+    return 'Éditeur : $name';
+  }
+
+  @override
+  String get privacyPolicyAgeRating =>
+      'Cette application est destinée à tous les publics (tout âge).';
+
+  @override
+  String get privacyPolicyOnlineVersion => 'Politique complète en ligne';
 
   @override
   String get quranSettingsDescription => 'Personnalisez votre lecture du Coran';
@@ -682,7 +762,54 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get nowPlaying => 'En cours de lecture';
+
+  @override
+  String get collapsePlayer => 'Réduire';
+
+  @override
+  String get previousSurah => 'Précédent';
+
+  @override
+  String get nextSurah => 'Suivant';
+
+  @override
+  String get rewind10s => 'Reculer 10s';
+
+  @override
+  String get forward10s => 'Avancer 10s';
+
+  @override
   String hizbThreeQuarter(int n) {
     return '3/4 Hizb $n';
   }
+
+  @override
+  String get supportProject => 'Soutenir le projet';
+
+  @override
+  String get supportSubtitle => 'Contribuez au maintien de l\'application';
+
+  @override
+  String get supportPageTitle => 'Soutenir Coran Wolof';
+
+  @override
+  String get supportUnavailableOnIosTitle =>
+      'Le soutien est indisponible sur iOS';
+
+  @override
+  String get supportUnavailableOnIosBody =>
+      'Pour respecter les règles de l\'App Store, cette section de soutien est actuellement désactivée sur iOS.';
+
+  @override
+  String get payWithWave => 'Wave';
+
+  @override
+  String get piSpiPayment => 'PI SPI';
+
+  @override
+  String get copyId => 'Copier l\'identifiant';
+
+  @override
+  String get supportValue => 'Jazaakumullaahu khairan';
 }

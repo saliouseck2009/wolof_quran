@@ -64,6 +64,29 @@ class DailyInspirationCubit extends Cubit<DailyInspirationState> {
     }
   }
 
+  /// Re-translates the current verse with a new translation.
+  /// Called when the user changes the translation setting.
+  void updateTranslation(quran.Translation newTranslation) {
+    final currentState = state;
+    if (currentState is DailyInspirationLoaded) {
+      try {
+        final newTranslationText = quran.getVerseTranslation(
+          currentState.surahNumber,
+          currentState.verseNumber,
+          translation: newTranslation,
+        );
+        emit(currentState.copyWith(
+          translation: newTranslationText,
+          currentTranslation: newTranslation,
+        ));
+      } catch (e) {
+        emit(DailyInspirationError('Failed to update translation: $e'));
+      }
+    } else {
+      generateRandomAyah(newTranslation);
+    }
+  }
+
   void refreshAyah(quran.Translation currentTranslation) {
     // Save current expansion state before refreshing
     final currentState = state;

@@ -37,7 +37,7 @@ class SurahAudioListPage extends StatelessWidget {
 
         if (selectedReciter == null) {
           return Scaffold(
-            appBar: AppBar(title: Text(localizations.audioDownloads)),
+            appBar: AppBar(title: Text(localizations.recitation)),
             body: _NoReciterSelectedState(localizations: localizations),
           );
         }
@@ -406,8 +406,17 @@ class _ReciterSliverHeader extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SliverAppBar(
-      expandedHeight: 180,
+      expandedHeight: 150,
       pinned: true,
+      centerTitle: false,
+      title: Text(
+        localizations.recitation,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
       backgroundColor: isDark
           ? colorScheme.surfaceContainerLowest
           : colorScheme.primary,
@@ -486,15 +495,6 @@ class _ReciterSliverHeader extends StatelessWidget {
             ),
           ),
         ),
-        title: Text(
-          reciter.name,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        titlePadding: const EdgeInsets.only(left: 56, bottom: 14),
       ),
     );
   }
@@ -1039,12 +1039,11 @@ class _TrackAction extends StatelessWidget {
 
     // Downloaded: play/pause button
     if (isDownloaded) {
-      // Now playing → solid accent fill with white icon
-      // Idle downloaded → primaryContainer fill in light, semi-transparent in dark
-      final btnBg = isNowPlaying
-          ? accentColor
-          : (isDark ? accentColor.withValues(alpha: 0.2) : colorScheme.primary);
-      final iconColor = colorScheme.onPrimary;
+      // Now playing  → solid accent fill, white icon
+      // Idle (light)  → primary teal fill, white icon
+      // Idle (dark)   → primaryContainer tint, primary-colored icon (more visible than 20% alpha)
+      final btnBg = isDark ? colorScheme.primary : colorScheme.primary;
+      final iconColor = isDark ? colorScheme.onPrimary : colorScheme.onPrimary;
 
       return GestureDetector(
         onTap: onPlay,
@@ -1061,7 +1060,7 @@ class _TrackAction extends StatelessWidget {
       );
     }
 
-    // Not available remotely
+    // Not available remotely → disabled appearance (Material spec: 8–12% onSurface bg, 35% icon)
     if (!isAvailableRemotely) {
       return Tooltip(
         message: localizations.audioNotYetAvailable,
@@ -1069,36 +1068,36 @@ class _TrackAction extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: colorScheme.primary,
+            color: colorScheme.onSurface.withValues(
+              alpha: isDark ? 0.10 : 0.08,
+            ),
             shape: BoxShape.circle,
           ),
           child: Icon(
             Icons.cloud_off_outlined,
             size: 20,
-            color: colorScheme.onPrimary,
+            color: colorScheme.onSurface.withValues(alpha: 0.35),
           ),
         ),
       );
     }
 
-    // Available: download button
-    // Light: primaryContainer fill with primary icon — clear and inviting
-    // Dark: semi-transparent accent fill
+    // Available for download → soft primary tint = harmonieux avec le thème teal
+    // Light: primary @ 13% bg + icône primary (teal léger, suggère l'action à venir)
+    // Dark:  primary @ 18% bg + icône primary (plus visible sur fond sombre)
     return GestureDetector(
       onTap: onDownload,
       child: Container(
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: isDark
-              ? accentColor.withValues(alpha: 0.15)
-              : colorScheme.primary,
+          color: colorScheme.primary.withValues(alpha: isDark ? 0.18 : 0.13),
           shape: BoxShape.circle,
         ),
         child: Icon(
           Icons.download_rounded,
           size: 20,
-          color: colorScheme.onPrimary,
+          color: colorScheme.primary,
         ),
       ),
     );

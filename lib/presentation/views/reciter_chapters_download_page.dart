@@ -26,10 +26,7 @@ class ReciterChaptersDownloadPage extends StatelessWidget {
             : Theme.of(context).colorScheme.surface,
         body: CustomScrollView(
           slivers: [
-            ReciterChaptersAppBar(
-              reciter: reciter,
-              accentColor: accentGreen,
-            ),
+            ReciterChaptersAppBar(reciter: reciter, accentColor: accentGreen),
             SliverToBoxAdapter(
               child: ReciterChaptersContent(
                 reciter: reciter,

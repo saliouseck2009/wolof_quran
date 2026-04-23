@@ -78,7 +78,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookmarks => 'العلامات المرجعية';
 
   @override
-  String get recitation => 'التلاوة';
+  String get recitation => 'استماع';
 
   @override
   String get translation => 'الترجمة';
@@ -346,6 +346,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareVideoGenerationFailed => 'فشل إنشاء الفيديو.';
 
   @override
+  String get shareVideoUnavailableInScreenshotMode =>
+      'مشاركة الفيديو غير متاحة في وضع لقطات الشاشة.';
+
+  @override
   String get shareActionCancelled => 'تم إلغاء العملية.';
 
   @override
@@ -478,7 +482,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get about => 'حول التطبيق';
 
   @override
-  String get aboutSubtitle => 'إصدار التطبيق والدعم';
+  String get aboutSubtitle => 'إصدار التطبيق والمعلومات القانونية';
 
   @override
   String get aboutDescription =>
@@ -510,14 +514,88 @@ class AppLocalizationsAr extends AppLocalizations {
   String get copyLabel => 'نسخ';
 
   @override
-  String copiedToClipboard(String label) {
-    return 'تم نسخ $label';
-  }
+  String get copiedToClipboard => 'تم النسخ';
 
   @override
   String appVersion(String version) {
     return 'الإصدار $version';
   }
+
+  @override
+  String get privacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get privacyPolicySubtitle => 'خصوصيتك تهمنا';
+
+  @override
+  String get privacyPolicyValue => 'عرض';
+
+  @override
+  String get privacyPolicyPageTitle => 'سياسة الخصوصية';
+
+  @override
+  String privacyPolicyLastUpdated(String date) {
+    return 'آخر تحديث: $date';
+  }
+
+  @override
+  String get privacyPolicyIntro =>
+      'تطبيق القرآن بالولوف لا يجمع ولا يخزن ولا ينقل أي بيانات شخصية. خصوصيتك محترمة بالكامل.';
+
+  @override
+  String get privacyPolicyLocalDataTitle => 'البيانات المخزنة على جهازك';
+
+  @override
+  String get privacyPolicyLocalDataBody =>
+      'جميع بياناتك تبقى على جهازك ولا تُرسل أبداً إلى أي خادم:\n\n- تفضيلاتك (اللغة، المظهر، حجم الخط، القارئ المختار)\n- ملفات الصوت المحملة\n- العلامات المرجعية وتقدم القراءة';
+
+  @override
+  String get privacyPolicyInternetTitle => 'الاتصال بالإنترنت';
+
+  @override
+  String get privacyPolicyInternetBody =>
+      'يستخدم التطبيق الاتصال بالإنترنت فقط من أجل:\n\n- تحميل تلاوات القرآن الصوتية\n- التحقق من تحديثات التطبيق\n\nلا يتم إرسال أي معلومات شخصية أثناء هذه العمليات.';
+
+  @override
+  String get privacyPolicyPermissionsTitle => 'الأذونات';
+
+  @override
+  String get privacyPolicyPermissionsBody =>
+      'لا يطلب التطبيق سوى الأذونات الضرورية لعمله:\n\n- الإنترنت: لتحميل المحتوى الصوتي\n- تشغيل الصوت: لقراءة تلاوات القرآن، بما في ذلك في الخلفية';
+
+  @override
+  String get privacyPolicyThirdPartyTitle => 'الروابط الخارجية';
+
+  @override
+  String get privacyPolicyThirdPartyBody =>
+      'قد يفتح التطبيق روابط خارجية إلى خدمات طرف ثالث. لهذه الخدمات سياسات خصوصية خاصة بها، ونحن لا نتحكم في ممارسات بياناتها.';
+
+  @override
+  String get privacyPolicyChildrenTitle => 'مناسب لجميع الأعمار';
+
+  @override
+  String get privacyPolicyChildrenBody =>
+      'بما أن التطبيق لا يجمع أي بيانات شخصية، فهو آمن للمستخدمين من جميع الأعمار، بما في ذلك الأطفال.';
+
+  @override
+  String get privacyPolicyContactTitle => 'التواصل';
+
+  @override
+  String privacyPolicyContactBody(String email) {
+    return 'لأي سؤال متعلق بهذه السياسة: $email';
+  }
+
+  @override
+  String privacyPolicyPublisher(String name) {
+    return 'الناشر: $name';
+  }
+
+  @override
+  String get privacyPolicyAgeRating =>
+      'هذا التطبيق مخصص لجميع الفئات العمرية (كل الأعمار).';
+
+  @override
+  String get privacyPolicyOnlineVersion => 'السياسة الكاملة عبر الإنترنت';
 
   @override
   String get quranSettingsDescription => 'خصص تجربة قراءة القرآن لديك';
@@ -665,7 +743,53 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get nowPlaying => 'قيد التشغيل';
+
+  @override
+  String get collapsePlayer => 'تصغير';
+
+  @override
+  String get previousSurah => 'السابق';
+
+  @override
+  String get nextSurah => 'التالي';
+
+  @override
+  String get rewind10s => '10 ثوانٍ للخلف';
+
+  @override
+  String get forward10s => '10 ثوانٍ للأمام';
+
+  @override
   String hizbThreeQuarter(int n) {
     return 'ثلاثة أرباع حزب $n';
   }
+
+  @override
+  String get supportProject => 'دعم المشروع';
+
+  @override
+  String get supportSubtitle => 'ساهم في استمرارية التطبيق';
+
+  @override
+  String get supportPageTitle => 'دعم القرآن بالولوف';
+
+  @override
+  String get supportUnavailableOnIosTitle => 'الدعم غير متاح على iOS';
+
+  @override
+  String get supportUnavailableOnIosBody =>
+      'للالتزام بسياسات App Store، تم تعطيل قسم الدعم هذا حالياً على iOS.';
+
+  @override
+  String get payWithWave => 'Wave';
+
+  @override
+  String get piSpiPayment => 'PI SPI';
+
+  @override
+  String get copyId => 'نسخ المعرّف';
+
+  @override
+  String get supportValue => 'جزاكم الله خيرًا';
 }
