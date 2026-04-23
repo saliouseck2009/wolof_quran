@@ -137,6 +137,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
   final int Function(int max) _nextRandomInt;
   final List<int> _shuffleHistory = <int>[];
   bool _isAdvancingQueue = false;
+  int _navigationToken = 0;
 
   SurahMiniPlayerCubit({
     required AudioPlayerService audioPlayerService,
@@ -489,6 +490,12 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     bool resetShuffleHistory = false,
     bool isQueueAdvance = false,
   }) async {
+    // Capture a token so that if another navigation starts while this one is
+    // awaiting I/O, the older call detects it has been superseded and exits
+    // before touching the audio player. This prevents concurrent stop/load
+    // calls that cause the MediaCodec dead-thread crash on Android.
+    final myToken = ++_navigationToken;
+
     final reciterId = state.reciterId;
     if (reciterId == null) {
       return;
@@ -510,6 +517,10 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         reciterId,
         surahNumber,
       );
+      if (myToken != _navigationToken) {
+        if (isQueueAdvance) _isAdvancingQueue = false;
+        return;
+      }
       if (ayahAudios.isEmpty) {
         if (isQueueAdvance) {
           _isAdvancingQueue = false;
@@ -527,13 +538,25 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
       if (hasMissingDurations) {
         try {
           await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
+          if (myToken != _navigationToken) {
+            if (isQueueAdvance) _isAdvancingQueue = false;
+            return;
+          }
           final warmedAyahs = await _audioRepository.getAyahAudios(
             reciterId,
             surahNumber,
           );
+          if (myToken != _navigationToken) {
+            if (isQueueAdvance) _isAdvancingQueue = false;
+            return;
+          }
           ayahDurations = warmedAyahs.map((audio) => audio.duration).toList();
         } catch (_) {
           // Continue with partial durations.
+          if (myToken != _navigationToken) {
+            if (isQueueAdvance) _isAdvancingQueue = false;
+            return;
+          }
         }
       }
 
