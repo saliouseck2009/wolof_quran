@@ -390,36 +390,79 @@ class _DownloadActions extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
         final colorScheme = Theme.of(dialogContext).colorScheme;
+        final isDark = colorScheme.brightness == Brightness.dark;
+        final surahName = getSurahDisplayName(surahNumber);
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(22),
           ),
-          title: Text(
-            localizations.confirmDeleteSurahAudioTitle,
-            style: const TextStyle(fontWeight: FontWeight.w600),
+          titlePadding: const EdgeInsets.fromLTRB(24, 22, 24, 10),
+          contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          title: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: colorScheme.errorContainer.withValues(
+                    alpha: isDark ? 0.35 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.delete_forever_rounded,
+                  size: 22,
+                  color: colorScheme.error,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  localizations.confirmDeleteSurahAudioTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
           ),
           content: Text(
-            localizations.confirmDeleteSurahAudioMessage(
-              getSurahDisplayName(surahNumber),
+            localizations.confirmDeleteSurahAudioMessage(surahName),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           actions: [
-            TextButton(
+            OutlinedButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(
-                localizations.cancel,
-                style: TextStyle(color: colorScheme.onSurfaceVariant),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(96, 42),
+                side: BorderSide(
+                  color: colorScheme.outline.withValues(alpha: 0.45),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
+              child: Text(localizations.cancel),
             ),
-            TextButton(
+            FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(112, 42),
+                backgroundColor: colorScheme.error,
+                foregroundColor: colorScheme.onError,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               child: Text(
                 localizations.delete,
-                style: TextStyle(
-                  color: colorScheme.error,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
           ],
