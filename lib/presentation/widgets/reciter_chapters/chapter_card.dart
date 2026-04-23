@@ -323,22 +323,7 @@ class _DownloadActions extends StatelessWidget {
               ? colorScheme.error
               : colorScheme.onErrorContainer;
           return IconButton(
-            onPressed: () async {
-              await context.read<AudioManagementCubit>().deleteSurahAudio(
-                reciter.id,
-                surahNumber,
-              );
-              onDownloadComplete();
-              if (context.mounted) {
-                CustomSnackbar.showSnackbar(
-                  context,
-                  localizations.surahAudioDeleted(
-                    getSurahDisplayName(surahNumber),
-                  ),
-                  duration: 2,
-                );
-              }
-            },
+            onPressed: () => _confirmDelete(context),
             tooltip: localizations.deleteAudioLabel,
             icon: Icon(
               Icons.delete_outline_rounded,
@@ -399,6 +384,61 @@ class _DownloadActions extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        final colorScheme = Theme.of(dialogContext).colorScheme;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            localizations.confirmDeleteSurahAudioTitle,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          content: Text(
+            localizations.confirmDeleteSurahAudioMessage(
+              getSurahDisplayName(surahNumber),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(
+                localizations.cancel,
+                style: TextStyle(color: colorScheme.onSurfaceVariant),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(
+                localizations.delete,
+                style: TextStyle(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed != true || !context.mounted) return;
+    await context.read<AudioManagementCubit>().deleteSurahAudio(
+      reciter.id,
+      surahNumber,
+    );
+    onDownloadComplete();
+    if (context.mounted) {
+      CustomSnackbar.showSnackbar(
+        context,
+        localizations.surahAudioDeleted(getSurahDisplayName(surahNumber)),
+        duration: 2,
+      );
+    }
   }
 
   Future<void> _enqueue(BuildContext context) async {
