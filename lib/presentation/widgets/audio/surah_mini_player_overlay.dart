@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
-import 'package:wolof_quran/core/config/theme/app_color.dart';
 
 import '../../../core/services/audio_player_service.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -60,7 +59,7 @@ class SurahMiniPlayerOverlay extends StatelessWidget {
                   height: isExpanded ? expandedHeight : 76,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: AppColor.surfaceLight.withValues(alpha: 0.95),
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
                     // color: Theme.of(context).colorScheme.onPrimary,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
@@ -106,7 +105,7 @@ class _CollapsedMiniPlayer extends StatelessWidget {
     final isPlaying =
         state.playerState == AudioPlayerState.playing ||
         state.playerState == AudioPlayerState.loading;
-    final isLoading = state.playerState == AudioPlayerState.loading;
+    // final isLoading = state.playerState == AudioPlayerState.loading;
     final surahName = _localizedSurahName(
       context,
       state.surahNumber,
