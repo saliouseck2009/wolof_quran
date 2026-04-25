@@ -706,7 +706,7 @@ class _SeekBar extends StatelessWidget {
         : t.accent.withValues(alpha: 0.12);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         children: [
           SliderTheme(
