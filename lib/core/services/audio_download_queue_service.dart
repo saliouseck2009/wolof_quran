@@ -158,6 +158,8 @@ class AudioDownloadQueueService {
       task.surahNumber,
     );
     if (!hasDownloadLock) {
+      _lastPersistedProgress.remove(task.key);
+      _lastPersistedAt.remove(task.key);
       await _queueRepository.removeTask(task.reciterId, task.surahNumber);
       await _publishTasks();
       return;
