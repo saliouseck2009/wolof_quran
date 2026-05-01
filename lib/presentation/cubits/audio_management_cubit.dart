@@ -94,6 +94,31 @@ class AudioDownloading extends AudioManagementState {
   ];
 }
 
+class AudioDownloadAlreadyInProgress extends AudioManagementState {
+  final String reciterId;
+  final int surahNumber;
+  final Map<String, SurahAudioStatus> surahStatusMap;
+  final Map<String, List<AyahAudio>> ayahAudiosMap;
+
+  const AudioDownloadAlreadyInProgress({
+    required this.reciterId,
+    required this.surahNumber,
+    required this.surahStatusMap,
+    required this.ayahAudiosMap,
+  });
+
+  String _getKey(String reciterId, int surahNumber) => '${reciterId}_$surahNumber';
+
+  SurahAudioStatus? getSurahStatus(String reciterId, int surahNumber) =>
+      surahStatusMap[_getKey(reciterId, surahNumber)];
+
+  List<AyahAudio> getAyahAudios(String reciterId, int surahNumber) =>
+      ayahAudiosMap[_getKey(reciterId, surahNumber)] ?? [];
+
+  @override
+  List<Object> get props => [reciterId, surahNumber, surahStatusMap, ayahAudiosMap];
+}
+
 // Events
 abstract class AudioManagementEvent extends Equatable {
   const AudioManagementEvent();
@@ -241,6 +266,25 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
       log(
         'Ignoring duplicate download start for $reciterId/$surahNumber because a lock is already held',
       );
+      // If already in this state (e.g. rapid duplicate taps), do not re-emit.
+      if (state is AudioDownloadAlreadyInProgress) {
+        return;
+      }
+      Map<String, SurahAudioStatus> currentSurahStatusMap = {};
+      Map<String, List<AyahAudio>> currentAyahAudiosMap = {};
+      final stateSnapshot = state;
+      if (stateSnapshot is AudioManagementLoaded) {
+        currentSurahStatusMap = Map.from(stateSnapshot.surahStatusMap);
+        currentAyahAudiosMap = Map.from(stateSnapshot.ayahAudiosMap);
+      }
+      emit(
+        AudioDownloadAlreadyInProgress(
+          reciterId: reciterId,
+          surahNumber: surahNumber,
+          surahStatusMap: currentSurahStatusMap,
+          ayahAudiosMap: currentAyahAudiosMap,
+        ),
+      );
       return;
     }
 
@@ -359,6 +403,9 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
       } else if (currentState is AudioDownloading) {
         currentSurahStatusMap = Map.from(currentState.previousSurahStatusMap);
         currentAyahAudiosMap = Map.from(currentState.previousAyahAudiosMap);
+      } else if (currentState is AudioDownloadAlreadyInProgress) {
+        currentSurahStatusMap = Map.from(currentState.surahStatusMap);
+        currentAyahAudiosMap = Map.from(currentState.ayahAudiosMap);
       }
 
       // Check database for download status
@@ -541,6 +588,10 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
       final status = currentState.getSurahStatus(reciterId, surahNumber);
       return status?.isDownloaded ?? false;
     }
+    if (currentState is AudioDownloadAlreadyInProgress) {
+      final status = currentState.getSurahStatus(reciterId, surahNumber);
+      return status?.isDownloaded ?? false;
+    }
     return false;
   }
 
@@ -550,6 +601,9 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
     if (currentState is AudioManagementLoaded) {
       return currentState.getSurahStatus(reciterId, surahNumber);
     }
+    if (currentState is AudioDownloadAlreadyInProgress) {
+      return currentState.getSurahStatus(reciterId, surahNumber);
+    }
     return null;
   }
 
@@ -557,6 +611,9 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
   List<AyahAudio> getAyahAudios(String reciterId, int surahNumber) {
     final currentState = state;
     if (currentState is AudioManagementLoaded) {
+      return currentState.getAyahAudios(reciterId, surahNumber);
+    }
+    if (currentState is AudioDownloadAlreadyInProgress) {
       return currentState.getAyahAudios(reciterId, surahNumber);
     }
     return [];
