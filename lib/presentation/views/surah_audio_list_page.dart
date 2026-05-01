@@ -207,7 +207,9 @@ class _SurahAudioListBody extends StatelessWidget {
           },
         ),
         BlocListener<AudioManagementCubit, AudioManagementState>(
-          listenWhen: (_, current) => current is AudioDownloadAlreadyInProgress,
+          listenWhen: (_, current) =>
+              current is AudioDownloadAlreadyInProgress &&
+              current.reciterId == reciter.id,
           listener: (context, _) {
             CustomSnackbar.showSnackbar(
               context,

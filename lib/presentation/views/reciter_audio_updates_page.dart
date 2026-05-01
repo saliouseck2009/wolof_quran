@@ -53,7 +53,9 @@ class _ReciterAudioUpdatesPageState extends State<ReciterAudioUpdatesPage> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return BlocListener<AudioManagementCubit, AudioManagementState>(
-      listenWhen: (_, current) => current is AudioDownloadAlreadyInProgress,
+      listenWhen: (_, current) =>
+          current is AudioDownloadAlreadyInProgress &&
+          current.reciterId == widget.reciter.id,
       listener: (context, _) {
         CustomSnackbar.showSnackbar(
           context,
