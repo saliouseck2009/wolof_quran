@@ -266,22 +266,23 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
       log(
         'Ignoring duplicate download start for $reciterId/$surahNumber because a lock is already held',
       );
-      Map<String, SurahAudioStatus> lockedSurahStatusMap = {};
-      Map<String, List<AyahAudio>> lockedAyahAudiosMap = {};
-      final lockedCurrentState = state;
-      if (lockedCurrentState is AudioManagementLoaded) {
-        lockedSurahStatusMap = Map.from(lockedCurrentState.surahStatusMap);
-        lockedAyahAudiosMap = Map.from(lockedCurrentState.ayahAudiosMap);
-      } else if (lockedCurrentState is AudioDownloadAlreadyInProgress) {
-        lockedSurahStatusMap = Map.from(lockedCurrentState.surahStatusMap);
-        lockedAyahAudiosMap = Map.from(lockedCurrentState.ayahAudiosMap);
+      // If already in this state (e.g. rapid duplicate taps), do not re-emit.
+      if (state is AudioDownloadAlreadyInProgress) {
+        return;
+      }
+      Map<String, SurahAudioStatus> currentSurahStatusMap = {};
+      Map<String, List<AyahAudio>> currentAyahAudiosMap = {};
+      final stateSnapshot = state;
+      if (stateSnapshot is AudioManagementLoaded) {
+        currentSurahStatusMap = Map.from(stateSnapshot.surahStatusMap);
+        currentAyahAudiosMap = Map.from(stateSnapshot.ayahAudiosMap);
       }
       emit(
         AudioDownloadAlreadyInProgress(
           reciterId: reciterId,
           surahNumber: surahNumber,
-          surahStatusMap: lockedSurahStatusMap,
-          ayahAudiosMap: lockedAyahAudiosMap,
+          surahStatusMap: currentSurahStatusMap,
+          ayahAudiosMap: currentAyahAudiosMap,
         ),
       );
       return;
