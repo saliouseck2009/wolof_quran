@@ -53,6 +53,19 @@ class HomePage extends StatelessWidget {
               }
             },
           ),
+          BlocListener<AudioManagementCubit, AudioManagementState>(
+            listenWhen: (_, current) =>
+                current is AudioDownloadAlreadyInProgress,
+            listener: (context, audioState) {
+              final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+              if (!isCurrentRoute) return;
+              CustomSnackbar.showSnackbar(
+                context,
+                AppLocalizations.of(context)!.surahDownloadAlreadyInProgress,
+                duration: 2,
+              );
+            },
+          ),
         ],
         child: Scaffold(
           backgroundColor: colorScheme.surface,

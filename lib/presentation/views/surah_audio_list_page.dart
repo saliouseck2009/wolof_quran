@@ -206,6 +206,16 @@ class _SurahAudioListBody extends StatelessWidget {
             }
           },
         ),
+        BlocListener<AudioManagementCubit, AudioManagementState>(
+          listenWhen: (_, current) => current is AudioDownloadAlreadyInProgress,
+          listener: (context, _) {
+            CustomSnackbar.showSnackbar(
+              context,
+              localizations.surahDownloadAlreadyInProgress,
+              duration: 2,
+            );
+          },
+        ),
       ],
       child: BlocBuilder<ReciterChaptersBloc, ReciterChaptersState>(
         builder: (context, chaptersState) {

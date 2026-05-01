@@ -266,6 +266,10 @@ class _DownloadSurahButton extends StatelessWidget {
           return current is AudioManagementLoaded ||
               current is AudioManagementError;
         }
+        if (current is AudioDownloadAlreadyInProgress) {
+          return current.reciterId == reciterId &&
+              current.surahNumber == surahNumber;
+        }
         return false;
       },
       listener: (context, currentState) {
@@ -295,6 +299,12 @@ class _DownloadSurahButton extends StatelessWidget {
             context,
             localizations.downloadFailedWithError(formattedError),
             duration: 5,
+          );
+        } else if (currentState is AudioDownloadAlreadyInProgress) {
+          CustomSnackbar.showSnackbar(
+            context,
+            localizations.surahDownloadAlreadyInProgress,
+            duration: 2,
           );
         }
       },

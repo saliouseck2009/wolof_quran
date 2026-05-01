@@ -94,6 +94,19 @@ class AudioDownloading extends AudioManagementState {
   ];
 }
 
+class AudioDownloadAlreadyInProgress extends AudioManagementState {
+  final String reciterId;
+  final int surahNumber;
+
+  const AudioDownloadAlreadyInProgress({
+    required this.reciterId,
+    required this.surahNumber,
+  });
+
+  @override
+  List<Object> get props => [reciterId, surahNumber];
+}
+
 // Events
 abstract class AudioManagementEvent extends Equatable {
   const AudioManagementEvent();
@@ -241,6 +254,14 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
       log(
         'Ignoring duplicate download start for $reciterId/$surahNumber because a lock is already held',
       );
+      final previousState = state;
+      emit(
+        AudioDownloadAlreadyInProgress(
+          reciterId: reciterId,
+          surahNumber: surahNumber,
+        ),
+      );
+      emit(previousState);
       return;
     }
 
