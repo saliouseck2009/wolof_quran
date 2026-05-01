@@ -266,10 +266,20 @@ class _DownloadSurahButton extends StatelessWidget {
           return current is AudioManagementLoaded ||
               current is AudioManagementError;
         }
+        if (current is AudioDownloadAlreadyInProgress) {
+          return current.reciterId == reciterId &&
+              current.surahNumber == surahNumber;
+        }
         return false;
       },
       listener: (context, currentState) {
         if (currentState is AudioManagementLoaded) {
+          final didCompleteDownload =
+              currentState.getSurahStatus(reciterId, surahNumber)?.isDownloaded ==
+              true;
+          if (!didCompleteDownload) {
+            return;
+          }
           context.read<SurahDownloadStatusBloc>().add(
             RefreshSurahDownloadStatus(
               reciterId: reciterId,
@@ -289,6 +299,12 @@ class _DownloadSurahButton extends StatelessWidget {
             context,
             localizations.downloadFailedWithError(formattedError),
             duration: 5,
+          );
+        } else if (currentState is AudioDownloadAlreadyInProgress) {
+          CustomSnackbar.showSnackbar(
+            context,
+            localizations.surahDownloadAlreadyInProgress,
+            duration: 2,
           );
         }
       },
@@ -417,12 +433,16 @@ class _DownloadSurahButton extends StatelessWidget {
     }
 
     final audioState = context.read<AudioManagementCubit>().state;
-    if (audioState is AudioDownloading &&
-        (audioState.reciterId != reciterId ||
-            audioState.surahNumber != surahNumber)) {
+    if (audioState is AudioDownloading) {
+      final localizations = AppLocalizations.of(context)!;
+      final isSameSurah =
+          audioState.reciterId == reciterId &&
+          audioState.surahNumber == surahNumber;
       CustomSnackbar.showSnackbar(
         context,
-        AppLocalizations.of(context)!.downloadInProgress,
+        isSameSurah
+            ? localizations.surahDownloadAlreadyInProgress
+            : localizations.downloadInProgress,
         duration: 2,
       );
       return;

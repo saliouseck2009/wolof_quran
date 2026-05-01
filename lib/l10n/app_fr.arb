@@ -200,6 +200,7 @@
   "ayahCountLabel": "{count} verset(s)",
   "surahAudioDeleted": "Audio de {surahName} supprimé",
   "downloadInProgress": "Un téléchargement est déjà en cours. Veuillez attendre la fin avant d'en lancer un autre.",
+  "surahDownloadAlreadyInProgress": "Le téléchargement de cette sourate est déjà en cours.",
   "queued": "En file",
   "alreadyQueued": "Cette sourate est déjà dans la file de téléchargement.",
   "retryDownload": "Relancer le téléchargement",

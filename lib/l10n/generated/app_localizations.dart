@@ -1318,6 +1318,12 @@ abstract class AppLocalizations {
   /// **'Another download is already in progress. Please wait for it to finish.'**
   String get downloadInProgress;
 
+  /// Shown when user tries to download the same surah while its download is in progress
+  ///
+  /// In en, this message translates to:
+  /// **'This surah is already being downloaded.'**
+  String get surahDownloadAlreadyInProgress;
+
   /// Label shown when a surah download is queued
   ///
   /// In en, this message translates to:

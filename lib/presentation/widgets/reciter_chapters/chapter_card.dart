@@ -485,6 +485,21 @@ class _DownloadActions extends StatelessWidget {
   }
 
   Future<void> _enqueue(BuildContext context) async {
+    final audioState = context.read<AudioManagementCubit>().state;
+    if (audioState is AudioDownloading) {
+      final isSameSurah =
+          audioState.reciterId == reciter.id &&
+          audioState.surahNumber == surahNumber;
+      CustomSnackbar.showSnackbar(
+        context,
+        isSameSurah
+            ? localizations.surahDownloadAlreadyInProgress
+            : localizations.downloadInProgress,
+        duration: 2,
+      );
+      return;
+    }
+
     final canProceed = await DownloadNetworkGuard.confirmManualDownload(
       context,
     );
@@ -501,6 +516,14 @@ class _DownloadActions extends StatelessWidget {
     }
     if (result == EnqueueAudioDownloadResult.alreadyQueued) {
       CustomSnackbar.showSnackbar(context, localizations.alreadyQueued);
+      return;
+    }
+    if (result == EnqueueAudioDownloadResult.alreadyInProgress) {
+      CustomSnackbar.showSnackbar(
+        context,
+        localizations.surahDownloadAlreadyInProgress,
+        duration: 2,
+      );
       return;
     }
     if (result == EnqueueAudioDownloadResult.alreadyDownloaded) {

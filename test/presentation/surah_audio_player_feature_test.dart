@@ -40,9 +40,32 @@ import 'package:wolof_quran/service_locator.dart';
 
 class _ConfigurableDownloadRepository implements DownloadRepository {
   final Map<String, List<DownloadedSurah>> downloadedByReciter;
+  final Set<String> _activeDownloads = <String>{};
 
   _ConfigurableDownloadRepository({Map<String, List<DownloadedSurah>>? seed})
     : downloadedByReciter = seed ?? {};
+
+  String _key(String reciterId, int surahNumber) => '${reciterId}_$surahNumber';
+
+  @override
+  bool tryStartSurahDownload(String reciterId, int surahNumber) {
+    final key = _key(reciterId, surahNumber);
+    if (_activeDownloads.contains(key)) {
+      return false;
+    }
+    _activeDownloads.add(key);
+    return true;
+  }
+
+  @override
+  void finishSurahDownload(String reciterId, int surahNumber) {
+    _activeDownloads.remove(_key(reciterId, surahNumber));
+  }
+
+  @override
+  bool isSurahDownloadInProgress(String reciterId, int surahNumber) {
+    return _activeDownloads.contains(_key(reciterId, surahNumber));
+  }
 
   @override
   Future<DownloadedSurah?> getDownloadedSurah(

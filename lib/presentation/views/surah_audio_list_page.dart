@@ -206,6 +206,18 @@ class _SurahAudioListBody extends StatelessWidget {
             }
           },
         ),
+        BlocListener<AudioManagementCubit, AudioManagementState>(
+          listenWhen: (_, current) =>
+              current is AudioDownloadAlreadyInProgress &&
+              current.reciterId == reciter.id,
+          listener: (context, _) {
+            CustomSnackbar.showSnackbar(
+              context,
+              localizations.surahDownloadAlreadyInProgress,
+              duration: 2,
+            );
+          },
+        ),
       ],
       child: BlocBuilder<ReciterChaptersBloc, ReciterChaptersState>(
         builder: (context, chaptersState) {
@@ -364,6 +376,11 @@ class _SurahAudioListBody extends StatelessWidget {
     }
     final existingTaskForFirst = queueState.taskFor(reciter.id, 1);
     if (existingTaskForFirst?.isFailed == true) {
+      return;
+    }
+
+    final audioState = context.read<AudioManagementCubit>().state;
+    if (audioState is AudioDownloading) {
       return;
     }
 
@@ -731,6 +748,21 @@ class _SurahTrackTile extends StatelessWidget {
   }
 
   Future<void> _download(BuildContext context) async {
+    final audioState = context.read<AudioManagementCubit>().state;
+    if (audioState is AudioDownloading) {
+      final isSameSurah =
+          audioState.reciterId == reciterId &&
+          audioState.surahNumber == surahNumber;
+      CustomSnackbar.showSnackbar(
+        context,
+        isSameSurah
+            ? localizations.surahDownloadAlreadyInProgress
+            : localizations.downloadInProgress,
+        duration: 2,
+      );
+      return;
+    }
+
     final canProceed = await DownloadNetworkGuard.confirmManualDownload(
       context,
     );
@@ -747,6 +779,12 @@ class _SurahTrackTile extends StatelessWidget {
     }
     if (result == EnqueueAudioDownloadResult.alreadyQueued) {
       CustomSnackbar.showSnackbar(context, localizations.alreadyQueued);
+    } else if (result == EnqueueAudioDownloadResult.alreadyInProgress) {
+      CustomSnackbar.showSnackbar(
+        context,
+        localizations.surahDownloadAlreadyInProgress,
+        duration: 2,
+      );
     } else if (result == EnqueueAudioDownloadResult.alreadyDownloaded) {
       CustomSnackbar.showSnackbar(
         context,

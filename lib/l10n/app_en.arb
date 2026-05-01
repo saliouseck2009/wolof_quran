@@ -868,6 +868,10 @@
   "@downloadInProgress": {
     "description": "Shown when user tries to start a second download while one is active"
   },
+  "surahDownloadAlreadyInProgress": "This surah is already being downloaded.",
+  "@surahDownloadAlreadyInProgress": {
+    "description": "Shown when user tries to download the same surah while its download is in progress"
+  },
   "queued": "Queued",
   "@queued": {
     "description": "Label shown when a surah download is queued"

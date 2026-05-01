@@ -134,6 +134,22 @@ class AyahPlayButton extends StatelessWidget {
     String reciterId,
   ) async {
     final audioManagementCubit = context.read<AudioManagementCubit>();
+    final localizations = AppLocalizations.of(context)!;
+
+    final currentAudioState = audioManagementCubit.state;
+    if (currentAudioState is AudioDownloading) {
+      final isSameSurah =
+          currentAudioState.reciterId == reciterId &&
+          currentAudioState.surahNumber == surahNumber;
+      CustomSnackbar.showSnackbar(
+        context,
+        isSameSurah
+            ? localizations.surahDownloadAlreadyInProgress
+            : localizations.downloadInProgress,
+        duration: 2,
+      );
+      return;
+    }
 
     await audioManagementCubit.refreshSurahStatus(reciterId, surahNumber);
     if (!context.mounted) {
@@ -290,12 +306,16 @@ class AyahPlayButton extends StatelessWidget {
                             final audioState = context
                                 .read<AudioManagementCubit>()
                                 .state;
-                            if (audioState is AudioDownloading &&
-                                (audioState.reciterId != reciterId ||
-                                    audioState.surahNumber != surahNumber)) {
+                            if (audioState is AudioDownloading) {
+                              final isSameSurah =
+                                  audioState.reciterId == reciterId &&
+                                  audioState.surahNumber == surahNumber;
                               CustomSnackbar.showSnackbar(
                                 context,
-                                localizations.downloadInProgress,
+                                isSameSurah
+                                    ? localizations
+                                          .surahDownloadAlreadyInProgress
+                                    : localizations.downloadInProgress,
                                 duration: 2,
                               );
                               return;

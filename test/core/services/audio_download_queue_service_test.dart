@@ -278,11 +278,32 @@ class _FakeAudioRepository implements AudioRepository {
 
 class _FakeDownloadRepository implements DownloadRepository {
   final Set<String> _downloadedKeys = <String>{};
+  final Set<String> _activeDownloads = <String>{};
   final List<int> completedOrder = <int>[];
   final List<int> inProgressCalls = <int>[];
   final List<int> removedCalls = <int>[];
 
   String _key(String reciterId, int surahNumber) => '${reciterId}_$surahNumber';
+
+  @override
+  bool tryStartSurahDownload(String reciterId, int surahNumber) {
+    final key = _key(reciterId, surahNumber);
+    if (_activeDownloads.contains(key)) {
+      return false;
+    }
+    _activeDownloads.add(key);
+    return true;
+  }
+
+  @override
+  void finishSurahDownload(String reciterId, int surahNumber) {
+    _activeDownloads.remove(_key(reciterId, surahNumber));
+  }
+
+  @override
+  bool isSurahDownloadInProgress(String reciterId, int surahNumber) {
+    return _activeDownloads.contains(_key(reciterId, surahNumber));
+  }
 
   @override
   Future<bool> isSurahDownloaded(String reciterId, int surahNumber) async {
@@ -431,6 +452,27 @@ void main() {
         );
       },
     );
+
+    test('returns alreadyInProgress when same surah is locked elsewhere', () async {
+      final queueRepository = _InMemoryDownloadQueueRepository();
+      final audioRepository = _FakeAudioRepository();
+      final downloadRepository = _FakeDownloadRepository();
+
+      final service = AudioDownloadQueueService(
+        queueRepository: queueRepository,
+        audioRepository: audioRepository,
+        downloadRepository: downloadRepository,
+      );
+      addTearDown(service.dispose);
+
+      await service.initialize();
+      final acquired = downloadRepository.tryStartSurahDownload('imamsarr', 1);
+      expect(acquired, isTrue);
+
+      final result = await service.enqueue('imamsarr', 1);
+      expect(result, EnqueueAudioDownloadResult.alreadyInProgress);
+      expect(await queueRepository.getTask('imamsarr', 1), isNull);
+    });
 
     test(
       'retries failed task twice then marks failed and proceeds to next',

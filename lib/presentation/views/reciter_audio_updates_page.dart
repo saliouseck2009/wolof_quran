@@ -52,7 +52,18 @@ class _ReciterAudioUpdatesPageState extends State<ReciterAudioUpdatesPage> {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
+    return BlocListener<AudioManagementCubit, AudioManagementState>(
+      listenWhen: (_, current) =>
+          current is AudioDownloadAlreadyInProgress &&
+          current.reciterId == widget.reciter.id,
+      listener: (context, _) {
+        CustomSnackbar.showSnackbar(
+          context,
+          localizations.surahDownloadAlreadyInProgress,
+          duration: 2,
+        );
+      },
+      child: Scaffold(
       appBar: AppBar(
         title: Text(localizations.newAudioUpdatesTitle),
         backgroundColor: colorScheme.brightness == Brightness.dark
@@ -110,6 +121,7 @@ class _ReciterAudioUpdatesPageState extends State<ReciterAudioUpdatesPage> {
                 ),
               ],
             ),
+      ),
     );
   }
 }

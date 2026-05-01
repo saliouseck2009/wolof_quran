@@ -1,6 +1,10 @@
 import '../../data/models/downloaded_surah.dart';
 
 abstract class DownloadRepository {
+  bool tryStartSurahDownload(String reciterId, int surahNumber);
+  void finishSurahDownload(String reciterId, int surahNumber);
+  bool isSurahDownloadInProgress(String reciterId, int surahNumber);
+
   Future<bool> isSurahDownloaded(String reciterId, int surahNumber);
   Future<void> markSurahAsDownloaded(
     String reciterId,

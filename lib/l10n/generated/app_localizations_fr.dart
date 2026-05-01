@@ -689,6 +689,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Un téléchargement est déjà en cours. Veuillez attendre la fin avant d\'en lancer un autre.';
 
   @override
+  String get surahDownloadAlreadyInProgress =>
+      'Le téléchargement de cette sourate est déjà en cours.';
+
+  @override
   String get queued => 'En file';
 
   @override
