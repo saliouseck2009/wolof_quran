@@ -107,13 +107,13 @@ class AudioDownloadAlreadyInProgress extends AudioManagementState {
     required this.ayahAudiosMap,
   });
 
-  String _getKey(String r, int s) => '${r}_$s';
+  String _getKey(String reciterId, int surahNumber) => '${reciterId}_$surahNumber';
 
-  SurahAudioStatus? getSurahStatus(String r, int s) =>
-      surahStatusMap[_getKey(r, s)];
+  SurahAudioStatus? getSurahStatus(String reciterId, int surahNumber) =>
+      surahStatusMap[_getKey(reciterId, surahNumber)];
 
-  List<AyahAudio> getAyahAudios(String r, int s) =>
-      ayahAudiosMap[_getKey(r, s)] ?? [];
+  List<AyahAudio> getAyahAudios(String reciterId, int surahNumber) =>
+      ayahAudiosMap[_getKey(reciterId, surahNumber)] ?? [];
 
   @override
   List<Object> get props => [reciterId, surahNumber, surahStatusMap, ayahAudiosMap];
