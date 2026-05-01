@@ -1348,6 +1348,24 @@ abstract class AppLocalizations {
   /// **'Delete audio'**
   String get deleteAudioLabel;
 
+  /// Title of the confirmation dialog when deleting a surah audio
+  ///
+  /// In en, this message translates to:
+  /// **'Delete audio?'**
+  String get confirmDeleteSurahAudioTitle;
+
+  /// Body of the confirmation dialog when deleting a surah audio
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the audio for {surahName}? This action cannot be undone.'**
+  String confirmDeleteSurahAudioMessage(String surahName);
+
+  /// Label for the delete confirm button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
   /// Short generic message for failed queued download
   ///
   /// In en, this message translates to:

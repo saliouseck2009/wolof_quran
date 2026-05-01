@@ -888,6 +888,23 @@
   "@deleteAudioLabel": {
     "description": "Tooltip or action label to delete a downloaded surah audio"
   },
+  "confirmDeleteSurahAudioTitle": "Delete audio?",
+  "@confirmDeleteSurahAudioTitle": {
+    "description": "Title of the confirmation dialog when deleting a surah audio"
+  },
+  "confirmDeleteSurahAudioMessage": "Are you sure you want to delete the audio for {surahName}? This action cannot be undone.",
+  "@confirmDeleteSurahAudioMessage": {
+    "description": "Body of the confirmation dialog when deleting a surah audio",
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      }
+    }
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Label for the delete confirm button"
+  },
   "downloadFailedShort": "Download failed",
   "@downloadFailedShort": {
     "description": "Short generic message for failed queued download"

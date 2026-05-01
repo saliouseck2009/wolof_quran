@@ -706,6 +706,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deleteAudioLabel => 'Supprimer l\'audio';
 
   @override
+  String get confirmDeleteSurahAudioTitle => 'Supprimer l\'audio ?';
+
+  @override
+  String confirmDeleteSurahAudioMessage(String surahName) {
+    return 'Êtes-vous sûr de vouloir supprimer l\'audio de $surahName ? Cette action est irréversible.';
+  }
+
+  @override
+  String get delete => 'Supprimer';
+
+  @override
   String get downloadFailedShort => 'Téléchargement échoué';
 
   @override

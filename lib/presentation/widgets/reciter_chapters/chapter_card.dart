@@ -323,22 +323,7 @@ class _DownloadActions extends StatelessWidget {
               ? colorScheme.error
               : colorScheme.onErrorContainer;
           return IconButton(
-            onPressed: () async {
-              await context.read<AudioManagementCubit>().deleteSurahAudio(
-                reciter.id,
-                surahNumber,
-              );
-              onDownloadComplete();
-              if (context.mounted) {
-                CustomSnackbar.showSnackbar(
-                  context,
-                  localizations.surahAudioDeleted(
-                    getSurahDisplayName(surahNumber),
-                  ),
-                  duration: 2,
-                );
-              }
-            },
+            onPressed: () => _confirmDelete(context),
             tooltip: localizations.deleteAudioLabel,
             icon: Icon(
               Icons.delete_outline_rounded,
@@ -399,6 +384,104 @@ class _DownloadActions extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+        final colorScheme = Theme.of(dialogContext).colorScheme;
+        final isDark = colorScheme.brightness == Brightness.dark;
+        final surahName = getSurahDisplayName(surahNumber);
+        return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+          titlePadding: const EdgeInsets.fromLTRB(24, 22, 24, 10),
+          contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          title: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: colorScheme.errorContainer.withValues(
+                    alpha: isDark ? 0.35 : 1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.delete_forever_rounded,
+                  size: 22,
+                  color: colorScheme.error,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  localizations.confirmDeleteSurahAudioTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            localizations.confirmDeleteSurahAudioMessage(surahName),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(96, 42),
+                side: BorderSide(
+                  color: colorScheme.outline.withValues(alpha: 0.45),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(localizations.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(112, 42),
+                backgroundColor: colorScheme.error,
+                foregroundColor: colorScheme.onError,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                localizations.delete,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed != true || !context.mounted) return;
+    await context.read<AudioManagementCubit>().deleteSurahAudio(
+      reciter.id,
+      surahNumber,
+    );
+    onDownloadComplete();
+    if (context.mounted) {
+      CustomSnackbar.showSnackbar(
+        context,
+        localizations.surahAudioDeleted(getSurahDisplayName(surahNumber)),
+        duration: 2,
+      );
+    }
   }
 
   Future<void> _enqueue(BuildContext context) async {
