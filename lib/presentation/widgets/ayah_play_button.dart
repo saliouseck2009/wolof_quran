@@ -6,7 +6,7 @@ import '../cubits/audio_availability_cubit.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/ayah_playback_cubit.dart';
-import '../utils/download_network_guard.dart';
+import 'audio_download_to_play_modal.dart';
 import 'snackbar.dart';
 
 /// A reusable play button widget for ayah audio playback
@@ -137,40 +137,59 @@ class AyahPlayButton extends StatelessWidget {
     final localizations = AppLocalizations.of(context)!;
 
     final currentAudioState = audioManagementCubit.state;
-    if (currentAudioState is AudioDownloading) {
-      final isSameSurah =
-          currentAudioState.reciterId == reciterId &&
-          currentAudioState.surahNumber == surahNumber;
+    final isDownloadingSameSurah =
+        currentAudioState is AudioDownloading &&
+        currentAudioState.reciterId == reciterId &&
+        currentAudioState.surahNumber == surahNumber;
+    final isAlreadyInProgressSameSurah =
+        currentAudioState is AudioDownloadAlreadyInProgress &&
+        currentAudioState.reciterId == reciterId &&
+        currentAudioState.surahNumber == surahNumber;
+
+    if (currentAudioState is AudioDownloading && !isDownloadingSameSurah) {
       CustomSnackbar.showSnackbar(
         context,
-        isSameSurah
-            ? localizations.surahDownloadAlreadyInProgress
-            : localizations.downloadInProgress,
+        localizations.downloadInProgress,
         duration: 2,
       );
       return;
     }
 
-    await audioManagementCubit.refreshSurahStatus(reciterId, surahNumber);
-    if (!context.mounted) {
-      return;
+    var isDownloaded = false;
+    if (!isDownloadingSameSurah && !isAlreadyInProgressSameSurah) {
+      await audioManagementCubit.refreshSurahStatus(reciterId, surahNumber);
+      if (!context.mounted) {
+        return;
+      }
+      isDownloaded = audioManagementCubit.isSurahDownloaded(
+        reciterId,
+        surahNumber,
+      );
     }
 
-    final isDownloaded = audioManagementCubit.isSurahDownloaded(
-      reciterId,
-      surahNumber,
-    );
-
-    if (!isDownloaded) {
+    if (!isDownloaded ||
+        isDownloadingSameSurah ||
+        isAlreadyInProgressSameSurah) {
       final availabilityCubit = context.read<AudioAvailabilityCubit>();
       final isAvailableRemotely = availabilityCubit.state.isSurahAvailable(
         reciterId,
         surahNumber,
       );
-      await _showDownloadPromptModal(
-        context,
+      final shouldPlayAfterDownload = await showAudioDownloadToPlayModal(
+        context: context,
         reciterId: reciterId,
+        surahNumber: surahNumber,
+        surahName: surahName ?? 'Surah $surahNumber',
         isAvailableRemotely: isAvailableRemotely,
+      );
+      if (!context.mounted || !shouldPlayAfterDownload) {
+        return;
+      }
+      context.read<AyahPlaybackCubit>().toggleAyahPlayback(
+        surahNumber: surahNumber,
+        ayahNumber: ayahNumber,
+        reciterId: reciterId,
+        surahName: surahName,
       );
       return;
     }
@@ -180,172 +199,6 @@ class AyahPlayButton extends StatelessWidget {
       ayahNumber: ayahNumber,
       reciterId: reciterId,
       surahName: surahName,
-    );
-  }
-
-  Future<void> _showDownloadPromptModal(
-    BuildContext context, {
-    required String reciterId,
-    required bool isAvailableRemotely,
-  }) async {
-    final localizations = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final commonButtonShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(14),
-    );
-    final commonButtonTextStyle = theme.textTheme.labelLarge?.copyWith(
-      fontWeight: FontWeight.w700,
-    );
-    final secondaryButtonStyle = FilledButton.styleFrom(
-      minimumSize: const Size.fromHeight(48),
-      shape: commonButtonShape,
-      textStyle: commonButtonTextStyle,
-      backgroundColor: colorScheme.surfaceContainerHighest,
-      foregroundColor: colorScheme.error,
-    );
-    final primaryButtonStyle = FilledButton.styleFrom(
-      minimumSize: const Size.fromHeight(48),
-      shape: commonButtonShape,
-      textStyle: commonButtonTextStyle,
-      backgroundColor: colorScheme.primary,
-      foregroundColor: colorScheme.onPrimary,
-    );
-
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: colorScheme.surface,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.download_for_offline_outlined,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          surahName ?? 'Surah $surahNumber',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    isAvailableRemotely
-                        ? localizations.audioNotAvailable
-                        : localizations.audioNotYetAvailable,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      height: 1.35,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 4,
-                        child: FilledButton(
-                          style: secondaryButtonStyle,
-                          onPressed: () => Navigator.of(sheetContext).pop(),
-                          //icon: const Icon(Icons.close_rounded, size: 18),
-                          child: Text(localizations.cancel),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 5,
-                        child: FilledButton(
-                          style: primaryButtonStyle,
-                          onPressed: () async {
-                            Navigator.of(sheetContext).pop();
-                            if (!isAvailableRemotely) {
-                              return;
-                            }
-
-                            final canProceed =
-                                await DownloadNetworkGuard.confirmManualDownload(
-                                  context,
-                                );
-                            if (!canProceed || !context.mounted) {
-                              return;
-                            }
-
-                            final audioState = context
-                                .read<AudioManagementCubit>()
-                                .state;
-                            if (audioState is AudioDownloading) {
-                              final isSameSurah =
-                                  audioState.reciterId == reciterId &&
-                                  audioState.surahNumber == surahNumber;
-                              CustomSnackbar.showSnackbar(
-                                context,
-                                isSameSurah
-                                    ? localizations
-                                          .surahDownloadAlreadyInProgress
-                                    : localizations.downloadInProgress,
-                                duration: 2,
-                              );
-                              return;
-                            }
-
-                            context
-                                .read<AudioManagementCubit>()
-                                .downloadSurahAudio(reciterId, surahNumber);
-                          },
-                          // icon: Icon(
-                          //   isAvailableRemotely
-                          //       ? Icons.download_outlined
-                          //       : Icons.check_circle_outline,
-                          //   size: 18,
-                          // ),
-                          child: Text(
-                            isAvailableRemotely
-                                ? localizations.downloadLabel
-                                : localizations.close,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
