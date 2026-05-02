@@ -106,8 +106,12 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
     _pageController = PageController();
     _mushafBloc = widget.pageContext.read<MushafBloc>();
     _quranSettingsCubit = widget.pageContext.read<QuranSettingsCubit>();
-    _currentSurahNumber = widget.surahNumber;
-    _currentVerseNumber = widget.verseNumber;
+    final initialReference = _normalizeVerseReference(
+      widget.surahNumber,
+      widget.verseNumber,
+    );
+    _currentSurahNumber = initialReference.surahNumber;
+    _currentVerseNumber = initialReference.verseNumber;
   }
 
   @override
@@ -470,35 +474,80 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
     final selectedOption = QuranSettingsCubit.getTranslationOption(
       selectedTranslation,
     );
-    final selectedText = quran.getVerseTranslation(
+    final selectedText = _tryGetVerseTranslation(
       surahNumber,
       verseNumber,
       translation: selectedTranslation,
     );
-    pages.add(
-      _TranslationPage(
-        title: selectedOption?.displayName ?? localizations.translation,
-        text: selectedText,
-      ),
-    );
+    if (selectedText != null && selectedText.trim().isNotEmpty) {
+      pages.add(
+        _TranslationPage(
+          title: selectedOption?.displayName ?? localizations.translation,
+          text: selectedText,
+        ),
+      );
+    }
 
     // Transliteration page is intentionally skipped when unsupported by package.
     for (final option in QuranSettingsCubit.availableTranslations) {
       if (option.translation == selectedTranslation) {
         continue;
       }
-      final text = quran.getVerseTranslation(
+      final text = _tryGetVerseTranslation(
         surahNumber,
         verseNumber,
         translation: option.translation,
       );
-      if (text.trim().isEmpty) {
+      if (text == null || text.trim().isEmpty) {
         continue;
       }
       pages.add(_TranslationPage(title: option.displayName, text: text));
     }
 
+    if (pages.isEmpty) {
+      pages.add(
+        _TranslationPage(
+          title: localizations.translation,
+          text: quran.getVerse(surahNumber, verseNumber, verseEndSymbol: false),
+        ),
+      );
+    }
+
     return pages;
+  }
+
+  String? _tryGetVerseTranslation(
+    int surahNumber,
+    int verseNumber, {
+    required quran.Translation translation,
+  }) {
+    if (!_isValidVerseReference(surahNumber, verseNumber)) {
+      return null;
+    }
+    try {
+      return quran.getVerseTranslation(
+        surahNumber,
+        verseNumber,
+        translation: translation,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  _VerseReference _normalizeVerseReference(int surahNumber, int verseNumber) {
+    final normalizedSurah = surahNumber.clamp(1, 114);
+    final verseCount = quran.getVerseCount(normalizedSurah);
+    final normalizedVerse = verseNumber.clamp(1, verseCount);
+    return _VerseReference(normalizedSurah, normalizedVerse);
+  }
+
+  bool _isValidVerseReference(int surahNumber, int verseNumber) {
+    if (surahNumber < 1 || surahNumber > 114) {
+      return false;
+    }
+    final verseCount = quran.getVerseCount(surahNumber);
+    return verseNumber >= 1 && verseNumber <= verseCount;
   }
 }
 
@@ -610,11 +659,7 @@ class _IconActionButton extends StatelessWidget {
     // When a custom child is provided (e.g. AyahPlayButton), render it
     // directly without an outer InkWell so the child's own tap handler works.
     if (child != null) {
-      return SizedBox(
-        width: 44,
-        height: 44,
-        child: Center(child: child),
-      );
+      return SizedBox(width: 44, height: 44, child: Center(child: child));
     }
 
     return Material(

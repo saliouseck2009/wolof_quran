@@ -66,4 +66,5 @@ class AppColor {
   static const Color gold = secondary;
   static const Color pureWhite = Color(0xFFFFFFFF);
   static const Color darkSurface = surfaceDark;
+  static const Color surface = Color(0xFFF6F2EA);
 }

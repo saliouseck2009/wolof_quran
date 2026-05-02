@@ -60,14 +60,18 @@ class SurahMiniPlayerOverlay extends StatelessWidget {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                    // color: Theme.of(context).colorScheme.onPrimary,
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.18),
-                        blurRadius: 24,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
+                    border: Border.all(
+                      color: Colors.black.withValues(alpha: 0.12),
+                    ),
+                    // boxShadow: [
+                    //   BoxShadow(
+                    //     color: Colors.black.withValues(alpha: 0.18),
+                    //     blurRadius: 24,
+                    //     offset: const Offset(0, 6),
+                    //   ),
+                    // ],
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
@@ -101,7 +105,7 @@ class _CollapsedMiniPlayer extends StatelessWidget {
     final isPlaying =
         state.playerState == AudioPlayerState.playing ||
         state.playerState == AudioPlayerState.loading;
-    final isLoading = state.playerState == AudioPlayerState.loading;
+    // final isLoading = state.playerState == AudioPlayerState.loading;
     final surahName = _localizedSurahName(
       context,
       state.surahNumber,
@@ -154,32 +158,21 @@ class _CollapsedMiniPlayer extends StatelessWidget {
             const SizedBox(width: 4),
 
             // ── Play / Pause ───────────────────────────────────────────────
-            isLoading
-                ? SizedBox(
-                    width: 36,
-                    height: 36,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: colorScheme.primary,
-                    ),
-                  )
-                : IconButton(
-                    onPressed: () =>
-                        context.read<SurahMiniPlayerCubit>().togglePlayPause(),
-                    tooltip: _tooltipIfOverlay(
-                      context,
-                      isPlaying
-                          ? localizations.pauseSurah
-                          : localizations.playSurah,
-                    ),
-                    iconSize: 36,
-                    icon: Icon(
-                      isPlaying
-                          ? Icons.pause_circle_filled_rounded
-                          : Icons.play_circle_filled_rounded,
-                      color: isDark ? Colors.white : colorScheme.primary,
-                    ),
-                  ),
+            IconButton(
+              onPressed: () =>
+                  context.read<SurahMiniPlayerCubit>().togglePlayPause(),
+              tooltip: _tooltipIfOverlay(
+                context,
+                isPlaying ? localizations.pauseSurah : localizations.playSurah,
+              ),
+              iconSize: 36,
+              icon: Icon(
+                isPlaying
+                    ? Icons.pause_circle_filled_rounded
+                    : Icons.play_circle_filled_rounded,
+                color: isDark ? Colors.white : colorScheme.primary,
+              ),
+            ),
 
             // ── Close ─────────────────────────────────────────────────────
             IconButton(
@@ -664,16 +657,6 @@ class _ExpandedPlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return SizedBox(
-        width: 52,
-        height: 52,
-        child: CircularProgressIndicator(
-          strokeWidth: 2.5,
-          color: colorScheme.primary,
-        ),
-      );
-    }
     return GestureDetector(
       onTap: onTap,
       child: Container(

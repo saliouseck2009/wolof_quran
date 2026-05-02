@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -159,14 +160,44 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
           backgroundColor: theme.appBarBackground,
           foregroundColor: theme.appBarForeground,
           centerTitle: true,
-          leadingWidth: 64,
+          leadingWidth: 106,
           leading: Padding(
             padding: const EdgeInsets.only(left: 8),
-            child: Center(
-              child: Text(
-                pageInfo != null ? localizations.juzLabel(pageInfo.juzNumber) : '',
-                style: TextStyle(fontSize: 12, color: theme.bottomBarSubtext),
-              ),
+            child: Row(
+              children: [
+                if (Navigator.of(context).canPop())
+                  SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                      splashRadius: 18,
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).backButtonTooltip,
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      icon: Icon(
+                        CupertinoIcons.back,
+                        size: 17,
+                        color: theme.appBarForeground,
+                      ),
+                    ),
+                  ),
+                Expanded(
+                  child: Text(
+                    pageInfo != null
+                        ? localizations.juzLabel(pageInfo.juzNumber)
+                        : '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.bottomBarSubtext,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           title: GestureDetector(
