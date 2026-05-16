@@ -273,6 +273,8 @@ class _SurahAudioListBody extends StatelessWidget {
                               reciter: reciter,
                               downloadedCount: downloadedCount,
                               localizations: localizations,
+                              playerState: playerState,
+                              translation: translation,
                             ),
                             SliverPadding(
                               padding: const EdgeInsets.fromLTRB(
@@ -410,20 +412,32 @@ class _ReciterSliverHeader extends StatelessWidget {
   final Reciter reciter;
   final int downloadedCount;
   final AppLocalizations localizations;
+  final SurahMiniPlayerState playerState;
+  final quran.Translation translation;
 
   const _ReciterSliverHeader({
     required this.reciter,
     required this.downloadedCount,
     required this.localizations,
+    required this.playerState,
+    required this.translation,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final hasNowPlaying = playerState.hasActiveSurah;
+    final currentSurahNumber = playerState.surahNumber;
+    final currentSurahName = currentSurahNumber == null
+        ? null
+        : QuranSettingsCubit.getSurahNameInTranslation(
+            currentSurahNumber,
+            translation,
+          );
 
     return SliverAppBar(
-      expandedHeight: 150,
+      expandedHeight: hasNowPlaying ? 216 : 150,
       pinned: true,
       centerTitle: false,
       title: Text(
@@ -438,6 +452,13 @@ class _ReciterSliverHeader extends StatelessWidget {
           ? colorScheme.surfaceContainerLowest
           : colorScheme.primary,
       iconTheme: const IconThemeData(color: Colors.white),
+      bottom: hasNowPlaying && currentSurahName != null
+          ? _HeaderNowPlayingBar(
+              playerState: playerState,
+              surahName: currentSurahName,
+              localizations: localizations,
+            )
+          : null,
       flexibleSpace: FlexibleSpaceBar(
         collapseMode: CollapseMode.pin,
         background: Container(
@@ -511,6 +532,128 @@ class _ReciterSliverHeader extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderNowPlayingBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  final SurahMiniPlayerState playerState;
+  final String surahName;
+  final AppLocalizations localizations;
+
+  const _HeaderNowPlayingBar({
+    required this.playerState,
+    required this.surahName,
+    required this.localizations,
+  });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(66);
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isPlaying =
+        playerState.playerState == AudioPlayerState.playing ||
+        playerState.playerState == AudioPlayerState.loading;
+    final cubit = context.read<SurahMiniPlayerCubit>();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+      child: Container(
+        height: preferredSize.height - 10,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  '${playerState.surahNumber ?? ''}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    localizations.nowPlaying,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    surahName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: playerState.canGoPrevious
+                  ? cubit.playPreviousSurah
+                  : null,
+              tooltip: localizations.previousSurah,
+              icon: const Icon(Icons.skip_previous_rounded, size: 22),
+              color: Colors.white,
+              disabledColor: Colors.white.withValues(alpha: 0.45),
+              visualDensity: VisualDensity.compact,
+            ),
+            IconButton(
+              onPressed: cubit.togglePlayPause,
+              tooltip: isPlaying
+                  ? localizations.pauseSurah
+                  : localizations.playSurah,
+              icon: Icon(
+                isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                size: 22,
+              ),
+              color: Colors.white,
+              visualDensity: VisualDensity.compact,
+              style: IconButton.styleFrom(
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.4),
+              ),
+            ),
+            IconButton(
+              onPressed: playerState.canGoNext ? cubit.playNextSurah : null,
+              tooltip: localizations.nextSurah,
+              icon: const Icon(Icons.skip_next_rounded, size: 22),
+              color: Colors.white,
+              disabledColor: Colors.white.withValues(alpha: 0.45),
+              visualDensity: VisualDensity.compact,
+            ),
+          ],
         ),
       ),
     );
