@@ -157,6 +157,12 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
            playbackMode: audioPlayerService.currentPlaybackMode,
          ),
        ) {
+    _audioPlayerService.configureChapterNavigation(
+      onNextChapter: playNextSurah,
+      onPreviousChapter: playPreviousSurah,
+      canGoNextChapter: () => state.canGoNext,
+      canGoPreviousChapter: () => state.canGoPrevious,
+    );
     _listenToPlayerStreams();
   }
 
@@ -670,6 +676,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
 
   @override
   Future<void> close() async {
+    _audioPlayerService.clearChapterNavigation();
     await _audioSub?.cancel();
     await _playerStateSub?.cancel();
     await _globalPositionSub?.cancel();

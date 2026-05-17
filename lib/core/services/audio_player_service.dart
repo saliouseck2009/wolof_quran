@@ -2,6 +2,7 @@ import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
 /// Enum for audio player state
 enum AudioPlayerState { idle, loading, playing, paused, stopped, error }
@@ -120,6 +121,12 @@ class AudioPlayerService {
   bool _isPlayingPlaylist = false;
   bool _initialized = false;
   Future<void>? _initializationFuture;
+  StreamSubscription<AudioInterruptionEvent>? _interruptionSub;
+  StreamSubscription<void>? _becomingNoisySub;
+  Future<void> Function()? _chapterNextDelegate;
+  Future<void> Function()? _chapterPreviousDelegate;
+  bool Function()? _canGoChapterNextDelegate;
+  bool Function()? _canGoChapterPreviousDelegate;
 
   static const String _playbackModeKey = 'audio_playback_mode';
 
@@ -142,6 +149,16 @@ class AudioPlayerService {
   PlayingAudioInfo? get currentPlayingAudio => _currentAudioSubject.value;
   bool get isPlaying => currentPlayerState == AudioPlayerState.playing;
   bool get isPlayingPlaylist => _isPlayingPlaylist;
+  int get currentPlaylistIndex => _currentPlaylistIndex;
+  int get currentPlaylistLength => _currentPlaylist.length;
+  bool get canSkipToNext =>
+      _isPlayingPlaylist && _currentPlaylistIndex < _currentPlaylist.length - 1;
+  bool get canSkipToPrevious => _isPlayingPlaylist && _currentPlaylistIndex > 0;
+  bool get canGoToNextChapter => _canGoChapterNextDelegate?.call() ?? false;
+  bool get canGoToPreviousChapter =>
+      _canGoChapterPreviousDelegate?.call() ?? false;
+  Duration get currentPosition => _positionSubject.value;
+  Duration? get currentDuration => _durationSubject.value;
   Duration get currentSurahGlobalPosition => _surahGlobalPositionSubject.value;
   Duration? get currentSurahGlobalDuration => _surahGlobalDurationSubject.value;
   bool get isSurahSeekReady => _surahSeekReadySubject.value;
@@ -329,6 +346,41 @@ class AudioPlayerService {
     await _stop();
   }
 
+  void configureChapterNavigation({
+    required Future<void> Function() onNextChapter,
+    required Future<void> Function() onPreviousChapter,
+    required bool Function() canGoNextChapter,
+    required bool Function() canGoPreviousChapter,
+  }) {
+    _chapterNextDelegate = onNextChapter;
+    _chapterPreviousDelegate = onPreviousChapter;
+    _canGoChapterNextDelegate = canGoNextChapter;
+    _canGoChapterPreviousDelegate = canGoPreviousChapter;
+  }
+
+  void clearChapterNavigation() {
+    _chapterNextDelegate = null;
+    _chapterPreviousDelegate = null;
+    _canGoChapterNextDelegate = null;
+    _canGoChapterPreviousDelegate = null;
+  }
+
+  Future<void> skipToNextChapter() async {
+    final action = _chapterNextDelegate;
+    if (action == null) {
+      return;
+    }
+    await action();
+  }
+
+  Future<void> skipToPreviousChapter() async {
+    final action = _chapterPreviousDelegate;
+    if (action == null) {
+      return;
+    }
+    await action();
+  }
+
   /// Seek to a specific position
   Future<void> seek(Duration position) async {
     if (_isPlayingPlaylist) {
@@ -450,6 +502,25 @@ class AudioPlayerService {
     try {
       final session = await AudioSession.instance;
       await session.configure(const AudioSessionConfiguration.music());
+      await session.setActive(true);
+      await _interruptionSub?.cancel();
+      _interruptionSub = session.interruptionEventStream.listen((event) async {
+        if (event.begin) {
+          if (event.type == AudioInterruptionType.duck) {
+            await _audioPlayer.setVolume(0.5);
+            return;
+          }
+          await pause();
+          return;
+        }
+        if (event.type == AudioInterruptionType.duck) {
+          await _audioPlayer.setVolume(1.0);
+        }
+      });
+      await _becomingNoisySub?.cancel();
+      _becomingNoisySub = session.becomingNoisyEventStream.listen((_) async {
+        await pause();
+      });
     } catch (_) {
       // Audio playback still works without explicit session configuration,
       // but iOS background behavior is more reliable when this succeeds.
@@ -458,6 +529,8 @@ class AudioPlayerService {
 
   /// Dispose resources
   Future<void> dispose() async {
+    await _interruptionSub?.cancel();
+    await _becomingNoisySub?.cancel();
     await _audioPlayer.dispose();
     await _playerStateSubject.close();
     await _currentAudioSubject.close();
@@ -528,18 +601,12 @@ class AudioPlayerService {
   /// Internal stop method
   Future<void> _stop() async {
     await _audioPlayer.stop();
-    _clearPlaybackSession(
-      clearCurrentAudio: true,
-      emitStoppedState: true,
-    );
+    _clearPlaybackSession(clearCurrentAudio: true, emitStoppedState: true);
   }
 
   Future<void> _replaceCurrentPlayback() async {
     await _audioPlayer.stop();
-    _clearPlaybackSession(
-      clearCurrentAudio: false,
-      emitStoppedState: false,
-    );
+    _clearPlaybackSession(clearCurrentAudio: false, emitStoppedState: false);
   }
 
   void _clearPlaybackSession({
