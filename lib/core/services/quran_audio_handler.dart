@@ -1,18 +1,25 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
+import 'package:quran/quran.dart' as quran;
 
 import 'audio_player_service.dart';
+import '../config/localization/localization_service.dart';
 
 class QuranAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
   static const String _appAlbumLabel = 'Wolof Quran';
-  static final Uri _appArtworkUri = Uri.parse(
+  static final Uri _androidArtworkUri = Uri.parse(
     'android.resource://com.saliouseck.wolofquran/mipmap/launcher_icon',
   );
+  Uri _appArtworkUri = Uri.parse('asset:///assets/icon/app_icon.png');
 
   final AudioPlayerService _audioPlayerService;
   final List<StreamSubscription<dynamic>> _subscriptions = [];
+  String _languageCode = 'fr';
 
   QuranAudioHandler(this._audioPlayerService) {
     _subscriptions.add(
@@ -38,6 +45,11 @@ class QuranAudioHandler extends BaseAudioHandler
       ),
     );
 
+    _appArtworkUri = Platform.isAndroid
+        ? _androidArtworkUri
+        : Uri.parse('asset:///assets/icon/app_icon.png');
+    unawaited(_prepareArtworkForPlatform());
+    unawaited(_loadLanguagePreference());
     _broadcastMediaAndQueue();
     _broadcastPlaybackState();
   }
@@ -83,6 +95,33 @@ class QuranAudioHandler extends BaseAudioHandler
   Future<void> onTaskRemoved() async {
     // Keep playback running when the app task is removed, similar to
     // dedicated audio players.
+  }
+
+  Future<void> _loadLanguagePreference() async {
+    final saved = await LocalizationService.getSavedLanguageCode();
+    _languageCode = saved ?? 'fr';
+    _broadcastMediaAndQueue();
+    _broadcastPlaybackState();
+  }
+
+  Future<void> _prepareArtworkForPlatform() async {
+    if (!Platform.isIOS) {
+      return;
+    }
+    try {
+      final byteData = await rootBundle.load('assets/icon/app_icon.png');
+      final supportDir = await getApplicationSupportDirectory();
+      final artworkFile = File('${supportDir.path}/lockscreen_app_icon.png');
+      await artworkFile.writeAsBytes(
+        byteData.buffer.asUint8List(),
+        flush: true,
+      );
+      _appArtworkUri = Uri.file(artworkFile.path);
+      _broadcastMediaAndQueue();
+      _broadcastPlaybackState();
+    } catch (_) {
+      // Keep asset URI fallback if file generation fails.
+    }
   }
 
   void _broadcastMediaAndQueue() {
@@ -204,7 +243,8 @@ class QuranAudioHandler extends BaseAudioHandler
         id:
             'surah_${currentAudio.surahNumber}_ayah_$ayahNumber'
             '_reciter_${currentAudio.reciterId}',
-        title: '$baseSurahName • Ayah $ayahNumber',
+        title:
+            '${currentAudio.surahNumber} $baseSurahName • ${_verseLabel()} $ayahNumber',
         artist: reciterLabel,
         album: _appAlbumLabel,
         artUri: _appArtworkUri,
@@ -225,8 +265,8 @@ class QuranAudioHandler extends BaseAudioHandler
   }) {
     final ayahNumber = _displayAyahNumber(currentAudio);
     final title = ayahNumber == null
-        ? baseSurahName
-        : '$baseSurahName • Ayah $ayahNumber';
+        ? '${currentAudio.surahNumber} $baseSurahName'
+        : '${currentAudio.surahNumber} $baseSurahName • ${_verseLabel()} $ayahNumber';
 
     return MediaItem(
       id:
@@ -271,11 +311,39 @@ class QuranAudioHandler extends BaseAudioHandler
   }
 
   String _normalizedSurahName(PlayingAudioInfo audio) {
-    final raw = audio.surahName?.trim();
-    if (raw != null && raw.isNotEmpty) {
-      return raw;
+    try {
+      switch (_languageCode) {
+        case 'ar':
+          return quran.getSurahNameArabic(audio.surahNumber);
+        case 'en':
+          return quran.getSurahNameEnglish(audio.surahNumber);
+        case 'fr':
+        default:
+          return quran.getSurahNameFrench(audio.surahNumber);
+      }
+    } catch (_) {
+      switch (_languageCode) {
+        case 'ar':
+          return 'سورة ${audio.surahNumber}';
+        case 'en':
+          return 'Surah ${audio.surahNumber}';
+        case 'fr':
+        default:
+          return 'Sourate ${audio.surahNumber}';
+      }
     }
-    return 'Surah ${audio.surahNumber}';
+  }
+
+  String _verseLabel() {
+    switch (_languageCode) {
+      case 'ar':
+        return 'آية';
+      case 'en':
+        return 'Ayah';
+      case 'fr':
+      default:
+        return 'Verset';
+    }
   }
 
   String _reciterLabel(String reciterId) {

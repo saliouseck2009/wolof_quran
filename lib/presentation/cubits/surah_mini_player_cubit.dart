@@ -8,6 +8,7 @@ import 'package:quran/quran.dart' as quran;
 import '../../core/services/audio_player_service.dart';
 import '../../domain/repositories/audio_repository.dart';
 import '../../domain/repositories/download_repository.dart';
+import 'quran_settings_cubit.dart';
 
 enum SurahMiniPlayerUiState { hidden, collapsed, expanded, fullscreen }
 
@@ -519,6 +520,11 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     }
 
     try {
+      final translation = await QuranSettingsCubit.getCurrentTranslation();
+      final localizedSurahName = QuranSettingsCubit.getSurahNameInTranslation(
+        surahNumber,
+        translation,
+      );
       final ayahAudios = await _audioRepository.getAyahAudios(
         reciterId,
         surahNumber,
@@ -570,7 +576,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         filePaths: filePaths,
         surahNumber: surahNumber,
         reciterId: reciterId,
-        surahName: quran.getSurahNameEnglish(surahNumber),
+        surahName: localizedSurahName,
         ayahDurations: ayahDurations,
         startIndex: 0,
       );
@@ -583,7 +589,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         state.copyWith(
           uiState: targetUiState,
           surahNumber: surahNumber,
-          surahName: quran.getSurahNameEnglish(surahNumber),
+          surahName: localizedSurahName,
           shuffleHistoryDepth: _shuffleHistory.length,
         ),
       );
