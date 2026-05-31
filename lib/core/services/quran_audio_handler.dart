@@ -12,9 +12,6 @@ import '../config/localization/localization_service.dart';
 class QuranAudioHandler extends BaseAudioHandler
     with QueueHandler, SeekHandler {
   static const String _appAlbumLabel = 'Wolof Quran';
-  static final Uri _androidArtworkUri = Uri.parse(
-    'android.resource://com.saliouseck.wolofquran/mipmap/launcher_icon',
-  );
   Uri _appArtworkUri = Uri.parse('asset:///assets/icon/app_icon.png');
 
   final AudioPlayerService _audioPlayerService;
@@ -45,10 +42,7 @@ class QuranAudioHandler extends BaseAudioHandler
       ),
     );
 
-    _appArtworkUri = Platform.isAndroid
-        ? _androidArtworkUri
-        : Uri.parse('asset:///assets/icon/app_icon.png');
-    unawaited(_prepareArtworkForPlatform());
+    unawaited(_prepareArtworkFile());
     unawaited(_loadLanguagePreference());
     _broadcastMediaAndQueue();
     _broadcastPlaybackState();
@@ -104,14 +98,11 @@ class QuranAudioHandler extends BaseAudioHandler
     _broadcastPlaybackState();
   }
 
-  Future<void> _prepareArtworkForPlatform() async {
-    if (!Platform.isIOS) {
-      return;
-    }
+  Future<void> _prepareArtworkFile() async {
     try {
       final byteData = await rootBundle.load('assets/icon/app_icon.png');
       final supportDir = await getApplicationSupportDirectory();
-      final artworkFile = File('${supportDir.path}/lockscreen_app_icon.png');
+      final artworkFile = File('${supportDir.path}/media_app_icon.png');
       await artworkFile.writeAsBytes(
         byteData.buffer.asUint8List(),
         flush: true,
