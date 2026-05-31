@@ -669,11 +669,39 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
 
     _isTopUpInFlight = true;
     try {
-      final ayahAudios = await _audioRepository.getAyahAudios(
+      var ayahAudios = await _audioRepository.getAyahAudios(
         reciterId,
         nextSurahNumber,
       );
       if (ayahAudios.isEmpty) return;
+
+      // Warm up durations *before* appending so the seeker has a valid total
+      // duration the moment the player crosses into this segment. Without
+      // this, the cached durations passed to appendSurahToQueue contain nulls,
+      // computeTotalDuration returns null, and the seeker stays disabled even
+      // while audio plays correctly.
+      var ayahDurations = ayahAudios.map((audio) => audio.duration).toList();
+      final hasMissingDurations = ayahDurations.any(
+        (duration) => duration == null || duration.inMilliseconds <= 0,
+      );
+      if (hasMissingDurations) {
+        try {
+          await _audioRepository.warmUpAyahDurations(reciterId, nextSurahNumber);
+          final warmedAyahs = await _audioRepository.getAyahAudios(
+            reciterId,
+            nextSurahNumber,
+          );
+          if (warmedAyahs.isNotEmpty) {
+            ayahAudios = warmedAyahs;
+            ayahDurations = warmedAyahs
+                .map((audio) => audio.duration)
+                .toList();
+          }
+        } catch (_) {
+          // Fall through with whatever durations we have.
+        }
+      }
+
       if (state.reciterId != reciterId ||
           state.surahNumber != currentSurah ||
           _audioPlayerService.hasQueuedSurahAhead) {
@@ -691,7 +719,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         surahNumber: nextSurahNumber,
         reciterId: reciterId,
         surahName: localizedSurahName,
-        ayahDurations: ayahAudios.map((audio) => audio.duration).toList(),
+        ayahDurations: ayahDurations,
       );
     } catch (_) {
       // Best-effort; if queuing fails we'll fall back to handlePlaybackCompleted.
