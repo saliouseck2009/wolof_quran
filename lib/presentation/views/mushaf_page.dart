@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:qcf_quran_plus/qcf_quran_plus.dart';
 
 import '../../core/mushaf/mushaf_theme.dart';
@@ -287,11 +288,22 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
       builder: (context, state) {
         final pageInfo = state.pageInfo;
         final theme = state.theme;
+        final isDarkStatusBar =
+            ThemeData.estimateBrightnessForColor(theme.appBarBackground) ==
+            Brightness.dark;
+        final overlayStyle = isDarkStatusBar
+            ? SystemUiOverlayStyle.light.copyWith(
+                statusBarColor: theme.appBarBackground,
+              )
+            : SystemUiOverlayStyle.dark.copyWith(
+                statusBarColor: theme.appBarBackground,
+              );
 
         return AppBar(
           toolbarHeight: 40,
           backgroundColor: theme.appBarBackground,
           foregroundColor: theme.appBarForeground,
+          systemOverlayStyle: overlayStyle,
           centerTitle: true,
           leadingWidth: 106,
           leading: Padding(

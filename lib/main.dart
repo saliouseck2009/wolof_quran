@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:qcf_quran_plus/qcf_quran_plus.dart';
 import 'package:wolof_quran/core/helpers/bloc_observer.dart';
@@ -156,6 +157,34 @@ class MyApp extends StatelessWidget {
                       theme: MaterialTheme().light(),
                       darkTheme: MaterialTheme().dark(),
                       themeMode: themeMode,
+                      builder: (context, child) {
+                        final theme = Theme.of(context);
+                        final isDark = theme.brightness == Brightness.dark;
+                        final overlayStyle = isDark
+                            ? SystemUiOverlayStyle.light.copyWith(
+                                statusBarColor: Colors.transparent,
+                                systemNavigationBarColor:
+                                    theme.colorScheme.surface,
+                                systemNavigationBarIconBrightness:
+                                    Brightness.light,
+                                statusBarIconBrightness: Brightness.light,
+                                statusBarBrightness: Brightness.dark,
+                              )
+                            : SystemUiOverlayStyle.dark.copyWith(
+                                statusBarColor: Colors.transparent,
+                                systemNavigationBarColor:
+                                    theme.colorScheme.surface,
+                                systemNavigationBarIconBrightness:
+                                    Brightness.dark,
+                                statusBarIconBrightness: Brightness.dark,
+                                statusBarBrightness: Brightness.light,
+                              );
+
+                        return AnnotatedRegion<SystemUiOverlayStyle>(
+                          value: overlayStyle,
+                          child: child ?? const SizedBox.shrink(),
+                        );
+                      },
                       onGenerateRoute: AppRoutes.onGenerateRoutes,
                     );
                   },
