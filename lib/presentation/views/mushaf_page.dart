@@ -107,6 +107,10 @@ class _MushafPageViewState extends State<_MushafPageView> {
           final mushafIsDark =
               ThemeData.estimateBrightnessForColor(theme.pageBackgroundColor) ==
               Brightness.dark;
+          final mushafAccentTextColor = _resolveReadableForeground(
+            preferred: theme.verseTextColor,
+            background: theme.pageBackgroundColor,
+          );
 
           return Scaffold(
             backgroundColor: theme.pageBackgroundColor,
@@ -117,6 +121,18 @@ class _MushafPageViewState extends State<_MushafPageView> {
               pageBackgroundColor: theme.pageBackgroundColor,
               isDarkMode: mushafIsDark,
               ayahStyle: TextStyle(color: theme.verseTextColor),
+              surahHeaderBuilder: (context, surahNumber) {
+                return _MushafSurahHeader(
+                  surahNumber: surahNumber,
+                  textColor: mushafAccentTextColor,
+                );
+              },
+              basmallahBuilder: (context, surahNumber) {
+                return _MushafBasmallah(
+                  surahNumber: surahNumber,
+                  textColor: mushafAccentTextColor,
+                );
+              },
               onPageChanged: (pageNumber) {
                 context.read<MushafBloc>().add(MushafPageChanged(pageNumber));
               },
@@ -458,4 +474,102 @@ class _MushafBottomBar extends StatelessWidget {
       },
     );
   }
+}
+
+class _MushafSurahHeader extends StatelessWidget {
+  const _MushafSurahHeader({
+    required this.surahNumber,
+    required this.textColor,
+  });
+
+  final int surahNumber;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    const imagePath = 'assets/surah_banner.png';
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth;
+        final headerWidth = availableWidth * 0.9;
+        final dynamicFontSize = headerWidth * 0.085;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          width: double.infinity,
+          alignment: Alignment.center,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Image(
+                image: const AssetImage(imagePath, package: 'qcf_quran_plus'),
+                width: headerWidth,
+                fit: BoxFit.contain,
+              ),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  text: '$surahNumber',
+                  style: QuranTextStyles.surahHeaderStyle(
+                    fontSize: dynamicFontSize,
+                    color: textColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MushafBasmallah extends StatelessWidget {
+  const _MushafBasmallah({required this.surahNumber, required this.textColor});
+
+  final int surahNumber;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final basmallahText = surahNumber == 97 || surahNumber == 95
+        ? '齃𧻓𥳐龎'
+        : '齃𧻓𥳐𥉉';
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Text(
+          basmallahText,
+          style: QuranTextStyles.basmallahStyle(fontSize: 20, color: textColor),
+        ),
+      ),
+    );
+  }
+}
+
+Color _resolveReadableForeground({
+  required Color preferred,
+  required Color background,
+  double minContrast = 3.0,
+}) {
+  if (_contrastRatio(preferred, background) >= minContrast) {
+    return preferred;
+  }
+
+  final darkCandidate = const Color(0xFF111111);
+  final lightCandidate = const Color(0xFFF5F5F5);
+  return _contrastRatio(darkCandidate, background) >=
+          _contrastRatio(lightCandidate, background)
+      ? darkCandidate
+      : lightCandidate;
+}
+
+double _contrastRatio(Color a, Color b) {
+  final l1 = a.computeLuminance();
+  final l2 = b.computeLuminance();
+  final lighter = l1 > l2 ? l1 : l2;
+  final darker = l1 > l2 ? l2 : l1;
+  return (lighter + 0.05) / (darker + 0.05);
 }
