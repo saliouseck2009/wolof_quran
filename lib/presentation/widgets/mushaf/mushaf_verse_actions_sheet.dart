@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:qcf_quran/qcf_quran.dart' as qcf;
+import 'package:qcf_quran_plus/qcf_quran_plus.dart' as qcf;
 import 'package:quran/quran.dart' as quran;
 
 import '../../../domain/entities/bookmark.dart';
@@ -48,7 +48,7 @@ class MushafVerseActionsSheet extends StatefulWidget {
     Color? modalBackgroundColor;
     try {
       final mushafTheme = context.read<MushafBloc>().state.theme;
-      final pageBackground = mushafTheme.qcfTheme.pageBackgroundColor;
+      final pageBackground = mushafTheme.pageBackgroundColor;
       final isDark =
           ThemeData.estimateBrightnessForColor(pageBackground) ==
           Brightness.dark;
@@ -187,8 +187,8 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
     final localizations = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final mushafTheme = _mushafBloc.state.theme;
-    final baseBackground = mushafTheme.qcfTheme.pageBackgroundColor;
-    final baseText = mushafTheme.qcfTheme.verseTextColor;
+    final baseBackground = mushafTheme.pageBackgroundColor;
+    final baseText = mushafTheme.verseTextColor;
     final isDark =
         ThemeData.estimateBrightnessForColor(baseBackground) == Brightness.dark;
     final sheetBackground = isDark

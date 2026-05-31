@@ -1,24 +1,27 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:qcf_quran/qcf_quran.dart';
 
 class MushafThemeData extends Equatable {
   final int index;
+  final Color pageBackgroundColor;
+  final Color verseTextColor;
+  final Color verseNumberColor;
   final Color appBarBackground;
   final Color appBarForeground;
   final Color bottomBarBackground;
   final Color bottomBarText;
   final Color bottomBarSubtext;
-  final QcfThemeData qcfTheme;
 
   const MushafThemeData({
     required this.index,
+    required this.pageBackgroundColor,
+    required this.verseTextColor,
+    required this.verseNumberColor,
     required this.appBarBackground,
     required this.appBarForeground,
     required this.bottomBarBackground,
     required this.bottomBarText,
     required this.bottomBarSubtext,
-    required this.qcfTheme,
   });
 
   @override
@@ -41,18 +44,14 @@ class MushafThemeData extends Equatable {
 
     return MushafThemeData(
       index: index,
+      pageBackgroundColor: pageBg,
+      verseTextColor: textColor,
+      verseNumberColor: verseNumberColor ?? textColor,
       appBarBackground: barBg,
       appBarForeground: barFg,
       bottomBarBackground: barBg,
       bottomBarText: barFg,
       bottomBarSubtext: barSub,
-      qcfTheme: QcfThemeData(
-        pageBackgroundColor: pageBg,
-        verseTextColor: textColor,
-        verseNumberColor: verseNumberColor ?? textColor,
-        basmalaColor: textColor,
-        headerTextColor: const Color(0xFF5D4037),
-      ),
     );
   }
 

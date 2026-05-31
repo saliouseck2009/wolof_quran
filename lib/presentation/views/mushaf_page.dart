@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qcf_quran_plus/qcf_quran_plus.dart';
 
 import '../../core/mushaf/mushaf_theme.dart';
 import '../../data/repositories/mushaf_repository.dart';
@@ -11,7 +12,7 @@ import '../blocs/mushaf/mushaf_bloc.dart';
 import '../blocs/mushaf/mushaf_event.dart';
 import '../blocs/mushaf/mushaf_state.dart';
 import '../cubits/bookmark_cubit.dart';
-import '../widgets/mushaf/mushaf_page_content.dart';
+import '../widgets/mushaf/mushaf_verse_actions_sheet.dart';
 import 'mushaf_surah_picker_page.dart';
 
 class MushafPage extends StatelessWidget {
@@ -67,11 +68,19 @@ class _MushafPageView extends StatefulWidget {
 
 class _MushafPageViewState extends State<_MushafPageView> {
   late final PageController _controller;
+  final MushafRepository _mushafRepository = MushafRepository();
+  bool _didCheckLongPressHint = false;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController(initialPage: widget.initialPage - 1);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _maybeShowLongPressHint();
   }
 
   @override
@@ -95,28 +104,79 @@ class _MushafPageViewState extends State<_MushafPageView> {
         buildWhen: (previous, current) => previous.theme != current.theme,
         builder: (context, state) {
           final theme = state.theme;
+          final mushafIsDark =
+              ThemeData.estimateBrightnessForColor(theme.pageBackgroundColor) ==
+              Brightness.dark;
 
           return Scaffold(
-            backgroundColor: theme.qcfTheme.pageBackgroundColor,
+            backgroundColor: theme.pageBackgroundColor,
             appBar: _MushafAppBar(onSurahTap: _openSurahList),
-            body: Directionality(
-              textDirection: TextDirection.rtl,
-              child: PageView.builder(
-                controller: _controller,
-                itemCount: 604,
-                onPageChanged: (index) {
-                  context.read<MushafBloc>().add(MushafPageChanged(index + 1));
-                },
-                itemBuilder: (context, index) {
-                  return MushafPageContent(pageNumber: index + 1);
-                },
-              ),
+            body: QuranPageView(
+              pageController: _controller,
+              highlights: const [],
+              pageBackgroundColor: theme.pageBackgroundColor,
+              isDarkMode: mushafIsDark,
+              ayahStyle: TextStyle(color: theme.verseTextColor),
+              onPageChanged: (pageNumber) {
+                context.read<MushafBloc>().add(MushafPageChanged(pageNumber));
+              },
+              onLongPress: (surahNumber, verseNumber, details) {
+                if (!mounted) {
+                  return;
+                }
+                MushafVerseActionsSheet.show(
+                  context,
+                  surahNumber: surahNumber,
+                  verseNumber: verseNumber,
+                );
+              },
             ),
             bottomNavigationBar: const _MushafBottomBar(),
           );
         },
       ),
     );
+  }
+
+  Future<void> _maybeShowLongPressHint() async {
+    if (_didCheckLongPressHint) {
+      return;
+    }
+    _didCheckLongPressHint = true;
+
+    final hasSeenHint = await _mushafRepository.getHasSeenLongPressHint();
+    if (hasSeenHint || !mounted) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) {
+        return;
+      }
+
+      final message = _longPressHintText(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 6),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      await _mushafRepository.setHasSeenLongPressHint(true);
+    });
+  }
+
+  String _longPressHintText(BuildContext context) {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    switch (languageCode) {
+      case 'ar':
+        return 'لرؤية الترجمة/التفسير للآية، اضغط مطولاً على الآية.';
+      case 'en':
+        return 'To view verse translation/tafsir, long-press on a verse.';
+      case 'fr':
+      default:
+        return 'Pour voir la traduction/le tafsir d’un verset, faites un appui long sur le verset.';
+    }
   }
 
   Future<void> _openSurahList() async {
@@ -299,9 +359,8 @@ class _ThemePickerSheet extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final theme = themes[index];
                         final isSelected = index == selectedIndex;
-                        final pageBackground =
-                            theme.qcfTheme.pageBackgroundColor;
-                        final textColor = theme.qcfTheme.verseTextColor;
+                        final pageBackground = theme.pageBackgroundColor;
+                        final textColor = theme.verseTextColor;
 
                         return GestureDetector(
                           onTap: () {

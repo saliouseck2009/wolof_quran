@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:qcf_quran/qcf_quran.dart' as qcf;
+import 'package:qcf_quran_plus/qcf_quran_plus.dart' as qcf;
 import 'package:quran/quran.dart' as quran;
 
 import '../../l10n/generated/app_localizations.dart';
