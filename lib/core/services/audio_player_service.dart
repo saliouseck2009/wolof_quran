@@ -114,11 +114,13 @@ class _PlaylistSegment {
 }
 
 class QueuedSurahChange {
+  final int? fromSurahNumber;
   final int surahNumber;
   final String reciterId;
   final String? surahName;
 
   const QueuedSurahChange({
+    this.fromSurahNumber,
     required this.surahNumber,
     required this.reciterId,
     required this.surahName,
@@ -453,8 +455,10 @@ class AudioPlayerService {
     final currentIdx = _currentSegmentIdx;
     if (currentIdx == null) return null;
     if (currentIdx + 1 >= _segments.length) return null;
+    final current = _segments[currentIdx];
     final next = _segments[currentIdx + 1];
     return QueuedSurahChange(
+      fromSurahNumber: current.surahNumber,
       surahNumber: next.surahNumber,
       reciterId: next.reciterId,
       surahName: next.surahName,
@@ -478,6 +482,14 @@ class AudioPlayerService {
     final localIndex = globalIndex - segment.startIndex;
 
     if (segmentIdx != _currentSegmentIdx) {
+      final previousSegmentIdx = _currentSegmentIdx;
+      final previousSegment =
+          previousSegmentIdx != null &&
+              previousSegmentIdx >= 0 &&
+              previousSegmentIdx < _segments.length
+          ? _segments[previousSegmentIdx]
+          : null;
+
       // The player crossed into a new surah without us stopping it — this is
       // the gapless transition path. Swap our "current segment" state to the
       // new surah and emit fresh now-playing info.
@@ -497,6 +509,7 @@ class AudioPlayerService {
       );
       _queuedSurahPlayingSubject.add(
         QueuedSurahChange(
+          fromSurahNumber: previousSegment?.surahNumber,
           surahNumber: segment.surahNumber,
           reciterId: segment.reciterId,
           surahName: segment.surahName,

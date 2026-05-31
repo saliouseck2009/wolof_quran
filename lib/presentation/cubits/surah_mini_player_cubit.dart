@@ -223,8 +223,18 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
       handlePlaybackCompleted,
     );
     _queuedSurahPlayingSub = _audioPlayerService.queuedSurahPlaying.listen((
-      _,
+      change,
     ) {
+      // In shuffle mode, gapless auto-advances do not emit playbackCompleted.
+      // Record history on the actual segment transition (from -> to).
+      if (state.playbackMode == PlaybackMode.shuffle) {
+        final fromSurah = change.fromSurahNumber;
+        if (fromSurah != null && fromSurah != change.surahNumber) {
+          _shuffleHistory.add(fromSurah);
+          _syncShuffleHistoryDepth();
+        }
+      }
+
       // The player just transitioned (gaplessly) into the next surah we had
       // queued. Top up the queue again so the *next* surah is ready before
       // this one ends — this is what keeps iOS background audio alive.
@@ -686,16 +696,17 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
       );
       if (hasMissingDurations) {
         try {
-          await _audioRepository.warmUpAyahDurations(reciterId, nextSurahNumber);
+          await _audioRepository.warmUpAyahDurations(
+            reciterId,
+            nextSurahNumber,
+          );
           final warmedAyahs = await _audioRepository.getAyahAudios(
             reciterId,
             nextSurahNumber,
           );
           if (warmedAyahs.isNotEmpty) {
             ayahAudios = warmedAyahs;
-            ayahDurations = warmedAyahs
-                .map((audio) => audio.duration)
-                .toList();
+            ayahDurations = warmedAyahs.map((audio) => audio.duration).toList();
           }
         } catch (_) {
           // Fall through with whatever durations we have.
