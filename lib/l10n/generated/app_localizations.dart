@@ -172,6 +172,18 @@ abstract class AppLocalizations {
   /// **'Theme'**
   String get theme;
 
+  /// Label for tajweed coloring toggle in mushaf settings
+  ///
+  /// In en, this message translates to:
+  /// **'Tajweed coloring'**
+  String get tajweedColoring;
+
+  /// Subtitle for tajweed coloring toggle in mushaf settings
+  ///
+  /// In en, this message translates to:
+  /// **'Show colored tajweed rules in the Mushaf'**
+  String get tajweedColoringDescription;
+
   /// Dark theme
   ///
   /// In en, this message translates to:

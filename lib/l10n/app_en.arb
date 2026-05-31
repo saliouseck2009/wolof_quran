@@ -48,6 +48,14 @@
   "@theme": {
     "description": "Theme setting"
   },
+  "tajweedColoring": "Tajweed coloring",
+  "@tajweedColoring": {
+    "description": "Label for tajweed coloring toggle in mushaf settings"
+  },
+  "tajweedColoringDescription": "Show colored tajweed rules in the Mushaf",
+  "@tajweedColoringDescription": {
+    "description": "Subtitle for tajweed coloring toggle in mushaf settings"
+  },
   "dark": "Dark",
   "@dark": {
     "description": "Dark theme"

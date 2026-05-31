@@ -15,17 +15,20 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
     on<MushafNavigateToSurah>(_onNavigateToSurah);
     on<MushafNavigateToPage>(_onNavigateToPage);
     on<MushafThemeChanged>(_onThemeChanged);
+    on<MushafTajweedToggled>(_onTajweedToggled);
   }
 
   Future<void> _onLoaded(MushafLoaded event, Emitter<MushafState> emit) async {
     final lastPage = await _repository.getLastReadPage();
     final themeIndex = await _repository.getThemeIndex();
+    final isTajweedEnabled = await _repository.getTajweedEnabled();
 
     emit(
       state.copyWith(
         currentPage: lastPage,
         pageInfo: getPageInfo(lastPage),
         isLoading: false,
+        isTajweedEnabled: isTajweedEnabled,
         theme: MushafThemeData.fromIndex(themeIndex),
       ),
     );
@@ -80,5 +83,13 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   ) async {
     await _repository.saveThemeIndex(event.themeIndex);
     emit(state.copyWith(theme: MushafThemeData.fromIndex(event.themeIndex)));
+  }
+
+  Future<void> _onTajweedToggled(
+    MushafTajweedToggled event,
+    Emitter<MushafState> emit,
+  ) async {
+    await _repository.saveTajweedEnabled(event.enabled);
+    emit(state.copyWith(isTajweedEnabled: event.enabled));
   }
 }

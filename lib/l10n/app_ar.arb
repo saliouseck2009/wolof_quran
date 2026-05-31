@@ -12,6 +12,8 @@
   "settings": "الإعدادات",
   "language": "اللغة",
   "theme": "المظهر",
+  "tajweedColoring": "ألوان التجويد",
+  "tajweedColoringDescription": "إظهار قواعد التجويد بالألوان في المصحف",
   "dark": "داكن",
   "light": "فاتح",
   "arabic": "العربية",

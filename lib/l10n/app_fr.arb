@@ -12,6 +12,8 @@
   "settings": "Paramètres",
   "language": "Langue",
   "theme": "Thème",
+  "tajweedColoring": "Coloration tajwid",
+  "tajweedColoringDescription": "Afficher les règles de tajwid en couleur dans le Mushaf",
   "dark": "Sombre",
   "light": "Clair",
   "arabic": "Arabe",

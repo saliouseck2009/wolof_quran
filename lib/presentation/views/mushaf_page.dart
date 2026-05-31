@@ -101,7 +101,9 @@ class _MushafPageViewState extends State<_MushafPageView> {
         _controller.jumpToPage(targetPage - 1);
       },
       child: BlocBuilder<MushafBloc, MushafState>(
-        buildWhen: (previous, current) => previous.theme != current.theme,
+        buildWhen: (previous, current) =>
+            previous.theme != current.theme ||
+            previous.isTajweedEnabled != current.isTajweedEnabled,
         builder: (context, state) {
           final theme = state.theme;
           final mushafIsDark =
@@ -120,6 +122,7 @@ class _MushafPageViewState extends State<_MushafPageView> {
               highlights: const [],
               pageBackgroundColor: theme.pageBackgroundColor,
               isDarkMode: mushafIsDark,
+              isTajweed: state.isTajweedEnabled,
               ayahStyle: TextStyle(color: theme.verseTextColor),
               surahHeaderBuilder: (context, surahNumber) {
                 return _MushafSurahHeader(
@@ -170,28 +173,82 @@ class _MushafPageViewState extends State<_MushafPageView> {
         return;
       }
 
-      final message = _longPressHintText(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 6),
-          behavior: SnackBarBehavior.floating,
+      final hint = _mushafHintContent(context);
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
+        builder: (sheetContext) {
+          final textTheme = Theme.of(sheetContext).textTheme;
+          return SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    hint.title,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(hint.longPressMessage, style: textTheme.bodyMedium),
+                  const SizedBox(height: 8),
+                  Text(hint.tajweedMessage, style: textTheme.bodyMedium),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton(
+                      onPressed: () => Navigator.of(sheetContext).pop(),
+                      child: Text(hint.actionLabel),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       );
       await _mushafRepository.setHasSeenLongPressHint(true);
     });
   }
 
-  String _longPressHintText(BuildContext context) {
+  _MushafHintContent _mushafHintContent(BuildContext context) {
     final languageCode = Localizations.localeOf(context).languageCode;
     switch (languageCode) {
       case 'ar':
-        return 'لرؤية الترجمة/التفسير للآية، اضغط مطولاً على الآية.';
+        return const _MushafHintContent(
+          title: 'معلومة سريعة',
+          longPressMessage:
+              'لعرض الترجمة/التفسير لأي آية، اضغط مطولاً على الآية.',
+          tajweedMessage:
+              'ميزة جديدة: يمكنك الآن تفعيل/تعطيل ألوان التجويد من قائمة مظهر المصحف.',
+          actionLabel: 'حسنًا',
+        );
       case 'en':
-        return 'To view verse translation/tafsir, long-press on a verse.';
+        return const _MushafHintContent(
+          title: 'Quick tip',
+          longPressMessage:
+              'To view verse translation/tafsir, long-press on a verse.',
+          tajweedMessage:
+              'New: Tajweed coloring is now available and can be enabled/disabled from the Mushaf theme panel.',
+          actionLabel: 'Got it',
+        );
       case 'fr':
       default:
-        return 'Pour voir la traduction/le tafsir d’un verset, faites un appui long sur le verset.';
+        return const _MushafHintContent(
+          title: 'Astuce rapide',
+          longPressMessage:
+              'Pour voir la traduction/le tafsir d’un verset, faites un appui long sur le verset.',
+          tajweedMessage:
+              'Nouveau: l’affichage Tajweed est disponible et peut être activé/désactivé dans le panneau de thème du Mushaf.',
+          actionLabel: 'Compris',
+        );
     }
   }
 
@@ -337,6 +394,7 @@ class _ThemePickerSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<MushafBloc, MushafState>(
       builder: (context, state) {
+        final localizations = AppLocalizations.of(context)!;
         final themes = MushafThemeData.allThemes;
         final selectedIndex = state.theme.index;
 
@@ -361,6 +419,25 @@ class _ThemePickerSheet extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      value: state.isTajweedEnabled,
+                      activeTrackColor: Colors.white,
+                      inactiveTrackColor: Colors.white,
+                      activeThumbColor: state.theme.appBarForeground,
+                      inactiveThumbColor: state.theme.bottomBarSubtext,
+                      onChanged: (enabled) {
+                        context.read<MushafBloc>().add(
+                          MushafTajweedToggled(enabled),
+                        );
+                      },
+                      title: Text(
+                        localizations.tajweedColoring,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(localizations.tajweedColoringDescription),
+                    ),
+                    const SizedBox(height: 12),
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -474,6 +551,20 @@ class _MushafBottomBar extends StatelessWidget {
       },
     );
   }
+}
+
+class _MushafHintContent {
+  final String title;
+  final String longPressMessage;
+  final String tajweedMessage;
+  final String actionLabel;
+
+  const _MushafHintContent({
+    required this.title,
+    required this.longPressMessage,
+    required this.tajweedMessage,
+    required this.actionLabel,
+  });
 }
 
 class _MushafSurahHeader extends StatelessWidget {

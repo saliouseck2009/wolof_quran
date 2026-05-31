@@ -46,3 +46,12 @@ class MushafThemeChanged extends MushafEvent {
   @override
   List<Object?> get props => [themeIndex];
 }
+
+class MushafTajweedToggled extends MushafEvent {
+  final bool enabled;
+
+  const MushafTajweedToggled(this.enabled);
+
+  @override
+  List<Object?> get props => [enabled];
+}
