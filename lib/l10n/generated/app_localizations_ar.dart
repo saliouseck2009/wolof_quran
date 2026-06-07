@@ -45,6 +45,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get theme => 'المظهر';
 
   @override
+  String get tajweedColoring => 'ألوان التجويد';
+
+  @override
+  String get tajweedColoringDescription =>
+      'إظهار قواعد التجويد بالألوان في المصحف';
+
+  @override
   String get dark => 'داكن';
 
   @override

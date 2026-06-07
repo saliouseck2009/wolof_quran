@@ -45,6 +45,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get theme => 'Thème';
 
   @override
+  String get tajweedColoring => 'Coloration tajwid';
+
+  @override
+  String get tajweedColoringDescription =>
+      'Afficher les règles de tajwid en couleur dans le Mushaf';
+
+  @override
   String get dark => 'Sombre';
 
   @override

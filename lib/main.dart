@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:qcf_quran_plus/qcf_quran_plus.dart';
 import 'package:wolof_quran/core/helpers/bloc_observer.dart';
 import 'package:wolof_quran/core/services/audio_player_service.dart';
 import 'package:wolof_quran/core/services/audio_download_queue_service.dart';
@@ -36,7 +38,18 @@ void main() async {
   await initializeDateFormatting("fr_FR");
   await setupDependencies();
   Bloc.observer = SimpleBlocObserver();
-  runApp(MyApp());
+  runApp(const MyApp());
+  _preloadMushafFontsInBackground();
+}
+
+void _preloadMushafFontsInBackground() {
+  Future<void>(() async {
+    try {
+      await QcfFontLoader.setupFontsAtStartup(onProgress: (_) {});
+    } catch (_) {
+      // Preload is optional; ignore failures to avoid impacting app startup.
+    }
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -144,6 +157,34 @@ class MyApp extends StatelessWidget {
                       theme: MaterialTheme().light(),
                       darkTheme: MaterialTheme().dark(),
                       themeMode: themeMode,
+                      builder: (context, child) {
+                        final theme = Theme.of(context);
+                        final isDark = theme.brightness == Brightness.dark;
+                        final overlayStyle = isDark
+                            ? SystemUiOverlayStyle.light.copyWith(
+                                statusBarColor: Colors.transparent,
+                                systemNavigationBarColor:
+                                    theme.colorScheme.surface,
+                                systemNavigationBarIconBrightness:
+                                    Brightness.light,
+                                statusBarIconBrightness: Brightness.light,
+                                statusBarBrightness: Brightness.dark,
+                              )
+                            : SystemUiOverlayStyle.dark.copyWith(
+                                statusBarColor: Colors.transparent,
+                                systemNavigationBarColor:
+                                    theme.colorScheme.surface,
+                                systemNavigationBarIconBrightness:
+                                    Brightness.dark,
+                                statusBarIconBrightness: Brightness.dark,
+                                statusBarBrightness: Brightness.light,
+                              );
+
+                        return AnnotatedRegion<SystemUiOverlayStyle>(
+                          value: overlayStyle,
+                          child: child ?? const SizedBox.shrink(),
+                        );
+                      },
                       onGenerateRoute: AppRoutes.onGenerateRoutes,
                     );
                   },
