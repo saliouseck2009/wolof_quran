@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:qcf_quran_plus/qcf_quran_plus.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../core/mushaf/mushaf_theme.dart';
 import '../../data/repositories/mushaf_repository.dart';
@@ -76,6 +77,7 @@ class _MushafPageViewState extends State<_MushafPageView> {
   void initState() {
     super.initState();
     _controller = PageController(initialPage: widget.initialPage - 1);
+    WakelockPlus.enable();
   }
 
   @override
@@ -86,6 +88,7 @@ class _MushafPageViewState extends State<_MushafPageView> {
 
   @override
   void dispose() {
+    WakelockPlus.disable();
     _controller.dispose();
     super.dispose();
   }
