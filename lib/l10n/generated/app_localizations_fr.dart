@@ -834,4 +834,45 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get supportValue => 'Jazaakumullaahu khairan';
+
+  @override
+  String get playVerseRange => 'Lire plusieurs versets';
+
+  @override
+  String get playUntilSurahEnd => 'Jusqu\'à la fin de la sourate';
+
+  @override
+  String get customVerseRange => 'Plage personnalisée';
+
+  @override
+  String get customVerseRangeHint =>
+      'Choisissez le premier et le dernier verset';
+
+  @override
+  String get rangeStartLabel => 'De';
+
+  @override
+  String get rangeEndLabel => 'À';
+
+  @override
+  String versesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count versets',
+      one: '1 verset',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String playVersesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Lire $count versets',
+      one: 'Lire 1 verset',
+    );
+    return '$_temp0';
+  }
 }

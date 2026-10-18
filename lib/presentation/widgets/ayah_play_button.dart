@@ -77,7 +77,7 @@ class AyahPlayButton extends StatelessWidget {
                     final isThisAyahPlaying =
                         currentAudio != null &&
                         currentAudio.surahNumber == surahNumber &&
-                        currentAudio.ayahNumber == ayahNumber &&
+                        currentAudio.verseNumber == ayahNumber &&
                         currentAudio.reciterId == selectedReciter.id;
 
                     // Check if this ayah is loading

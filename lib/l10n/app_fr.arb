@@ -254,5 +254,13 @@
   "piSpiPayment": "PI SPI",
   "copiedToClipboard": "Copie dans le presse-papiers",
   "copyId": "Copier l'identifiant",
-  "supportValue": "Jazaakumullaahu khairan"
+  "supportValue": "Jazaakumullaahu khairan",
+  "playVerseRange": "Lire plusieurs versets",
+  "playUntilSurahEnd": "Jusqu'à la fin de la sourate",
+  "customVerseRange": "Plage personnalisée",
+  "customVerseRangeHint": "Choisissez le premier et le dernier verset",
+  "rangeStartLabel": "De",
+  "rangeEndLabel": "À",
+  "versesCount": "{count, plural, =1{1 verset} other{{count} versets}}",
+  "playVersesCount": "{count, plural, =1{Lire 1 verset} other{Lire {count} versets}}"
 }

@@ -821,4 +821,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supportValue => 'Jazaakumullaahu khairan';
+
+  @override
+  String get playVerseRange => 'Play multiple verses';
+
+  @override
+  String get playUntilSurahEnd => 'Until the end of the surah';
+
+  @override
+  String get customVerseRange => 'Custom range';
+
+  @override
+  String get customVerseRangeHint => 'Choose the first and last verse';
+
+  @override
+  String get rangeStartLabel => 'From';
+
+  @override
+  String get rangeEndLabel => 'To';
+
+  @override
+  String versesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count verses',
+      one: '1 verse',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String playVersesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Play $count verses',
+      one: 'Play 1 verse',
+    );
+    return '$_temp0';
+  }
 }

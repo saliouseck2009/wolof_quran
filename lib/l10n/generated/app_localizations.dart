@@ -1569,6 +1569,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Jazaakumullaahu khairan'**
   String get supportValue;
+
+  /// Tooltip and title of the sheet to play a range of verses
+  ///
+  /// In en, this message translates to:
+  /// **'Play multiple verses'**
+  String get playVerseRange;
+
+  /// Default verse range option: from the current verse to the last verse of the surah
+  ///
+  /// In en, this message translates to:
+  /// **'Until the end of the surah'**
+  String get playUntilSurahEnd;
+
+  /// Verse range option letting the user pick the first and last verse
+  ///
+  /// In en, this message translates to:
+  /// **'Custom range'**
+  String get customVerseRange;
+
+  /// Hint under the custom verse range option
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the first and last verse'**
+  String get customVerseRangeHint;
+
+  /// Label above the first verse pickers of a verse range
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get rangeStartLabel;
+
+  /// Label above the last verse pickers of a verse range
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get rangeEndLabel;
+
+  /// Number of verses in a verse range
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 verse} other{{count} verses}}'**
+  String versesCount(int count);
+
+  /// Button starting playback of a verse range
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Play 1 verse} other{Play {count} verses}}'**
+  String playVersesCount(int count);
 }
 
 class _AppLocalizationsDelegate

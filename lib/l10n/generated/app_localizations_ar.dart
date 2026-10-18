@@ -813,4 +813,48 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get supportValue => 'جزاكم الله خيرًا';
+
+  @override
+  String get playVerseRange => 'تشغيل عدة آيات';
+
+  @override
+  String get playUntilSurahEnd => 'حتى نهاية السورة';
+
+  @override
+  String get customVerseRange => 'نطاق مخصص';
+
+  @override
+  String get customVerseRangeHint => 'اختر الآية الأولى والأخيرة';
+
+  @override
+  String get rangeStartLabel => 'من';
+
+  @override
+  String get rangeEndLabel => 'إلى';
+
+  @override
+  String versesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count آية',
+      few: '$count آيات',
+      two: 'آيتان',
+      one: 'آية واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String playVersesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تشغيل $count آية',
+      few: 'تشغيل $count آيات',
+      two: 'تشغيل آيتين',
+      one: 'تشغيل آية واحدة',
+    );
+    return '$_temp0';
+  }
 }

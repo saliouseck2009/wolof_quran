@@ -1069,5 +1069,49 @@
   "supportValue": "Jazaakumullaahu khairan",
   "@supportValue": {
     "description": "Short value text shown on the support settings card"
+  },
+  "playVerseRange": "Play multiple verses",
+  "@playVerseRange": {
+    "description": "Tooltip and title of the sheet to play a range of verses"
+  },
+  "playUntilSurahEnd": "Until the end of the surah",
+  "@playUntilSurahEnd": {
+    "description": "Default verse range option: from the current verse to the last verse of the surah"
+  },
+  "customVerseRange": "Custom range",
+  "@customVerseRange": {
+    "description": "Verse range option letting the user pick the first and last verse"
+  },
+  "customVerseRangeHint": "Choose the first and last verse",
+  "@customVerseRangeHint": {
+    "description": "Hint under the custom verse range option"
+  },
+  "rangeStartLabel": "From",
+  "@rangeStartLabel": {
+    "description": "Label above the first verse pickers of a verse range"
+  },
+  "rangeEndLabel": "To",
+  "@rangeEndLabel": {
+    "description": "Label above the last verse pickers of a verse range"
+  },
+  "versesCount": "{count, plural, =1{1 verse} other{{count} verses}}",
+  "@versesCount": {
+    "description": "Number of verses in a verse range",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of verses"
+      }
+    }
+  },
+  "playVersesCount": "{count, plural, =1{Play 1 verse} other{Play {count} verses}}",
+  "@playVersesCount": {
+    "description": "Button starting playback of a verse range",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of verses"
+      }
+    }
   }
 }
