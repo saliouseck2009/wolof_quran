@@ -187,6 +187,11 @@ class LocalNotificationsReminderScheduler implements ReminderScheduler {
           requestBadgePermission: false,
           requestSoundPermission: false,
         ),
+        macOS: DarwinInitializationSettings(
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        ),
       ),
     );
     _initialized = true;

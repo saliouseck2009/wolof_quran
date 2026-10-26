@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran/quran.dart' as quran;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/config/theme/app_color.dart';
@@ -356,7 +357,7 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
           else
             Text(
               '${localizations.pageNumberLabel(_startPage)} · '
-              '${getPageInfo(_startPage).surahNameEnglish}',
+              '${quran.getSurahName(getPageInfo(_startPage).primarySurahNumber)}',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -488,7 +489,7 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
                 Icons.play_circle_outline_rounded,
                 localizations.goalStartPoint,
                 '${localizations.pageNumberLabel(_startPage)} · '
-                '${startInfo.surahNameEnglish}',
+                '${quran.getSurahName(startInfo.primarySurahNumber)}',
               ),
               row(
                 Icons.event_outlined,

@@ -989,6 +989,7 @@ class _MushafBottomBar extends StatelessWidget {
                 Expanded(
                   child: Align(
                     alignment: AlignmentDirectional.centerStart,
+                    heightFactor: 1,
                     child: pageInfo?.hizbInfo != null
                         ? Text(
                             pageInfo!.hizbInfo!.localizedText(localizations),
@@ -1006,6 +1007,7 @@ class _MushafBottomBar extends StatelessWidget {
                 Expanded(
                   child: Align(
                     alignment: AlignmentDirectional.centerEnd,
+                    heightFactor: 1,
                     child: _PageLabel(theme: theme, pageNumber: pageNumber),
                   ),
                 ),

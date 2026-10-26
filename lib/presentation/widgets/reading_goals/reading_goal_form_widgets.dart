@@ -33,7 +33,7 @@ class SegmentedSwitch<T> extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 180),
                   padding: const EdgeInsets.symmetric(
-                    vertical: 12,
+                    vertical: 10,
                     horizontal: 4,
                   ),
                   decoration: BoxDecoration(
@@ -54,7 +54,7 @@ class SegmentedSwitch<T> extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     label,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
