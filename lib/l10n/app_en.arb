@@ -1074,17 +1074,13 @@
   "@playVerseRange": {
     "description": "Tooltip and title of the sheet to play a range of verses"
   },
-  "playUntilSurahEnd": "Until the end of the surah",
+  "playUntilSurahEnd": "Until the end",
   "@playUntilSurahEnd": {
     "description": "Default verse range option: from the current verse to the last verse of the surah"
   },
-  "customVerseRange": "Custom range",
+  "customVerseRange": "Custom",
   "@customVerseRange": {
     "description": "Verse range option letting the user pick the first and last verse"
-  },
-  "customVerseRangeHint": "Choose the first and last verse",
-  "@customVerseRangeHint": {
-    "description": "Hint under the custom verse range option"
   },
   "rangeStartLabel": "From",
   "@rangeStartLabel": {
@@ -1107,6 +1103,52 @@
   "playVersesCount": "{count, plural, =1{Play 1 verse} other{Play {count} verses}}",
   "@playVersesCount": {
     "description": "Button starting playback of a verse range",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of verses"
+      }
+    }
+  },
+  "verseRangeSubtitle": "Continuous playback from {reference}",
+  "@verseRangeSubtitle": {
+    "description": "Subtitle of the verse range sheet",
+    "placeholders": {
+      "reference": {
+        "type": "String",
+        "description": "Surah name and verse, e.g. Al Baqarah 2:1"
+      }
+    }
+  },
+  "addVersesChip": "{count, plural, =1{+1 verse} other{+{count} verses}}",
+  "@addVersesChip": {
+    "description": "Quick choice extending a custom verse range",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "description": "Number of verses"
+      }
+    }
+  },
+  "surahEndChip": "End of surah",
+  "@surahEndChip": {
+    "description": "Quick choice ending a custom verse range at the end of the surah"
+  },
+  "chooseFirstVerse": "Choose the first verse",
+  "@chooseFirstVerse": {
+    "description": "Title of the picker for the first verse of a range"
+  },
+  "chooseLastVerse": "Choose the last verse",
+  "@chooseLastVerse": {
+    "description": "Title of the picker for the last verse of a range"
+  },
+  "searchSurahOrNumber": "Search a surah or a number",
+  "@searchSurahOrNumber": {
+    "description": "Hint of the surah search field in the verse range picker"
+  },
+  "verseCountShort": "{count} v.",
+  "@verseCountShort": {
+    "description": "Abbreviated verse count of a surah",
     "placeholders": {
       "count": {
         "type": "int",

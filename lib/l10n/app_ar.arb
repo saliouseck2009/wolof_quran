@@ -265,11 +265,17 @@
   "copyId": "نسخ المعرّف",
   "supportValue": "جزاكم الله خيرًا",
   "playVerseRange": "تشغيل عدة آيات",
-  "playUntilSurahEnd": "حتى نهاية السورة",
-  "customVerseRange": "نطاق مخصص",
-  "customVerseRangeHint": "اختر الآية الأولى والأخيرة",
+  "playUntilSurahEnd": "حتى النهاية",
+  "customVerseRange": "مخصص",
   "rangeStartLabel": "من",
   "rangeEndLabel": "إلى",
   "versesCount": "{count, plural, =1{آية واحدة} =2{آيتان} few{{count} آيات} other{{count} آية}}",
-  "playVersesCount": "{count, plural, =1{تشغيل آية واحدة} =2{تشغيل آيتين} few{تشغيل {count} آيات} other{تشغيل {count} آية}}"
+  "playVersesCount": "{count, plural, =1{تشغيل آية واحدة} =2{تشغيل آيتين} few{تشغيل {count} آيات} other{تشغيل {count} آية}}",
+  "verseRangeSubtitle": "تشغيل متواصل بدءًا من {reference}",
+  "addVersesChip": "{count, plural, =1{+آية واحدة} =2{+آيتان} few{+{count} آيات} other{+{count} آية}}",
+  "surahEndChip": "نهاية السورة",
+  "chooseFirstVerse": "اختر الآية الأولى",
+  "chooseLastVerse": "اختر الآية الأخيرة",
+  "searchSurahOrNumber": "ابحث عن سورة أو رقم",
+  "verseCountShort": "{count} آية"
 }

@@ -839,14 +839,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get playVerseRange => 'Lire plusieurs versets';
 
   @override
-  String get playUntilSurahEnd => 'Jusqu\'à la fin de la sourate';
+  String get playUntilSurahEnd => 'Jusqu\'à la fin';
 
   @override
-  String get customVerseRange => 'Plage personnalisée';
-
-  @override
-  String get customVerseRangeHint =>
-      'Choisissez le premier et le dernier verset';
+  String get customVerseRange => 'Personnalisée';
 
   @override
   String get rangeStartLabel => 'De';
@@ -874,5 +870,38 @@ class AppLocalizationsFr extends AppLocalizations {
       one: 'Lire 1 verset',
     );
     return '$_temp0';
+  }
+
+  @override
+  String verseRangeSubtitle(String reference) {
+    return 'Lecture continue à partir de $reference';
+  }
+
+  @override
+  String addVersesChip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count versets',
+      one: '+1 verset',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get surahEndChip => 'Fin de la sourate';
+
+  @override
+  String get chooseFirstVerse => 'Choisir le premier verset';
+
+  @override
+  String get chooseLastVerse => 'Choisir le dernier verset';
+
+  @override
+  String get searchSurahOrNumber => 'Rechercher une sourate ou un numéro';
+
+  @override
+  String verseCountShort(int count) {
+    return '$count v.';
   }
 }

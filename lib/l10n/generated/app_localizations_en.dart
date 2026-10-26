@@ -826,13 +826,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get playVerseRange => 'Play multiple verses';
 
   @override
-  String get playUntilSurahEnd => 'Until the end of the surah';
+  String get playUntilSurahEnd => 'Until the end';
 
   @override
-  String get customVerseRange => 'Custom range';
-
-  @override
-  String get customVerseRangeHint => 'Choose the first and last verse';
+  String get customVerseRange => 'Custom';
 
   @override
   String get rangeStartLabel => 'From';
@@ -860,5 +857,38 @@ class AppLocalizationsEn extends AppLocalizations {
       one: 'Play 1 verse',
     );
     return '$_temp0';
+  }
+
+  @override
+  String verseRangeSubtitle(String reference) {
+    return 'Continuous playback from $reference';
+  }
+
+  @override
+  String addVersesChip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count verses',
+      one: '+1 verse',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get surahEndChip => 'End of surah';
+
+  @override
+  String get chooseFirstVerse => 'Choose the first verse';
+
+  @override
+  String get chooseLastVerse => 'Choose the last verse';
+
+  @override
+  String get searchSurahOrNumber => 'Search a surah or a number';
+
+  @override
+  String verseCountShort(int count) {
+    return '$count v.';
   }
 }

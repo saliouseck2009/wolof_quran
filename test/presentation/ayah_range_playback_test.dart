@@ -312,7 +312,8 @@ void main() {
     testWidgets('plays until the end of the surah by default', (tester) async {
       final results = await openSheet(tester, surahNumber: 2, ayahNumber: 255);
 
-      expect(find.text('2:255 – 2:286 · 32 verses'), findsOneWidget);
+      expect(find.text('2:255'), findsOneWidget);
+      expect(find.text('2:286'), findsOneWidget);
       await tester.tap(find.text('Play 32 verses'));
       await tester.pumpAndSettle();
 
@@ -321,23 +322,53 @@ void main() {
       ]);
     });
 
-    testWidgets('custom range starts and ends on the current verse', (
+    testWidgets('keeps the play button above the system navigation bar', (
+      tester,
+    ) async {
+      // 48 logical pixels of navigation bar, set in physical pixels.
+      final navigationBar = 48 * tester.view.devicePixelRatio;
+      tester.view.padding = FakeViewPadding(bottom: navigationBar);
+      tester.view.viewPadding = FakeViewPadding(bottom: navigationBar);
+      addTearDown(tester.view.reset);
+      await openSheet(tester, surahNumber: 2, ayahNumber: 255);
+
+      final screenHeight =
+          tester.view.physicalSize.height / tester.view.devicePixelRatio;
+      final buttonBottom = tester
+          .getBottomLeft(find.widgetWithText(FilledButton, 'Play 32 verses'))
+          .dy;
+      expect(buttonBottom, lessThanOrEqualTo(screenHeight - 48));
+    });
+
+    testWidgets('custom range uses quick choices and the verse picker', (
       tester,
     ) async {
       final results = await openSheet(tester, surahNumber: 2, ayahNumber: 255);
 
-      await tester.tap(find.text('Custom range'));
+      await tester.tap(find.text('Custom'));
       await tester.pumpAndSettle();
+      // The custom range starts and ends on the current verse.
+      expect(find.text('Play 1 verse'), findsOneWidget);
 
-      expect(find.text('From'), findsOneWidget);
-      expect(find.text('To'), findsOneWidget);
-      expect(find.text('2:255 – 2:255 · 1 verse'), findsOneWidget);
+      await tester.tap(find.text('+10 verses'));
+      await tester.pumpAndSettle();
+      expect(find.text('2:264'), findsOneWidget);
 
-      await tester.tap(find.text('Play 1 verse'));
+      await tester.tap(find.text('2:264'));
+      await tester.pumpAndSettle();
+      expect(find.text('Choose the last verse'), findsOneWidget);
+      // Verses before the range start cannot be picked.
+      await tester.tap(find.text('250'), warnIfMissed: false);
+      await tester.pumpAndSettle();
+      expect(find.text('Choose the last verse'), findsOneWidget);
+
+      await tester.tap(find.text('270'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Play 16 verses'));
       await tester.pumpAndSettle();
 
       expect(results, const <AyahRange?>[
-        AyahRange(startSurah: 2, startAyah: 255, endSurah: 2, endAyah: 255),
+        AyahRange(startSurah: 2, startAyah: 255, endSurah: 2, endAyah: 270),
       ]);
     });
   });

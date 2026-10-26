@@ -1579,20 +1579,14 @@ abstract class AppLocalizations {
   /// Default verse range option: from the current verse to the last verse of the surah
   ///
   /// In en, this message translates to:
-  /// **'Until the end of the surah'**
+  /// **'Until the end'**
   String get playUntilSurahEnd;
 
   /// Verse range option letting the user pick the first and last verse
   ///
   /// In en, this message translates to:
-  /// **'Custom range'**
+  /// **'Custom'**
   String get customVerseRange;
-
-  /// Hint under the custom verse range option
-  ///
-  /// In en, this message translates to:
-  /// **'Choose the first and last verse'**
-  String get customVerseRangeHint;
 
   /// Label above the first verse pickers of a verse range
   ///
@@ -1617,6 +1611,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{Play 1 verse} other{Play {count} verses}}'**
   String playVersesCount(int count);
+
+  /// Subtitle of the verse range sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Continuous playback from {reference}'**
+  String verseRangeSubtitle(String reference);
+
+  /// Quick choice extending a custom verse range
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{+1 verse} other{+{count} verses}}'**
+  String addVersesChip(int count);
+
+  /// Quick choice ending a custom verse range at the end of the surah
+  ///
+  /// In en, this message translates to:
+  /// **'End of surah'**
+  String get surahEndChip;
+
+  /// Title of the picker for the first verse of a range
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the first verse'**
+  String get chooseFirstVerse;
+
+  /// Title of the picker for the last verse of a range
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the last verse'**
+  String get chooseLastVerse;
+
+  /// Hint of the surah search field in the verse range picker
+  ///
+  /// In en, this message translates to:
+  /// **'Search a surah or a number'**
+  String get searchSurahOrNumber;
+
+  /// Abbreviated verse count of a surah
+  ///
+  /// In en, this message translates to:
+  /// **'{count} v.'**
+  String verseCountShort(int count);
 }
 
 class _AppLocalizationsDelegate
