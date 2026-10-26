@@ -9,6 +9,7 @@ import '../cubits/reading_goals_cubit.dart';
 import '../widgets/reading_goals/reading_goal_card.dart';
 import '../widgets/reading_goals/reading_goal_form_widgets.dart';
 import 'create_reading_goal_page.dart';
+import 'reading_stats_page.dart';
 
 enum _GoalsSection { ongoing, planned, finished }
 
@@ -56,6 +57,14 @@ class _ReadingGoalsPageState extends State<ReadingGoalsPage> {
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
+        actions: [
+          IconButton(
+            tooltip: localizations.statsTitle,
+            icon: const Icon(Icons.insights_rounded),
+            onPressed: () =>
+                Navigator.pushNamed(context, ReadingStatsPage.routeName),
+          ),
+        ],
       ),
       floatingActionButton: BlocBuilder<ReadingGoalsCubit, ReadingGoalsState>(
         buildWhen: (previous, current) =>

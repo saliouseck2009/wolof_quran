@@ -59,8 +59,9 @@ class SurahAyahsList extends StatelessWidget {
 
                   return Icon(
                     isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-                    color:
-                        isBookmarked ? colorScheme.primary : colorScheme.outline,
+                    color: isBookmarked
+                        ? colorScheme.primary
+                        : colorScheme.outline,
                   );
                 },
               ),

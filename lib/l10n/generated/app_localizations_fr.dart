@@ -1360,4 +1360,192 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get markReadShort => 'Marquer comme lue';
+
+  @override
+  String continuousProgressLabel(int page) {
+    return 'Progression continue jusqu\'à la page $page';
+  }
+
+  @override
+  String get readingNotStarted => 'Aucune page lue pour le moment';
+
+  @override
+  String todayTarget(int count) {
+    return 'Objectif : $count pages';
+  }
+
+  @override
+  String todayRead(int count) {
+    return 'Lues : $count pages';
+  }
+
+  @override
+  String recommendedPace(String pages) {
+    return 'Environ $pages pages par jour jusqu\'à la fin';
+  }
+
+  @override
+  String get pagesSectionTitle => 'Pages';
+
+  @override
+  String get legendRead => 'Lue';
+
+  @override
+  String get legendUnread => 'Non lue';
+
+  @override
+  String get legendSkipped => 'Sautée';
+
+  @override
+  String get missingPages => 'Pages manquantes';
+
+  @override
+  String get noMissingPages => 'Aucune page sautée.';
+
+  @override
+  String pageRangeLabel(int from, int to) {
+    return 'Pages $from–$to';
+  }
+
+  @override
+  String get historyTitle => 'Historique de lecture';
+
+  @override
+  String get noPagesThatDay => 'Aucune page';
+
+  @override
+  String pagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages',
+      one: '1 page',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get journalTitle => 'Validations';
+
+  @override
+  String get noValidations => 'Aucune validation pour le moment.';
+
+  @override
+  String get validationSourceAuto => 'automatique';
+
+  @override
+  String get validationSourceManual => 'manuelle';
+
+  @override
+  String get actionPage => 'Page';
+
+  @override
+  String get actionRange => 'Plage de pages';
+
+  @override
+  String get actionReadUntil => 'Lu jusqu\'ici';
+
+  @override
+  String get actionJuz => 'Juz';
+
+  @override
+  String get actionHizb => 'Hizb';
+
+  @override
+  String get actionSurah => 'Sourate';
+
+  @override
+  String get actionUnmark => 'Validation retirée';
+
+  @override
+  String get markSection => 'Marquer un Juz, un Hizb ou une Sourate';
+
+  @override
+  String get sectionJuz => 'Juz';
+
+  @override
+  String get sectionHizb => 'Hizb';
+
+  @override
+  String get sectionSurah => 'Sourate';
+
+  @override
+  String sharedPagePrevious(int page) {
+    return 'La page $page contient aussi la fin de la section précédente. Décochez-la si vous ne l\'avez pas lue entièrement.';
+  }
+
+  @override
+  String sharedPageNext(int page) {
+    return 'La page $page contient aussi le début de la section suivante. Décochez-la si vous ne l\'avez pas lue entièrement.';
+  }
+
+  @override
+  String includePage(int page) {
+    return 'Inclure la page $page';
+  }
+
+  @override
+  String sectionPagesSummary(String range, String count) {
+    return '$range · $count';
+  }
+
+  @override
+  String markSectionConfirm(String name) {
+    return 'Marquer $name comme lu';
+  }
+
+  @override
+  String get statsTitle => 'Mes performances';
+
+  @override
+  String get statTotalPages => 'Pages lues';
+
+  @override
+  String get statKhatmCompleted => 'Khatm terminés';
+
+  @override
+  String get statCurrentStreak => 'Série en cours';
+
+  @override
+  String get statBestStreak => 'Meilleure série';
+
+  @override
+  String get statAverage => 'Moyenne par jour (30 j)';
+
+  @override
+  String get statBestDay => 'Meilleur jour';
+
+  @override
+  String get statReadingTime => 'Temps de lecture actif';
+
+  @override
+  String periodDays(int count) {
+    return '$count j';
+  }
+
+  @override
+  String get chartTitle => 'Pages par jour';
+
+  @override
+  String get byGoalTitle => 'Par objectif';
+
+  @override
+  String get completedKhatmTitle => 'Khatm terminés';
+
+  @override
+  String get noStatsYet =>
+      'Lisez quelques pages dans un objectif et vos performances apparaîtront ici.';
+
+  @override
+  String hoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String minutesOnly(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get encouragement => 'Continuez à votre rythme.';
 }

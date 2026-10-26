@@ -71,6 +71,9 @@ class _FakeRepository implements ReadingGoalRepository {
       sessions.where((s) => s.goalId == goalId).toList();
 
   @override
+  Future<List<ReadingSession>> getAllSessions() async => sessions;
+
+  @override
   Future<String?> getActiveGoalId() async => activeGoalId;
 
   @override

@@ -65,6 +65,9 @@ class _FakeRepository implements ReadingGoalRepository {
   Future<List<ReadingSession>> getSessions(String goalId) async => [];
 
   @override
+  Future<List<ReadingSession>> getAllSessions() async => [];
+
+  @override
   Future<String?> getActiveGoalId() async => activeGoalId;
 
   @override

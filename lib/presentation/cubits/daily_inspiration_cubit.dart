@@ -75,10 +75,12 @@ class DailyInspirationCubit extends Cubit<DailyInspirationState> {
           currentState.verseNumber,
           translation: newTranslation,
         );
-        emit(currentState.copyWith(
-          translation: newTranslationText,
-          currentTranslation: newTranslation,
-        ));
+        emit(
+          currentState.copyWith(
+            translation: newTranslationText,
+            currentTranslation: newTranslation,
+          ),
+        );
       } catch (e) {
         emit(DailyInspirationError('Failed to update translation: $e'));
       }

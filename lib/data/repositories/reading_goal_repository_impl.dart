@@ -120,6 +120,10 @@ class ReadingGoalRepositoryImpl implements ReadingGoalRepository {
       _localDataSource.getSessions(goalId);
 
   @override
+  Future<List<ReadingSession>> getAllSessions() =>
+      _localDataSource.getAllSessions();
+
+  @override
   Future<String?> getActiveGoalId() => _preferences.getActiveGoalId();
 
   @override

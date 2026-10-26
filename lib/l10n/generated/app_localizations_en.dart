@@ -1346,4 +1346,192 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get markReadShort => 'Mark as read';
+
+  @override
+  String continuousProgressLabel(int page) {
+    return 'Continuous progress up to page $page';
+  }
+
+  @override
+  String get readingNotStarted => 'No page read yet';
+
+  @override
+  String todayTarget(int count) {
+    return 'Target: $count pages';
+  }
+
+  @override
+  String todayRead(int count) {
+    return 'Read: $count pages';
+  }
+
+  @override
+  String recommendedPace(String pages) {
+    return 'About $pages pages per day until the end';
+  }
+
+  @override
+  String get pagesSectionTitle => 'Pages';
+
+  @override
+  String get legendRead => 'Read';
+
+  @override
+  String get legendUnread => 'Unread';
+
+  @override
+  String get legendSkipped => 'Skipped';
+
+  @override
+  String get missingPages => 'Missing pages';
+
+  @override
+  String get noMissingPages => 'No skipped page.';
+
+  @override
+  String pageRangeLabel(int from, int to) {
+    return 'Pages $from–$to';
+  }
+
+  @override
+  String get historyTitle => 'Reading history';
+
+  @override
+  String get noPagesThatDay => 'No page';
+
+  @override
+  String pagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages',
+      one: '1 page',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get journalTitle => 'Validations';
+
+  @override
+  String get noValidations => 'No validation yet.';
+
+  @override
+  String get validationSourceAuto => 'automatic';
+
+  @override
+  String get validationSourceManual => 'manual';
+
+  @override
+  String get actionPage => 'Page';
+
+  @override
+  String get actionRange => 'Page range';
+
+  @override
+  String get actionReadUntil => 'Read until here';
+
+  @override
+  String get actionJuz => 'Juz';
+
+  @override
+  String get actionHizb => 'Hizb';
+
+  @override
+  String get actionSurah => 'Surah';
+
+  @override
+  String get actionUnmark => 'Validation removed';
+
+  @override
+  String get markSection => 'Mark a Juz, Hizb or Surah';
+
+  @override
+  String get sectionJuz => 'Juz';
+
+  @override
+  String get sectionHizb => 'Hizb';
+
+  @override
+  String get sectionSurah => 'Surah';
+
+  @override
+  String sharedPagePrevious(int page) {
+    return 'Page $page also holds the end of the previous section. Untick it if you did not read it entirely.';
+  }
+
+  @override
+  String sharedPageNext(int page) {
+    return 'Page $page also holds the start of the next section. Untick it if you did not read it entirely.';
+  }
+
+  @override
+  String includePage(int page) {
+    return 'Include page $page';
+  }
+
+  @override
+  String sectionPagesSummary(String range, String count) {
+    return '$range · $count';
+  }
+
+  @override
+  String markSectionConfirm(String name) {
+    return 'Mark $name as read';
+  }
+
+  @override
+  String get statsTitle => 'My performance';
+
+  @override
+  String get statTotalPages => 'Pages read';
+
+  @override
+  String get statKhatmCompleted => 'Khatm completed';
+
+  @override
+  String get statCurrentStreak => 'Current streak';
+
+  @override
+  String get statBestStreak => 'Best streak';
+
+  @override
+  String get statAverage => 'Average per day (30 d)';
+
+  @override
+  String get statBestDay => 'Best day';
+
+  @override
+  String get statReadingTime => 'Active reading time';
+
+  @override
+  String periodDays(int count) {
+    return '$count d';
+  }
+
+  @override
+  String get chartTitle => 'Pages per day';
+
+  @override
+  String get byGoalTitle => 'By goal';
+
+  @override
+  String get completedKhatmTitle => 'Completed Khatm';
+
+  @override
+  String get noStatsYet =>
+      'Read a few pages in a goal and your performance will appear here.';
+
+  @override
+  String hoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String minutesOnly(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get encouragement => 'Keep going at your own pace.';
 }

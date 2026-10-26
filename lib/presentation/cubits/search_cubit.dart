@@ -99,10 +99,9 @@ class SearchCubit extends Cubit<SearchState> {
       int totalOccurrences = 0;
 
       // First, search the full phrase exactly as typed by the user.
-      var searchResults = quran.searchWordsInTranslation(
-        [normalizedQuery],
-        translation: currentTranslation,
-      );
+      var searchResults = quran.searchWordsInTranslation([
+        normalizedQuery,
+      ], translation: currentTranslation);
 
       // If no phrase match, fallback to word-by-word search.
       if ((searchResults['occurences'] as int? ?? 0) == 0) {

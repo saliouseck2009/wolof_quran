@@ -175,8 +175,7 @@ class AyahPlayButton extends StatelessWidget {
         reciterId,
         surahNumber,
       );
-      final modalSurahName =
-          surahName ?? '${localizations.surah} $surahNumber';
+      final modalSurahName = surahName ?? '${localizations.surah} $surahNumber';
       final shouldPlayAfterDownload = await showAudioDownloadToPlayModal(
         context: context,
         reciterId: reciterId,

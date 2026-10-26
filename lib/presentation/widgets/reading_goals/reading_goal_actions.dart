@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/navigation/create_reading_goal_arguments.dart';
 import '../../../core/navigation/mushaf_arguments.dart';
+import '../../../core/navigation/reading_goal_detail_arguments.dart';
 import '../../../core/reading/local_date.dart';
 import '../../../domain/entities/reading_goal.dart';
 import '../../../domain/entities/reading_goal_progress.dart';
@@ -10,12 +11,15 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/reading_goals_cubit.dart';
 import '../../views/create_reading_goal_page.dart';
 import '../../views/mushaf_page.dart';
+import '../../views/reading_goal_detail_page.dart';
 import '../snackbar.dart';
 import 'mark_pages_sheet.dart';
+import 'mark_section_sheet.dart';
 
 enum ReadingGoalMenuAction {
   follow,
   markPages,
+  markSection,
   rename,
   changeEndDate,
   pause,
@@ -75,6 +79,37 @@ class ReadingGoalActions {
       localizations.pagesMarked(validation.pages.length),
       () => cubit.undoValidation(validation.id),
       actionLabel: localizations.undo,
+    );
+  }
+
+  static Future<void> markSection(
+    BuildContext context,
+    ReadingGoalProgress progress, {
+    int? currentPage,
+  }) async {
+    final cubit = context.read<ReadingGoalsCubit>();
+    final validation = await showMarkSectionSheet(
+      context,
+      progress: progress,
+      currentPage: currentPage,
+    );
+    if (validation == null || !context.mounted) {
+      return;
+    }
+    final localizations = AppLocalizations.of(context)!;
+    CustomSnackbar.showSnackbarAction(
+      context,
+      localizations.pagesMarked(validation.pages.length),
+      () => cubit.undoValidation(validation.id),
+      actionLabel: localizations.undo,
+    );
+  }
+
+  static Future<void> openDetail(BuildContext context, String goalId) {
+    return Navigator.pushNamed(
+      context,
+      ReadingGoalDetailPage.routeName,
+      arguments: ReadingGoalDetailArguments(goalId: goalId),
     );
   }
 
@@ -201,6 +236,8 @@ class ReadingGoalActions {
         await cubit.setActiveGoal(goal.id);
       case ReadingGoalMenuAction.markPages:
         await markPages(context, progress);
+      case ReadingGoalMenuAction.markSection:
+        await markSection(context, progress);
       case ReadingGoalMenuAction.rename:
         await rename(context, goal);
       case ReadingGoalMenuAction.changeEndDate:
@@ -272,6 +309,11 @@ class ReadingGoalActions {
             ReadingGoalMenuAction.markPages,
             Icons.playlist_add_check_rounded,
             localizations.markPagesRead,
+          ),
+          item(
+            ReadingGoalMenuAction.markSection,
+            Icons.menu_book_rounded,
+            localizations.markSection,
           ),
           item(
             ReadingGoalMenuAction.rename,

@@ -107,7 +107,8 @@ class AudioDownloadAlreadyInProgress extends AudioManagementState {
     required this.ayahAudiosMap,
   });
 
-  String _getKey(String reciterId, int surahNumber) => '${reciterId}_$surahNumber';
+  String _getKey(String reciterId, int surahNumber) =>
+      '${reciterId}_$surahNumber';
 
   SurahAudioStatus? getSurahStatus(String reciterId, int surahNumber) =>
       surahStatusMap[_getKey(reciterId, surahNumber)];
@@ -116,7 +117,12 @@ class AudioDownloadAlreadyInProgress extends AudioManagementState {
       ayahAudiosMap[_getKey(reciterId, surahNumber)] ?? [];
 
   @override
-  List<Object> get props => [reciterId, surahNumber, surahStatusMap, ayahAudiosMap];
+  List<Object> get props => [
+    reciterId,
+    surahNumber,
+    surahStatusMap,
+    ayahAudiosMap,
+  ];
 }
 
 // Events
@@ -533,9 +539,7 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
         }
 
         final filePaths = ayahAudios.map((audio) => audio.localPath).toList();
-        var ayahDurations = ayahAudios
-            .map((audio) => audio.duration)
-            .toList();
+        var ayahDurations = ayahAudios.map((audio) => audio.duration).toList();
         final hasMissingDurations = ayahDurations.any(
           (duration) => duration == null || duration.inMilliseconds <= 0,
         );
@@ -548,9 +552,7 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
               reciterId,
               surahNumber,
             );
-            ayahDurations = warmedAyahs
-                .map((audio) => audio.duration)
-                .toList();
+            ayahDurations = warmedAyahs.map((audio) => audio.duration).toList();
 
             final currentState2 = state;
             if (currentState2 is AudioManagementLoaded) {
@@ -561,7 +563,9 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
               emit(currentState2.copyWith(ayahAudiosMap: updatedMap));
             }
           } catch (e) {
-            log('Pre-play warmup failed, continuing with partial durations: $e');
+            log(
+              'Pre-play warmup failed, continuing with partial durations: $e',
+            );
           }
         }
 
@@ -618,5 +622,4 @@ class AudioManagementCubit extends Cubit<AudioManagementState> {
     }
     return [];
   }
-
 }

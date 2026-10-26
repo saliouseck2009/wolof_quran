@@ -50,7 +50,11 @@ class _SettingsButton extends StatelessWidget {
     return IconButton(
       onPressed: () => Navigator.pushNamed(context, '/settings'),
       tooltip: localizations.settings,
-      icon: Icon(Icons.settings_outlined, color: colorScheme.onSurfaceVariant, size: 20),
+      icon: Icon(
+        Icons.settings_outlined,
+        color: colorScheme.onSurfaceVariant,
+        size: 20,
+      ),
       style: IconButton.styleFrom(
         backgroundColor: colorScheme.onSurface.withValues(alpha: 0.06),
         minimumSize: const Size(40, 40),

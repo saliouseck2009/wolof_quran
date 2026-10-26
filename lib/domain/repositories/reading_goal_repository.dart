@@ -49,6 +49,9 @@ abstract class ReadingGoalRepository {
   /// Sessions of [goalId], most recent first.
   Future<List<ReadingSession>> getSessions(String goalId);
 
+  /// Every session of every goal.
+  Future<List<ReadingSession>> getAllSessions();
+
   /// Goal followed in the mushaf, `null` for free reading.
   Future<String?> getActiveGoalId();
 

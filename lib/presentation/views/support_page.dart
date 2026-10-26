@@ -218,7 +218,9 @@ class _SupportUnavailableOnIosView extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: isDark ? colorScheme.surfaceContainer : colorScheme.onPrimary,
+            color: isDark
+                ? colorScheme.surfaceContainer
+                : colorScheme.onPrimary,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -227,9 +229,9 @@ class _SupportUnavailableOnIosView extends StatelessWidget {
             children: [
               Text(
                 localizations.supportUnavailableOnIosTitle,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 12),
               Text(

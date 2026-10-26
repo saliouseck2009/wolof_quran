@@ -2343,6 +2343,312 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mark as read'**
   String get markReadShort;
+
+  /// Pages read in a row from the goal start
+  ///
+  /// In en, this message translates to:
+  /// **'Continuous progress up to page {page}'**
+  String continuousProgressLabel(int page);
+
+  /// Detail header when nothing is validated
+  ///
+  /// In en, this message translates to:
+  /// **'No page read yet'**
+  String get readingNotStarted;
+
+  /// Detail today card
+  ///
+  /// In en, this message translates to:
+  /// **'Target: {count} pages'**
+  String todayTarget(int count);
+
+  /// Detail today card
+  ///
+  /// In en, this message translates to:
+  /// **'Read: {count} pages'**
+  String todayRead(int count);
+
+  /// Detail today card
+  ///
+  /// In en, this message translates to:
+  /// **'About {pages} pages per day until the end'**
+  String recommendedPace(String pages);
+
+  /// Title of the pages map
+  ///
+  /// In en, this message translates to:
+  /// **'Pages'**
+  String get pagesSectionTitle;
+
+  /// Pages map legend
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get legendRead;
+
+  /// Pages map legend
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get legendUnread;
+
+  /// Pages map legend: unread page before a read one
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get legendSkipped;
+
+  /// Detail section listing skipped pages
+  ///
+  /// In en, this message translates to:
+  /// **'Missing pages'**
+  String get missingPages;
+
+  /// Detail section when there is no gap
+  ///
+  /// In en, this message translates to:
+  /// **'No skipped page.'**
+  String get noMissingPages;
+
+  /// A page range
+  ///
+  /// In en, this message translates to:
+  /// **'Pages {from}–{to}'**
+  String pageRangeLabel(int from, int to);
+
+  /// Detail section: pages per day
+  ///
+  /// In en, this message translates to:
+  /// **'Reading history'**
+  String get historyTitle;
+
+  /// History row with nothing read
+  ///
+  /// In en, this message translates to:
+  /// **'No page'**
+  String get noPagesThatDay;
+
+  /// Number of pages
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page} other{{count} pages}}'**
+  String pagesCount(int count);
+
+  /// Detail section: validation journal
+  ///
+  /// In en, this message translates to:
+  /// **'Validations'**
+  String get journalTitle;
+
+  /// Empty journal
+  ///
+  /// In en, this message translates to:
+  /// **'No validation yet.'**
+  String get noValidations;
+
+  /// Journal entry source
+  ///
+  /// In en, this message translates to:
+  /// **'automatic'**
+  String get validationSourceAuto;
+
+  /// Journal entry source
+  ///
+  /// In en, this message translates to:
+  /// **'manual'**
+  String get validationSourceManual;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get actionPage;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Page range'**
+  String get actionRange;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Read until here'**
+  String get actionReadUntil;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Juz'**
+  String get actionJuz;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Hizb'**
+  String get actionHizb;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Surah'**
+  String get actionSurah;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Validation removed'**
+  String get actionUnmark;
+
+  /// Opens the section sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Mark a Juz, Hizb or Surah'**
+  String get markSection;
+
+  /// Section type
+  ///
+  /// In en, this message translates to:
+  /// **'Juz'**
+  String get sectionJuz;
+
+  /// Section type
+  ///
+  /// In en, this message translates to:
+  /// **'Hizb'**
+  String get sectionHizb;
+
+  /// Section type
+  ///
+  /// In en, this message translates to:
+  /// **'Surah'**
+  String get sectionSurah;
+
+  /// Shared boundary page note
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} also holds the end of the previous section. Untick it if you did not read it entirely.'**
+  String sharedPagePrevious(int page);
+
+  /// Shared boundary page note
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} also holds the start of the next section. Untick it if you did not read it entirely.'**
+  String sharedPageNext(int page);
+
+  /// Checkbox for a shared page
+  ///
+  /// In en, this message translates to:
+  /// **'Include page {page}'**
+  String includePage(int page);
+
+  /// Range and page count of a section
+  ///
+  /// In en, this message translates to:
+  /// **'{range} · {count}'**
+  String sectionPagesSummary(String range, String count);
+
+  /// Confirm button of the section sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {name} as read'**
+  String markSectionConfirm(String name);
+
+  /// Stats page title
+  ///
+  /// In en, this message translates to:
+  /// **'My performance'**
+  String get statsTitle;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Pages read'**
+  String get statTotalPages;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Khatm completed'**
+  String get statKhatmCompleted;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Current streak'**
+  String get statCurrentStreak;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Best streak'**
+  String get statBestStreak;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Average per day (30 d)'**
+  String get statAverage;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Best day'**
+  String get statBestDay;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Active reading time'**
+  String get statReadingTime;
+
+  /// Chart period chip
+  ///
+  /// In en, this message translates to:
+  /// **'{count} d'**
+  String periodDays(int count);
+
+  /// Chart title
+  ///
+  /// In en, this message translates to:
+  /// **'Pages per day'**
+  String get chartTitle;
+
+  /// Stats section
+  ///
+  /// In en, this message translates to:
+  /// **'By goal'**
+  String get byGoalTitle;
+
+  /// Stats section
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Khatm'**
+  String get completedKhatmTitle;
+
+  /// Stats empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Read a few pages in a goal and your performance will appear here.'**
+  String get noStatsYet;
+
+  /// Duration
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min'**
+  String hoursMinutes(int hours, int minutes);
+
+  /// Duration
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String minutesOnly(int minutes);
+
+  /// Neutral closing line of the stats page
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going at your own pace.'**
+  String get encouragement;
 }
 
 class _AppLocalizationsDelegate

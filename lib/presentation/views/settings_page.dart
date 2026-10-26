@@ -80,7 +80,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   showSupport: !isIos,
                   onShowSupport: isIos
                       ? null
-                      : () => Navigator.pushNamed(context, SupportPage.routeName),
+                      : () =>
+                            Navigator.pushNamed(context, SupportPage.routeName),
                 );
               },
             ),

@@ -64,63 +64,63 @@ class _ReciterAudioUpdatesPageState extends State<ReciterAudioUpdatesPage> {
         );
       },
       child: Scaffold(
-      appBar: AppBar(
-        title: Text(localizations.newAudioUpdatesTitle),
-        backgroundColor: colorScheme.brightness == Brightness.dark
-            ? colorScheme.surface
-            : colorScheme.primary,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
-        titleTextStyle: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: colorScheme.onPrimary,
+        appBar: AppBar(
+          title: Text(localizations.newAudioUpdatesTitle),
+          backgroundColor: colorScheme.brightness == Brightness.dark
+              ? colorScheme.surface
+              : colorScheme.primary,
+          iconTheme: IconThemeData(color: colorScheme.onPrimary),
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onPrimary,
+          ),
         ),
-      ),
-      body: _displaySurahs.isEmpty
-          ? Center(
-              child: Text(
-                localizations.noNewAudioUpdates,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
+        body: _displaySurahs.isEmpty
+            ? Center(
+                child: Text(
+                  localizations.noNewAudioUpdates,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
+                ),
+              )
+            : Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      localizations.newAudioUpdatesCount(_displaySurahs.length),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      itemCount: _displaySurahs.length,
+                      itemBuilder: (context, index) {
+                        final surahNumber = _displaySurahs[index];
+                        return _NewAudioSurahTile(
+                          reciterId: widget.reciter.id,
+                          surahNumber: surahNumber,
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            )
-          : Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainer,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    localizations.newAudioUpdatesCount(_displaySurahs.length),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.primary,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    itemCount: _displaySurahs.length,
-                    itemBuilder: (context, index) {
-                      final surahNumber = _displaySurahs[index];
-                      return _NewAudioSurahTile(
-                        reciterId: widget.reciter.id,
-                        surahNumber: surahNumber,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
       ),
     );
   }
