@@ -29,6 +29,7 @@ import 'package:wolof_quran/presentation/cubits/surah_mini_player_cubit.dart';
 import 'package:wolof_quran/service_locator.dart';
 
 import 'core/navigation/app_routes.dart';
+import 'core/navigation/route_observers.dart';
 import 'core/config/theme/theme.dart';
 import 'core/config/localization/localization_service.dart';
 import 'presentation/cubits/language_cubit.dart';
@@ -196,6 +197,7 @@ class MyApp extends StatelessWidget {
                         );
                       },
                       onGenerateRoute: AppRoutes.onGenerateRoutes,
+                      navigatorObservers: [modalRouteObserver],
                     );
                   },
                 );

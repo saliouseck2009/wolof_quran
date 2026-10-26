@@ -159,8 +159,9 @@ class DownloadNetworkGuard {
   }
 
   static Future<_DownloadConnectionStatus> _currentStatus() async {
-    final results = await (_statusLoaderOverride?.call() ??
-        Connectivity().checkConnectivity());
+    final results =
+        await (_statusLoaderOverride?.call() ??
+            Connectivity().checkConnectivity());
 
     if (results.contains(ConnectivityResult.wifi) ||
         results.contains(ConnectivityResult.ethernet)) {

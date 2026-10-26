@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../core/reading/local_date.dart';
 import '../../domain/entities/reading_goal.dart';
 import '../../domain/entities/reading_goal_progress.dart';
+import '../../domain/entities/reading_session.dart';
 import '../../domain/entities/reading_validation.dart';
 import '../../domain/repositories/reading_goal_repository.dart';
 
@@ -338,6 +339,40 @@ class ReadingGoalsCubit extends Cubit<ReadingGoalsState> {
     await _updateGoal(
       activeGoalId,
       (goal) => goal.copyWith(lastViewedPage: page),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Sessions
+  // ---------------------------------------------------------------------------
+
+  /// Opens a reading session for [goalId] and returns it.
+  Future<ReadingSession> startSession(String goalId) async {
+    final session = ReadingSession(
+      id: _uuid.v4(),
+      goalId: goalId,
+      startedAt: _now(),
+    );
+    await _repository.saveSession(session);
+    return session;
+  }
+
+  /// Closes [session] with the time actually spent reading and the pages
+  /// seen. Empty sessions are dropped silently.
+  Future<void> endSession(
+    ReadingSession session, {
+    required Duration activeDuration,
+    required Iterable<int> pagesViewed,
+  }) async {
+    await _repository.saveSession(
+      ReadingSession(
+        id: session.id,
+        goalId: session.goalId,
+        startedAt: session.startedAt,
+        endedAt: _now(),
+        activeDuration: activeDuration,
+        pagesViewed: pagesViewed.toList()..sort(),
+      ),
     );
   }
 

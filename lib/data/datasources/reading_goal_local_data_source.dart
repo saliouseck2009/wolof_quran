@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../../core/reading/local_date.dart';
 import '../../domain/entities/reading_goal.dart';
+import '../../domain/entities/reading_session.dart';
 import '../../domain/entities/reading_validation.dart';
 import 'database_helper.dart';
 
@@ -240,6 +241,46 @@ class ReadingGoalLocalDataSource {
         whereArgs: [validation.id],
       );
     });
+  }
+
+  Future<void> saveSession(ReadingSession session) async {
+    final db = await _db;
+    await db.insert(DatabaseHelper.readingSessionsTable, {
+      'id': session.id,
+      'goal_id': session.goalId,
+      'started_at': session.startedAt.millisecondsSinceEpoch,
+      'ended_at': session.endedAt?.millisecondsSinceEpoch,
+      'active_ms': session.activeDuration.inMilliseconds,
+      'pages_viewed_json': jsonEncode(session.pagesViewed),
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<ReadingSession>> getSessions(String goalId) async {
+    final db = await _db;
+    final rows = await db.query(
+      DatabaseHelper.readingSessionsTable,
+      where: 'goal_id = ?',
+      whereArgs: [goalId],
+      orderBy: 'started_at DESC',
+    );
+    return rows.map((row) {
+      final endedAt = row['ended_at'] as int?;
+      final rawPages = jsonDecode(row['pages_viewed_json'] as String? ?? '[]');
+      return ReadingSession(
+        id: row['id'] as String,
+        goalId: row['goal_id'] as String,
+        startedAt: DateTime.fromMillisecondsSinceEpoch(
+          row['started_at'] as int,
+        ),
+        endedAt: endedAt == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(endedAt),
+        activeDuration: Duration(milliseconds: row['active_ms'] as int? ?? 0),
+        pagesViewed: rawPages is List
+            ? rawPages.whereType<int>().toList()
+            : const [],
+      );
+    }).toList();
   }
 
   Future<Set<int>> _existingPages(

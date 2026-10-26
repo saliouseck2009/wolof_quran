@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,8 +16,21 @@ import '../blocs/mushaf/mushaf_bloc.dart';
 import '../blocs/mushaf/mushaf_event.dart';
 import '../blocs/mushaf/mushaf_state.dart';
 import '../cubits/bookmark_cubit.dart';
+import '../../core/navigation/create_reading_goal_arguments.dart';
+import '../../core/navigation/route_observers.dart';
+import '../../domain/entities/reading_session.dart';
+import '../../domain/entities/reading_validation.dart';
+import '../cubits/quran_settings_cubit.dart';
+import '../cubits/reading_goals_cubit.dart';
+import '../utils/mushaf_reading_tracker.dart';
+import '../widgets/mushaf/goal_switcher_sheet.dart';
+import '../widgets/mushaf/mushaf_reading_actions_sheet.dart';
 import '../widgets/mushaf/mushaf_verse_actions_sheet.dart';
+import '../widgets/reading_goals/reading_goal_actions.dart';
+import '../widgets/snackbar.dart';
+import 'create_reading_goal_page.dart';
 import 'mushaf_surah_picker_page.dart';
+import 'reading_goals_page.dart';
 
 class MushafPage extends StatelessWidget {
   static const routeName = '/mushaf';
@@ -30,8 +45,9 @@ class MushafPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => MushafBloc(MushafRepository())
-            ..add(MushafLoaded(initialPage: initialPage)),
+          create: (_) =>
+              MushafBloc(MushafRepository())
+                ..add(MushafLoaded(initialPage: initialPage)),
         ),
         BlocProvider(
           create: (_) =>
@@ -71,42 +87,371 @@ class _MushafPageView extends StatefulWidget {
   State<_MushafPageView> createState() => _MushafPageViewState();
 }
 
-class _MushafPageViewState extends State<_MushafPageView> {
+class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
   late final PageController _controller;
   final MushafRepository _mushafRepository = MushafRepository();
   bool _didCheckLongPressHint = false;
+
+  late final ReadingGoalsCubit _goalsCubit;
+  late final MushafReadingTracker _tracker;
+  late final AppLifecycleListener _lifecycleListener;
+  ModalRoute<dynamic>? _route;
+  ReadingSession? _session;
+  Timer? _pageViewedDebounce;
+
+  /// The tracker only runs while both the app and this route are visible.
+  bool _appVisible = true;
+  bool _routeVisible = true;
 
   @override
   void initState() {
     super.initState();
     _controller = PageController(initialPage: widget.initialPage - 1);
     WakelockPlus.enable();
+
+    _goalsCubit = context.read<ReadingGoalsCubit>();
+    final goalsCubit = _goalsCubit;
+    final settings = context.read<QuranSettingsCubit>().state;
+    _appVisible =
+        WidgetsBinding.instance.lifecycleState != AppLifecycleState.paused &&
+        WidgetsBinding.instance.lifecycleState != AppLifecycleState.hidden;
+    _tracker = MushafReadingTracker(
+      threshold: settings.autoTrackingThreshold,
+      enabled: settings.autoTrackingEnabled,
+      goalId: goalsCubit.state.activeGoalId,
+      isValidated: (page) =>
+          goalsCubit.state.activeProgress?.isValidated(page) ?? false,
+      onPageRead: _validatePageAutomatically,
+      onPageTooShort: _showTooShortHint,
+      visible: _appVisible,
+    );
+    _lifecycleListener = AppLifecycleListener(
+      onStateChange: (state) =>
+          _setAppVisible(state == AppLifecycleState.resumed),
+    );
+    _openSession(goalsCubit.state.activeGoalId);
+    _handlePageViewed(widget.initialPage);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != _route) {
+      if (_route != null) {
+        modalRouteObserver.unsubscribe(this);
+      }
+      _route = route;
+      if (route != null) {
+        modalRouteObserver.subscribe(this, route);
+      }
+    }
     _maybeShowLongPressHint();
   }
 
   @override
   void dispose() {
+    modalRouteObserver.unsubscribe(this);
+    _lifecycleListener.dispose();
+    _pageViewedDebounce?.cancel();
+    _tracker.dispose();
+    _closeSession();
     WakelockPlus.disable();
     _controller.dispose();
     super.dispose();
   }
 
+  // ---------------------------------------------------------------------------
+  // Visibility: another route on top, or the app in the background
+  // ---------------------------------------------------------------------------
+
+  @override
+  void didPushNext() => _setRouteVisible(false);
+
+  @override
+  void didPopNext() => _setRouteVisible(true);
+
+  void _setRouteVisible(bool visible) {
+    _routeVisible = visible;
+    _tracker.onVisibilityChanged(_appVisible && _routeVisible);
+  }
+
+  void _setAppVisible(bool visible) {
+    if (visible == _appVisible) {
+      return;
+    }
+    _appVisible = visible;
+    _tracker.onVisibilityChanged(_appVisible && _routeVisible);
+    // Sessions map to foreground stretches, so a killed app leaves nothing
+    // half written.
+    if (visible) {
+      _openSession(_tracker.goalId);
+    } else {
+      _closeSession();
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Pages, goals and sessions
+  // ---------------------------------------------------------------------------
+
+  void _handlePageViewed(int page) {
+    _tracker.onPageChanged(page);
+    _pageViewedDebounce?.cancel();
+    _pageViewedDebounce = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _goalsCubit.recordPageViewed(page);
+      }
+    });
+  }
+
+  void _handleActiveGoalChanged(String? goalId) {
+    _tracker.onGoalChanged(goalId);
+    _closeSession();
+    _openSession(goalId);
+  }
+
+  void _openSession(String? goalId) {
+    if (goalId == null || _session != null) {
+      return;
+    }
+    _goalsCubit.startSession(goalId).then((session) {
+      if (!mounted || _tracker.goalId != goalId || _session != null) {
+        return;
+      }
+      _session = session;
+    });
+  }
+
+  void _closeSession() {
+    final session = _session;
+    _session = null;
+    if (session == null) {
+      return;
+    }
+    _goalsCubit.endSession(
+      session,
+      activeDuration: _tracker.activeTotal,
+      pagesViewed: _tracker.pagesViewed,
+    );
+    _tracker.activeTotal = Duration.zero;
+    _tracker.pagesViewed.clear();
+  }
+
+  void _validatePageAutomatically(int page) {
+    final goalId = _tracker.goalId;
+    if (goalId == null) {
+      return;
+    }
+    _goalsCubit.validatePage(
+      goalId,
+      page,
+      source: ReadingValidationSource.auto,
+    );
+  }
+
+  void _showTooShortHint(int page) {
+    if (!mounted) {
+      return;
+    }
+    final localizations = AppLocalizations.of(context)!;
+    CustomSnackbar.showSnackbarAction(
+      context,
+      localizations.pageNotCounted(page),
+      () => _markPage(page),
+      actionLabel: localizations.markReadShort,
+    );
+  }
+
+  Future<void> _markPage(int page) async {
+    final cubit = _goalsCubit;
+    final goalId = cubit.state.activeGoalId;
+    if (goalId == null) {
+      return;
+    }
+    final validation = await cubit.validatePage(goalId, page);
+    if (validation != null && mounted) {
+      CustomSnackbar.showSuccessSnackbar(
+        context,
+        AppLocalizations.of(context)!.pageMarkedRead(page),
+      );
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Reading actions
+  // ---------------------------------------------------------------------------
+
+  Future<void> _openReadingActions() async {
+    final currentPage = context.read<MushafBloc>().state.currentPage;
+    final action = await showMushafReadingActionsSheet(
+      context,
+      currentPage: currentPage,
+    );
+    if (action == null || !mounted) {
+      return;
+    }
+    final cubit = _goalsCubit;
+    final progress = cubit.state.activeProgress;
+    final localizations = AppLocalizations.of(context)!;
+
+    switch (action) {
+      case MushafReadingAction.markPage:
+        await _markPage(currentPage);
+      case MushafReadingAction.unmarkPage:
+        if (progress != null) {
+          await cubit.unmarkPage(progress.goal.id, currentPage);
+        }
+      case MushafReadingAction.readUntilHere:
+        if (progress != null) {
+          await _readUntilHere(progress.goal.id, currentPage);
+        }
+      case MushafReadingAction.markSeveral:
+        if (progress != null) {
+          await ReadingGoalActions.markPages(
+            context,
+            progress,
+            initialPage: currentPage,
+          );
+        }
+      case MushafReadingAction.viewProgress:
+        await Navigator.pushNamed(context, ReadingGoalsPage.routeName);
+      case MushafReadingAction.switchGoal:
+      case MushafReadingAction.followGoal:
+        await _openGoalSwitcher();
+      case MushafReadingAction.freeReading:
+        await cubit.setActiveGoal(null);
+        if (mounted) {
+          CustomSnackbar.showSnackbar(context, localizations.freeReading);
+        }
+      case MushafReadingAction.createGoal:
+        await Navigator.pushNamed(
+          context,
+          CreateReadingGoalPage.routeName,
+          arguments: const CreateReadingGoalArguments(),
+        );
+    }
+  }
+
+  Future<void> _readUntilHere(String goalId, int page) async {
+    final cubit = _goalsCubit;
+    final localizations = AppLocalizations.of(context)!;
+    final pages = cubit.pagesUntil(goalId, page);
+    if (pages.isEmpty) {
+      CustomSnackbar.showSnackbar(context, localizations.readUntilHereNothing);
+      return;
+    }
+    final goalName = cubit.state.progressOf(goalId)?.goal.name ?? '';
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          localizations.readUntilHere,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        content: Text(
+          '${localizations.readUntilHereConfirm(pages.first, page, goalName)}\n'
+          '${localizations.pagesToMarkSummary(pages.length)}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(localizations.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(
+              localizations.confirm,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) {
+      return;
+    }
+    final validation = await cubit.readUntil(goalId, page);
+    if (validation == null || !mounted) {
+      return;
+    }
+    CustomSnackbar.showSnackbarAction(
+      context,
+      localizations.pagesMarked(validation.pages.length),
+      () => cubit.undoValidation(validation.id),
+      actionLabel: localizations.undo,
+    );
+  }
+
+  Future<void> _openGoalSwitcher() async {
+    final choice = await showGoalSwitcherSheet(context);
+    if (choice == null || !mounted) {
+      return;
+    }
+    final cubit = _goalsCubit;
+    await cubit.setActiveGoal(choice.goalId);
+    if (!mounted) {
+      return;
+    }
+    final page = choice.page;
+    if (page != null && page != context.read<MushafBloc>().state.currentPage) {
+      context.read<MushafBloc>().add(MushafNavigateToPage(page));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocListener<MushafBloc, MushafState>(
-      listenWhen: (previous, current) => current.navigateToPage != null,
-      listener: (context, state) {
-        final targetPage = state.navigateToPage;
-        if (targetPage == null) {
-          return;
-        }
-        _controller.jumpToPage(targetPage - 1);
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<MushafBloc, MushafState>(
+          listenWhen: (previous, current) => current.navigateToPage != null,
+          listener: (context, state) {
+            final targetPage = state.navigateToPage;
+            if (targetPage == null) {
+              return;
+            }
+            _controller.jumpToPage(targetPage - 1);
+          },
+        ),
+        BlocListener<MushafBloc, MushafState>(
+          listenWhen: (previous, current) =>
+              previous.currentPage != current.currentPage,
+          listener: (context, state) => _handlePageViewed(state.currentPage),
+        ),
+        BlocListener<ReadingGoalsCubit, ReadingGoalsState>(
+          listenWhen: (previous, current) =>
+              previous.activeGoalId != current.activeGoalId,
+          listener: (context, state) =>
+              _handleActiveGoalChanged(state.activeGoalId),
+        ),
+        BlocListener<ReadingGoalsCubit, ReadingGoalsState>(
+          listenWhen: (previous, current) =>
+              current.lastCompletedGoalId != null &&
+              previous.lastCompletedGoalId != current.lastCompletedGoalId,
+          listener: (context, state) {
+            final goal = state.progressOf(state.lastCompletedGoalId)?.goal;
+            _goalsCubit.clearLastCompleted();
+            if (goal != null) {
+              CustomSnackbar.showSuccessSnackbar(
+                context,
+                AppLocalizations.of(context)!.goalCompletedToast(goal.name),
+                duration: 4,
+              );
+            }
+          },
+        ),
+        BlocListener<QuranSettingsCubit, QuranSettingsState>(
+          listenWhen: (previous, current) =>
+              previous.autoTrackingEnabled != current.autoTrackingEnabled ||
+              previous.autoTrackingThresholdSeconds !=
+                  current.autoTrackingThresholdSeconds,
+          listener: (context, state) {
+            _tracker.threshold = state.autoTrackingThreshold;
+            _tracker.setEnabled(state.autoTrackingEnabled);
+          },
+        ),
+      ],
       child: BlocBuilder<MushafBloc, MushafState>(
         buildWhen: (previous, current) =>
             previous.theme != current.theme ||
@@ -123,7 +468,10 @@ class _MushafPageViewState extends State<_MushafPageView> {
 
           return Scaffold(
             backgroundColor: theme.pageBackgroundColor,
-            appBar: _MushafAppBar(onSurahTap: _openSurahList),
+            appBar: _MushafAppBar(
+              onSurahTap: _openSurahList,
+              onReadingTap: _openReadingActions,
+            ),
             body: QuranPageView(
               pageController: _controller,
               highlights: const [],
@@ -157,7 +505,7 @@ class _MushafPageViewState extends State<_MushafPageView> {
                 );
               },
             ),
-            bottomNavigationBar: const _MushafBottomBar(),
+            bottomNavigationBar: _MushafBottomBar(onGoalTap: _openGoalSwitcher),
           );
         },
       ),
@@ -280,8 +628,9 @@ class _MushafPageViewState extends State<_MushafPageView> {
 
 class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onSurahTap;
+  final VoidCallback onReadingTap;
 
-  const _MushafAppBar({required this.onSurahTap});
+  const _MushafAppBar({required this.onSurahTap, required this.onReadingTap});
 
   @override
   Size get preferredSize => const Size.fromHeight(50);
@@ -379,6 +728,14 @@ class _MushafAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           actions: [
+            IconButton(
+              icon: Icon(
+                Icons.playlist_add_check_rounded,
+                color: theme.appBarForeground,
+              ),
+              tooltip: localizations.readingActions,
+              onPressed: onReadingTap,
+            ),
             IconButton(
               icon: Icon(Icons.palette_outlined, color: theme.appBarForeground),
               tooltip: localizations.theme,
@@ -524,7 +881,9 @@ class _ThemePickerSheet extends StatelessWidget {
 }
 
 class _MushafBottomBar extends StatelessWidget {
-  const _MushafBottomBar();
+  final VoidCallback onGoalTap;
+
+  const _MushafBottomBar({required this.onGoalTap});
 
   @override
   Widget build(BuildContext context) {
@@ -534,6 +893,7 @@ class _MushafBottomBar extends StatelessWidget {
       builder: (context, state) {
         final pageInfo = state.pageInfo;
         final theme = state.theme;
+        final pageNumber = pageInfo?.pageNumber ?? 1;
 
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
@@ -542,26 +902,155 @@ class _MushafBottomBar extends StatelessWidget {
             top: false,
             minimum: const EdgeInsets.only(bottom: 2),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (pageInfo?.hizbInfo != null)
-                  Text(
-                    pageInfo!.hizbInfo!.localizedText(localizations),
-                    style: TextStyle(
-                      color: theme.bottomBarSubtext,
-                      fontSize: 12,
-                    ),
-                  )
-                else
-                  const SizedBox.shrink(),
-                Text(
-                  localizations.pageNumberLabel(pageInfo?.pageNumber ?? 1),
-                  style: TextStyle(
-                    color: theme.bottomBarText,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
+                Expanded(
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: pageInfo?.hizbInfo != null
+                        ? Text(
+                            pageInfo!.hizbInfo!.localizedText(localizations),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: theme.bottomBarSubtext,
+                              fontSize: 12,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ),
+                _ReadingGoalIndicator(theme: theme, onTap: onGoalTap),
+                Expanded(
+                  child: Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: _PageLabel(theme: theme, pageNumber: pageNumber),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Page number, with a check when the page is read in the followed goal.
+class _PageLabel extends StatelessWidget {
+  final MushafThemeData theme;
+  final int pageNumber;
+
+  const _PageLabel({required this.theme, required this.pageNumber});
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
+    return BlocBuilder<ReadingGoalsCubit, ReadingGoalsState>(
+      buildWhen: (previous, current) =>
+          previous.activeProgress?.isValidated(pageNumber) !=
+          current.activeProgress?.isValidated(pageNumber),
+      builder: (context, state) {
+        final isValidated =
+            state.activeProgress?.isValidated(pageNumber) ?? false;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isValidated) ...[
+              Icon(
+                Icons.check_circle_rounded,
+                size: 14,
+                color: theme.bottomBarText,
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              localizations.pageNumberLabel(pageNumber),
+              style: TextStyle(
+                color: theme.bottomBarText,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Followed goal and today's quota, or "free reading"; tap to switch.
+class _ReadingGoalIndicator extends StatelessWidget {
+  final MushafThemeData theme;
+  final VoidCallback onTap;
+
+  const _ReadingGoalIndicator({required this.theme, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
+    return BlocBuilder<ReadingGoalsCubit, ReadingGoalsState>(
+      builder: (context, state) {
+        final progress = state.activeProgress;
+        final metrics = progress?.metrics;
+        final String title;
+        final String? subtitle;
+        if (progress == null || metrics == null) {
+          title = localizations.freeReading;
+          subtitle = null;
+        } else {
+          title =
+              '${progress.goal.name} · '
+              '${metrics.validatedCount}/${metrics.totalPages}';
+          subtitle = metrics.isTodayTargetReached
+              ? localizations.todayDoneShort
+              : localizations.todayShort(
+                  metrics.readToday,
+                  metrics.todayTarget,
+                );
+        }
+
+        return InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(10),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: theme.bottomBarText,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      size: 16,
+                      color: theme.bottomBarSubtext,
+                    ),
+                  ],
+                ),
+                if (subtitle != null)
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: theme.bottomBarSubtext,
+                      fontSize: 11,
+                    ),
+                  ),
               ],
             ),
           ),

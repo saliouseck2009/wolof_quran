@@ -1259,4 +1259,105 @@ class AppLocalizationsFr extends AppLocalizations {
   String completedOn(String date) {
     return 'Terminé le $date';
   }
+
+  @override
+  String get freeReading => 'Lecture libre';
+
+  @override
+  String get freeReadingDescription =>
+      'Parcourez le Mushaf sans toucher à aucun objectif.';
+
+  @override
+  String get readingActions => 'Lecture';
+
+  @override
+  String get markThisPageRead => 'Marquer cette page comme lue';
+
+  @override
+  String get unmarkThisPage => 'Retirer la validation de cette page';
+
+  @override
+  String get readUntilHere => 'J\'ai lu jusqu\'ici';
+
+  @override
+  String readUntilHereConfirm(int from, int to, String goal) {
+    return 'Marquer les pages $from à $to comme lues dans « $goal » ?';
+  }
+
+  @override
+  String get readUntilHereNothing =>
+      'Toutes les pages jusqu\'ici sont déjà lues.';
+
+  @override
+  String get markSeveralPages => 'Marquer plusieurs pages';
+
+  @override
+  String get viewProgress => 'Voir ma progression';
+
+  @override
+  String get switchGoal => 'Changer d\'objectif';
+
+  @override
+  String get switchGoalSubtitle =>
+      'Sa dernière position de lecture sera restaurée.';
+
+  @override
+  String get switchToFreeReading => 'Passer en lecture libre';
+
+  @override
+  String get followAGoal => 'Suivre un objectif';
+
+  @override
+  String pageNotCounted(int page) {
+    return 'Page $page non comptabilisée — lecture trop courte';
+  }
+
+  @override
+  String pageMarkedRead(int page) {
+    return 'Page $page marquée comme lue';
+  }
+
+  @override
+  String goalCompletedToast(String name) {
+    return 'Alhamdulillah ! « $name » est terminé.';
+  }
+
+  @override
+  String get readingTrackingSettings => 'Suivi de lecture';
+
+  @override
+  String get readingTrackingSubtitle =>
+      'Validation automatique des pages dans le Mushaf';
+
+  @override
+  String get autoTracking => 'Suivi automatique de lecture';
+
+  @override
+  String get autoTrackingDescription =>
+      'Une page est comptée comme lue dans l\'objectif suivi après un temps minimum d\'affichage. Vous pouvez toujours marquer les pages à la main.';
+
+  @override
+  String get autoTrackingThreshold => 'Temps minimum par page';
+
+  @override
+  String secondsShort(int count) {
+    return '$count s';
+  }
+
+  @override
+  String get enabled => 'Activé';
+
+  @override
+  String get disabled => 'Désactivé';
+
+  @override
+  String todayShort(int read, int target) {
+    return 'Aujourd\'hui $read/$target';
+  }
+
+  @override
+  String get todayDoneShort => 'Objectif du jour atteint ✓';
+
+  @override
+  String get markReadShort => 'Marquer comme lue';
 }

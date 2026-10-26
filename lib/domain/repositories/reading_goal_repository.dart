@@ -1,4 +1,5 @@
 import '../entities/reading_goal.dart';
+import '../entities/reading_session.dart';
 import '../entities/reading_validation.dart';
 
 abstract class ReadingGoalRepository {
@@ -41,6 +42,12 @@ abstract class ReadingGoalRepository {
 
   /// Reverts the journal entry [validationId] and removes it.
   Future<void> undoValidation(String validationId);
+
+  /// Inserts or replaces a reading session.
+  Future<void> saveSession(ReadingSession session);
+
+  /// Sessions of [goalId], most recent first.
+  Future<List<ReadingSession>> getSessions(String goalId);
 
   /// Goal followed in the mushaf, `null` for free reading.
   Future<String?> getActiveGoalId();
