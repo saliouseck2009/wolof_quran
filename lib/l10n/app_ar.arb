@@ -316,7 +316,7 @@
   "resumeGoal": "استئناف",
   "abandonGoal": "ترك الهدف",
   "deleteGoal": "حذف",
-  "duplicateGoal": "هدف جديد من هذا الهدف",
+  "duplicateGoal": "تكرار الهدف",
   "reactivateGoal": "إعادة التفعيل",
   "extendGoal": "تمديد",
   "deleteGoalConfirmTitle": "حذف هذا الهدف؟",
@@ -419,7 +419,7 @@
   "actionHizb": "حزب",
   "actionSurah": "سورة",
   "actionUnmark": "أُلغي التحديد",
-  "markSection": "تحديد جزء أو حزب أو سورة",
+  "markSection": "تحديد جزء / حزب / سورة",
   "sectionJuz": "جزء",
   "sectionHizb": "حزب",
   "sectionSurah": "سورة",
@@ -461,5 +461,9 @@
   "viewHistory": "عرض السجل",
   "readingGoalsHintTitle": "تابع قراءتك",
   "readingGoalsHintBody": "أنشئ هدفًا لتعرف كل يوم عدد الصفحات التي تقرؤها، وتحقق من تقدمك مباشرة في المصحف.",
-  "later": "لاحقًا"
+  "later": "لاحقًا",
+  "markPagesShort": "تحديد صفحات",
+  "markSectionShort": "تحديد قسم",
+  "statBestDayOn": "أفضل يوم · {date}",
+  "readUntilHereConfirmSingle": "تحديد الصفحة {page} كمقروءة في «{goal}»؟"
 }

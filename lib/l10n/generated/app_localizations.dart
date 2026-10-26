@@ -1885,7 +1885,7 @@ abstract class AppLocalizations {
   /// Goal menu action creating a goal with the same settings
   ///
   /// In en, this message translates to:
-  /// **'New goal from this one'**
+  /// **'Duplicate goal'**
   String get duplicateGoal;
 
   /// Goal menu action for a finished goal
@@ -2503,7 +2503,7 @@ abstract class AppLocalizations {
   /// Opens the section sheet
   ///
   /// In en, this message translates to:
-  /// **'Mark a Juz, Hizb or Surah'**
+  /// **'Mark Juz / Hizb / Surah'**
   String get markSection;
 
   /// Section type
@@ -2757,6 +2757,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Later'**
   String get later;
+
+  /// Short button label opening the mark pages sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Mark pages'**
+  String get markPagesShort;
+
+  /// Short button label opening the section sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Mark a section'**
+  String get markSectionShort;
+
+  /// Stats tile label with the date
+  ///
+  /// In en, this message translates to:
+  /// **'Best day · {date}'**
+  String statBestDayOn(String date);
+
+  /// Read-until-here confirmation for one page
+  ///
+  /// In en, this message translates to:
+  /// **'Mark page {page} as read in “{goal}”?'**
+  String readUntilHereConfirmSingle(int page, String goal);
 }
 
 class _AppLocalizationsDelegate

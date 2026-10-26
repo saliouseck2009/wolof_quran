@@ -1367,7 +1367,7 @@
   "@deleteGoal": {
     "description": "Goal menu action"
   },
-  "duplicateGoal": "New goal from this one",
+  "duplicateGoal": "Duplicate goal",
   "@duplicateGoal": {
     "description": "Goal menu action creating a goal with the same settings"
   },
@@ -1817,7 +1817,7 @@
   "@actionSurah": {"description": "Journal action"},
   "actionUnmark": "Validation removed",
   "@actionUnmark": {"description": "Journal action"},
-  "markSection": "Mark a Juz, Hizb or Surah",
+  "markSection": "Mark Juz / Hizb / Surah",
   "@markSection": {"description": "Opens the section sheet"},
   "sectionJuz": "Juz",
   "@sectionJuz": {"description": "Section type"},
@@ -1902,5 +1902,13 @@
   "readingGoalsHintBody": "Create a goal to know each day how many pages to read, and validate your progress right here in the Mushaf.",
   "@readingGoalsHintBody": {"description": "One-time hint body"},
   "later": "Later",
-  "@later": {"description": "Dismisses the hint"}
+  "@later": {"description": "Dismisses the hint"},
+  "markPagesShort": "Mark pages",
+  "@markPagesShort": {"description": "Short button label opening the mark pages sheet"},
+  "markSectionShort": "Mark a section",
+  "@markSectionShort": {"description": "Short button label opening the section sheet"},
+  "statBestDayOn": "Best day · {date}",
+  "@statBestDayOn": {"description": "Stats tile label with the date", "placeholders": {"date": {"type": "String"}}},
+  "readUntilHereConfirmSingle": "Mark page {page} as read in “{goal}”?",
+  "@readUntilHereConfirmSingle": {"description": "Read-until-here confirmation for one page", "placeholders": {"page": {"type": "int"}, "goal": {"type": "String"}}}
 }

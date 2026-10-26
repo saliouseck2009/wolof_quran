@@ -29,7 +29,6 @@ class _ReadingTrackingSettingsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
       builder: (context, state) {
@@ -116,13 +115,6 @@ class _ReadingTrackingSettingsSheet extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(localizations.remindersGlobalDescription),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                localizations.readingTrackingSubtitle,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                ),
               ),
             ],
           ),

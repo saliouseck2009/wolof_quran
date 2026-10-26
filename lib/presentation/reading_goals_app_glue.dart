@@ -30,15 +30,19 @@ void _syncReminders(BuildContext context) {
   final goalsState = context.read<ReadingGoalsCubit>().state;
   final settings = context.read<QuranSettingsCubit>().state;
   final l10n = lookupAppLocalizations(context.read<LanguageCubit>().state);
-  locator<ReadingReminderService>().sync(
-    goals: goalsState.goals,
-    remindersEnabled: settings.remindersEnabled,
-    copy: ReminderCopy(
-      title: l10n.reminderTitle,
-      singleGoalBody: (goal, pages) => l10n.reminderBodySingle(pages, goal),
-      multiGoalBody: l10n.reminderBodyMulti,
-    ),
-  );
+  // Reminders are best effort: a platform without notification support
+  // must never break the goals themselves.
+  locator<ReadingReminderService>()
+      .sync(
+        goals: goalsState.goals,
+        remindersEnabled: settings.remindersEnabled,
+        copy: ReminderCopy(
+          title: l10n.reminderTitle,
+          singleGoalBody: (goal, pages) => l10n.reminderBodySingle(pages, goal),
+          multiGoalBody: l10n.reminderBodyMulti,
+        ),
+      )
+      .catchError((Object _) {});
 }
 
 /// Recomputes today's quotas when the app comes back to the foreground, so

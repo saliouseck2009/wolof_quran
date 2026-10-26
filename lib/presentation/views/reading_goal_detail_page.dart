@@ -491,7 +491,7 @@ class _ActionsRow extends StatelessWidget {
                       ReadingGoalActions.markPages(context, progress),
                   icon: const Icon(Icons.playlist_add_check_rounded, size: 18),
                   label: Text(
-                    localizations.markPagesRead,
+                    localizations.markPagesShort,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -505,7 +505,7 @@ class _ActionsRow extends StatelessWidget {
                       ReadingGoalActions.markSection(context, progress),
                   icon: const Icon(Icons.menu_book_rounded, size: 18),
                   label: Text(
-                    '${localizations.sectionJuz} · ${localizations.sectionHizb} · ${localizations.sectionSurah}',
+                    localizations.markSectionShort,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -581,8 +581,11 @@ class _MissingPages extends StatelessWidget {
     final skipped = order.skippedPages(progress.validatedPages);
     final ranges = <(int, int)>[];
     for (final page in skipped) {
+      // Consecutive in reading order, and not across the 604 → 1 wrap, so
+      // a range always reads left to right.
       if (ranges.isNotEmpty &&
-          order.indexOf(page) == order.indexOf(ranges.last.$2) + 1) {
+          order.indexOf(page) == order.indexOf(ranges.last.$2) + 1 &&
+          page == ranges.last.$2 + 1) {
         ranges[ranges.length - 1] = (ranges.last.$1, page);
       } else {
         ranges.add((page, page));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran/quran.dart' as quran;
 import 'package:flutter/services.dart';
 
 import '../../../core/mushaf/quran_page_data.dart';
@@ -71,7 +72,7 @@ class _PagePickerFieldState extends State<PagePickerField> {
     if (_isValid) {
       final info = getPageInfo(value!);
       helper =
-          '${localizations.juzLabel(info.juzNumber)} · ${info.surahNameEnglish}';
+          '${localizations.juzLabel(info.juzNumber)} · ${quran.getSurahName(info.primarySurahNumber)}';
     } else if (_controller.text.isEmpty) {
       helper = null;
     } else {

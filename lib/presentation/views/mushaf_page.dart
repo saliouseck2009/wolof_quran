@@ -365,8 +365,10 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         content: Text(
-          '${localizations.readUntilHereConfirm(pages.first, page, goalName)}\n'
-          '${localizations.pagesToMarkSummary(pages.length)}',
+          pages.length == 1
+              ? localizations.readUntilHereConfirmSingle(page, goalName)
+              : '${localizations.readUntilHereConfirm(pages.first, page, goalName)}\n'
+                    '${localizations.pagesToMarkSummary(pages.length)}',
         ),
         actions: [
           TextButton(
@@ -989,6 +991,7 @@ class _MushafBottomBar extends StatelessWidget {
                 Expanded(
                   child: Align(
                     alignment: AlignmentDirectional.centerStart,
+                    heightFactor: 1,
                     child: pageInfo?.hizbInfo != null
                         ? Text(
                             pageInfo!.hizbInfo!.localizedText(localizations),
@@ -1006,6 +1009,7 @@ class _MushafBottomBar extends StatelessWidget {
                 Expanded(
                   child: Align(
                     alignment: AlignmentDirectional.centerEnd,
+                    heightFactor: 1,
                     child: _PageLabel(theme: theme, pageNumber: pageNumber),
                   ),
                 ),

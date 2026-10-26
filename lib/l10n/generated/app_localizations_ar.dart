@@ -1058,7 +1058,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deleteGoal => 'حذف';
 
   @override
-  String get duplicateGoal => 'هدف جديد من هذا الهدف';
+  String get duplicateGoal => 'تكرار الهدف';
 
   @override
   String get reactivateGoal => 'إعادة التفعيل';
@@ -1457,7 +1457,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get actionUnmark => 'أُلغي التحديد';
 
   @override
-  String get markSection => 'تحديد جزء أو حزب أو سورة';
+  String get markSection => 'تحديد جزء / حزب / سورة';
 
   @override
   String get sectionJuz => 'جزء';
@@ -1618,4 +1618,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get later => 'لاحقًا';
+
+  @override
+  String get markPagesShort => 'تحديد صفحات';
+
+  @override
+  String get markSectionShort => 'تحديد قسم';
+
+  @override
+  String statBestDayOn(String date) {
+    return 'أفضل يوم · $date';
+  }
+
+  @override
+  String readUntilHereConfirmSingle(int page, String goal) {
+    return 'تحديد الصفحة $page كمقروءة في «$goal»؟';
+  }
 }
