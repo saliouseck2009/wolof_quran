@@ -10,6 +10,7 @@ enum MushafReadingAction {
   unmarkPage,
   readUntilHere,
   markSeveral,
+  markSection,
   viewProgress,
   switchGoal,
   freeReading,
@@ -132,6 +133,11 @@ class _ReadingActionsSheet extends StatelessWidget {
                   icon: Icons.playlist_add_check_rounded,
                   label: localizations.markSeveralPages,
                   onTap: () => pick(MushafReadingAction.markSeveral),
+                ),
+                _ActionTile(
+                  icon: Icons.menu_book_rounded,
+                  label: localizations.markSection,
+                  onTap: () => pick(MushafReadingAction.markSection),
                 ),
                 _ActionTile(
                   icon: Icons.insights_rounded,

@@ -5,10 +5,7 @@ import '../../../l10n/generated/app_localizations.dart';
 class SurahListNoResults extends StatelessWidget {
   final bool asSliver;
 
-  const SurahListNoResults({
-    super.key,
-    this.asSliver = true,
-  });
+  const SurahListNoResults({super.key, this.asSliver = true});
 
   @override
   Widget build(BuildContext context) {

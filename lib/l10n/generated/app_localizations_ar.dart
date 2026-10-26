@@ -1357,4 +1357,193 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get markReadShort => 'تحديد كمقروءة';
+
+  @override
+  String continuousProgressLabel(int page) {
+    return 'تقدم متواصل حتى الصفحة $page';
+  }
+
+  @override
+  String get readingNotStarted => 'لم تُقرأ أي صفحة بعد';
+
+  @override
+  String todayTarget(int count) {
+    return 'الهدف: $count صفحة';
+  }
+
+  @override
+  String todayRead(int count) {
+    return 'المقروء: $count صفحة';
+  }
+
+  @override
+  String recommendedPace(String pages) {
+    return 'حوالي $pages صفحة في اليوم حتى النهاية';
+  }
+
+  @override
+  String get pagesSectionTitle => 'الصفحات';
+
+  @override
+  String get legendRead => 'مقروءة';
+
+  @override
+  String get legendUnread => 'غير مقروءة';
+
+  @override
+  String get legendSkipped => 'متخطاة';
+
+  @override
+  String get missingPages => 'الصفحات الناقصة';
+
+  @override
+  String get noMissingPages => 'لا توجد صفحة متخطاة.';
+
+  @override
+  String pageRangeLabel(int from, int to) {
+    return 'الصفحات $from–$to';
+  }
+
+  @override
+  String get historyTitle => 'سجل القراءة';
+
+  @override
+  String get noPagesThatDay => 'لا صفحات';
+
+  @override
+  String pagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفحة',
+      few: '$count صفحات',
+      two: 'صفحتان',
+      one: 'صفحة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get journalTitle => 'عمليات التحقق';
+
+  @override
+  String get noValidations => 'لا يوجد تحقق بعد.';
+
+  @override
+  String get validationSourceAuto => 'تلقائي';
+
+  @override
+  String get validationSourceManual => 'يدوي';
+
+  @override
+  String get actionPage => 'صفحة';
+
+  @override
+  String get actionRange => 'نطاق صفحات';
+
+  @override
+  String get actionReadUntil => 'قرأت حتى هنا';
+
+  @override
+  String get actionJuz => 'جزء';
+
+  @override
+  String get actionHizb => 'حزب';
+
+  @override
+  String get actionSurah => 'سورة';
+
+  @override
+  String get actionUnmark => 'أُلغي التحديد';
+
+  @override
+  String get markSection => 'تحديد جزء أو حزب أو سورة';
+
+  @override
+  String get sectionJuz => 'جزء';
+
+  @override
+  String get sectionHizb => 'حزب';
+
+  @override
+  String get sectionSurah => 'سورة';
+
+  @override
+  String sharedPagePrevious(int page) {
+    return 'الصفحة $page تحتوي أيضًا على نهاية القسم السابق. ألغِ تحديدها إن لم تقرأها كاملة.';
+  }
+
+  @override
+  String sharedPageNext(int page) {
+    return 'الصفحة $page تحتوي أيضًا على بداية القسم التالي. ألغِ تحديدها إن لم تقرأها كاملة.';
+  }
+
+  @override
+  String includePage(int page) {
+    return 'تضمين الصفحة $page';
+  }
+
+  @override
+  String sectionPagesSummary(String range, String count) {
+    return '$range · $count';
+  }
+
+  @override
+  String markSectionConfirm(String name) {
+    return 'تحديد $name كمقروء';
+  }
+
+  @override
+  String get statsTitle => 'أدائي';
+
+  @override
+  String get statTotalPages => 'الصفحات المقروءة';
+
+  @override
+  String get statKhatmCompleted => 'الختمات المكتملة';
+
+  @override
+  String get statCurrentStreak => 'السلسلة الحالية';
+
+  @override
+  String get statBestStreak => 'أفضل سلسلة';
+
+  @override
+  String get statAverage => 'المعدل اليومي (30 يومًا)';
+
+  @override
+  String get statBestDay => 'أفضل يوم';
+
+  @override
+  String get statReadingTime => 'وقت القراءة الفعلي';
+
+  @override
+  String periodDays(int count) {
+    return '$count ي';
+  }
+
+  @override
+  String get chartTitle => 'الصفحات في اليوم';
+
+  @override
+  String get byGoalTitle => 'حسب الهدف';
+
+  @override
+  String get completedKhatmTitle => 'الختمات المكتملة';
+
+  @override
+  String get noStatsYet => 'اقرأ بعض الصفحات في هدف وسيظهر أداؤك هنا.';
+
+  @override
+  String hoursMinutes(int hours, int minutes) {
+    return '$hours س $minutes د';
+  }
+
+  @override
+  String minutesOnly(int minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String get encouragement => 'واصل على وتيرتك.';
 }

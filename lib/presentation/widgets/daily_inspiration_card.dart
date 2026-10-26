@@ -26,16 +26,16 @@ class DailyInspirationCard extends StatelessWidget {
       },
       child: BlocBuilder<DailyInspirationCubit, DailyInspirationState>(
         builder: (context, state) {
-        if (state is DailyInspirationLoading) {
-          return _buildLoadingCard(context);
-        } else if (state is DailyInspirationLoaded) {
-          return _buildInspirationCard(context, localizations, state);
-        } else if (state is DailyInspirationError) {
-          return _buildErrorCard(context, localizations, state.message);
-        }
-        return _buildInitialCard(context, localizations);
-      },
-    ),
+          if (state is DailyInspirationLoading) {
+            return _buildLoadingCard(context);
+          } else if (state is DailyInspirationLoaded) {
+            return _buildInspirationCard(context, localizations, state);
+          } else if (state is DailyInspirationError) {
+            return _buildErrorCard(context, localizations, state.message);
+          }
+          return _buildInitialCard(context, localizations);
+        },
+      ),
     );
   }
 

@@ -80,7 +80,9 @@ class HomePage extends StatelessWidget {
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
-                  sliver: SliverToBoxAdapter(child: const DailyInspirationCard()),
+                  sliver: SliverToBoxAdapter(
+                    child: const DailyInspirationCard(),
+                  ),
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),

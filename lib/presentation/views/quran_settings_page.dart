@@ -69,7 +69,7 @@ class _QuranSettingsView extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+              children: [
                 QuranSettingsHeader(localizations: localizations),
                 const SizedBox(height: 24),
                 QuranSettingsMenu(
@@ -92,10 +92,8 @@ class _QuranSettingsView extends StatelessWidget {
                     title: localizations.supportProject,
                     subtitle: localizations.supportSubtitle,
                     value: localizations.supportValue,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      SupportPage.routeName,
-                    ),
+                    onTap: () =>
+                        Navigator.pushNamed(context, SupportPage.routeName),
                     showArrow: true,
                   ),
                 ],

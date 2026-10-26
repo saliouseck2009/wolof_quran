@@ -263,24 +263,33 @@ class ReadingGoalLocalDataSource {
       whereArgs: [goalId],
       orderBy: 'started_at DESC',
     );
-    return rows.map((row) {
-      final endedAt = row['ended_at'] as int?;
-      final rawPages = jsonDecode(row['pages_viewed_json'] as String? ?? '[]');
-      return ReadingSession(
-        id: row['id'] as String,
-        goalId: row['goal_id'] as String,
-        startedAt: DateTime.fromMillisecondsSinceEpoch(
-          row['started_at'] as int,
-        ),
-        endedAt: endedAt == null
-            ? null
-            : DateTime.fromMillisecondsSinceEpoch(endedAt),
-        activeDuration: Duration(milliseconds: row['active_ms'] as int? ?? 0),
-        pagesViewed: rawPages is List
-            ? rawPages.whereType<int>().toList()
-            : const [],
-      );
-    }).toList();
+    return rows.map(_sessionFromMap).toList();
+  }
+
+  Future<List<ReadingSession>> getAllSessions() async {
+    final db = await _db;
+    final rows = await db.query(
+      DatabaseHelper.readingSessionsTable,
+      orderBy: 'started_at DESC',
+    );
+    return rows.map(_sessionFromMap).toList();
+  }
+
+  static ReadingSession _sessionFromMap(Map<String, Object?> row) {
+    final endedAt = row['ended_at'] as int?;
+    final rawPages = jsonDecode(row['pages_viewed_json'] as String? ?? '[]');
+    return ReadingSession(
+      id: row['id'] as String,
+      goalId: row['goal_id'] as String,
+      startedAt: DateTime.fromMillisecondsSinceEpoch(row['started_at'] as int),
+      endedAt: endedAt == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(endedAt),
+      activeDuration: Duration(milliseconds: row['active_ms'] as int? ?? 0),
+      pagesViewed: rawPages is List
+          ? rawPages.whereType<int>().toList()
+          : const [],
+    );
   }
 
   Future<Set<int>> _existingPages(

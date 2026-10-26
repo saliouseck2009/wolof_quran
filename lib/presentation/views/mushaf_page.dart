@@ -314,8 +314,20 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
             initialPage: currentPage,
           );
         }
+      case MushafReadingAction.markSection:
+        if (progress != null) {
+          await ReadingGoalActions.markSection(
+            context,
+            progress,
+            currentPage: currentPage,
+          );
+        }
       case MushafReadingAction.viewProgress:
-        await Navigator.pushNamed(context, ReadingGoalsPage.routeName);
+        if (progress != null) {
+          await ReadingGoalActions.openDetail(context, progress.goal.id);
+        } else {
+          await Navigator.pushNamed(context, ReadingGoalsPage.routeName);
+        }
       case MushafReadingAction.switchGoal:
       case MushafReadingAction.followGoal:
         await _openGoalSwitcher();

@@ -16,12 +16,15 @@ import 'package:wolof_quran/presentation/views/privacy_policy_page.dart';
 import 'package:wolof_quran/presentation/views/support_page.dart';
 import 'package:wolof_quran/presentation/views/reading_goals_page.dart';
 import 'package:wolof_quran/presentation/views/create_reading_goal_page.dart';
+import 'package:wolof_quran/presentation/views/reading_goal_detail_page.dart';
+import 'package:wolof_quran/presentation/views/reading_stats_page.dart';
 import 'package:wolof_quran/presentation/widgets/audio/global_mini_player_shell.dart';
 import 'package:wolof_quran/domain/entities/reciter.dart';
 import 'package:wolof_quran/core/navigation/surah_detail_arguments.dart';
 import 'package:wolof_quran/core/navigation/reciter_audio_updates_arguments.dart';
 import 'package:wolof_quran/core/navigation/mushaf_arguments.dart';
 import 'package:wolof_quran/core/navigation/create_reading_goal_arguments.dart';
+import 'package:wolof_quran/core/navigation/reading_goal_detail_arguments.dart';
 
 class AppRoutes {
   static Route onGenerateRoutes(RouteSettings settings) {
@@ -74,6 +77,19 @@ class AppRoutes {
       case ReadingGoalsPage.routeName:
         return _materialRoute(
           view: const ReadingGoalsPage(),
+          settings: settings,
+        );
+      case ReadingGoalDetailPage.routeName:
+        if (args is! ReadingGoalDetailArguments) {
+          return _errorRoute(settings);
+        }
+        return _materialRoute(
+          view: ReadingGoalDetailPage(goalId: args.goalId),
+          settings: settings,
+        );
+      case ReadingStatsPage.routeName:
+        return _materialRoute(
+          view: const ReadingStatsPage(),
           settings: settings,
         );
       case CreateReadingGoalPage.routeName:

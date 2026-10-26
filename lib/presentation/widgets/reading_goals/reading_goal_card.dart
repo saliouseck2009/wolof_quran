@@ -26,7 +26,6 @@ class ReadingGoalCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
     final goal = progress.goal;
-    final metrics = progress.metrics;
     final phase = progress.phase;
     final phaseColor = ReadingGoalFormatting.phaseColor(colorScheme, phase);
     final mutedStyle = theme.textTheme.bodySmall?.copyWith(
@@ -35,7 +34,6 @@ class ReadingGoalCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.fromLTRB(18, 14, 8, 16),
       decoration: BoxDecoration(
         color: isDark ? colorScheme.surfaceContainerLow : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(20),
@@ -43,110 +41,139 @@ class ReadingGoalCard extends StatelessWidget {
             ? Border.all(color: colorScheme.primary.withValues(alpha: 0.5))
             : null,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      goal.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => ReadingGoalActions.openDetail(context, goal.id),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 14, 8, 16),
+          child: _buildBody(
+            context,
+            localizations,
+            theme,
+            colorScheme,
+            phase,
+            phaseColor,
+            mutedStyle,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    AppLocalizations localizations,
+    ThemeData theme,
+    ColorScheme colorScheme,
+    ReadingGoalPhase phase,
+    Color phaseColor,
+    TextStyle? mutedStyle,
+  ) {
+    final goal = progress.goal;
+    final metrics = progress.metrics;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    goal.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
-                    const SizedBox(height: 6),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        _StatusChip(
-                          label: ReadingGoalFormatting.phaseLabel(
-                            localizations,
-                            phase,
-                          ),
-                          color: phaseColor,
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      _StatusChip(
+                        label: ReadingGoalFormatting.phaseLabel(
+                          localizations,
+                          phase,
                         ),
-                        if (isFollowed)
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.auto_stories_rounded,
-                                size: 14,
+                        color: phaseColor,
+                      ),
+                      if (isFollowed)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.auto_stories_rounded,
+                              size: 14,
+                              color: colorScheme.primary,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              localizations.readingGoalFollowed,
+                              style: theme.textTheme.labelSmall?.copyWith(
                                 color: colorScheme.primary,
+                                fontWeight: FontWeight.w600,
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                localizations.readingGoalFollowed,
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            ReadingGoalActions.menuButton(
+              context,
+              progress,
+              isFollowed: isFollowed,
+              iconColor: colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 14),
+              ReadingProgressBar(
+                fraction: metrics.fraction,
+                color: phase == ReadingGoalPhase.completed
+                    ? colorScheme.tertiary
+                    : colorScheme.primary,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      localizations.readingValidatedOf(
+                        metrics.validatedCount,
+                        metrics.totalPages,
+                      ),
+                      style: mutedStyle,
                     ),
-                  ],
-                ),
+                  ),
+                  Text(
+                    localizations.percentValue(metrics.percent),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
-              ReadingGoalActions.menuButton(
-                context,
-                progress,
-                isFollowed: isFollowed,
-                iconColor: colorScheme.onSurfaceVariant,
-              ),
+              const SizedBox(height: 10),
+              ..._phaseDetails(context, localizations, mutedStyle),
+              const SizedBox(height: 14),
+              _primaryAction(context, localizations),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 14),
-                ReadingProgressBar(
-                  fraction: metrics.fraction,
-                  color: phase == ReadingGoalPhase.completed
-                      ? colorScheme.tertiary
-                      : colorScheme.primary,
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        localizations.readingValidatedOf(
-                          metrics.validatedCount,
-                          metrics.totalPages,
-                        ),
-                        style: mutedStyle,
-                      ),
-                    ),
-                    Text(
-                      localizations.percentValue(metrics.percent),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                ..._phaseDetails(context, localizations, mutedStyle),
-                const SizedBox(height: 14),
-                _primaryAction(context, localizations),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
