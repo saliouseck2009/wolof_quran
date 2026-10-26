@@ -1534,4 +1534,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get encouragement => 'Keep going at your own pace.';
+
+  @override
+  String get reminderDaily => 'Daily reminder';
+
+  @override
+  String get reminderTime => 'Reminder time';
+
+  @override
+  String get reminderSheetHint =>
+      'A reminder is sent at this time as long as the day\'s quota is not reached.';
+
+  @override
+  String get setReminder => 'Reminder';
+
+  @override
+  String get remindersGlobal => 'Reading reminders';
+
+  @override
+  String get remindersGlobalDescription =>
+      'Allow reminders for the goals that ask for one. Nothing is sent once the day\'s quota is reached.';
+
+  @override
+  String get reminderPermissionDenied =>
+      'Notifications are turned off for the app. Enable them in the phone settings to receive reminders.';
+
+  @override
+  String get reminderTitle => 'Your reading for today';
+
+  @override
+  String reminderBodySingle(int count, String goal) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages left for “$goal”.',
+      one: '1 page left for “$goal”.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reminderBodyMulti(int count) {
+    return '$count goals are waiting for your reading.';
+  }
+
+  @override
+  String get goalCompletedTitle => 'Alhamdulillah!';
+
+  @override
+  String get goalCompletedBody =>
+      'You have completed your reading of the Quran.';
+
+  @override
+  String actualDuration(String days) {
+    return 'Actual duration: $days';
+  }
+
+  @override
+  String get startNewKhatm => 'New Khatm';
+
+  @override
+  String get viewHistory => 'View history';
+
+  @override
+  String get readingGoalsHintTitle => 'Track your reading';
+
+  @override
+  String get readingGoalsHintBody =>
+      'Create a goal to know each day how many pages to read, and validate your progress right here in the Mushaf.';
+
+  @override
+  String get later => 'Later';
 }

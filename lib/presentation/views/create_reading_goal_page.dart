@@ -13,6 +13,7 @@ import '../cubits/reading_goals_cubit.dart';
 import '../utils/reading_goal_formatting.dart';
 import '../widgets/reading_goals/page_picker_field.dart';
 import '../widgets/reading_goals/reading_goal_form_widgets.dart';
+import '../widgets/reading_goals/reminder_settings_sheet.dart';
 
 enum _DurationMode { preset, custom, endDate }
 
@@ -48,6 +49,7 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
   int _currentMushafPage = 1;
   late LocalDate _startDate;
   var _isSaving = false;
+  var _reminder = const ReminderSettings();
 
   ReadingGoal? get _editing => widget.arguments.goalToEdit;
 
@@ -60,6 +62,7 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
     final source = _editing ?? widget.arguments.template;
     _nameController = TextEditingController(text: source?.name ?? '');
     if (source != null) {
+      _reminder = source.reminder;
       _startDate = _isEdit ? source.startDate : today;
       _days = source.durationDays;
       if (!_durationPresets.contains(_days)) {
@@ -183,12 +186,14 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
         startDate: _startDate,
         endDate: _endDate,
       );
+      await cubit.updateReminder(editing.id, _reminder);
     } else {
       await cubit.createGoal(
         name: _resolvedName(localizations),
         startPage: _startPage,
         startDate: _startDate,
         endDate: _endDate,
+        reminder: _reminder,
       );
     }
     if (mounted) {
@@ -498,7 +503,12 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
             ],
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 16),
+        _ReminderCard(
+          reminder: _reminder,
+          onChanged: (reminder) => setState(() => _reminder = reminder),
+        ),
+        const SizedBox(height: 24),
         FilledButton.icon(
           onPressed: _isSaving ? null : _submit,
           style: FilledButton.styleFrom(
@@ -565,6 +575,76 @@ class _DaysFieldState extends State<_DaysField> {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
+      ),
+    );
+  }
+}
+
+/// Optional daily reminder, set while creating or editing a goal.
+class _ReminderCard extends StatelessWidget {
+  final ReminderSettings reminder;
+  final ValueChanged<ReminderSettings> onChanged;
+
+  const _ReminderCard({required this.reminder, required this.onChanged});
+
+  Future<void> _toggle(BuildContext context, bool on) async {
+    if (on && !await enableRemindersGlobally(context)) {
+      return;
+    }
+    onChanged(reminder.copyWith(enabled: on));
+  }
+
+  Future<void> _pickTime(BuildContext context) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: reminder.hour, minute: reminder.minute),
+    );
+    if (picked != null) {
+      onChanged(reminder.copyWith(hour: picked.hour, minute: picked.minute));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final time = TimeOfDay(hour: reminder.hour, minute: reminder.minute);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+      decoration: BoxDecoration(
+        color: isDark ? colorScheme.surfaceContainerLow : colorScheme.onPrimary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        children: [
+          SwitchListTile.adaptive(
+            contentPadding: EdgeInsets.zero,
+            value: reminder.enabled,
+            onChanged: (on) => _toggle(context, on),
+            title: Text(
+              localizations.reminderDaily,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(localizations.reminderSheetHint),
+          ),
+          if (reminder.enabled)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.schedule_rounded),
+              title: Text(localizations.reminderTime),
+              trailing: Text(
+                time.format(context),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.primary,
+                ),
+              ),
+              onTap: () => _pickTime(context),
+            ),
+        ],
       ),
     );
   }

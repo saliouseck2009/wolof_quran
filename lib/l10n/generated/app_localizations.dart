@@ -2649,6 +2649,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep going at your own pace.'**
   String get encouragement;
+
+  /// Per-goal reminder toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder'**
+  String get reminderDaily;
+
+  /// Per-goal reminder time
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time'**
+  String get reminderTime;
+
+  /// Explanation under the per-goal reminder settings
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder is sent at this time as long as the day\'s quota is not reached.'**
+  String get reminderSheetHint;
+
+  /// Goal menu action opening the reminder settings
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get setReminder;
+
+  /// Global reminders toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Reading reminders'**
+  String get remindersGlobal;
+
+  /// Global reminders toggle description
+  ///
+  /// In en, this message translates to:
+  /// **'Allow reminders for the goals that ask for one. Nothing is sent once the day\'s quota is reached.'**
+  String get remindersGlobalDescription;
+
+  /// Shown when the notification permission is refused
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are turned off for the app. Enable them in the phone settings to receive reminders.'**
+  String get reminderPermissionDenied;
+
+  /// Notification title
+  ///
+  /// In en, this message translates to:
+  /// **'Your reading for today'**
+  String get reminderTitle;
+
+  /// Notification body for one goal
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page left for “{goal}”.} other{{count} pages left for “{goal}”.}}'**
+  String reminderBodySingle(int count, String goal);
+
+  /// Notification body when several goals share the time
+  ///
+  /// In en, this message translates to:
+  /// **'{count} goals are waiting for your reading.'**
+  String reminderBodyMulti(int count);
+
+  /// Completion sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Alhamdulillah!'**
+  String get goalCompletedTitle;
+
+  /// Completion sheet body
+  ///
+  /// In en, this message translates to:
+  /// **'You have completed your reading of the Quran.'**
+  String get goalCompletedBody;
+
+  /// Completion sheet row
+  ///
+  /// In en, this message translates to:
+  /// **'Actual duration: {days}'**
+  String actualDuration(String days);
+
+  /// Completion sheet action
+  ///
+  /// In en, this message translates to:
+  /// **'New Khatm'**
+  String get startNewKhatm;
+
+  /// Completion sheet action
+  ///
+  /// In en, this message translates to:
+  /// **'View history'**
+  String get viewHistory;
+
+  /// One-time hint title in the Mushaf
+  ///
+  /// In en, this message translates to:
+  /// **'Track your reading'**
+  String get readingGoalsHintTitle;
+
+  /// One-time hint body
+  ///
+  /// In en, this message translates to:
+  /// **'Create a goal to know each day how many pages to read, and validate your progress right here in the Mushaf.'**
+  String get readingGoalsHintBody;
+
+  /// Dismisses the hint
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get later;
 }
 
 class _AppLocalizationsDelegate

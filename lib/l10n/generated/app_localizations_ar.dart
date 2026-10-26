@@ -1546,4 +1546,76 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get encouragement => 'واصل على وتيرتك.';
+
+  @override
+  String get reminderDaily => 'تذكير يومي';
+
+  @override
+  String get reminderTime => 'وقت التذكير';
+
+  @override
+  String get reminderSheetHint =>
+      'يُرسل تذكير في هذا الوقت ما لم يتحقق هدف اليوم.';
+
+  @override
+  String get setReminder => 'تذكير';
+
+  @override
+  String get remindersGlobal => 'تذكيرات القراءة';
+
+  @override
+  String get remindersGlobalDescription =>
+      'السماح بالتذكيرات للأهداف التي تطلبها. لا يُرسل شيء بعد تحقق هدف اليوم.';
+
+  @override
+  String get reminderPermissionDenied =>
+      'الإشعارات معطّلة للتطبيق. فعّلها في إعدادات الهاتف لتلقي التذكيرات.';
+
+  @override
+  String get reminderTitle => 'قراءتك لليوم';
+
+  @override
+  String reminderBodySingle(int count, String goal) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'بقيت $count صفحة لـ «$goal».',
+      few: 'بقيت $count صفحات لـ «$goal».',
+      two: 'بقيت صفحتان لـ «$goal».',
+      one: 'بقيت صفحة واحدة لـ «$goal».',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reminderBodyMulti(int count) {
+    return '$count أهداف بانتظار قراءتك.';
+  }
+
+  @override
+  String get goalCompletedTitle => 'الحمد لله!';
+
+  @override
+  String get goalCompletedBody => 'لقد أتممت ختمتك للقرآن الكريم.';
+
+  @override
+  String actualDuration(String days) {
+    return 'المدة الفعلية: $days';
+  }
+
+  @override
+  String get startNewKhatm => 'ختمة جديدة';
+
+  @override
+  String get viewHistory => 'عرض السجل';
+
+  @override
+  String get readingGoalsHintTitle => 'تابع قراءتك';
+
+  @override
+  String get readingGoalsHintBody =>
+      'أنشئ هدفًا لتعرف كل يوم عدد الصفحات التي تقرؤها، وتحقق من تقدمك مباشرة في المصحف.';
+
+  @override
+  String get later => 'لاحقًا';
 }

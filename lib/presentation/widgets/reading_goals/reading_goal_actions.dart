@@ -15,6 +15,7 @@ import '../../views/reading_goal_detail_page.dart';
 import '../snackbar.dart';
 import 'mark_pages_sheet.dart';
 import 'mark_section_sheet.dart';
+import 'reminder_settings_sheet.dart';
 
 enum ReadingGoalMenuAction {
   follow,
@@ -22,6 +23,7 @@ enum ReadingGoalMenuAction {
   markSection,
   rename,
   changeEndDate,
+  reminder,
   pause,
   resume,
   reactivate,
@@ -242,6 +244,8 @@ class ReadingGoalActions {
         await rename(context, goal);
       case ReadingGoalMenuAction.changeEndDate:
         await changeEndDate(context, goal);
+      case ReadingGoalMenuAction.reminder:
+        await showReminderSettingsSheet(context, goal: goal);
       case ReadingGoalMenuAction.pause:
         await cubit.pauseGoal(goal.id);
       case ReadingGoalMenuAction.resume:
@@ -324,6 +328,13 @@ class ReadingGoalActions {
             ReadingGoalMenuAction.changeEndDate,
             Icons.event_outlined,
             localizations.changeEndDate,
+          ),
+          item(
+            ReadingGoalMenuAction.reminder,
+            progress.goal.reminder.enabled
+                ? Icons.notifications_active_outlined
+                : Icons.notifications_none_rounded,
+            localizations.setReminder,
           ),
           if (phase == ReadingGoalPhase.paused)
             item(

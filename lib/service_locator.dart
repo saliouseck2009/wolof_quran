@@ -43,6 +43,7 @@ import 'domain/usecases/mark_audio_updates_seen_usecase.dart';
 import 'core/services/audio_player_service.dart';
 import 'core/services/audio_download_queue_service.dart';
 import 'core/services/quran_audio_handler.dart';
+import 'core/services/reading_reminder_service.dart';
 import 'data/datasources/remote_config_service.dart';
 
 final locator = GetIt.instance;
@@ -160,6 +161,12 @@ Future<void> setupDependencies() async {
       queueRepository: locator<DownloadQueueRepository>(),
       audioRepository: locator<AudioRepository>(),
       downloadRepository: locator<DownloadRepository>(),
+    ),
+  );
+
+  locator.registerLazySingleton<ReadingReminderService>(
+    () => ReadingReminderService(
+      scheduler: LocalNotificationsReminderScheduler(),
     ),
   );
 
