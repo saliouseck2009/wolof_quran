@@ -14,6 +14,10 @@ class QuranSettingsState {
   final bool autoTrackingEnabled;
   final int autoTrackingThresholdSeconds;
 
+  /// Whether reading reminders may be scheduled at all (the notification
+  /// permission was granted when this was turned on).
+  final bool remindersEnabled;
+
   const QuranSettingsState({
     this.selectedTranslation = quran.Translation.frHamidullah,
     this.selectedReciter,
@@ -21,6 +25,7 @@ class QuranSettingsState {
     this.autoTrackingEnabled = true,
     this.autoTrackingThresholdSeconds =
         QuranSettingsCubit.defaultAutoTrackingThresholdSeconds,
+    this.remindersEnabled = false,
   });
 
   Duration get autoTrackingThreshold =>
@@ -32,6 +37,7 @@ class QuranSettingsState {
     double? ayahFontSize,
     bool? autoTrackingEnabled,
     int? autoTrackingThresholdSeconds,
+    bool? remindersEnabled,
   }) {
     return QuranSettingsState(
       selectedTranslation: selectedTranslation ?? this.selectedTranslation,
@@ -40,6 +46,7 @@ class QuranSettingsState {
       autoTrackingEnabled: autoTrackingEnabled ?? this.autoTrackingEnabled,
       autoTrackingThresholdSeconds:
           autoTrackingThresholdSeconds ?? this.autoTrackingThresholdSeconds,
+      remindersEnabled: remindersEnabled ?? this.remindersEnabled,
     );
   }
 }
@@ -65,6 +72,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   static const String _autoTrackingEnabledKey = 'reading_auto_tracking_enabled';
   static const String _autoTrackingThresholdKey =
       'reading_auto_tracking_threshold_seconds';
+  static const String _remindersEnabledKey = 'reading_reminders_enabled';
 
   // Font size constraints
   static const double minFontSize = 16.0;
@@ -203,6 +211,7 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
           ayahFontSize: ayahFontSize,
           autoTrackingEnabled: autoTrackingEnabled,
           autoTrackingThresholdSeconds: autoTrackingThresholdSeconds,
+          remindersEnabled: prefs.getBool(_remindersEnabledKey) ?? false,
           // selectedReciter not set here, waiting for loadReciterFromPrefs
         ),
       );
@@ -285,6 +294,16 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_autoTrackingEnabledKey, enabled);
       emit(state.copyWith(autoTrackingEnabled: enabled));
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void updateRemindersEnabled(bool enabled) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_remindersEnabledKey, enabled);
+      emit(state.copyWith(remindersEnabled: enabled));
     } catch (e) {
       // Handle error
     }

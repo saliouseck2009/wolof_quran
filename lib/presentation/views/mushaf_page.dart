@@ -26,6 +26,8 @@ import '../utils/mushaf_reading_tracker.dart';
 import '../widgets/mushaf/goal_switcher_sheet.dart';
 import '../widgets/mushaf/mushaf_reading_actions_sheet.dart';
 import '../widgets/mushaf/mushaf_verse_actions_sheet.dart';
+import '../../data/datasources/reading_preferences_data_source.dart';
+import '../widgets/reading_goals/goal_completed_sheet.dart';
 import '../widgets/reading_goals/reading_goal_actions.dart';
 import '../widgets/snackbar.dart';
 import 'create_reading_goal_page.dart';
@@ -437,22 +439,6 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
           listener: (context, state) =>
               _handleActiveGoalChanged(state.activeGoalId),
         ),
-        BlocListener<ReadingGoalsCubit, ReadingGoalsState>(
-          listenWhen: (previous, current) =>
-              current.lastCompletedGoalId != null &&
-              previous.lastCompletedGoalId != current.lastCompletedGoalId,
-          listener: (context, state) {
-            final goal = state.progressOf(state.lastCompletedGoalId)?.goal;
-            _goalsCubit.clearLastCompleted();
-            if (goal != null) {
-              CustomSnackbar.showSuccessSnackbar(
-                context,
-                AppLocalizations.of(context)!.goalCompletedToast(goal.name),
-                duration: 4,
-              );
-            }
-          },
-        ),
         BlocListener<QuranSettingsCubit, QuranSettingsState>(
           listenWhen: (previous, current) =>
               previous.autoTrackingEnabled != current.autoTrackingEnabled ||
@@ -464,62 +450,68 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
           },
         ),
       ],
-      child: BlocBuilder<MushafBloc, MushafState>(
-        buildWhen: (previous, current) =>
-            previous.theme != current.theme ||
-            previous.isTajweedEnabled != current.isTajweedEnabled,
-        builder: (context, state) {
-          final theme = state.theme;
-          final mushafIsDark =
-              ThemeData.estimateBrightnessForColor(theme.pageBackgroundColor) ==
-              Brightness.dark;
-          final mushafAccentTextColor = _resolveReadableForeground(
-            preferred: theme.verseTextColor,
-            background: theme.pageBackgroundColor,
-          );
+      child: ReadingGoalCompletionListener(
+        child: BlocBuilder<MushafBloc, MushafState>(
+          buildWhen: (previous, current) =>
+              previous.theme != current.theme ||
+              previous.isTajweedEnabled != current.isTajweedEnabled,
+          builder: (context, state) {
+            final theme = state.theme;
+            final mushafIsDark =
+                ThemeData.estimateBrightnessForColor(
+                  theme.pageBackgroundColor,
+                ) ==
+                Brightness.dark;
+            final mushafAccentTextColor = _resolveReadableForeground(
+              preferred: theme.verseTextColor,
+              background: theme.pageBackgroundColor,
+            );
 
-          return Scaffold(
-            backgroundColor: theme.pageBackgroundColor,
-            appBar: _MushafAppBar(
-              onSurahTap: _openSurahList,
-              onReadingTap: _openReadingActions,
-            ),
-            body: QuranPageView(
-              pageController: _controller,
-              highlights: const [],
-              pageBackgroundColor: theme.pageBackgroundColor,
-              isDarkMode: mushafIsDark,
-              isTajweed: state.isTajweedEnabled,
-              ayahStyle: TextStyle(color: theme.verseTextColor),
-              surahHeaderBuilder: (context, surahNumber) {
-                return _MushafSurahHeader(
-                  surahNumber: surahNumber,
-                  textColor: mushafAccentTextColor,
-                );
-              },
-              basmallahBuilder: (context, surahNumber) {
-                return _MushafBasmallah(
-                  surahNumber: surahNumber,
-                  textColor: mushafAccentTextColor,
-                );
-              },
-              onPageChanged: (pageNumber) {
-                context.read<MushafBloc>().add(MushafPageChanged(pageNumber));
-              },
-              onLongPress: (surahNumber, verseNumber, details) {
-                if (!mounted) {
-                  return;
-                }
-                MushafVerseActionsSheet.show(
-                  context,
-                  surahNumber: surahNumber,
-                  verseNumber: verseNumber,
-                );
-              },
-            ),
-            bottomNavigationBar: _MushafBottomBar(onGoalTap: _openGoalSwitcher),
-          );
-        },
+            return Scaffold(
+              backgroundColor: theme.pageBackgroundColor,
+              appBar: _MushafAppBar(
+                onSurahTap: _openSurahList,
+                onReadingTap: _openReadingActions,
+              ),
+              body: QuranPageView(
+                pageController: _controller,
+                highlights: const [],
+                pageBackgroundColor: theme.pageBackgroundColor,
+                isDarkMode: mushafIsDark,
+                isTajweed: state.isTajweedEnabled,
+                ayahStyle: TextStyle(color: theme.verseTextColor),
+                surahHeaderBuilder: (context, surahNumber) {
+                  return _MushafSurahHeader(
+                    surahNumber: surahNumber,
+                    textColor: mushafAccentTextColor,
+                  );
+                },
+                basmallahBuilder: (context, surahNumber) {
+                  return _MushafBasmallah(
+                    surahNumber: surahNumber,
+                    textColor: mushafAccentTextColor,
+                  );
+                },
+                onPageChanged: (pageNumber) {
+                  context.read<MushafBloc>().add(MushafPageChanged(pageNumber));
+                },
+                onLongPress: (surahNumber, verseNumber, details) {
+                  if (!mounted) {
+                    return;
+                  }
+                  MushafVerseActionsSheet.show(
+                    context,
+                    surahNumber: surahNumber,
+                    verseNumber: verseNumber,
+                  );
+                },
+              ),
+              bottomNavigationBar: _MushafBottomBar(
+                onGoalTap: _openGoalSwitcher,
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -531,7 +523,12 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
     _didCheckLongPressHint = true;
 
     final hasSeenHint = await _mushafRepository.getHasSeenLongPressHint();
-    if (hasSeenHint || !mounted) {
+    if (!mounted) {
+      return;
+    }
+    if (hasSeenHint) {
+      // One hint per visit: the goals hint waits for a later session.
+      await _maybeShowGoalsHint();
       return;
     }
 
@@ -583,6 +580,80 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
       );
       await _mushafRepository.setHasSeenLongPressHint(true);
     });
+  }
+
+  /// Once, in free reading with no goal yet, suggests creating one.
+  Future<void> _maybeShowGoalsHint() async {
+    final preferences = locator<ReadingPreferencesDataSource>();
+    if (await preferences.getHasSeenGoalsHint() || !mounted) {
+      return;
+    }
+    if (_goalsCubit.state.isLoading || _goalsCubit.state.hasGoals) {
+      return;
+    }
+    await preferences.setHasSeenGoalsHint(true);
+    if (!mounted) {
+      return;
+    }
+    final localizations = AppLocalizations.of(context)!;
+    final create = await showModalBottomSheet<bool>(
+      context: context,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        final theme = Theme.of(sheetContext);
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(
+                Icons.flag_rounded,
+                size: 36,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                localizations.readingGoalsHintTitle,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                localizations.readingGoalsHintBody,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 20),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: () => Navigator.of(sheetContext).pop(true),
+                child: Text(localizations.createReadingGoal),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(sheetContext).pop(false),
+                child: Text(localizations.later),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (create == true && mounted) {
+      await Navigator.pushNamed(
+        context,
+        CreateReadingGoalPage.routeName,
+        arguments: const CreateReadingGoalArguments(),
+      );
+    }
   }
 
   _MushafHintContent _mushafHintContent(BuildContext context) {

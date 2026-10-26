@@ -1548,4 +1548,75 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get encouragement => 'Continuez à votre rythme.';
+
+  @override
+  String get reminderDaily => 'Rappel quotidien';
+
+  @override
+  String get reminderTime => 'Heure du rappel';
+
+  @override
+  String get reminderSheetHint =>
+      'Un rappel est envoyé à cette heure tant que le quota du jour n\'est pas atteint.';
+
+  @override
+  String get setReminder => 'Rappel';
+
+  @override
+  String get remindersGlobal => 'Rappels de lecture';
+
+  @override
+  String get remindersGlobalDescription =>
+      'Autoriser les rappels pour les objectifs qui en demandent un. Rien n\'est envoyé une fois le quota du jour atteint.';
+
+  @override
+  String get reminderPermissionDenied =>
+      'Les notifications sont désactivées pour l\'application. Activez-les dans les réglages du téléphone pour recevoir des rappels.';
+
+  @override
+  String get reminderTitle => 'Votre lecture du jour';
+
+  @override
+  String reminderBodySingle(int count, String goal) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Il vous reste $count pages pour « $goal ».',
+      one: 'Il vous reste 1 page pour « $goal ».',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reminderBodyMulti(int count) {
+    return '$count objectifs attendent votre lecture.';
+  }
+
+  @override
+  String get goalCompletedTitle => 'Alhamdulillah !';
+
+  @override
+  String get goalCompletedBody =>
+      'Vous avez terminé votre parcours de lecture du Coran.';
+
+  @override
+  String actualDuration(String days) {
+    return 'Durée réelle : $days';
+  }
+
+  @override
+  String get startNewKhatm => 'Nouveau Khatm';
+
+  @override
+  String get viewHistory => 'Voir l\'historique';
+
+  @override
+  String get readingGoalsHintTitle => 'Suivez votre lecture';
+
+  @override
+  String get readingGoalsHintBody =>
+      'Créez un objectif pour savoir chaque jour combien de pages lire, et validez votre progression directement dans le Mushaf.';
+
+  @override
+  String get later => 'Plus tard';
 }

@@ -14,6 +14,7 @@ import '../../service_locator.dart';
 import '../cubits/reading_goal_detail_cubit.dart';
 import '../cubits/reading_goals_cubit.dart';
 import '../utils/reading_goal_formatting.dart';
+import '../widgets/reading_goals/goal_completed_sheet.dart';
 import '../widgets/reading_goals/reading_goal_actions.dart';
 import '../widgets/reading_goals/reading_pages_map.dart';
 import '../widgets/reading_goals/reading_progress_bar.dart';
@@ -36,7 +37,7 @@ class ReadingGoalDetailPage extends StatelessWidget {
         repository: locator<ReadingGoalRepository>(),
         goalsCubit: context.read<ReadingGoalsCubit>(),
       )..load(),
-      child: _DetailView(goalId: goalId),
+      child: ReadingGoalCompletionListener(child: _DetailView(goalId: goalId)),
     );
   }
 }
@@ -450,6 +451,23 @@ class _ActionsRow extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (progress.phase == ReadingGoalPhase.expired) ...[
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(50),
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: () =>
+                ReadingGoalActions.changeEndDate(context, progress.goal),
+            icon: const Icon(Icons.event_repeat_rounded, size: 18),
+            label: Text(localizations.extendGoal),
+          ),
+          const SizedBox(height: 8),
+        ],
         FilledButton.icon(
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(50),

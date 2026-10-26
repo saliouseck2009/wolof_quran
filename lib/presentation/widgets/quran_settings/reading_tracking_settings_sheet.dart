@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../reading_goals/reading_goal_form_widgets.dart';
+import '../reading_goals/reminder_settings_sheet.dart';
 
 /// Lets the user enable automatic page validation in the mushaf and pick
 /// the minimum time a page must stay open.
@@ -98,6 +99,23 @@ class _ReadingTrackingSettingsSheet extends StatelessWidget {
                     ],
                   ),
                 ),
+              ),
+              const Divider(height: 24),
+              SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                value: state.remindersEnabled,
+                onChanged: (on) async {
+                  if (on) {
+                    await enableRemindersGlobally(context);
+                  } else {
+                    cubit.updateRemindersEnabled(false);
+                  }
+                },
+                title: Text(
+                  localizations.remindersGlobal,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(localizations.remindersGlobalDescription),
               ),
               const SizedBox(height: 8),
               Text(
