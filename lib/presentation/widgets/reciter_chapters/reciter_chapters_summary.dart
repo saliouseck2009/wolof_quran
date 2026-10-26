@@ -28,10 +28,7 @@ class ReciterChaptersSummary extends StatelessWidget {
             : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(12),
         border: isDark
-            ? Border.all(
-                color: accentColor.withValues(alpha: 0.25),
-                width: 1,
-              )
+            ? Border.all(color: accentColor.withValues(alpha: 0.25), width: 1)
             : null,
       ),
       child: Row(
@@ -41,9 +38,9 @@ class ReciterChaptersSummary extends StatelessWidget {
           Text(
             localizations.surahsDownloaded(downloadedCount),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w400,
-                  color: accentColor,
-                ),
+              fontWeight: FontWeight.w400,
+              color: accentColor,
+            ),
           ),
         ],
       ),

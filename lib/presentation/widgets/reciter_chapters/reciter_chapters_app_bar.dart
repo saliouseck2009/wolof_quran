@@ -24,12 +24,8 @@ class ReciterChaptersAppBar extends StatelessWidget {
       expandedHeight: 160,
       floating: false,
       pinned: true,
-      backgroundColor: isDark
-          ? colorScheme.surfaceContainer
-          : accentColor,
-      iconTheme: IconThemeData(
-        color: colorScheme.onPrimary,
-      ),
+      backgroundColor: isDark ? colorScheme.surfaceContainer : accentColor,
+      iconTheme: IconThemeData(color: colorScheme.onPrimary),
       surfaceTintColor: Colors.transparent,
       shadowColor: isDark
           ? Colors.black.withValues(alpha: 0.4)
@@ -49,10 +45,7 @@ class ReciterChaptersAppBar extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: isDark
-                  ? [
-                      colorScheme.surfaceContainer,
-                      colorScheme.surface,
-                    ]
+                  ? [colorScheme.surfaceContainer, colorScheme.surface]
                   : [accentColor.withValues(alpha: 0.85), accentColor],
             ),
           ),

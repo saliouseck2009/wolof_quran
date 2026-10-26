@@ -11,6 +11,7 @@ import '../widgets/snackbar.dart';
 import '../widgets/quran_settings/font_size_selector_sheet.dart';
 import '../widgets/quran_settings/quran_settings_header.dart';
 import '../widgets/quran_settings/quran_settings_menu.dart';
+import '../widgets/quran_settings/reading_tracking_settings_sheet.dart';
 import '../widgets/quran_settings/translation_selector_sheet.dart';
 import '../widgets/settings/settings_menu_item.dart';
 import 'support_page.dart';
@@ -68,7 +69,7 @@ class _QuranSettingsView extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+              children: [
                 QuranSettingsHeader(localizations: localizations),
                 const SizedBox(height: 24),
                 QuranSettingsMenu(
@@ -81,6 +82,8 @@ class _QuranSettingsView extends StatelessWidget {
                   onRecitersTap: () {
                     Navigator.pushNamed(context, '/reciter-list');
                   },
+                  onReadingTrackingTap: () =>
+                      showReadingTrackingSettingsSheet(context),
                 ),
                 if (!isIos) ...[
                   const SizedBox(height: 24),
@@ -89,10 +92,8 @@ class _QuranSettingsView extends StatelessWidget {
                     title: localizations.supportProject,
                     subtitle: localizations.supportSubtitle,
                     value: localizations.supportValue,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      SupportPage.routeName,
-                    ),
+                    onTap: () =>
+                        Navigator.pushNamed(context, SupportPage.routeName),
                     showArrow: true,
                   ),
                 ],

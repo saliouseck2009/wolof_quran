@@ -77,10 +77,7 @@ class PrivacyPolicyPage extends StatelessWidget {
               style: bodyStyle,
             ),
             const SizedBox(height: 2),
-            Text(
-              localizations.privacyPolicyAgeRating,
-              style: bodyStyle,
-            ),
+            Text(localizations.privacyPolicyAgeRating, style: bodyStyle),
             const SizedBox(height: 2),
             Text(
               localizations.privacyPolicyLastUpdated(_lastUpdated),
@@ -92,40 +89,50 @@ class PrivacyPolicyPage extends StatelessWidget {
             divider,
 
             // --- Local data ---
-            Text(localizations.privacyPolicyLocalDataTitle,
-                style: sectionTitleStyle),
+            Text(
+              localizations.privacyPolicyLocalDataTitle,
+              style: sectionTitleStyle,
+            ),
             const SizedBox(height: 8),
             Text(localizations.privacyPolicyLocalDataBody, style: bodyStyle),
 
             divider,
 
             // --- Internet ---
-            Text(localizations.privacyPolicyInternetTitle,
-                style: sectionTitleStyle),
+            Text(
+              localizations.privacyPolicyInternetTitle,
+              style: sectionTitleStyle,
+            ),
             const SizedBox(height: 8),
             Text(localizations.privacyPolicyInternetBody, style: bodyStyle),
 
             divider,
 
             // --- Permissions ---
-            Text(localizations.privacyPolicyPermissionsTitle,
-                style: sectionTitleStyle),
+            Text(
+              localizations.privacyPolicyPermissionsTitle,
+              style: sectionTitleStyle,
+            ),
             const SizedBox(height: 8),
             Text(localizations.privacyPolicyPermissionsBody, style: bodyStyle),
 
             divider,
 
             // --- Children ---
-            Text(localizations.privacyPolicyChildrenTitle,
-                style: sectionTitleStyle),
+            Text(
+              localizations.privacyPolicyChildrenTitle,
+              style: sectionTitleStyle,
+            ),
             const SizedBox(height: 8),
             Text(localizations.privacyPolicyChildrenBody, style: bodyStyle),
 
             divider,
 
             // --- Contact ---
-            Text(localizations.privacyPolicyContactTitle,
-                style: sectionTitleStyle),
+            Text(
+              localizations.privacyPolicyContactTitle,
+              style: sectionTitleStyle,
+            ),
             const SizedBox(height: 8),
             Text(
               localizations.privacyPolicyContactBody(_contactEmail),

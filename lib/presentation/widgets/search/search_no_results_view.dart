@@ -32,10 +32,7 @@ class SearchNoResultsView extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             localizations.tryDifferentSearchTerms,
-            style: TextStyle(
-              fontSize: 14,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            style: TextStyle(fontSize: 14, color: colorScheme.onSurfaceVariant),
           ),
         ],
       ),

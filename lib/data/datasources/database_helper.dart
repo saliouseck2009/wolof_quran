@@ -11,6 +11,10 @@ class DatabaseHelper {
   static const String _downloadedSurahsTable = 'downloaded_surahs';
   static const String _bookmarksTable = 'bookmarks';
   static const String _downloadQueueTable = 'download_queue';
+  static const String readingGoalsTable = 'reading_goals';
+  static const String readingGoalPagesTable = 'reading_goal_pages';
+  static const String readingValidationsTable = 'reading_validations';
+  static const String readingSessionsTable = 'reading_sessions';
 
   DatabaseHelper._internal();
 
@@ -28,7 +32,7 @@ class DatabaseHelper {
 
       return await openDatabase(
         path,
-        version: 3,
+        version: 4,
         onCreate: _createTables,
         onUpgrade: _onUpgrade,
       );
@@ -47,6 +51,7 @@ class DatabaseHelper {
     await _createDownloadedSurahsTable(db);
     await _createBookmarksTable(db);
     await _createDownloadQueueTable(db);
+    await _createReadingTables(db);
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -56,6 +61,72 @@ class DatabaseHelper {
     if (oldVersion < 3) {
       await _createDownloadQueueTable(db);
     }
+    if (oldVersion < 4) {
+      await _createReadingTables(db);
+    }
+  }
+
+  /// Reading goals (Khatm tracking): goals, their validated pages, the
+  /// validation journal and reading sessions.
+  Future<void> _createReadingTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $readingGoalsTable (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        status TEXT NOT NULL,
+        start_page INTEGER NOT NULL,
+        total_pages INTEGER NOT NULL,
+        mushaf_edition TEXT NOT NULL,
+        start_date TEXT NOT NULL,
+        end_date TEXT NOT NULL,
+        paused_at TEXT,
+        last_viewed_page INTEGER,
+        reminder_enabled INTEGER NOT NULL DEFAULT 0,
+        reminder_time TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        completed_at INTEGER
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $readingGoalPagesTable (
+        goal_id TEXT NOT NULL,
+        page INTEGER NOT NULL,
+        validated_at INTEGER NOT NULL,
+        validation_id TEXT NOT NULL,
+        PRIMARY KEY (goal_id, page)
+      )
+    ''');
+    await db.execute('''
+      CREATE INDEX IF NOT EXISTS idx_reading_goal_pages_goal_date
+      ON $readingGoalPagesTable (goal_id, validated_at)
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $readingValidationsTable (
+        id TEXT PRIMARY KEY,
+        goal_id TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        source TEXT NOT NULL,
+        action TEXT NOT NULL,
+        from_page INTEGER,
+        to_page INTEGER,
+        pages_json TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE INDEX IF NOT EXISTS idx_reading_validations_goal_date
+      ON $readingValidationsTable (goal_id, created_at)
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS $readingSessionsTable (
+        id TEXT PRIMARY KEY,
+        goal_id TEXT NOT NULL,
+        started_at INTEGER NOT NULL,
+        ended_at INTEGER,
+        active_ms INTEGER NOT NULL DEFAULT 0,
+        pages_viewed_json TEXT NOT NULL DEFAULT '[]'
+      )
+    ''');
   }
 
   Future<void> _createDownloadedSurahsTable(Database db) async {

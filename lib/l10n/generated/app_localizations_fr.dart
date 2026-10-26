@@ -904,4 +904,719 @@ class AppLocalizationsFr extends AppLocalizations {
   String verseCountShort(int count) {
     return '$count v.';
   }
+
+  @override
+  String get readingGoals => 'Mes objectifs';
+
+  @override
+  String get readingGoalsSubtitle => 'Planifiez votre Khatm';
+
+  @override
+  String get newReadingGoal => 'Nouvel objectif';
+
+  @override
+  String get editReadingGoal => 'Modifier l\'objectif';
+
+  @override
+  String get readingGoalsOngoing => 'En cours';
+
+  @override
+  String get readingGoalsPlanned => 'Planifiés';
+
+  @override
+  String get readingGoalsFinished => 'Terminés';
+
+  @override
+  String get noReadingGoalsTitle => 'Aucun objectif de lecture';
+
+  @override
+  String get noReadingGoalsDescription =>
+      'Planifiez un Khatm à votre rythme : choisissez une durée et l\'application vous indique combien de pages lire chaque jour.';
+
+  @override
+  String get noReadingGoalsInSection => 'Rien ici pour le moment';
+
+  @override
+  String get createReadingGoal => 'Créer un objectif';
+
+  @override
+  String get continueReading => 'Continuer la lecture';
+
+  @override
+  String readingProgressLabel(int validated, int total) {
+    return '$validated/$total pages';
+  }
+
+  @override
+  String readingValidatedOf(int validated, int total) {
+    return '$validated pages lues sur $total';
+  }
+
+  @override
+  String percentValue(int percent) {
+    return '$percent %';
+  }
+
+  @override
+  String readingTodayProgress(int read, int target) {
+    return 'Aujourd\'hui : $read/$target pages';
+  }
+
+  @override
+  String get readingTodayDone => 'Objectif du jour atteint ✓';
+
+  @override
+  String readingRemainingToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Il reste $count pages à lire aujourd\'hui',
+      one: 'Il reste 1 page à lire aujourd\'hui',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readingDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jours restants',
+      one: '1 jour restant',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readingEndsOn(String date) {
+    return 'Fin le $date';
+  }
+
+  @override
+  String readingStartsOn(String date) {
+    return 'Début le $date';
+  }
+
+  @override
+  String readingPaceAhead(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages d\'avance',
+      one: '1 page d\'avance',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readingPaceBehind(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages de retard',
+      one: '1 page de retard',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get readingPaceOnTrack => 'Dans les temps';
+
+  @override
+  String get readingStatusActive => 'Actif';
+
+  @override
+  String get readingStatusPaused => 'En pause';
+
+  @override
+  String get readingStatusPlanned => 'Planifié';
+
+  @override
+  String get readingStatusCompleted => 'Terminé';
+
+  @override
+  String get readingStatusExpired => 'Expiré';
+
+  @override
+  String get readingStatusAbandoned => 'Abandonné';
+
+  @override
+  String get readingGoalFollowed => 'Suivi dans le Mushaf';
+
+  @override
+  String get followGoal => 'Suivre cet objectif';
+
+  @override
+  String get renameGoal => 'Renommer';
+
+  @override
+  String get changeEndDate => 'Modifier la date de fin';
+
+  @override
+  String get pauseGoal => 'Mettre en pause';
+
+  @override
+  String get resumeGoal => 'Reprendre';
+
+  @override
+  String get abandonGoal => 'Abandonner';
+
+  @override
+  String get deleteGoal => 'Supprimer';
+
+  @override
+  String get duplicateGoal => 'Nouvel objectif à partir de celui-ci';
+
+  @override
+  String get reactivateGoal => 'Réactiver';
+
+  @override
+  String get extendGoal => 'Prolonger';
+
+  @override
+  String get deleteGoalConfirmTitle => 'Supprimer cet objectif ?';
+
+  @override
+  String get deleteGoalConfirmBody =>
+      'Sa progression et son historique seront perdus. Cette action est irréversible.';
+
+  @override
+  String get abandonGoalConfirmTitle => 'Abandonner cet objectif ?';
+
+  @override
+  String get abandonGoalConfirmBody =>
+      'Sa progression est conservée et vous pourrez le réactiver plus tard.';
+
+  @override
+  String get confirm => 'Confirmer';
+
+  @override
+  String get markPagesRead => 'Marquer des pages comme lues';
+
+  @override
+  String get untilPageMode => 'Jusqu\'à une page';
+
+  @override
+  String get pageRangeMode => 'Plage de pages';
+
+  @override
+  String get untilPageHint =>
+      'Marque toutes les pages non lues de l\'objectif jusqu\'à cette page, dans l\'ordre de lecture.';
+
+  @override
+  String get fromPageLabel => 'De la page';
+
+  @override
+  String get toPageLabel => 'À la page';
+
+  @override
+  String get pageFieldLabel => 'Page';
+
+  @override
+  String pagesToMarkSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages seront marquées comme lues',
+      one: '1 page sera marquée comme lue',
+      zero: 'Aucune nouvelle page à marquer',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String pagesAlreadyRead(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count déjà lues',
+      one: '1 déjà lue',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get markAsRead => 'Marquer comme lues';
+
+  @override
+  String pagesMarked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages marquées comme lues',
+      one: '1 page marquée comme lue',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get undo => 'Annuler';
+
+  @override
+  String invalidPage(int total) {
+    return 'Saisissez une page entre 1 et $total';
+  }
+
+  @override
+  String get goalName => 'Nom de l\'objectif';
+
+  @override
+  String get goalNameHint => 'ex. Khatm Ramadan';
+
+  @override
+  String defaultGoalName(int number) {
+    return 'Khatm $number';
+  }
+
+  @override
+  String get goalDuration => 'Durée';
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count jours',
+      one: '1 jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get customDuration => 'Personnalisée';
+
+  @override
+  String get pickEndDate => 'Date de fin';
+
+  @override
+  String get goalStartPoint => 'Point de départ';
+
+  @override
+  String get startFromBeginning => 'Début du Coran';
+
+  @override
+  String get startFromCurrentPage => 'Page actuelle';
+
+  @override
+  String get startFromChosenPage => 'Page choisie';
+
+  @override
+  String get goalStartDate => 'Date de début';
+
+  @override
+  String get today => 'Aujourd\'hui';
+
+  @override
+  String get chooseDate => 'Choisir une date';
+
+  @override
+  String get goalSummary => 'Récapitulatif';
+
+  @override
+  String get pagesToRead => 'Pages à lire';
+
+  @override
+  String averagePerDay(String pages) {
+    return 'Environ $pages pages par jour';
+  }
+
+  @override
+  String get goalCreate => 'Créer l\'objectif';
+
+  @override
+  String get goalSave => 'Enregistrer';
+
+  @override
+  String get nextStep => 'Suivant';
+
+  @override
+  String get homeReadingTitle => 'Lecture en cours';
+
+  @override
+  String get homeReadingEmptyTitle => 'Planifiez votre lecture du Coran';
+
+  @override
+  String get homeReadingEmptyBody =>
+      'Fixez un objectif et sachez chaque jour combien de pages lire.';
+
+  @override
+  String get seeAllGoals => 'Tous les objectifs';
+
+  @override
+  String get chooseSurah => 'Choisir une sourate';
+
+  @override
+  String resumeAtPage(int page) {
+    return 'Reprendre à la page $page';
+  }
+
+  @override
+  String goalDates(String start, String end) {
+    return '$start → $end';
+  }
+
+  @override
+  String completedOn(String date) {
+    return 'Terminé le $date';
+  }
+
+  @override
+  String get freeReading => 'Lecture libre';
+
+  @override
+  String get freeReadingDescription =>
+      'Parcourez le Mushaf sans toucher à aucun objectif.';
+
+  @override
+  String get readingActions => 'Lecture';
+
+  @override
+  String get markThisPageRead => 'Marquer cette page comme lue';
+
+  @override
+  String get unmarkThisPage => 'Retirer la validation de cette page';
+
+  @override
+  String get readUntilHere => 'J\'ai lu jusqu\'ici';
+
+  @override
+  String readUntilHereConfirm(int from, int to, String goal) {
+    return 'Marquer les pages $from à $to comme lues dans « $goal » ?';
+  }
+
+  @override
+  String get readUntilHereNothing =>
+      'Toutes les pages jusqu\'ici sont déjà lues.';
+
+  @override
+  String get markSeveralPages => 'Marquer plusieurs pages';
+
+  @override
+  String get viewProgress => 'Voir ma progression';
+
+  @override
+  String get switchGoal => 'Changer d\'objectif';
+
+  @override
+  String get switchGoalSubtitle =>
+      'Sa dernière position de lecture sera restaurée.';
+
+  @override
+  String get switchToFreeReading => 'Passer en lecture libre';
+
+  @override
+  String get followAGoal => 'Suivre un objectif';
+
+  @override
+  String pageNotCounted(int page) {
+    return 'Page $page non comptabilisée — lecture trop courte';
+  }
+
+  @override
+  String pageMarkedRead(int page) {
+    return 'Page $page marquée comme lue';
+  }
+
+  @override
+  String goalCompletedToast(String name) {
+    return 'Alhamdulillah ! « $name » est terminé.';
+  }
+
+  @override
+  String get readingTrackingSettings => 'Suivi de lecture';
+
+  @override
+  String get readingTrackingSubtitle =>
+      'Validation automatique des pages dans le Mushaf';
+
+  @override
+  String get autoTracking => 'Suivi automatique de lecture';
+
+  @override
+  String get autoTrackingDescription =>
+      'Une page est comptée comme lue dans l\'objectif suivi après un temps minimum d\'affichage. Vous pouvez toujours marquer les pages à la main.';
+
+  @override
+  String get autoTrackingThreshold => 'Temps minimum par page';
+
+  @override
+  String secondsShort(int count) {
+    return '$count s';
+  }
+
+  @override
+  String get enabled => 'Activé';
+
+  @override
+  String get disabled => 'Désactivé';
+
+  @override
+  String todayShort(int read, int target) {
+    return 'Aujourd\'hui $read/$target';
+  }
+
+  @override
+  String get todayDoneShort => 'Objectif du jour atteint ✓';
+
+  @override
+  String get markReadShort => 'Marquer comme lue';
+
+  @override
+  String continuousProgressLabel(int page) {
+    return 'Progression continue jusqu\'à la page $page';
+  }
+
+  @override
+  String get readingNotStarted => 'Aucune page lue pour le moment';
+
+  @override
+  String todayTarget(int count) {
+    return 'Objectif : $count pages';
+  }
+
+  @override
+  String todayRead(int count) {
+    return 'Lues : $count pages';
+  }
+
+  @override
+  String recommendedPace(String pages) {
+    return 'Environ $pages pages par jour jusqu\'à la fin';
+  }
+
+  @override
+  String get pagesSectionTitle => 'Pages';
+
+  @override
+  String get legendRead => 'Lue';
+
+  @override
+  String get legendUnread => 'Non lue';
+
+  @override
+  String get legendSkipped => 'Sautée';
+
+  @override
+  String get missingPages => 'Pages manquantes';
+
+  @override
+  String get noMissingPages => 'Aucune page sautée.';
+
+  @override
+  String pageRangeLabel(int from, int to) {
+    return 'Pages $from–$to';
+  }
+
+  @override
+  String get historyTitle => 'Historique de lecture';
+
+  @override
+  String get noPagesThatDay => 'Aucune page';
+
+  @override
+  String pagesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages',
+      one: '1 page',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get journalTitle => 'Validations';
+
+  @override
+  String get noValidations => 'Aucune validation pour le moment.';
+
+  @override
+  String get validationSourceAuto => 'automatique';
+
+  @override
+  String get validationSourceManual => 'manuelle';
+
+  @override
+  String get actionPage => 'Page';
+
+  @override
+  String get actionRange => 'Plage de pages';
+
+  @override
+  String get actionReadUntil => 'Lu jusqu\'ici';
+
+  @override
+  String get actionJuz => 'Juz';
+
+  @override
+  String get actionHizb => 'Hizb';
+
+  @override
+  String get actionSurah => 'Sourate';
+
+  @override
+  String get actionUnmark => 'Validation retirée';
+
+  @override
+  String get markSection => 'Marquer un Juz, un Hizb ou une Sourate';
+
+  @override
+  String get sectionJuz => 'Juz';
+
+  @override
+  String get sectionHizb => 'Hizb';
+
+  @override
+  String get sectionSurah => 'Sourate';
+
+  @override
+  String sharedPagePrevious(int page) {
+    return 'La page $page contient aussi la fin de la section précédente. Décochez-la si vous ne l\'avez pas lue entièrement.';
+  }
+
+  @override
+  String sharedPageNext(int page) {
+    return 'La page $page contient aussi le début de la section suivante. Décochez-la si vous ne l\'avez pas lue entièrement.';
+  }
+
+  @override
+  String includePage(int page) {
+    return 'Inclure la page $page';
+  }
+
+  @override
+  String sectionPagesSummary(String range, String count) {
+    return '$range · $count';
+  }
+
+  @override
+  String markSectionConfirm(String name) {
+    return 'Marquer $name comme lu';
+  }
+
+  @override
+  String get statsTitle => 'Mes performances';
+
+  @override
+  String get statTotalPages => 'Pages lues';
+
+  @override
+  String get statKhatmCompleted => 'Khatm terminés';
+
+  @override
+  String get statCurrentStreak => 'Série en cours';
+
+  @override
+  String get statBestStreak => 'Meilleure série';
+
+  @override
+  String get statAverage => 'Moyenne par jour (30 j)';
+
+  @override
+  String get statBestDay => 'Meilleur jour';
+
+  @override
+  String get statReadingTime => 'Temps de lecture actif';
+
+  @override
+  String periodDays(int count) {
+    return '$count j';
+  }
+
+  @override
+  String get chartTitle => 'Pages par jour';
+
+  @override
+  String get byGoalTitle => 'Par objectif';
+
+  @override
+  String get completedKhatmTitle => 'Khatm terminés';
+
+  @override
+  String get noStatsYet =>
+      'Lisez quelques pages dans un objectif et vos performances apparaîtront ici.';
+
+  @override
+  String hoursMinutes(int hours, int minutes) {
+    return '$hours h $minutes min';
+  }
+
+  @override
+  String minutesOnly(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get encouragement => 'Continuez à votre rythme.';
+
+  @override
+  String get reminderDaily => 'Rappel quotidien';
+
+  @override
+  String get reminderTime => 'Heure du rappel';
+
+  @override
+  String get reminderSheetHint =>
+      'Un rappel est envoyé à cette heure tant que le quota du jour n\'est pas atteint.';
+
+  @override
+  String get setReminder => 'Rappel';
+
+  @override
+  String get remindersGlobal => 'Rappels de lecture';
+
+  @override
+  String get remindersGlobalDescription =>
+      'Autoriser les rappels pour les objectifs qui en demandent un. Rien n\'est envoyé une fois le quota du jour atteint.';
+
+  @override
+  String get reminderPermissionDenied =>
+      'Les notifications sont désactivées pour l\'application. Activez-les dans les réglages du téléphone pour recevoir des rappels.';
+
+  @override
+  String get reminderTitle => 'Votre lecture du jour';
+
+  @override
+  String reminderBodySingle(int count, String goal) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Il vous reste $count pages pour « $goal ».',
+      one: 'Il vous reste 1 page pour « $goal ».',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reminderBodyMulti(int count) {
+    return '$count objectifs attendent votre lecture.';
+  }
+
+  @override
+  String get goalCompletedTitle => 'Alhamdulillah !';
+
+  @override
+  String get goalCompletedBody =>
+      'Vous avez terminé votre parcours de lecture du Coran.';
+
+  @override
+  String actualDuration(String days) {
+    return 'Durée réelle : $days';
+  }
+
+  @override
+  String get startNewKhatm => 'Nouveau Khatm';
+
+  @override
+  String get viewHistory => 'Voir l\'historique';
+
+  @override
+  String get readingGoalsHintTitle => 'Suivez votre lecture';
+
+  @override
+  String get readingGoalsHintBody =>
+      'Créez un objectif pour savoir chaque jour combien de pages lire, et validez votre progression directement dans le Mushaf.';
+
+  @override
+  String get later => 'Plus tard';
 }

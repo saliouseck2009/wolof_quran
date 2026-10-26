@@ -275,7 +275,9 @@ class _DownloadSurahButton extends StatelessWidget {
       listener: (context, currentState) {
         if (currentState is AudioManagementLoaded) {
           final didCompleteDownload =
-              currentState.getSurahStatus(reciterId, surahNumber)?.isDownloaded ==
+              currentState
+                  .getSurahStatus(reciterId, surahNumber)
+                  ?.isDownloaded ==
               true;
           if (!didCompleteDownload) {
             return;

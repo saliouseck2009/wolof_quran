@@ -19,7 +19,14 @@ class MushafBloc extends Bloc<MushafEvent, MushafState> {
   }
 
   Future<void> _onLoaded(MushafLoaded event, Emitter<MushafState> emit) async {
-    final lastPage = await _repository.getLastReadPage();
+    final initialPage = event.initialPage;
+    final int lastPage;
+    if (initialPage != null) {
+      lastPage = initialPage;
+      await _repository.saveLastReadPage(initialPage);
+    } else {
+      lastPage = await _repository.getLastReadPage();
+    }
     final themeIndex = await _repository.getThemeIndex();
     final isTajweedEnabled = await _repository.getTajweedEnabled();
 

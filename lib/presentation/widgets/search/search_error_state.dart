@@ -16,11 +16,7 @@ class SearchErrorStateView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 80,
-            color: colorScheme.error,
-          ),
+          Icon(Icons.error_outline, size: 80, color: colorScheme.error),
           const SizedBox(height: 24),
           Text(
             localizations.searchError,

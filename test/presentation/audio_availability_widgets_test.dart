@@ -402,6 +402,7 @@ void main() {
                   onTranslationTap: () {},
                   onFontSizeTap: () {},
                   onRecitersTap: () {},
+                  onReadingTrackingTap: () {},
                 );
               },
             ),

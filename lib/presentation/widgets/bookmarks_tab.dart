@@ -49,218 +49,225 @@ class BookmarksTab extends StatelessWidget {
         builder: (context, settingsState) {
           final currentTranslation = settingsState.selectedTranslation;
           return BlocBuilder<BookmarkCubit, BookmarkState>(
-        builder: (context, state) {
-          if (state is BookmarkLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+            builder: (context, state) {
+              if (state is BookmarkLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          if (state is BookmarkError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 80,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    localizations.errorLoadingBookmarks,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    child: Text(
-                      state.message,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+              if (state is BookmarkError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 80,
+                        color: Theme.of(context).colorScheme.error,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (state is BookmarkLoaded) {
-            if (state.bookmarks.isEmpty) {
-              return _buildEmptyState(context, localizations);
-            }
-
-            final sections = _groupBookmarksBySurah(state.bookmarks);
-
-            return Column(
-              children: [
-                // Header with clear all button
-                if (state.bookmarks.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 4,
-                      top: 12,
-                      bottom: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.bookmark,
-                              size: 18,
-                              color: colorScheme.primary,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${state.bookmarks.length} ${localizations.bookmarks.toLowerCase()}',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? colorScheme.onPrimary
-                                    : colorScheme.primary,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 24),
+                      Text(
+                        localizations.errorLoadingBookmarks,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.error,
                         ),
-                        TextButton(
-                          onPressed: () =>
-                              _showClearDialog(context, localizations),
-                          child: Text(
-                            localizations.clearAllBookmarks,
-                            style: TextStyle(
-                              color: colorScheme.error,
-                              fontWeight: FontWeight.w500,
-                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          state.message,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                      ],
-                    ),
-                  ),
-
-                // Bookmarks list
-                Expanded(
-                  child: CustomScrollView(
-                    key: const PageStorageKey<String>('bookmarks-list'),
-                    slivers: [
-                      for (final section in sections)
-                        SliverMainAxisGroup(
-                          slivers: [
-                            SliverPersistentHeader(
-                              pinned: true,
-                              delegate: SurahHeaderDelegate(
-                                accentGreen: accentGreen,
-                                colorScheme: colorScheme,
-                                isDark: isDark,
-                                surahName: section.surahName,
-                                surahNumber: section.surahNumber,
-                              ),
-                              // delegate: _BookmarksSurahHeaderDelegate(
-                              //   colorScheme: colorScheme,
-                              //   surahName: section.surahName,
-                              //   surahNumber: section.surahNumber,
-                              // ),
-                            ),
-                            SliverList(
-                              delegate: SliverChildBuilderDelegate((
-                                context,
-                                index,
-                              ) {
-                                final bookmark = section.bookmarks[index];
-                                return Dismissible(
-                                  key: ValueKey<String>(bookmark.key),
-                                  direction: DismissDirection.endToStart,
-                                  dismissThresholds: const {
-                                    DismissDirection.endToStart: 0.35,
-                                  },
-                                  background: _buildDismissBackground(
-                                    context,
-                                    localizations,
-                                  ),
-                                  onDismissed: (_) => _removeBookmark(
-                                    context,
-                                    localizations,
-                                    bookmark,
-                                  ),
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 12),
-                                    child: AyahCard(
-                                      verseNumber: bookmark.verseNumber,
-                                      arabicText: bookmark.arabicText,
-                                      translationSource: _translationSourceName(
-                                        currentTranslation,
-                                      ),
-                                      translation: _liveTranslation(
-                                        bookmark,
-                                        currentTranslation,
-                                      ),
-                                      surahNumber: bookmark.surahNumber,
-                                      surahName: bookmark.surahName,
-                                      actions: [
-                                        AyahPlayButton(
-                                          surahNumber: bookmark.surahNumber,
-                                          ayahNumber: bookmark.verseNumber,
-                                          surahName: bookmark.surahName,
-                                        ),
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.delete_outline,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.error,
-                                          ),
-                                          tooltip: localizations.clear,
-                                          onPressed: () => _removeBookmark(
-                                            context,
-                                            localizations,
-                                            bookmark,
-                                          ),
-                                        ),
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.open_in_new,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurfaceVariant,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.pushNamed(
-                                              context,
-                                              '/surah-detail',
-                                              arguments: SurahDetailArguments(
-                                                surahNumber:
-                                                    bookmark.surahNumber,
-                                                initialAyahNumber:
-                                                    bookmark.verseNumber,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }, childCount: section.bookmarks.length),
-                            ),
-                          ],
-                        ),
+                      ),
                     ],
                   ),
-                ),
-              ],
-            );
-          }
+                );
+              }
 
-          return const SizedBox.shrink();
-        },
+              if (state is BookmarkLoaded) {
+                if (state.bookmarks.isEmpty) {
+                  return _buildEmptyState(context, localizations);
+                }
+
+                final sections = _groupBookmarksBySurah(state.bookmarks);
+
+                return Column(
+                  children: [
+                    // Header with clear all button
+                    if (state.bookmarks.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 4,
+                          top: 12,
+                          bottom: 0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.bookmark,
+                                  size: 18,
+                                  color: colorScheme.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${state.bookmarks.length} ${localizations.bookmarks.toLowerCase()}',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark
+                                        ? colorScheme.onPrimary
+                                        : colorScheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            TextButton(
+                              onPressed: () =>
+                                  _showClearDialog(context, localizations),
+                              child: Text(
+                                localizations.clearAllBookmarks,
+                                style: TextStyle(
+                                  color: colorScheme.error,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // Bookmarks list
+                    Expanded(
+                      child: CustomScrollView(
+                        key: const PageStorageKey<String>('bookmarks-list'),
+                        slivers: [
+                          for (final section in sections)
+                            SliverMainAxisGroup(
+                              slivers: [
+                                SliverPersistentHeader(
+                                  pinned: true,
+                                  delegate: SurahHeaderDelegate(
+                                    accentGreen: accentGreen,
+                                    colorScheme: colorScheme,
+                                    isDark: isDark,
+                                    surahName: section.surahName,
+                                    surahNumber: section.surahNumber,
+                                  ),
+                                  // delegate: _BookmarksSurahHeaderDelegate(
+                                  //   colorScheme: colorScheme,
+                                  //   surahName: section.surahName,
+                                  //   surahNumber: section.surahNumber,
+                                  // ),
+                                ),
+                                SliverList(
+                                  delegate: SliverChildBuilderDelegate((
+                                    context,
+                                    index,
+                                  ) {
+                                    final bookmark = section.bookmarks[index];
+                                    return Dismissible(
+                                      key: ValueKey<String>(bookmark.key),
+                                      direction: DismissDirection.endToStart,
+                                      dismissThresholds: const {
+                                        DismissDirection.endToStart: 0.35,
+                                      },
+                                      background: _buildDismissBackground(
+                                        context,
+                                        localizations,
+                                      ),
+                                      onDismissed: (_) => _removeBookmark(
+                                        context,
+                                        localizations,
+                                        bookmark,
+                                      ),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                          bottom: 12,
+                                        ),
+                                        child: AyahCard(
+                                          verseNumber: bookmark.verseNumber,
+                                          arabicText: bookmark.arabicText,
+                                          translationSource:
+                                              _translationSourceName(
+                                                currentTranslation,
+                                              ),
+                                          translation: _liveTranslation(
+                                            bookmark,
+                                            currentTranslation,
+                                          ),
+                                          surahNumber: bookmark.surahNumber,
+                                          surahName: bookmark.surahName,
+                                          actions: [
+                                            AyahPlayButton(
+                                              surahNumber: bookmark.surahNumber,
+                                              ayahNumber: bookmark.verseNumber,
+                                              surahName: bookmark.surahName,
+                                            ),
+                                            IconButton(
+                                              icon: Icon(
+                                                Icons.delete_outline,
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.error,
+                                              ),
+                                              tooltip: localizations.clear,
+                                              onPressed: () => _removeBookmark(
+                                                context,
+                                                localizations,
+                                                bookmark,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(
+                                                Icons.open_in_new,
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pushNamed(
+                                                  context,
+                                                  '/surah-detail',
+                                                  arguments:
+                                                      SurahDetailArguments(
+                                                        surahNumber: bookmark
+                                                            .surahNumber,
+                                                        initialAyahNumber:
+                                                            bookmark
+                                                                .verseNumber,
+                                                      ),
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }, childCount: section.bookmarks.length),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return const SizedBox.shrink();
+            },
           );
         },
       ),

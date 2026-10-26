@@ -10,6 +10,7 @@ import 'package:wolof_quran/core/services/audio_download_queue_service.dart';
 import 'package:wolof_quran/domain/repositories/reciter_repository.dart';
 import 'package:wolof_quran/domain/repositories/download_repository.dart';
 import 'package:wolof_quran/domain/repositories/audio_repository.dart';
+import 'package:wolof_quran/domain/repositories/reading_goal_repository.dart';
 import 'package:wolof_quran/domain/usecases/download_surah_audio_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_ayah_audios_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_reciters_usecase.dart';
@@ -20,6 +21,8 @@ import 'package:wolof_quran/domain/usecases/refresh_audio_availability_usecase.d
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/audio_availability_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/quran_settings_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/reading_goals_cubit.dart';
+import 'package:wolof_quran/presentation/reading_goals_app_glue.dart';
 import 'package:wolof_quran/presentation/cubits/reciter_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/ayah_playback_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/audio_download_queue_cubit.dart';
@@ -27,6 +30,7 @@ import 'package:wolof_quran/presentation/cubits/surah_mini_player_cubit.dart';
 import 'package:wolof_quran/service_locator.dart';
 
 import 'core/navigation/app_routes.dart';
+import 'core/navigation/route_observers.dart';
 import 'core/config/theme/theme.dart';
 import 'core/config/localization/localization_service.dart';
 import 'presentation/cubits/language_cubit.dart';
@@ -36,6 +40,8 @@ import 'l10n/generated/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting("fr_FR");
+  await initializeDateFormatting("en_US");
+  await initializeDateFormatting("ar_SA");
   await setupDependencies();
   Bloc.observer = SimpleBlocObserver();
   runApp(const MyApp());
@@ -90,6 +96,12 @@ class MyApp extends StatelessWidget {
           lazy: false,
           create: (context) => QuranSettingsCubit()..loadSettings(),
         ),
+        BlocProvider(
+          lazy: false,
+          create: (context) =>
+              ReadingGoalsCubit(repository: locator<ReadingGoalRepository>())
+                ..load(),
+        ),
         // provide ayat playback
         BlocProvider(
           create: (context) => AyahPlaybackCubit(
@@ -116,6 +128,7 @@ class MyApp extends StatelessWidget {
         builder: (ctx) {
           return MultiBlocListener(
             listeners: [
+              ...readingGoalsAppListeners(),
               BlocListener<ReciterCubit, ReciterState>(
                 listener: (context, reciterState) {
                   // When reciters are loaded, update the settings cubit
@@ -132,64 +145,67 @@ class MyApp extends StatelessWidget {
                 },
               ),
             ],
-            child: BlocBuilder<LanguageCubit, Locale>(
-              builder: (context, locale) {
-                return BlocBuilder<ThemeCubit, ThemeMode>(
-                  builder: (context, themeMode) {
-                    return MaterialApp(
-                      onGenerateTitle: (context) {
-                        return AppLocalizations.of(context)?.appTitle ??
-                            'Wolof Quran';
-                      },
-                      debugShowCheckedModeBanner: false,
+            child: ReadingGoalsLifecycle(
+              child: BlocBuilder<LanguageCubit, Locale>(
+                builder: (context, locale) {
+                  return BlocBuilder<ThemeCubit, ThemeMode>(
+                    builder: (context, themeMode) {
+                      return MaterialApp(
+                        onGenerateTitle: (context) {
+                          return AppLocalizations.of(context)?.appTitle ??
+                              'Wolof Quran';
+                        },
+                        debugShowCheckedModeBanner: false,
 
-                      // Localization setup
-                      locale: locale,
-                      supportedLocales: LocalizationService.supportedLocales,
-                      localizationsDelegates: const [
-                        AppLocalizations.delegate,
-                        GlobalMaterialLocalizations.delegate,
-                        GlobalWidgetsLocalizations.delegate,
-                        GlobalCupertinoLocalizations.delegate,
-                      ],
+                        // Localization setup
+                        locale: locale,
+                        supportedLocales: LocalizationService.supportedLocales,
+                        localizationsDelegates: const [
+                          AppLocalizations.delegate,
+                          GlobalMaterialLocalizations.delegate,
+                          GlobalWidgetsLocalizations.delegate,
+                          GlobalCupertinoLocalizations.delegate,
+                        ],
 
-                      // Theme setup
-                      theme: MaterialTheme().light(),
-                      darkTheme: MaterialTheme().dark(),
-                      themeMode: themeMode,
-                      builder: (context, child) {
-                        final theme = Theme.of(context);
-                        final isDark = theme.brightness == Brightness.dark;
-                        final overlayStyle = isDark
-                            ? SystemUiOverlayStyle.light.copyWith(
-                                statusBarColor: Colors.transparent,
-                                systemNavigationBarColor:
-                                    theme.colorScheme.surface,
-                                systemNavigationBarIconBrightness:
-                                    Brightness.light,
-                                statusBarIconBrightness: Brightness.light,
-                                statusBarBrightness: Brightness.dark,
-                              )
-                            : SystemUiOverlayStyle.dark.copyWith(
-                                statusBarColor: Colors.transparent,
-                                systemNavigationBarColor:
-                                    theme.colorScheme.surface,
-                                systemNavigationBarIconBrightness:
-                                    Brightness.dark,
-                                statusBarIconBrightness: Brightness.dark,
-                                statusBarBrightness: Brightness.light,
-                              );
+                        // Theme setup
+                        theme: MaterialTheme().light(),
+                        darkTheme: MaterialTheme().dark(),
+                        themeMode: themeMode,
+                        builder: (context, child) {
+                          final theme = Theme.of(context);
+                          final isDark = theme.brightness == Brightness.dark;
+                          final overlayStyle = isDark
+                              ? SystemUiOverlayStyle.light.copyWith(
+                                  statusBarColor: Colors.transparent,
+                                  systemNavigationBarColor:
+                                      theme.colorScheme.surface,
+                                  systemNavigationBarIconBrightness:
+                                      Brightness.light,
+                                  statusBarIconBrightness: Brightness.light,
+                                  statusBarBrightness: Brightness.dark,
+                                )
+                              : SystemUiOverlayStyle.dark.copyWith(
+                                  statusBarColor: Colors.transparent,
+                                  systemNavigationBarColor:
+                                      theme.colorScheme.surface,
+                                  systemNavigationBarIconBrightness:
+                                      Brightness.dark,
+                                  statusBarIconBrightness: Brightness.dark,
+                                  statusBarBrightness: Brightness.light,
+                                );
 
-                        return AnnotatedRegion<SystemUiOverlayStyle>(
-                          value: overlayStyle,
-                          child: child ?? const SizedBox.shrink(),
-                        );
-                      },
-                      onGenerateRoute: AppRoutes.onGenerateRoutes,
-                    );
-                  },
-                );
-              },
+                          return AnnotatedRegion<SystemUiOverlayStyle>(
+                            value: overlayStyle,
+                            child: child ?? const SizedBox.shrink(),
+                          );
+                        },
+                        onGenerateRoute: AppRoutes.onGenerateRoutes,
+                        navigatorObservers: [modalRouteObserver],
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           );
         },
