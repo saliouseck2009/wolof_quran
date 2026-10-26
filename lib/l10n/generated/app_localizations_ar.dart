@@ -45,6 +45,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get theme => 'المظهر';
 
   @override
+  String get tajweedColoring => 'ألوان التجويد';
+
+  @override
+  String get tajweedColoringDescription =>
+      'إظهار قواعد التجويد بالألوان في المصحف';
+
+  @override
   String get dark => 'داكن';
 
   @override
@@ -806,4 +813,80 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get supportValue => 'جزاكم الله خيرًا';
+
+  @override
+  String get playVerseRange => 'تشغيل عدة آيات';
+
+  @override
+  String get playUntilSurahEnd => 'حتى النهاية';
+
+  @override
+  String get customVerseRange => 'مخصص';
+
+  @override
+  String get rangeStartLabel => 'من';
+
+  @override
+  String get rangeEndLabel => 'إلى';
+
+  @override
+  String versesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count آية',
+      few: '$count آيات',
+      two: 'آيتان',
+      one: 'آية واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String playVersesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تشغيل $count آية',
+      few: 'تشغيل $count آيات',
+      two: 'تشغيل آيتين',
+      one: 'تشغيل آية واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String verseRangeSubtitle(String reference) {
+    return 'تشغيل متواصل بدءًا من $reference';
+  }
+
+  @override
+  String addVersesChip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count آية',
+      few: '+$count آيات',
+      two: '+آيتان',
+      one: '+آية واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get surahEndChip => 'نهاية السورة';
+
+  @override
+  String get chooseFirstVerse => 'اختر الآية الأولى';
+
+  @override
+  String get chooseLastVerse => 'اختر الآية الأخيرة';
+
+  @override
+  String get searchSurahOrNumber => 'ابحث عن سورة أو رقم';
+
+  @override
+  String verseCountShort(int count) {
+    return '$count آية';
+  }
 }

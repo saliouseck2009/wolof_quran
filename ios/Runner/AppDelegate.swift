@@ -9,7 +9,12 @@ import UIKit
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     do {
-      try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+      try AVAudioSession.sharedInstance().setCategory(
+        .playback,
+        mode: .default,
+        options: [.allowAirPlay, .allowBluetoothA2DP]
+      )
+      try AVAudioSession.sharedInstance().setActive(true)
     } catch {
       NSLog("Failed to configure AVAudioSession for background playback: \(error)")
     }

@@ -110,10 +110,9 @@ class _DailyInspirationShareModalState
     } catch (_) {
       mushafBloc = null;
     }
-    final mushafThemeColor =
-        mushafBloc?.state.theme.qcfTheme.pageBackgroundColor;
+    final mushafThemeColor = mushafBloc?.state.theme.pageBackgroundColor;
     final mushafPalette = MushafThemeData.allThemes
-        .map((theme) => theme.qcfTheme.pageBackgroundColor)
+        .map((theme) => theme.pageBackgroundColor)
         .toSet()
         .toList(growable: false);
 

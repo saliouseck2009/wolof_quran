@@ -6,10 +6,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
 import '../../core/services/audio_player_service.dart';
+import '../../domain/entities/ayah_audio.dart';
+import '../../domain/entities/ayah_range.dart';
 import '../../domain/repositories/audio_repository.dart';
 import '../../domain/repositories/download_repository.dart';
+import 'quran_settings_cubit.dart';
 
 enum SurahMiniPlayerUiState { hidden, collapsed, expanded, fullscreen }
+
+enum AyahRangePlaybackResult {
+  started,
+
+  /// The audio of at least one verse of the range is not on the device.
+  audioMissing,
+
+  /// Another playback request started while the range was loading.
+  superseded,
+}
 
 class SurahMiniPlayerState extends Equatable {
   final SurahMiniPlayerUiState uiState;
@@ -134,10 +147,12 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
   StreamSubscription<bool>? _seekReadySub;
   StreamSubscription<PlaybackMode>? _playbackModeSub;
   StreamSubscription<PlaybackCompletedEvent>? _playbackCompletedSub;
+  StreamSubscription<QueuedSurahChange>? _queuedSurahPlayingSub;
   final int Function(int max) _nextRandomInt;
   final List<int> _shuffleHistory = <int>[];
   bool _isAdvancingQueue = false;
   int _navigationToken = 0;
+  bool _isTopUpInFlight = false;
 
   SurahMiniPlayerCubit({
     required AudioPlayerService audioPlayerService,
@@ -157,6 +172,12 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
            playbackMode: audioPlayerService.currentPlaybackMode,
          ),
        ) {
+    _audioPlayerService.configureChapterNavigation(
+      onNextChapter: playNextSurah,
+      onPreviousChapter: playPreviousSurah,
+      canGoNextChapter: () => state.canGoNext,
+      canGoPreviousChapter: () => state.canGoPrevious,
+    );
     _listenToPlayerStreams();
   }
 
@@ -202,10 +223,35 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     });
     _playbackModeSub = _audioPlayerService.playbackMode.listen((playbackMode) {
       emit(state.copyWith(playbackMode: playbackMode));
+      // Switching to a looping/random mode mid-playback means we suddenly need
+      // a queued surah ahead; switching back to off/repeatOne doesn't undo a
+      // surah we already appended (it will just play and stop at the end).
+      if (playbackMode == PlaybackMode.repeatAll ||
+          playbackMode == PlaybackMode.shuffle) {
+        unawaited(_topUpQueueIfNeeded());
+      }
     });
     _playbackCompletedSub = _audioPlayerService.playbackCompleted.listen(
       handlePlaybackCompleted,
     );
+    _queuedSurahPlayingSub = _audioPlayerService.queuedSurahPlaying.listen((
+      change,
+    ) {
+      // In shuffle mode, gapless auto-advances do not emit playbackCompleted.
+      // Record history on the actual segment transition (from -> to).
+      if (state.playbackMode == PlaybackMode.shuffle) {
+        final fromSurah = change.fromSurahNumber;
+        if (fromSurah != null && fromSurah != change.surahNumber) {
+          _shuffleHistory.add(fromSurah);
+          _syncShuffleHistoryDepth();
+        }
+      }
+
+      // The player just transitioned (gaplessly) into the next surah we had
+      // queued. Top up the queue again so the *next* surah is ready before
+      // this one ends — this is what keeps iOS background audio alive.
+      unawaited(_topUpQueueIfNeeded());
+    });
   }
 
   Future<void> _handleCurrentAudio(PlayingAudioInfo? audioInfo) async {
@@ -513,6 +559,11 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     }
 
     try {
+      final translation = await QuranSettingsCubit.getCurrentTranslation();
+      final localizedSurahName = QuranSettingsCubit.getSurahNameInTranslation(
+        surahNumber,
+        translation,
+      );
       final ayahAudios = await _audioRepository.getAyahAudios(
         reciterId,
         surahNumber,
@@ -564,7 +615,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         filePaths: filePaths,
         surahNumber: surahNumber,
         reciterId: reciterId,
-        surahName: quran.getSurahNameEnglish(surahNumber),
+        surahName: localizedSurahName,
         ayahDurations: ayahDurations,
         startIndex: 0,
       );
@@ -577,13 +628,232 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
         state.copyWith(
           uiState: targetUiState,
           surahNumber: surahNumber,
-          surahName: quran.getSurahNameEnglish(surahNumber),
+          surahName: localizedSurahName,
           shuffleHistoryDepth: _shuffleHistory.length,
         ),
       );
+
+      // With the new surah playing, prepare the *next* one ahead of time so
+      // the player can transition gaplessly when this surah ends. iOS will
+      // suspend the app the moment audio actually stops in background, so we
+      // can't rely on completion → fetch → setAudioSource — we must already
+      // have the next ayah ready inside the active source.
+      unawaited(_topUpQueueIfNeeded());
     } catch (_) {
       _isAdvancingQueue = false;
       rethrow;
+    }
+  }
+
+  /// Surahs of [range] whose audio is not fully downloaded for [reciterId].
+  Future<List<int>> missingSurahsForRange({
+    required String reciterId,
+    required AyahRange range,
+  }) async {
+    final downloaded = await _downloadRepository.getDownloadedSurahs(reciterId);
+    final complete = downloaded
+        .where((item) => item.isComplete)
+        .map((item) => item.surahNumber)
+        .toSet();
+    return range.surahNumbers
+        .where((surahNumber) => !complete.contains(surahNumber))
+        .toList();
+  }
+
+  /// Play the verses of [range] with [reciterId] through the mini player.
+  /// Every surah of the range must already be downloaded.
+  Future<AyahRangePlaybackResult> playAyahRange({
+    required String reciterId,
+    required AyahRange range,
+  }) async {
+    assert(range.isValid, 'Invalid verse range: $range');
+    final myToken = ++_navigationToken;
+    final translation = await QuranSettingsCubit.getCurrentTranslation();
+    final segments = <AyahRangeSegment>[];
+
+    for (final surahNumber in range.surahNumbers) {
+      final firstAyah = range.firstAyahIn(surahNumber);
+      final lastAyah = range.lastAyahIn(
+        surahNumber,
+        verseCount: quran.getVerseCount(surahNumber),
+      );
+
+      var selected = _ayahsBetween(
+        await _audioRepository.getAyahAudios(reciterId, surahNumber),
+        firstAyah,
+        lastAyah,
+      );
+      if (myToken != _navigationToken) {
+        return AyahRangePlaybackResult.superseded;
+      }
+      if (selected.length != lastAyah - firstAyah + 1) {
+        return AyahRangePlaybackResult.audioMissing;
+      }
+
+      final hasMissingDurations = selected.any(
+        (audio) =>
+            audio.duration == null || audio.duration!.inMilliseconds <= 0,
+      );
+      if (hasMissingDurations) {
+        try {
+          await _audioRepository.warmUpAyahDurations(reciterId, surahNumber);
+          final warmed = _ayahsBetween(
+            await _audioRepository.getAyahAudios(reciterId, surahNumber),
+            firstAyah,
+            lastAyah,
+          );
+          if (warmed.length == selected.length) {
+            selected = warmed;
+          }
+        } catch (_) {
+          // Continue with partial durations.
+        }
+        if (myToken != _navigationToken) {
+          return AyahRangePlaybackResult.superseded;
+        }
+      }
+
+      segments.add(
+        AyahRangeSegment(
+          surahNumber: surahNumber,
+          firstAyahNumber: firstAyah,
+          filePaths: selected.map((audio) => audio.localPath).toList(),
+          ayahDurations: selected.map((audio) => audio.duration).toList(),
+          surahName: QuranSettingsCubit.getSurahNameInTranslation(
+            surahNumber,
+            translation,
+          ),
+        ),
+      );
+    }
+
+    await _audioPlayerService.playAyahRange(
+      segments: segments,
+      reciterId: reciterId,
+    );
+    await attachToCurrentPlayback(expanded: false, resetShuffleHistory: true);
+    return AyahRangePlaybackResult.started;
+  }
+
+  static List<AyahAudio> _ayahsBetween(
+    List<AyahAudio> ayahAudios,
+    int firstAyah,
+    int lastAyah,
+  ) {
+    return ayahAudios
+        .where(
+          (audio) =>
+              audio.ayahNumber >= firstAyah && audio.ayahNumber <= lastAyah,
+        )
+        .toList()
+      ..sort((a, b) => a.ayahNumber.compareTo(b.ayahNumber));
+  }
+
+  /// Compute the surah that should play after [currentSurahNumber] given the
+  /// current playback mode, or `null` if nothing should be queued (off /
+  /// repeatOne / empty queue).
+  int? _nextSurahForQueue(int currentSurahNumber) {
+    final queue = state.downloadedQueue;
+    if (queue.isEmpty) return null;
+    final currentIdx = queue.indexOf(currentSurahNumber);
+    if (currentIdx < 0) return null;
+
+    switch (state.playbackMode) {
+      case PlaybackMode.repeatAll:
+        final nextIdx = computeLinearQueueTarget(
+          currentIndex: currentIdx,
+          queueLength: queue.length,
+          forward: true,
+          wrap: true,
+        );
+        if (nextIdx == null) return null;
+        return queue[nextIdx];
+      case PlaybackMode.shuffle:
+        return selectShuffleTarget(
+          queue: queue,
+          currentSurah: currentSurahNumber,
+          nextInt: _nextRandomInt,
+        );
+      case PlaybackMode.off:
+      case PlaybackMode.repeatOne:
+        return null;
+    }
+  }
+
+  /// Ensure the surah after the currently playing one is appended to the
+  /// active ConcatenatingAudioSource. Safe to call repeatedly — the service
+  /// dedupes if the same surah is already queued ahead.
+  Future<void> _topUpQueueIfNeeded() async {
+    if (_isTopUpInFlight) return;
+    // A verse range ends on its own last verse; never chain a surah after it.
+    if (_audioPlayerService.isPlayingRange) return;
+    final reciterId = state.reciterId;
+    final currentSurah = state.surahNumber;
+    if (reciterId == null || currentSurah == null) return;
+    if (_audioPlayerService.hasQueuedSurahAhead) return;
+
+    final nextSurahNumber = _nextSurahForQueue(currentSurah);
+    if (nextSurahNumber == null) return;
+
+    _isTopUpInFlight = true;
+    try {
+      var ayahAudios = await _audioRepository.getAyahAudios(
+        reciterId,
+        nextSurahNumber,
+      );
+      if (ayahAudios.isEmpty) return;
+
+      // Warm up durations *before* appending so the seeker has a valid total
+      // duration the moment the player crosses into this segment. Without
+      // this, the cached durations passed to appendSurahToQueue contain nulls,
+      // computeTotalDuration returns null, and the seeker stays disabled even
+      // while audio plays correctly.
+      var ayahDurations = ayahAudios.map((audio) => audio.duration).toList();
+      final hasMissingDurations = ayahDurations.any(
+        (duration) => duration == null || duration.inMilliseconds <= 0,
+      );
+      if (hasMissingDurations) {
+        try {
+          await _audioRepository.warmUpAyahDurations(
+            reciterId,
+            nextSurahNumber,
+          );
+          final warmedAyahs = await _audioRepository.getAyahAudios(
+            reciterId,
+            nextSurahNumber,
+          );
+          if (warmedAyahs.isNotEmpty) {
+            ayahAudios = warmedAyahs;
+            ayahDurations = warmedAyahs.map((audio) => audio.duration).toList();
+          }
+        } catch (_) {
+          // Fall through with whatever durations we have.
+        }
+      }
+
+      if (state.reciterId != reciterId ||
+          state.surahNumber != currentSurah ||
+          _audioPlayerService.hasQueuedSurahAhead) {
+        // The player's state changed while we were fetching; another top-up
+        // will run on the new state if needed.
+        return;
+      }
+      final translation = await QuranSettingsCubit.getCurrentTranslation();
+      final localizedSurahName = QuranSettingsCubit.getSurahNameInTranslation(
+        nextSurahNumber,
+        translation,
+      );
+      await _audioPlayerService.appendSurahToQueue(
+        filePaths: ayahAudios.map((audio) => audio.localPath).toList(),
+        surahNumber: nextSurahNumber,
+        reciterId: reciterId,
+        surahName: localizedSurahName,
+        ayahDurations: ayahDurations,
+      );
+    } catch (_) {
+      // Best-effort; if queuing fails we'll fall back to handlePlaybackCompleted.
+    } finally {
+      _isTopUpInFlight = false;
     }
   }
 
@@ -670,6 +940,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
 
   @override
   Future<void> close() async {
+    _audioPlayerService.clearChapterNavigation();
     await _audioSub?.cancel();
     await _playerStateSub?.cancel();
     await _globalPositionSub?.cancel();
@@ -677,6 +948,7 @@ class SurahMiniPlayerCubit extends Cubit<SurahMiniPlayerState> {
     await _seekReadySub?.cancel();
     await _playbackModeSub?.cancel();
     await _playbackCompletedSub?.cancel();
+    await _queuedSurahPlayingSub?.cancel();
     return super.close();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audio_service/audio_service.dart';
 
 // Data Sources
 import 'data/datasources/reciter_local_data_source.dart';
@@ -37,6 +38,7 @@ import 'domain/usecases/mark_audio_updates_seen_usecase.dart';
 // Services
 import 'core/services/audio_player_service.dart';
 import 'core/services/audio_download_queue_service.dart';
+import 'core/services/quran_audio_handler.dart';
 import 'data/datasources/remote_config_service.dart';
 
 final locator = GetIt.instance;
@@ -49,6 +51,17 @@ Future<void> setupDependencies() async {
   final audioPlayerService = AudioPlayerService();
   await audioPlayerService.initialize();
   locator.registerSingleton<AudioPlayerService>(audioPlayerService);
+  final audioHandler = await AudioService.init(
+    builder: () => QuranAudioHandler(audioPlayerService),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.saliouseck.wolofquran.audio',
+      androidNotificationChannelName: 'Wolof Quran Audio',
+      androidNotificationIcon: 'mipmap/launcher_icon',
+      androidNotificationOngoing: true,
+      preloadArtwork: true,
+    ),
+  );
+  locator.registerSingleton<AudioHandler>(audioHandler);
 
   // Data Sources
   locator.registerLazySingleton<ReciterLocalDataSource>(

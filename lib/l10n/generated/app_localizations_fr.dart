@@ -45,6 +45,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get theme => 'Thème';
 
   @override
+  String get tajweedColoring => 'Coloration tajwid';
+
+  @override
+  String get tajweedColoringDescription =>
+      'Afficher les règles de tajwid en couleur dans le Mushaf';
+
+  @override
   String get dark => 'Sombre';
 
   @override
@@ -827,4 +834,74 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get supportValue => 'Jazaakumullaahu khairan';
+
+  @override
+  String get playVerseRange => 'Lire plusieurs versets';
+
+  @override
+  String get playUntilSurahEnd => 'Jusqu\'à la fin';
+
+  @override
+  String get customVerseRange => 'Personnalisée';
+
+  @override
+  String get rangeStartLabel => 'De';
+
+  @override
+  String get rangeEndLabel => 'À';
+
+  @override
+  String versesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count versets',
+      one: '1 verset',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String playVersesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Lire $count versets',
+      one: 'Lire 1 verset',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String verseRangeSubtitle(String reference) {
+    return 'Lecture continue à partir de $reference';
+  }
+
+  @override
+  String addVersesChip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count versets',
+      one: '+1 verset',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get surahEndChip => 'Fin de la sourate';
+
+  @override
+  String get chooseFirstVerse => 'Choisir le premier verset';
+
+  @override
+  String get chooseLastVerse => 'Choisir le dernier verset';
+
+  @override
+  String get searchSurahOrNumber => 'Rechercher une sourate ou un numéro';
+
+  @override
+  String verseCountShort(int count) {
+    return '$count v.';
+  }
 }

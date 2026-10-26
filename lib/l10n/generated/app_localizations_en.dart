@@ -45,6 +45,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get theme => 'Theme';
 
   @override
+  String get tajweedColoring => 'Tajweed coloring';
+
+  @override
+  String get tajweedColoringDescription =>
+      'Show colored tajweed rules in the Mushaf';
+
+  @override
   String get dark => 'Dark';
 
   @override
@@ -814,4 +821,74 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get supportValue => 'Jazaakumullaahu khairan';
+
+  @override
+  String get playVerseRange => 'Play multiple verses';
+
+  @override
+  String get playUntilSurahEnd => 'Until the end';
+
+  @override
+  String get customVerseRange => 'Custom';
+
+  @override
+  String get rangeStartLabel => 'From';
+
+  @override
+  String get rangeEndLabel => 'To';
+
+  @override
+  String versesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count verses',
+      one: '1 verse',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String playVersesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Play $count verses',
+      one: 'Play 1 verse',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String verseRangeSubtitle(String reference) {
+    return 'Continuous playback from $reference';
+  }
+
+  @override
+  String addVersesChip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '+$count verses',
+      one: '+1 verse',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get surahEndChip => 'End of surah';
+
+  @override
+  String get chooseFirstVerse => 'Choose the first verse';
+
+  @override
+  String get chooseLastVerse => 'Choose the last verse';
+
+  @override
+  String get searchSurahOrNumber => 'Search a surah or a number';
+
+  @override
+  String verseCountShort(int count) {
+    return '$count v.';
+  }
 }

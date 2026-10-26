@@ -7,6 +7,7 @@ import '../../cubits/bookmark_cubit.dart';
 import '../../cubits/surah_detail_cubit.dart';
 import '../ayah_card.dart';
 import '../ayah_play_button.dart';
+import '../ayah_range_play_sheet.dart';
 
 class SurahAyahsList extends StatelessWidget {
   final int surahNumber;
@@ -44,6 +45,10 @@ class SurahAyahsList extends StatelessWidget {
               surahNumber: surahNumber,
               ayahNumber: ayah.verseNumber,
               surahName: quran.getSurahName(surahNumber),
+            ),
+            AyahRangePlayButton(
+              surahNumber: surahNumber,
+              ayahNumber: ayah.verseNumber,
             ),
             IconButton(
               icon: BlocBuilder<BookmarkCubit, BookmarkState>(
