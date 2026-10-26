@@ -86,6 +86,47 @@ class PlaybackCompletedEvent {
   });
 }
 
+/// A queued surah inside the active ConcatenatingAudioSource. Each segment
+/// occupies a contiguous range of indices `[startIndex, startIndex + length)`.
+/// Multiple segments let the player transition between surahs gaplessly,
+/// which is required to keep iOS background audio alive across queue advances.
+class _PlaylistSegment {
+  final int surahNumber;
+  final String reciterId;
+  final String? surahName;
+  final int startIndex;
+  final int length;
+  final List<String> filePaths;
+  List<Duration?> ayahDurations;
+
+  _PlaylistSegment({
+    required this.surahNumber,
+    required this.reciterId,
+    required this.surahName,
+    required this.startIndex,
+    required this.length,
+    required this.filePaths,
+    required this.ayahDurations,
+  });
+
+  int get endIndex => startIndex + length;
+  bool containsGlobalIndex(int idx) => idx >= startIndex && idx < endIndex;
+}
+
+class QueuedSurahChange {
+  final int? fromSurahNumber;
+  final int surahNumber;
+  final String reciterId;
+  final String? surahName;
+
+  const QueuedSurahChange({
+    this.fromSurahNumber,
+    required this.surahNumber,
+    required this.reciterId,
+    required this.surahName,
+  });
+}
+
 /// Global audio player service using just_audio
 class AudioPlayerService {
   static final AudioPlayerService _instance = AudioPlayerService._internal();
@@ -114,11 +155,18 @@ class AudioPlayerService {
   final PublishSubject<PlaybackCompletedEvent> _playbackCompletedSubject =
       PublishSubject<PlaybackCompletedEvent>();
 
-  // Playlist management
+  // Playlist management. _currentPlaylist / _currentPlaylistIndex /
+  // _playlistCachedDurations are LOCAL to the currently-playing segment; they
+  // mirror `_segments[_currentSegmentIdx]` so the rest of the service can
+  // continue to reason about a single surah at a time.
   List<String> _currentPlaylist = [];
   List<Duration?> _playlistCachedDurations = [];
   int _currentPlaylistIndex = 0;
   bool _isPlayingPlaylist = false;
+  final List<_PlaylistSegment> _segments = [];
+  int? _currentSegmentIdx;
+  final PublishSubject<QueuedSurahChange> _queuedSurahPlayingSubject =
+      PublishSubject<QueuedSurahChange>();
   bool _initialized = false;
   Future<void>? _initializationFuture;
   StreamSubscription<AudioInterruptionEvent>? _interruptionSub;
@@ -143,6 +191,13 @@ class AudioPlayerService {
   Stream<PlaybackMode> get playbackMode => _playbackModeSubject.stream;
   Stream<PlaybackCompletedEvent> get playbackCompleted =>
       _playbackCompletedSubject.stream;
+
+  /// Emits when the player crosses into a new surah segment that was
+  /// previously queued via [appendSurahToQueue]. Consumers should use this
+  /// to update their notion of "currently playing surah" and to top up the
+  /// queue with the next surah ahead of time.
+  Stream<QueuedSurahChange> get queuedSurahPlaying =>
+      _queuedSurahPlayingSubject.stream;
 
   // Current values
   AudioPlayerState get currentPlayerState => _playerStateSubject.value;
@@ -213,13 +268,11 @@ class AudioPlayerService {
       _emitSurahTimeline();
     });
 
-    _audioPlayer.currentIndexStream.listen((index) {
-      if (!_isPlayingPlaylist || index == null) {
+    _audioPlayer.currentIndexStream.listen((globalIndex) {
+      if (!_isPlayingPlaylist || globalIndex == null) {
         return;
       }
-      _currentPlaylistIndex = index;
-      _syncCurrentAudioAyahIndex(index);
-      _emitSurahTimeline();
+      _handleGlobalIndexChange(globalIndex);
     });
 
     _audioPlayer.sequenceStateStream.listen((_) {
@@ -272,13 +325,30 @@ class AudioPlayerService {
         return;
       }
 
-      _currentPlaylist = filePaths;
-      _currentPlaylistIndex = startIndex.clamp(0, filePaths.length - 1);
-      _isPlayingPlaylist = true;
-      _playlistCachedDurations = _normalizeDurations(
+      final normalizedDurations = _normalizeDurations(
         rawDurations: ayahDurations,
         expectedLength: filePaths.length,
       );
+
+      _segments
+        ..clear()
+        ..add(
+          _PlaylistSegment(
+            surahNumber: surahNumber,
+            reciterId: reciterId,
+            surahName: surahName,
+            startIndex: 0,
+            length: filePaths.length,
+            filePaths: List<String>.from(filePaths),
+            ayahDurations: List<Duration?>.from(normalizedDurations),
+          ),
+        );
+      _currentSegmentIdx = 0;
+
+      _currentPlaylist = List<String>.from(filePaths);
+      _currentPlaylistIndex = startIndex.clamp(0, filePaths.length - 1);
+      _isPlayingPlaylist = true;
+      _playlistCachedDurations = List<Duration?>.from(normalizedDurations);
 
       _currentAudioSubject.add(
         PlayingAudioInfo(
@@ -308,6 +378,168 @@ class AudioPlayerService {
     }
   }
 
+  /// Append the next surah's ayahs to the currently playing ConcatenatingAudioSource.
+  ///
+  /// The player transitions across surah boundaries without ever stopping its
+  /// audio output. This is what keeps iOS background audio alive during
+  /// `repeat all` / `shuffle` queue advances — iOS only keeps a backgrounded
+  /// app running while audio is actively being produced.
+  ///
+  /// Returns `true` if the surah was queued, `false` otherwise (e.g. nothing
+  /// is currently playing, or the source isn't a ConcatenatingAudioSource).
+  Future<bool> appendSurahToQueue({
+    required List<String> filePaths,
+    required int surahNumber,
+    required String reciterId,
+    String? surahName,
+    List<Duration?>? ayahDurations,
+  }) async {
+    if (!_isPlayingPlaylist || filePaths.isEmpty || _segments.isEmpty) {
+      return false;
+    }
+    final source = _audioPlayer.audioSource;
+    if (source is! ConcatenatingAudioSource) {
+      return false;
+    }
+    // Skip if the surah is already queued ahead of the currently-playing one
+    // (avoids unbounded growth when the cubit re-triggers a top-up).
+    final currentIdx = _currentSegmentIdx ?? 0;
+    final alreadyQueuedAhead = _segments
+        .skip(currentIdx + 1)
+        .any(
+          (segment) =>
+              segment.surahNumber == surahNumber &&
+              segment.reciterId == reciterId,
+        );
+    if (alreadyQueuedAhead) {
+      return false;
+    }
+
+    final startIndex = _segments.last.endIndex;
+    final normalizedDurations = _normalizeDurations(
+      rawDurations: ayahDurations,
+      expectedLength: filePaths.length,
+    );
+
+    try {
+      await source.addAll(
+        filePaths.map((path) => AudioSource.file(path)).toList(),
+      );
+    } catch (_) {
+      return false;
+    }
+
+    _segments.add(
+      _PlaylistSegment(
+        surahNumber: surahNumber,
+        reciterId: reciterId,
+        surahName: surahName,
+        startIndex: startIndex,
+        length: filePaths.length,
+        filePaths: List<String>.from(filePaths),
+        ayahDurations: List<Duration?>.from(normalizedDurations),
+      ),
+    );
+    return true;
+  }
+
+  bool get hasQueuedSurahAhead {
+    final currentIdx = _currentSegmentIdx;
+    if (currentIdx == null) return false;
+    return currentIdx + 1 < _segments.length;
+  }
+
+  /// The surah currently expected to play after the active one, if any was
+  /// pre-queued via [appendSurahToQueue].
+  QueuedSurahChange? get nextQueuedSurah {
+    final currentIdx = _currentSegmentIdx;
+    if (currentIdx == null) return null;
+    if (currentIdx + 1 >= _segments.length) return null;
+    final current = _segments[currentIdx];
+    final next = _segments[currentIdx + 1];
+    return QueuedSurahChange(
+      fromSurahNumber: current.surahNumber,
+      surahNumber: next.surahNumber,
+      reciterId: next.reciterId,
+      surahName: next.surahName,
+    );
+  }
+
+  void _handleGlobalIndexChange(int globalIndex) {
+    if (_segments.isEmpty) {
+      _currentPlaylistIndex = globalIndex;
+      _syncCurrentAudioAyahIndex(globalIndex);
+      _emitSurahTimeline();
+      return;
+    }
+
+    final segmentIdx = _findSegmentForGlobalIndex(globalIndex);
+    if (segmentIdx == null) {
+      return;
+    }
+
+    final segment = _segments[segmentIdx];
+    final localIndex = globalIndex - segment.startIndex;
+
+    if (segmentIdx != _currentSegmentIdx) {
+      final previousSegmentIdx = _currentSegmentIdx;
+      final previousSegment =
+          previousSegmentIdx != null &&
+              previousSegmentIdx >= 0 &&
+              previousSegmentIdx < _segments.length
+          ? _segments[previousSegmentIdx]
+          : null;
+
+      // The player crossed into a new surah without us stopping it — this is
+      // the gapless transition path. Swap our "current segment" state to the
+      // new surah and emit fresh now-playing info.
+      _currentSegmentIdx = segmentIdx;
+      _currentPlaylist = List<String>.from(segment.filePaths);
+      _playlistCachedDurations = List<Duration?>.from(segment.ayahDurations);
+      _currentPlaylistIndex = localIndex;
+
+      _currentAudioSubject.add(
+        PlayingAudioInfo(
+          surahNumber: segment.surahNumber,
+          ayahNumber: localIndex,
+          reciterId: segment.reciterId,
+          surahName: segment.surahName,
+          isPlaylist: true,
+        ),
+      );
+      _queuedSurahPlayingSubject.add(
+        QueuedSurahChange(
+          fromSurahNumber: previousSegment?.surahNumber,
+          surahNumber: segment.surahNumber,
+          reciterId: segment.reciterId,
+          surahName: segment.surahName,
+        ),
+      );
+    } else {
+      _currentPlaylistIndex = localIndex;
+      _syncCurrentAudioAyahIndex(localIndex);
+    }
+
+    _emitSurahTimeline();
+  }
+
+  int? _findSegmentForGlobalIndex(int globalIndex) {
+    for (var i = 0; i < _segments.length; i++) {
+      if (_segments[i].containsGlobalIndex(globalIndex)) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  int _globalIndexForLocal(int localIndex) {
+    final segmentIdx = _currentSegmentIdx;
+    if (segmentIdx == null) {
+      return localIndex;
+    }
+    return _segments[segmentIdx].startIndex + localIndex;
+  }
+
   /// Live update of known ayah durations for current surah playlist.
   void updatePlaylistDurations({
     required String reciterId,
@@ -328,6 +560,12 @@ class AudioPlayerService {
       rawDurations: durations,
       expectedLength: _currentPlaylist.length,
     );
+    final segmentIdx = _currentSegmentIdx;
+    if (segmentIdx != null && segmentIdx < _segments.length) {
+      _segments[segmentIdx].ayahDurations = List<Duration?>.from(
+        _playlistCachedDurations,
+      );
+    }
     _emitSurahTimeline();
   }
 
@@ -408,7 +646,10 @@ class AudioPlayerService {
     );
     _currentPlaylistIndex = seekTarget.ayahIndex;
     _syncCurrentAudioAyahIndex(seekTarget.ayahIndex);
-    await _audioPlayer.seek(seekTarget.offset, index: seekTarget.ayahIndex);
+    await _audioPlayer.seek(
+      seekTarget.offset,
+      index: _globalIndexForLocal(seekTarget.ayahIndex),
+    );
     _emitSurahTimeline();
   }
 
@@ -440,7 +681,10 @@ class AudioPlayerService {
       final nextIndex = _currentPlaylistIndex + 1;
       _currentPlaylistIndex = nextIndex;
       _syncCurrentAudioAyahIndex(nextIndex);
-      await _audioPlayer.seek(Duration.zero, index: nextIndex);
+      await _audioPlayer.seek(
+        Duration.zero,
+        index: _globalIndexForLocal(nextIndex),
+      );
       _emitSurahTimeline();
     }
   }
@@ -451,7 +695,10 @@ class AudioPlayerService {
       final previousIndex = _currentPlaylistIndex - 1;
       _currentPlaylistIndex = previousIndex;
       _syncCurrentAudioAyahIndex(previousIndex);
-      await _audioPlayer.seek(Duration.zero, index: previousIndex);
+      await _audioPlayer.seek(
+        Duration.zero,
+        index: _globalIndexForLocal(previousIndex),
+      );
       _emitSurahTimeline();
     }
   }
@@ -541,6 +788,7 @@ class AudioPlayerService {
     await _surahSeekReadySubject.close();
     await _playbackModeSubject.close();
     await _playbackCompletedSubject.close();
+    await _queuedSurahPlayingSubject.close();
   }
 
   /// Handle playback completion
@@ -561,7 +809,10 @@ class AudioPlayerService {
           }
           _currentPlaylistIndex = 0;
           _syncCurrentAudioAyahIndex(0);
-          await _audioPlayer.seek(Duration.zero, index: 0);
+          await _audioPlayer.seek(
+            Duration.zero,
+            index: _globalIndexForLocal(0),
+          );
           await _audioPlayer.play();
           _emitSurahTimeline();
           return;
@@ -605,7 +856,11 @@ class AudioPlayerService {
   }
 
   Future<void> _replaceCurrentPlayback() async {
-    await _audioPlayer.stop();
+    // Do not call `_audioPlayer.stop()` here. On iOS, just_audio's stop()
+    // deactivates the AVAudioSession (via `_setPlatformActive(false)`), which
+    // makes the system suspend the app between tracks when playing in the
+    // background — breaking `repeat all` queue advances. `setAudioSource()`
+    // performs the source swap without dropping the active session.
     _clearPlaybackSession(clearCurrentAudio: false, emitStoppedState: false);
   }
 
@@ -617,6 +872,8 @@ class AudioPlayerService {
     _currentPlaylist.clear();
     _playlistCachedDurations.clear();
     _currentPlaylistIndex = 0;
+    _segments.clear();
+    _currentSegmentIdx = null;
     _positionSubject.add(Duration.zero);
     _durationSubject.add(null);
     _resetSurahTimeline();
@@ -664,9 +921,10 @@ class AudioPlayerService {
     }
 
     final total = computeTotalDuration(durations);
+    final localIndex = _localIndexForCurrentPosition();
     final rawPosition = computeGlobalPosition(
       segmentDurations: durations,
-      currentIndex: _audioPlayer.currentIndex ?? _currentPlaylistIndex,
+      currentIndex: localIndex,
       currentPosition: _positionSubject.value,
     );
 
@@ -674,6 +932,21 @@ class AudioPlayerService {
     _surahGlobalPositionSubject.add(position);
     _surahGlobalDurationSubject.add(total);
     _surahSeekReadySubject.add(total != null && total.inMilliseconds > 0);
+  }
+
+  int _localIndexForCurrentPosition() {
+    final globalIndex = _audioPlayer.currentIndex;
+    final segmentIdx = _currentSegmentIdx;
+    if (globalIndex != null &&
+        segmentIdx != null &&
+        segmentIdx < _segments.length) {
+      final segment = _segments[segmentIdx];
+      final relative = globalIndex - segment.startIndex;
+      if (relative >= 0 && relative < segment.length) {
+        return relative;
+      }
+    }
+    return _currentPlaylistIndex;
   }
 
   void _resetSurahTimeline() {
@@ -687,7 +960,17 @@ class AudioPlayerService {
     if (sequence == null || sequence.isEmpty) {
       return const [];
     }
-    return sequence.map((source) => source.duration).toList();
+    final segmentIdx = _currentSegmentIdx;
+    if (segmentIdx == null || segmentIdx >= _segments.length) {
+      return sequence.map((source) => source.duration).toList();
+    }
+    final segment = _segments[segmentIdx];
+    final end = segment.endIndex.clamp(0, sequence.length);
+    final start = segment.startIndex.clamp(0, end);
+    return sequence
+        .getRange(start, end)
+        .map((source) => source.duration)
+        .toList();
   }
 
   List<Duration?> _effectivePlaylistDurations() {
