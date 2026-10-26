@@ -1155,5 +1155,465 @@
         "description": "Number of verses"
       }
     }
+  },
+  "readingGoals": "My goals",
+  "@readingGoals": {
+    "description": "Title of the reading goals screen and home tile"
+  },
+  "readingGoalsSubtitle": "Plan your Khatm",
+  "@readingGoalsSubtitle": {
+    "description": "Subtitle of the reading goals home tile"
+  },
+  "newReadingGoal": "New goal",
+  "@newReadingGoal": {
+    "description": "Button and title to create a reading goal"
+  },
+  "editReadingGoal": "Edit goal",
+  "@editReadingGoal": {
+    "description": "Title when editing a reading goal"
+  },
+  "readingGoalsOngoing": "Ongoing",
+  "@readingGoalsOngoing": {
+    "description": "Tab listing goals currently being read"
+  },
+  "readingGoalsPlanned": "Planned",
+  "@readingGoalsPlanned": {
+    "description": "Tab listing goals that start later"
+  },
+  "readingGoalsFinished": "Finished",
+  "@readingGoalsFinished": {
+    "description": "Tab listing completed and abandoned goals"
+  },
+  "noReadingGoalsTitle": "No reading goal yet",
+  "@noReadingGoalsTitle": {
+    "description": "Empty state title of the reading goals screen"
+  },
+  "noReadingGoalsDescription": "Plan a Khatm at your own pace: pick a duration and the app tells you how many pages to read each day.",
+  "@noReadingGoalsDescription": {
+    "description": "Empty state description of the reading goals screen"
+  },
+  "noReadingGoalsInSection": "Nothing here for now",
+  "@noReadingGoalsInSection": {
+    "description": "Empty state of a reading goals tab"
+  },
+  "createReadingGoal": "Create a goal",
+  "@createReadingGoal": {
+    "description": "Call to action creating the first reading goal"
+  },
+  "continueReading": "Continue reading",
+  "@continueReading": {
+    "description": "Opens the mushaf at the next page of a goal"
+  },
+  "readingProgressLabel": "{validated}/{total} pages",
+  "@readingProgressLabel": {
+    "description": "Short progress of a goal",
+    "placeholders": {
+      "validated": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "readingValidatedOf": "{validated} pages read out of {total}",
+  "@readingValidatedOf": {
+    "description": "Long progress of a goal",
+    "placeholders": {
+      "validated": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentValue": "{percent}%",
+  "@percentValue": {
+    "description": "A percentage",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "readingTodayProgress": "Today: {read}/{target} pages",
+  "@readingTodayProgress": {
+    "description": "Pages read today against the daily target",
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "readingTodayDone": "Today's goal reached ✓",
+  "@readingTodayDone": {
+    "description": "Shown when the daily target is met"
+  },
+  "readingRemainingToday": "{count, plural, =1{1 page left today} other{{count} pages left today}}",
+  "@readingRemainingToday": {
+    "description": "Pages still to read to meet today's target",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "readingDaysLeft": "{count, plural, =1{1 day left} other{{count} days left}}",
+  "@readingDaysLeft": {
+    "description": "Days until the goal end date, today included",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "readingEndsOn": "Ends on {date}",
+  "@readingEndsOn": {
+    "description": "End date of a goal",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "readingStartsOn": "Starts on {date}",
+  "@readingStartsOn": {
+    "description": "Start date of a planned goal",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "readingPaceAhead": "{count, plural, =1{1 page ahead} other{{count} pages ahead}}",
+  "@readingPaceAhead": {
+    "description": "Pages read beyond the planned pace",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "readingPaceBehind": "{count, plural, =1{1 page behind} other{{count} pages behind}}",
+  "@readingPaceBehind": {
+    "description": "Pages missing compared to the planned pace",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "readingPaceOnTrack": "On track",
+  "@readingPaceOnTrack": {
+    "description": "Progress matches the planned pace"
+  },
+  "readingStatusActive": "Active",
+  "@readingStatusActive": {
+    "description": "Goal status"
+  },
+  "readingStatusPaused": "Paused",
+  "@readingStatusPaused": {
+    "description": "Goal status"
+  },
+  "readingStatusPlanned": "Planned",
+  "@readingStatusPlanned": {
+    "description": "Goal status"
+  },
+  "readingStatusCompleted": "Completed",
+  "@readingStatusCompleted": {
+    "description": "Goal status"
+  },
+  "readingStatusExpired": "Expired",
+  "@readingStatusExpired": {
+    "description": "Goal status: end date passed without completion"
+  },
+  "readingStatusAbandoned": "Abandoned",
+  "@readingStatusAbandoned": {
+    "description": "Goal status"
+  },
+  "readingGoalFollowed": "Followed in the Mushaf",
+  "@readingGoalFollowed": {
+    "description": "Badge of the goal tracked while reading"
+  },
+  "followGoal": "Follow this goal",
+  "@followGoal": {
+    "description": "Makes a goal the one tracked in the mushaf"
+  },
+  "renameGoal": "Rename",
+  "@renameGoal": {
+    "description": "Goal menu action"
+  },
+  "changeEndDate": "Change end date",
+  "@changeEndDate": {
+    "description": "Goal menu action"
+  },
+  "pauseGoal": "Pause",
+  "@pauseGoal": {
+    "description": "Goal menu action"
+  },
+  "resumeGoal": "Resume",
+  "@resumeGoal": {
+    "description": "Goal menu action"
+  },
+  "abandonGoal": "Abandon",
+  "@abandonGoal": {
+    "description": "Goal menu action"
+  },
+  "deleteGoal": "Delete",
+  "@deleteGoal": {
+    "description": "Goal menu action"
+  },
+  "duplicateGoal": "New goal from this one",
+  "@duplicateGoal": {
+    "description": "Goal menu action creating a goal with the same settings"
+  },
+  "reactivateGoal": "Reactivate",
+  "@reactivateGoal": {
+    "description": "Goal menu action for a finished goal"
+  },
+  "extendGoal": "Extend",
+  "@extendGoal": {
+    "description": "Action on an expired goal to pick a new end date"
+  },
+  "deleteGoalConfirmTitle": "Delete this goal?",
+  "@deleteGoalConfirmTitle": {
+    "description": "Confirmation dialog title"
+  },
+  "deleteGoalConfirmBody": "Its progress and history will be lost. This cannot be undone.",
+  "@deleteGoalConfirmBody": {
+    "description": "Confirmation dialog body"
+  },
+  "abandonGoalConfirmTitle": "Abandon this goal?",
+  "@abandonGoalConfirmTitle": {
+    "description": "Confirmation dialog title"
+  },
+  "abandonGoalConfirmBody": "Its progress is kept and you can reactivate it later.",
+  "@abandonGoalConfirmBody": {
+    "description": "Confirmation dialog body"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Generic confirmation button"
+  },
+  "markPagesRead": "Mark pages as read",
+  "@markPagesRead": {
+    "description": "Title of the sheet validating pages read elsewhere"
+  },
+  "untilPageMode": "Up to a page",
+  "@untilPageMode": {
+    "description": "Mark pages mode: everything up to a page"
+  },
+  "pageRangeMode": "Page range",
+  "@pageRangeMode": {
+    "description": "Mark pages mode: from one page to another"
+  },
+  "untilPageHint": "Marks every unread page of the goal up to this page, in reading order.",
+  "@untilPageHint": {
+    "description": "Explanation under the until-page mode"
+  },
+  "fromPageLabel": "From page",
+  "@fromPageLabel": {
+    "description": "Label of the first page field"
+  },
+  "toPageLabel": "To page",
+  "@toPageLabel": {
+    "description": "Label of the last page field"
+  },
+  "pageFieldLabel": "Page",
+  "@pageFieldLabel": {
+    "description": "Label of a page number field"
+  },
+  "pagesToMarkSummary": "{count, plural, =0{No new page to mark} =1{1 page will be marked as read} other{{count} pages will be marked as read}}",
+  "@pagesToMarkSummary": {
+    "description": "Preview before confirming a manual validation",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pagesAlreadyRead": "{count, plural, =1{1 already read} other{{count} already read}}",
+  "@pagesAlreadyRead": {
+    "description": "Pages of the selection that are already validated",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "markAsRead": "Mark as read",
+  "@markAsRead": {
+    "description": "Confirms a manual validation"
+  },
+  "pagesMarked": "{count, plural, =1{1 page marked as read} other{{count} pages marked as read}}",
+  "@pagesMarked": {
+    "description": "Snackbar after a manual validation",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "undo": "Undo",
+  "@undo": {
+    "description": "Snackbar action reverting the last validation"
+  },
+  "invalidPage": "Enter a page between 1 and {total}",
+  "@invalidPage": {
+    "description": "Validation error of a page field",
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "goalName": "Goal name",
+  "@goalName": {
+    "description": "Label of the goal name field"
+  },
+  "goalNameHint": "e.g. Khatm Ramadan",
+  "@goalNameHint": {
+    "description": "Hint of the goal name field"
+  },
+  "defaultGoalName": "Khatm {number}",
+  "@defaultGoalName": {
+    "description": "Name suggested for a new goal",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "goalDuration": "Duration",
+  "@goalDuration": {
+    "description": "Section of the goal form"
+  },
+  "durationDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@durationDays": {
+    "description": "Duration chip",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "customDuration": "Custom",
+  "@customDuration": {
+    "description": "Duration chip opening a number field"
+  },
+  "pickEndDate": "End date",
+  "@pickEndDate": {
+    "description": "Duration chip opening a date picker"
+  },
+  "goalStartPoint": "Starting point",
+  "@goalStartPoint": {
+    "description": "Section of the goal form"
+  },
+  "startFromBeginning": "Beginning of the Quran",
+  "@startFromBeginning": {
+    "description": "Starting point option"
+  },
+  "startFromCurrentPage": "Current page",
+  "@startFromCurrentPage": {
+    "description": "Starting point option: last page opened in the mushaf"
+  },
+  "startFromChosenPage": "Chosen page",
+  "@startFromChosenPage": {
+    "description": "Starting point option"
+  },
+  "goalStartDate": "Start date",
+  "@goalStartDate": {
+    "description": "Section of the goal form"
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Start date option"
+  },
+  "chooseDate": "Choose a date",
+  "@chooseDate": {
+    "description": "Opens a date picker"
+  },
+  "goalSummary": "Summary",
+  "@goalSummary": {
+    "description": "Title of the recap step"
+  },
+  "pagesToRead": "Pages to read",
+  "@pagesToRead": {
+    "description": "Recap row"
+  },
+  "averagePerDay": "About {pages} pages per day",
+  "@averagePerDay": {
+    "description": "Recap row",
+    "placeholders": {
+      "pages": {
+        "type": "String"
+      }
+    }
+  },
+  "goalCreate": "Create the goal",
+  "@goalCreate": {
+    "description": "Final button of the creation form"
+  },
+  "goalSave": "Save",
+  "@goalSave": {
+    "description": "Final button of the edit form"
+  },
+  "nextStep": "Next",
+  "@nextStep": {
+    "description": "Goes from the form to the recap"
+  },
+  "homeReadingTitle": "Reading in progress",
+  "@homeReadingTitle": {
+    "description": "Header of the home card showing the followed goal"
+  },
+  "homeReadingEmptyTitle": "Plan your Quran reading",
+  "@homeReadingEmptyTitle": {
+    "description": "Home card title when no goal exists"
+  },
+  "homeReadingEmptyBody": "Set a goal and know each day how many pages to read.",
+  "@homeReadingEmptyBody": {
+    "description": "Home card body when no goal exists"
+  },
+  "seeAllGoals": "All goals",
+  "@seeAllGoals": {
+    "description": "Link from the home card to the goals screen"
+  },
+  "chooseSurah": "Choose a surah",
+  "@chooseSurah": {
+    "description": "Title of the surah picker used to pick a page"
+  },
+  "resumeAtPage": "Resume at page {page}",
+  "@resumeAtPage": {
+    "description": "Next page to read in a goal",
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "goalDates": "{start} → {end}",
+  "@goalDates": {
+    "description": "Start and end dates of a goal",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "completedOn": "Completed on {date}",
+  "@completedOn": {
+    "description": "Completion date of a goal",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   }
 }

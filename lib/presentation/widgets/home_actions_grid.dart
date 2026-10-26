@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../views/surah_audio_list_page.dart';
 import '../views/mushaf_page.dart';
+import '../views/reading_goals_page.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 class HomeActionsGrid extends StatelessWidget {
@@ -10,6 +11,39 @@ class HomeActionsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
+
+    final cards = [
+      _GridCard(
+        icon: Icons.menu_book_rounded,
+        title: localizations.quran,
+        subtitle: localizations.readSurahs,
+        onTap: () => Navigator.pushNamed(context, '/surahs'),
+      ),
+      _GridCard(
+        icon: Icons.headphones_rounded,
+        title: localizations.recitation,
+        subtitle: localizations.listenAudio,
+        onTap: () => Navigator.pushNamed(context, SurahAudioListPage.routeName),
+      ),
+      _GridCard(
+        icon: Icons.auto_stories_rounded,
+        title: localizations.mushaf,
+        subtitle: localizations.readByPage,
+        onTap: () => Navigator.pushNamed(context, MushafPage.routeName),
+      ),
+      _GridCard(
+        icon: Icons.flag_rounded,
+        title: localizations.readingGoals,
+        subtitle: localizations.readingGoalsSubtitle,
+        onTap: () => Navigator.pushNamed(context, ReadingGoalsPage.routeName),
+      ),
+      _GridCard(
+        icon: Icons.search_rounded,
+        title: localizations.explorer,
+        subtitle: '${localizations.search} & ${localizations.bookmarks}',
+        onTap: () => Navigator.pushNamed(context, '/search'),
+      ),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,51 +58,19 @@ class HomeActionsGrid extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _GridCard(
-                icon: Icons.menu_book_rounded,
-                title: localizations.quran,
-                subtitle: localizations.readSurahs,
-                onTap: () => Navigator.pushNamed(context, '/surahs'),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _GridCard(
-                icon: Icons.headphones_rounded,
-                title: localizations.recitation,
-                subtitle: localizations.listenAudio,
-                onTap: () =>
-                    Navigator.pushNamed(context, SurahAudioListPage.routeName),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _GridCard(
-                icon: Icons.auto_stories_rounded,
-                title: localizations.mushaf,
-                subtitle: localizations.readByPage,
-                onTap: () => Navigator.pushNamed(context, MushafPage.routeName),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _GridCard(
-                icon: Icons.search_rounded,
-                title: localizations.explorer,
-                subtitle:
-                    '${localizations.search} & ${localizations.bookmarks}',
-                onTap: () => Navigator.pushNamed(context, '/search'),
-              ),
-            ),
-          ],
-        ),
+        // Two cards per row; an odd last card spans the full width.
+        for (var i = 0; i < cards.length; i += 2) ...[
+          if (i > 0) const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: cards[i]),
+              if (i + 1 < cards.length) ...[
+                const SizedBox(width: 12),
+                Expanded(child: cards[i + 1]),
+              ],
+            ],
+          ),
+        ],
       ],
     );
   }

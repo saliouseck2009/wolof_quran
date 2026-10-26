@@ -9,6 +9,8 @@ import 'data/datasources/audio_local_data_source.dart';
 import 'data/datasources/database_helper.dart';
 import 'data/datasources/audio_availability_local_data_source.dart';
 import 'data/datasources/audio_availability_remote_data_source.dart';
+import 'data/datasources/reading_goal_local_data_source.dart';
+import 'data/datasources/reading_preferences_data_source.dart';
 
 // Repositories
 import 'data/repositories/reciter_repository_impl.dart';
@@ -17,12 +19,14 @@ import 'data/repositories/download_repository_impl.dart';
 import 'data/repositories/download_queue_repository_impl.dart';
 import 'data/repositories/bookmark_repository_impl.dart';
 import 'data/repositories/audio_availability_repository_impl.dart';
+import 'data/repositories/reading_goal_repository_impl.dart';
 import 'domain/repositories/reciter_repository.dart';
 import 'domain/repositories/audio_repository.dart';
 import 'domain/repositories/download_repository.dart';
 import 'domain/repositories/download_queue_repository.dart';
 import 'domain/repositories/bookmark_repository.dart';
 import 'domain/repositories/audio_availability_repository.dart';
+import 'domain/repositories/reading_goal_repository.dart';
 
 // Use Cases
 import 'domain/usecases/get_reciters_usecase.dart';
@@ -77,6 +81,12 @@ Future<void> setupDependencies() async {
   locator.registerLazySingleton<AudioAvailabilityRemoteDataSource>(
     () => AudioAvailabilityRemoteDataSource(locator<Dio>()),
   );
+  locator.registerLazySingleton<ReadingGoalLocalDataSource>(
+    () => ReadingGoalLocalDataSource(locator<DatabaseHelper>()),
+  );
+  locator.registerLazySingleton<ReadingPreferencesDataSource>(
+    () => ReadingPreferencesDataSource(),
+  );
 
   // Repositories
   locator.registerLazySingleton<ReciterRepository>(
@@ -98,6 +108,12 @@ Future<void> setupDependencies() async {
     () => AudioAvailabilityRepositoryImpl(
       remoteDataSource: locator<AudioAvailabilityRemoteDataSource>(),
       localDataSource: locator<AudioAvailabilityLocalDataSource>(),
+    ),
+  );
+  locator.registerLazySingleton<ReadingGoalRepository>(
+    () => ReadingGoalRepositoryImpl(
+      localDataSource: locator<ReadingGoalLocalDataSource>(),
+      preferences: locator<ReadingPreferencesDataSource>(),
     ),
   );
 

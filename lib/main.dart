@@ -10,6 +10,7 @@ import 'package:wolof_quran/core/services/audio_download_queue_service.dart';
 import 'package:wolof_quran/domain/repositories/reciter_repository.dart';
 import 'package:wolof_quran/domain/repositories/download_repository.dart';
 import 'package:wolof_quran/domain/repositories/audio_repository.dart';
+import 'package:wolof_quran/domain/repositories/reading_goal_repository.dart';
 import 'package:wolof_quran/domain/usecases/download_surah_audio_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_ayah_audios_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_reciters_usecase.dart';
@@ -20,6 +21,7 @@ import 'package:wolof_quran/domain/usecases/refresh_audio_availability_usecase.d
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/audio_availability_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/quran_settings_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/reading_goals_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/reciter_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/ayah_playback_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/audio_download_queue_cubit.dart';
@@ -36,6 +38,8 @@ import 'l10n/generated/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting("fr_FR");
+  await initializeDateFormatting("en_US");
+  await initializeDateFormatting("ar_SA");
   await setupDependencies();
   Bloc.observer = SimpleBlocObserver();
   runApp(const MyApp());
@@ -89,6 +93,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           lazy: false,
           create: (context) => QuranSettingsCubit()..loadSettings(),
+        ),
+        BlocProvider(
+          lazy: false,
+          create: (context) =>
+              ReadingGoalsCubit(repository: locator<ReadingGoalRepository>())
+                ..load(),
         ),
         // provide ayat playback
         BlocProvider(

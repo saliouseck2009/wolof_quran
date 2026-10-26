@@ -20,15 +20,18 @@ import 'mushaf_surah_picker_page.dart';
 class MushafPage extends StatelessWidget {
   static const routeName = '/mushaf';
 
-  const MushafPage({super.key});
+  /// Page to open instead of the last page read.
+  final int? initialPage;
+
+  const MushafPage({super.key, this.initialPage});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) =>
-              MushafBloc(MushafRepository())..add(const MushafLoaded()),
+          create: (_) => MushafBloc(MushafRepository())
+            ..add(MushafLoaded(initialPage: initialPage)),
         ),
         BlocProvider(
           create: (_) =>
