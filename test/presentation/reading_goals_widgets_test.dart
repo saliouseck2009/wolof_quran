@@ -199,7 +199,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Fini'), findsOneWidget);
       expect(find.text('Terminé'), findsOneWidget);
-      expect(find.text('Nouvel objectif à partir de celui-ci'), findsOneWidget);
+      expect(find.text('Dupliquer l\'objectif'), findsOneWidget);
     });
 
     testWidgets('shows the empty state without goals', (tester) async {

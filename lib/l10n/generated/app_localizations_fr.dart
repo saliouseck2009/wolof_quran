@@ -1065,7 +1065,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deleteGoal => 'Supprimer';
 
   @override
-  String get duplicateGoal => 'Nouvel objectif à partir de celui-ci';
+  String get duplicateGoal => 'Dupliquer l\'objectif';
 
   @override
   String get reactivateGoal => 'Réactiver';
@@ -1458,7 +1458,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionUnmark => 'Validation retirée';
 
   @override
-  String get markSection => 'Marquer un Juz, un Hizb ou une Sourate';
+  String get markSection => 'Marquer Juz / Hizb / Sourate';
 
   @override
   String get sectionJuz => 'Juz';
@@ -1619,4 +1619,20 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get later => 'Plus tard';
+
+  @override
+  String get markPagesShort => 'Marquer des pages';
+
+  @override
+  String get markSectionShort => 'Marquer une section';
+
+  @override
+  String statBestDayOn(String date) {
+    return 'Meilleur jour · $date';
+  }
+
+  @override
+  String readUntilHereConfirmSingle(int page, String goal) {
+    return 'Marquer la page $page comme lue dans « $goal » ?';
+  }
 }

@@ -307,7 +307,7 @@
   "resumeGoal": "Reprendre",
   "abandonGoal": "Abandonner",
   "deleteGoal": "Supprimer",
-  "duplicateGoal": "Nouvel objectif à partir de celui-ci",
+  "duplicateGoal": "Dupliquer l'objectif",
   "reactivateGoal": "Réactiver",
   "extendGoal": "Prolonger",
   "deleteGoalConfirmTitle": "Supprimer cet objectif ?",
@@ -410,7 +410,7 @@
   "actionHizb": "Hizb",
   "actionSurah": "Sourate",
   "actionUnmark": "Validation retirée",
-  "markSection": "Marquer un Juz, un Hizb ou une Sourate",
+  "markSection": "Marquer Juz / Hizb / Sourate",
   "sectionJuz": "Juz",
   "sectionHizb": "Hizb",
   "sectionSurah": "Sourate",
@@ -452,5 +452,9 @@
   "viewHistory": "Voir l'historique",
   "readingGoalsHintTitle": "Suivez votre lecture",
   "readingGoalsHintBody": "Créez un objectif pour savoir chaque jour combien de pages lire, et validez votre progression directement dans le Mushaf.",
-  "later": "Plus tard"
+  "later": "Plus tard",
+  "markPagesShort": "Marquer des pages",
+  "markSectionShort": "Marquer une section",
+  "statBestDayOn": "Meilleur jour · {date}",
+  "readUntilHereConfirmSingle": "Marquer la page {page} comme lue dans « {goal} » ?"
 }

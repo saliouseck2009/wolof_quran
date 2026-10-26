@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Thin rounded progress bar, 6 px high, in the style of the verse range
-/// sheet.
+/// sheet. Takes the full available width whatever the parent's alignment.
 class ReadingProgressBar extends StatelessWidget {
   final double fraction;
   final Color? color;
@@ -21,26 +21,29 @@ class ReadingProgressBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final radius = BorderRadius.circular(height / 2);
 
-    return ClipRRect(
-      borderRadius: radius,
-      child: SizedBox(
-        height: height,
+    return SizedBox(
+      width: double.infinity,
+      height: height,
+      child: ClipRRect(
+        borderRadius: radius,
         child: Stack(
+          fit: StackFit.expand,
           children: [
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: trackColor ?? colorScheme.surfaceContainerHighest,
-                ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: trackColor ?? colorScheme.surfaceContainerHighest,
               ),
             ),
-            FractionallySizedBox(
+            Align(
               alignment: AlignmentDirectional.centerStart,
-              widthFactor: fraction.clamp(0.0, 1.0),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: color ?? colorScheme.primary,
-                  borderRadius: radius,
+              child: FractionallySizedBox(
+                widthFactor: fraction.clamp(0.0, 1.0),
+                heightFactor: 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: color ?? colorScheme.primary,
+                    borderRadius: radius,
+                  ),
                 ),
               ),
             ),

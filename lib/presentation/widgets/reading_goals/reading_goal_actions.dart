@@ -75,6 +75,11 @@ class ReadingGoalActions {
     if (validation == null || !context.mounted) {
       return;
     }
+    // The completion sheet takes over once the goal is done.
+    if (cubit.state.progressOf(progress.goal.id)?.goal.status ==
+        ReadingGoalStatus.completed) {
+      return;
+    }
     final localizations = AppLocalizations.of(context)!;
     CustomSnackbar.showSnackbarAction(
       context,
@@ -96,6 +101,11 @@ class ReadingGoalActions {
       currentPage: currentPage,
     );
     if (validation == null || !context.mounted) {
+      return;
+    }
+    // The completion sheet takes over once the goal is done.
+    if (cubit.state.progressOf(progress.goal.id)?.goal.status ==
+        ReadingGoalStatus.completed) {
       return;
     }
     final localizations = AppLocalizations.of(context)!;
@@ -290,7 +300,14 @@ class ReadingGoalActions {
           children: [
             Icon(icon, size: 20, color: color ?? colorScheme.onSurfaceVariant),
             const SizedBox(width: 12),
-            Text(label, style: TextStyle(color: color)),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: color),
+              ),
+            ),
           ],
         ),
       );

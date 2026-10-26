@@ -38,8 +38,7 @@ void _syncReminders(BuildContext context) {
         remindersEnabled: settings.remindersEnabled,
         copy: ReminderCopy(
           title: l10n.reminderTitle,
-          singleGoalBody: (goal, pages) =>
-              l10n.reminderBodySingle(pages, goal),
+          singleGoalBody: (goal, pages) => l10n.reminderBodySingle(pages, goal),
           multiGoalBody: l10n.reminderBodyMulti,
         ),
       )

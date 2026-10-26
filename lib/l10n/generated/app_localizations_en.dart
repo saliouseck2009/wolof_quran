@@ -1052,7 +1052,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteGoal => 'Delete';
 
   @override
-  String get duplicateGoal => 'New goal from this one';
+  String get duplicateGoal => 'Duplicate goal';
 
   @override
   String get reactivateGoal => 'Reactivate';
@@ -1444,7 +1444,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionUnmark => 'Validation removed';
 
   @override
-  String get markSection => 'Mark a Juz, Hizb or Surah';
+  String get markSection => 'Mark Juz / Hizb / Surah';
 
   @override
   String get sectionJuz => 'Juz';
@@ -1605,4 +1605,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get later => 'Later';
+
+  @override
+  String get markPagesShort => 'Mark pages';
+
+  @override
+  String get markSectionShort => 'Mark a section';
+
+  @override
+  String statBestDayOn(String date) {
+    return 'Best day · $date';
+  }
+
+  @override
+  String readUntilHereConfirmSingle(int page, String goal) {
+    return 'Mark page $page as read in “$goal”?';
+  }
 }
