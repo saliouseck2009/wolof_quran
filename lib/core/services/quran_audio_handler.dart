@@ -229,7 +229,7 @@ class QuranAudioHandler extends BaseAudioHandler
     }
 
     return List<MediaItem>.generate(length, (index) {
-      final ayahNumber = index + 1;
+      final ayahNumber = index + currentAudio.firstAyahNumber;
       return MediaItem(
         id:
             'surah_${currentAudio.surahNumber}_ayah_$ayahNumber'
@@ -254,7 +254,7 @@ class QuranAudioHandler extends BaseAudioHandler
     required String baseSurahName,
     required String reciterLabel,
   }) {
-    final ayahNumber = _displayAyahNumber(currentAudio);
+    final ayahNumber = currentAudio.verseNumber;
     final title = ayahNumber == null
         ? '${currentAudio.surahNumber} $baseSurahName'
         : '${currentAudio.surahNumber} $baseSurahName • ${_verseLabel()} $ayahNumber';
@@ -288,17 +288,6 @@ class QuranAudioHandler extends BaseAudioHandler
       0,
       (_audioPlayerService.currentPlaylistLength - 1).clamp(0, 1000000),
     );
-  }
-
-  int? _displayAyahNumber(PlayingAudioInfo audio) {
-    final rawAyah = audio.ayahNumber;
-    if (rawAyah == null) {
-      return null;
-    }
-    if (audio.isPlaylist) {
-      return rawAyah + 1;
-    }
-    return rawAyah;
   }
 
   String _normalizedSurahName(PlayingAudioInfo audio) {

@@ -9,21 +9,44 @@ class QuranSettingsState {
   final Reciter? selectedReciter;
   final double ayahFontSize;
 
+  /// Whether mushaf pages are validated in the followed goal after staying
+  /// on them for [autoTrackingThresholdSeconds].
+  final bool autoTrackingEnabled;
+  final int autoTrackingThresholdSeconds;
+
+  /// Whether reading reminders may be scheduled at all (the notification
+  /// permission was granted when this was turned on).
+  final bool remindersEnabled;
+
   const QuranSettingsState({
     this.selectedTranslation = quran.Translation.frHamidullah,
     this.selectedReciter,
     this.ayahFontSize = 28.0,
+    this.autoTrackingEnabled = true,
+    this.autoTrackingThresholdSeconds =
+        QuranSettingsCubit.defaultAutoTrackingThresholdSeconds,
+    this.remindersEnabled = false,
   });
+
+  Duration get autoTrackingThreshold =>
+      Duration(seconds: autoTrackingThresholdSeconds);
 
   QuranSettingsState copyWith({
     quran.Translation? selectedTranslation,
     Reciter? selectedReciter,
     double? ayahFontSize,
+    bool? autoTrackingEnabled,
+    int? autoTrackingThresholdSeconds,
+    bool? remindersEnabled,
   }) {
     return QuranSettingsState(
       selectedTranslation: selectedTranslation ?? this.selectedTranslation,
       selectedReciter: selectedReciter ?? this.selectedReciter,
       ayahFontSize: ayahFontSize ?? this.ayahFontSize,
+      autoTrackingEnabled: autoTrackingEnabled ?? this.autoTrackingEnabled,
+      autoTrackingThresholdSeconds:
+          autoTrackingThresholdSeconds ?? this.autoTrackingThresholdSeconds,
+      remindersEnabled: remindersEnabled ?? this.remindersEnabled,
     );
   }
 }
@@ -46,11 +69,19 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   static const String _translationKey = 'selected_quran_translation';
   static const String _reciterKey = 'selected_reciter_id';
   static const String _ayahFontSizeKey = 'ayah_font_size';
+  static const String _autoTrackingEnabledKey = 'reading_auto_tracking_enabled';
+  static const String _autoTrackingThresholdKey =
+      'reading_auto_tracking_threshold_seconds';
+  static const String _remindersEnabledKey = 'reading_reminders_enabled';
 
   // Font size constraints
   static const double minFontSize = 16.0;
   static const double maxFontSize = 40.0;
   static const double defaultFontSize = 28.0;
+
+  // Reading tracking: seconds a page must stay open to count as read
+  static const int defaultAutoTrackingThresholdSeconds = 30;
+  static const List<int> autoTrackingThresholdOptions = [30, 45, 60];
 
   QuranSettingsCubit() : super(const QuranSettingsState());
 
@@ -143,11 +174,11 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
   void loadSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Load Translation
       final translationIndex = prefs.getInt(_translationKey);
       quran.Translation selectedTranslation = quran.Translation.frHamidullah;
-      
+
       if (translationIndex != null &&
           translationIndex < availableTranslations.length) {
         selectedTranslation =
@@ -165,19 +196,32 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
         await prefs.setString(_reciterKey, 'imamsarr');
       }
 
-      emit(state.copyWith(
-        selectedTranslation: selectedTranslation,
-        ayahFontSize: ayahFontSize,
-        // selectedReciter not set here, waiting for loadReciterFromPrefs
-      ));
+      // Load reading tracking
+      final autoTrackingEnabled =
+          prefs.getBool(_autoTrackingEnabledKey) ?? true;
+      final savedThreshold = prefs.getInt(_autoTrackingThresholdKey);
+      final autoTrackingThresholdSeconds =
+          savedThreshold != null && savedThreshold > 0
+          ? savedThreshold
+          : defaultAutoTrackingThresholdSeconds;
 
+      emit(
+        state.copyWith(
+          selectedTranslation: selectedTranslation,
+          ayahFontSize: ayahFontSize,
+          autoTrackingEnabled: autoTrackingEnabled,
+          autoTrackingThresholdSeconds: autoTrackingThresholdSeconds,
+          remindersEnabled: prefs.getBool(_remindersEnabledKey) ?? false,
+          // selectedReciter not set here, waiting for loadReciterFromPrefs
+        ),
+      );
     } catch (e) {
       // Fallback is handled by default state values, but we can emit a reset if needed.
       // In this case, if error occurs, we just keep defaults.
       try {
         final prefs = await SharedPreferences.getInstance();
         if (prefs.getString(_reciterKey) == null) {
-           await prefs.setString(_reciterKey, 'imamsarr');
+          await prefs.setString(_reciterKey, 'imamsarr');
         }
       } catch (_) {}
     }
@@ -240,6 +284,39 @@ class QuranSettingsCubit extends Cubit<QuranSettingsState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setDouble(_ayahFontSizeKey, clampedFontSize);
       emit(state.copyWith(ayahFontSize: clampedFontSize));
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void updateAutoTrackingEnabled(bool enabled) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_autoTrackingEnabledKey, enabled);
+      emit(state.copyWith(autoTrackingEnabled: enabled));
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void updateRemindersEnabled(bool enabled) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_remindersEnabledKey, enabled);
+      emit(state.copyWith(remindersEnabled: enabled));
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void updateAutoTrackingThreshold(int seconds) async {
+    if (seconds <= 0) {
+      return;
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt(_autoTrackingThresholdKey, seconds);
+      emit(state.copyWith(autoTrackingThresholdSeconds: seconds));
     } catch (e) {
       // Handle error
     }

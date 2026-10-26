@@ -41,10 +41,18 @@ extension PlaybackModeX on PlaybackMode {
 /// Model for current playing audio info
 class PlayingAudioInfo {
   final int surahNumber;
+
+  /// 1-based verse number for single ayah playback, 0-based index inside the
+  /// current surah segment for playlists. Prefer [verseNumber] when the
+  /// actual verse is needed.
   final int? ayahNumber;
   final String reciterId;
   final String? surahName;
   final bool isPlaylist;
+
+  /// Verse number of the first track of the current playlist segment. It is 1
+  /// for full surah playback and the range start for verse range playback.
+  final int firstAyahNumber;
 
   const PlayingAudioInfo({
     required this.surahNumber,
@@ -52,7 +60,17 @@ class PlayingAudioInfo {
     required this.reciterId,
     this.surahName,
     this.isPlaylist = false,
+    this.firstAyahNumber = 1,
   });
+
+  /// 1-based verse number currently playing, whatever the playback kind.
+  int? get verseNumber {
+    final raw = ayahNumber;
+    if (raw == null) {
+      return null;
+    }
+    return isPlaylist ? raw + firstAyahNumber : raw;
+  }
 
   @override
   bool operator ==(Object other) =>
@@ -97,6 +115,7 @@ class _PlaylistSegment {
   final int startIndex;
   final int length;
   final List<String> filePaths;
+  final int firstAyahNumber;
   List<Duration?> ayahDurations;
 
   _PlaylistSegment({
@@ -107,10 +126,29 @@ class _PlaylistSegment {
     required this.length,
     required this.filePaths,
     required this.ayahDurations,
+    this.firstAyahNumber = 1,
   });
 
   int get endIndex => startIndex + length;
   bool containsGlobalIndex(int idx) => idx >= startIndex && idx < endIndex;
+}
+
+/// One surah's slice of a verse range: contiguous ayah files starting at
+/// [firstAyahNumber].
+class AyahRangeSegment {
+  final int surahNumber;
+  final int firstAyahNumber;
+  final List<String> filePaths;
+  final List<Duration?>? ayahDurations;
+  final String? surahName;
+
+  const AyahRangeSegment({
+    required this.surahNumber,
+    required this.firstAyahNumber,
+    required this.filePaths,
+    this.ayahDurations,
+    this.surahName,
+  });
 }
 
 class QueuedSurahChange {
@@ -163,6 +201,7 @@ class AudioPlayerService {
   List<Duration?> _playlistCachedDurations = [];
   int _currentPlaylistIndex = 0;
   bool _isPlayingPlaylist = false;
+  bool _isPlayingRange = false;
   final List<_PlaylistSegment> _segments = [];
   int? _currentSegmentIdx;
   final PublishSubject<QueuedSurahChange> _queuedSurahPlayingSubject =
@@ -204,6 +243,10 @@ class AudioPlayerService {
   PlayingAudioInfo? get currentPlayingAudio => _currentAudioSubject.value;
   bool get isPlaying => currentPlayerState == AudioPlayerState.playing;
   bool get isPlayingPlaylist => _isPlayingPlaylist;
+
+  /// Whether the active playlist is a user-selected verse range (see
+  /// [playAyahRange]) rather than a full surah.
+  bool get isPlayingRange => _isPlayingRange;
   int get currentPlaylistIndex => _currentPlaylistIndex;
   int get currentPlaylistLength => _currentPlaylist.length;
   bool get canSkipToNext =>
@@ -378,6 +421,83 @@ class AudioPlayerService {
     }
   }
 
+  /// Play a contiguous verse range, possibly spanning several surahs. Each
+  /// [AyahRangeSegment] becomes one playlist segment so the player moves from
+  /// one surah to the next gaplessly. The range stops at its last verse, or
+  /// loops back to its first verse in repeat modes.
+  Future<void> playAyahRange({
+    required List<AyahRangeSegment> segments,
+    required String reciterId,
+  }) async {
+    try {
+      await _replaceCurrentPlayback();
+      final playable = segments
+          .where((segment) => segment.filePaths.isNotEmpty)
+          .toList();
+      if (playable.isEmpty) {
+        return;
+      }
+
+      var nextStartIndex = 0;
+      for (final segment in playable) {
+        _segments.add(
+          _PlaylistSegment(
+            surahNumber: segment.surahNumber,
+            reciterId: reciterId,
+            surahName: segment.surahName,
+            startIndex: nextStartIndex,
+            length: segment.filePaths.length,
+            filePaths: List<String>.from(segment.filePaths),
+            ayahDurations: _normalizeDurations(
+              rawDurations: segment.ayahDurations,
+              expectedLength: segment.filePaths.length,
+            ),
+            firstAyahNumber: segment.firstAyahNumber,
+          ),
+        );
+        nextStartIndex += segment.filePaths.length;
+      }
+
+      final first = _segments.first;
+      _currentSegmentIdx = 0;
+      _currentPlaylist = List<String>.from(first.filePaths);
+      _currentPlaylistIndex = 0;
+      _playlistCachedDurations = List<Duration?>.from(first.ayahDurations);
+      _isPlayingPlaylist = true;
+      _isPlayingRange = true;
+
+      _currentAudioSubject.add(
+        PlayingAudioInfo(
+          surahNumber: first.surahNumber,
+          ayahNumber: 0,
+          reciterId: reciterId,
+          surahName: first.surahName,
+          isPlaylist: true,
+          firstAyahNumber: first.firstAyahNumber,
+        ),
+      );
+
+      final source = ConcatenatingAudioSource(
+        useLazyPreparation: false,
+        children: [
+          for (final segment in _segments)
+            ...segment.filePaths.map((path) => AudioSource.file(path)),
+        ],
+      );
+
+      await _audioPlayer.setAudioSource(
+        source,
+        initialIndex: 0,
+        initialPosition: Duration.zero,
+      );
+      _emitSurahTimeline();
+      await _audioPlayer.play();
+    } catch (e) {
+      _playerStateSubject.add(AudioPlayerState.error);
+      rethrow;
+    }
+  }
+
   /// Append the next surah's ayahs to the currently playing ConcatenatingAudioSource.
   ///
   /// The player transitions across surah boundaries without ever stopping its
@@ -394,7 +514,10 @@ class AudioPlayerService {
     String? surahName,
     List<Duration?>? ayahDurations,
   }) async {
-    if (!_isPlayingPlaylist || filePaths.isEmpty || _segments.isEmpty) {
+    if (!_isPlayingPlaylist ||
+        _isPlayingRange ||
+        filePaths.isEmpty ||
+        _segments.isEmpty) {
       return false;
     }
     final source = _audioPlayer.audioSource;
@@ -505,6 +628,7 @@ class AudioPlayerService {
           reciterId: segment.reciterId,
           surahName: segment.surahName,
           isPlaylist: true,
+          firstAyahNumber: segment.firstAyahNumber,
         ),
       );
       _queuedSurahPlayingSubject.add(
@@ -800,6 +924,24 @@ class AudioPlayerService {
     }
     final mode = _playbackModeSubject.value;
 
+    if (_isPlayingRange) {
+      // A verse range never advances to another surah: repeat modes loop the
+      // range, other modes stop on its last verse. No completion event is
+      // emitted since listeners use it to drive surah queue advances.
+      if (mode == PlaybackMode.repeatOne || mode == PlaybackMode.repeatAll) {
+        await _audioPlayer.seek(Duration.zero, index: 0);
+        _handleGlobalIndexChange(0);
+        await _audioPlayer.play();
+        return;
+      }
+      _isPlayingPlaylist = false;
+      _isPlayingRange = false;
+      _playerStateSubject.add(AudioPlayerState.stopped);
+      _currentAudioSubject.add(null);
+      _resetSurahTimeline();
+      return;
+    }
+
     if (_isPlayingPlaylist) {
       switch (mode) {
         case PlaybackMode.repeatOne:
@@ -869,6 +1011,7 @@ class AudioPlayerService {
     required bool emitStoppedState,
   }) {
     _isPlayingPlaylist = false;
+    _isPlayingRange = false;
     _currentPlaylist.clear();
     _playlistCachedDurations.clear();
     _currentPlaylistIndex = 0;
@@ -899,6 +1042,7 @@ class AudioPlayerService {
         reciterId: currentAudio.reciterId,
         surahName: currentAudio.surahName,
         isPlaylist: true,
+        firstAyahNumber: currentAudio.firstAyahNumber,
       ),
     );
   }

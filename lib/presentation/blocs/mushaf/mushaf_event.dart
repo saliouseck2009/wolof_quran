@@ -8,7 +8,13 @@ sealed class MushafEvent extends Equatable {
 }
 
 class MushafLoaded extends MushafEvent {
-  const MushafLoaded();
+  /// Page to open instead of the last page read, e.g. a goal's next page.
+  final int? initialPage;
+
+  const MushafLoaded({this.initialPage});
+
+  @override
+  List<Object?> get props => [initialPage];
 }
 
 class MushafPageChanged extends MushafEvent {
@@ -45,4 +51,13 @@ class MushafThemeChanged extends MushafEvent {
 
   @override
   List<Object?> get props => [themeIndex];
+}
+
+class MushafTajweedToggled extends MushafEvent {
+  final bool enabled;
+
+  const MushafTajweedToggled(this.enabled);
+
+  @override
+  List<Object?> get props => [enabled];
 }

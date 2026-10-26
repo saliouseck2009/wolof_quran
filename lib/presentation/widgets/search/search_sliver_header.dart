@@ -25,8 +25,10 @@ class SearchSliverHeader extends StatelessWidget {
       builder: (context, constraints) {
         final topPadding = MediaQuery.of(context).padding.top;
         final collapseOffset =
-            (expandedHeight - collapsedToolbarHeight - topPadding)
-                .clamp(0.0, expandedHeight);
+            (expandedHeight - collapsedToolbarHeight - topPadding).clamp(
+              0.0,
+              expandedHeight,
+            );
         final isCollapsed = constraints.scrollOffset > collapseOffset;
 
         return SliverAppBar(

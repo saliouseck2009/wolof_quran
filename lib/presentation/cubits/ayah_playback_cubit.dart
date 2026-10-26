@@ -70,7 +70,7 @@ class AyahPlaybackCubit extends Cubit<AyahPlaybackState> {
       final isThisAyahPlaying =
           currentAudio != null &&
           currentAudio.surahNumber == surahNumber &&
-          currentAudio.ayahNumber == ayahNumber &&
+          currentAudio.verseNumber == ayahNumber &&
           currentAudio.reciterId == reciterId;
 
       if (isThisAyahPlaying) {
@@ -191,7 +191,7 @@ class AyahPlaybackCubit extends Cubit<AyahPlaybackState> {
 
     return currentAudio != null &&
         currentAudio.surahNumber == surahNumber &&
-        currentAudio.ayahNumber == ayahNumber &&
+        currentAudio.verseNumber == ayahNumber &&
         currentAudio.reciterId == reciterId &&
         playerState == AudioPlayerState.playing;
   }
@@ -207,7 +207,7 @@ class AyahPlaybackCubit extends Cubit<AyahPlaybackState> {
 
     return currentAudio != null &&
         currentAudio.surahNumber == surahNumber &&
-        currentAudio.ayahNumber == ayahNumber &&
+        currentAudio.verseNumber == ayahNumber &&
         currentAudio.reciterId == reciterId &&
         playerState == AudioPlayerState.paused;
   }

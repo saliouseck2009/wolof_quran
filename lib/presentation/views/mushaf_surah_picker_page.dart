@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:qcf_quran/qcf_quran.dart' as qcf;
+import 'package:qcf_quran_plus/qcf_quran_plus.dart' as qcf;
 import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 
@@ -14,10 +14,7 @@ import '../widgets/surah_list/surah_list_no_results.dart';
 class MushafSurahPickerPage extends StatelessWidget {
   final int? currentSurahNumber;
 
-  const MushafSurahPickerPage({
-    super.key,
-    this.currentSurahNumber,
-  });
+  const MushafSurahPickerPage({super.key, this.currentSurahNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -126,15 +123,15 @@ class _MushafSurahPickerViewState extends State<_MushafSurahPickerView> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final selectedTranslation = context.watch<QuranSettingsCubit>().currentTranslation;
+    final selectedTranslation = context
+        .watch<QuranSettingsCubit>()
+        .currentTranslation;
 
     return Scaffold(
       backgroundColor: colorScheme.brightness == Brightness.dark
           ? AppColor.surfaceDark
           : colorScheme.surface,
-      appBar: AppBar(
-        title: Text(localizations.selectSurah),
-      ),
+      appBar: AppBar(title: Text(localizations.selectSurah)),
       body: Column(
         children: [
           Padding(
@@ -220,8 +217,8 @@ class _MushafSurahPickerViewState extends State<_MushafSurahPickerView> {
                         );
                     final revelationLabel =
                         surah.revelationType == RevelationPlaceEnum.meccan
-                            ? localizations.meccan
-                            : localizations.medinan;
+                        ? localizations.meccan
+                        : localizations.medinan;
 
                     return Container(
                       key: _keyForSurah(surah.number),
@@ -285,10 +282,10 @@ class _JuzHeaderWidget extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                  ),
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
           Expanded(child: Divider(color: lineColor, height: 1)),

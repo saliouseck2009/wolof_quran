@@ -172,6 +172,18 @@ abstract class AppLocalizations {
   /// **'Theme'**
   String get theme;
 
+  /// Label for tajweed coloring toggle in mushaf settings
+  ///
+  /// In en, this message translates to:
+  /// **'Tajweed coloring'**
+  String get tajweedColoring;
+
+  /// Subtitle for tajweed coloring toggle in mushaf settings
+  ///
+  /// In en, this message translates to:
+  /// **'Show colored tajweed rules in the Mushaf'**
+  String get tajweedColoringDescription;
+
   /// Dark theme
   ///
   /// In en, this message translates to:
@@ -1557,6 +1569,1194 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Jazaakumullaahu khairan'**
   String get supportValue;
+
+  /// Tooltip and title of the sheet to play a range of verses
+  ///
+  /// In en, this message translates to:
+  /// **'Play multiple verses'**
+  String get playVerseRange;
+
+  /// Default verse range option: from the current verse to the last verse of the surah
+  ///
+  /// In en, this message translates to:
+  /// **'Until the end'**
+  String get playUntilSurahEnd;
+
+  /// Verse range option letting the user pick the first and last verse
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get customVerseRange;
+
+  /// Label above the first verse pickers of a verse range
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get rangeStartLabel;
+
+  /// Label above the last verse pickers of a verse range
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get rangeEndLabel;
+
+  /// Number of verses in a verse range
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 verse} other{{count} verses}}'**
+  String versesCount(int count);
+
+  /// Button starting playback of a verse range
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Play 1 verse} other{Play {count} verses}}'**
+  String playVersesCount(int count);
+
+  /// Subtitle of the verse range sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Continuous playback from {reference}'**
+  String verseRangeSubtitle(String reference);
+
+  /// Quick choice extending a custom verse range
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{+1 verse} other{+{count} verses}}'**
+  String addVersesChip(int count);
+
+  /// Quick choice ending a custom verse range at the end of the surah
+  ///
+  /// In en, this message translates to:
+  /// **'End of surah'**
+  String get surahEndChip;
+
+  /// Title of the picker for the first verse of a range
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the first verse'**
+  String get chooseFirstVerse;
+
+  /// Title of the picker for the last verse of a range
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the last verse'**
+  String get chooseLastVerse;
+
+  /// Hint of the surah search field in the verse range picker
+  ///
+  /// In en, this message translates to:
+  /// **'Search a surah or a number'**
+  String get searchSurahOrNumber;
+
+  /// Abbreviated verse count of a surah
+  ///
+  /// In en, this message translates to:
+  /// **'{count} v.'**
+  String verseCountShort(int count);
+
+  /// Title of the reading goals screen and home tile
+  ///
+  /// In en, this message translates to:
+  /// **'My goals'**
+  String get readingGoals;
+
+  /// Subtitle of the reading goals home tile
+  ///
+  /// In en, this message translates to:
+  /// **'Plan your Khatm'**
+  String get readingGoalsSubtitle;
+
+  /// Button and title to create a reading goal
+  ///
+  /// In en, this message translates to:
+  /// **'New goal'**
+  String get newReadingGoal;
+
+  /// Title when editing a reading goal
+  ///
+  /// In en, this message translates to:
+  /// **'Edit goal'**
+  String get editReadingGoal;
+
+  /// Tab listing goals currently being read
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing'**
+  String get readingGoalsOngoing;
+
+  /// Tab listing goals that start later
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get readingGoalsPlanned;
+
+  /// Tab listing completed and abandoned goals
+  ///
+  /// In en, this message translates to:
+  /// **'Finished'**
+  String get readingGoalsFinished;
+
+  /// Empty state title of the reading goals screen
+  ///
+  /// In en, this message translates to:
+  /// **'No reading goal yet'**
+  String get noReadingGoalsTitle;
+
+  /// Empty state description of the reading goals screen
+  ///
+  /// In en, this message translates to:
+  /// **'Plan a Khatm at your own pace: pick a duration and the app tells you how many pages to read each day.'**
+  String get noReadingGoalsDescription;
+
+  /// Empty state of a reading goals tab
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here for now'**
+  String get noReadingGoalsInSection;
+
+  /// Call to action creating the first reading goal
+  ///
+  /// In en, this message translates to:
+  /// **'Create a goal'**
+  String get createReadingGoal;
+
+  /// Opens the mushaf at the next page of a goal
+  ///
+  /// In en, this message translates to:
+  /// **'Continue reading'**
+  String get continueReading;
+
+  /// Short progress of a goal
+  ///
+  /// In en, this message translates to:
+  /// **'{validated}/{total} pages'**
+  String readingProgressLabel(int validated, int total);
+
+  /// Long progress of a goal
+  ///
+  /// In en, this message translates to:
+  /// **'{validated} pages read out of {total}'**
+  String readingValidatedOf(int validated, int total);
+
+  /// A percentage
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}%'**
+  String percentValue(int percent);
+
+  /// Pages read today against the daily target
+  ///
+  /// In en, this message translates to:
+  /// **'Today: {read}/{target} pages'**
+  String readingTodayProgress(int read, int target);
+
+  /// Shown when the daily target is met
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s goal reached ✓'**
+  String get readingTodayDone;
+
+  /// Pages still to read to meet today's target
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page left today} other{{count} pages left today}}'**
+  String readingRemainingToday(int count);
+
+  /// Days until the goal end date, today included
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day left} other{{count} days left}}'**
+  String readingDaysLeft(int count);
+
+  /// End date of a goal
+  ///
+  /// In en, this message translates to:
+  /// **'Ends on {date}'**
+  String readingEndsOn(String date);
+
+  /// Start date of a planned goal
+  ///
+  /// In en, this message translates to:
+  /// **'Starts on {date}'**
+  String readingStartsOn(String date);
+
+  /// Pages read beyond the planned pace
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page ahead} other{{count} pages ahead}}'**
+  String readingPaceAhead(int count);
+
+  /// Pages missing compared to the planned pace
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page behind} other{{count} pages behind}}'**
+  String readingPaceBehind(int count);
+
+  /// Progress matches the planned pace
+  ///
+  /// In en, this message translates to:
+  /// **'On track'**
+  String get readingPaceOnTrack;
+
+  /// Goal status
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get readingStatusActive;
+
+  /// Goal status
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get readingStatusPaused;
+
+  /// Goal status
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get readingStatusPlanned;
+
+  /// Goal status
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get readingStatusCompleted;
+
+  /// Goal status: end date passed without completion
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get readingStatusExpired;
+
+  /// Goal status
+  ///
+  /// In en, this message translates to:
+  /// **'Abandoned'**
+  String get readingStatusAbandoned;
+
+  /// Badge of the goal tracked while reading
+  ///
+  /// In en, this message translates to:
+  /// **'Followed in the Mushaf'**
+  String get readingGoalFollowed;
+
+  /// Makes a goal the one tracked in the mushaf
+  ///
+  /// In en, this message translates to:
+  /// **'Follow this goal'**
+  String get followGoal;
+
+  /// Goal menu action
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get renameGoal;
+
+  /// Goal menu action
+  ///
+  /// In en, this message translates to:
+  /// **'Change end date'**
+  String get changeEndDate;
+
+  /// Goal menu action
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get pauseGoal;
+
+  /// Goal menu action
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get resumeGoal;
+
+  /// Goal menu action
+  ///
+  /// In en, this message translates to:
+  /// **'Abandon'**
+  String get abandonGoal;
+
+  /// Goal menu action
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteGoal;
+
+  /// Goal menu action creating a goal with the same settings
+  ///
+  /// In en, this message translates to:
+  /// **'New goal from this one'**
+  String get duplicateGoal;
+
+  /// Goal menu action for a finished goal
+  ///
+  /// In en, this message translates to:
+  /// **'Reactivate'**
+  String get reactivateGoal;
+
+  /// Action on an expired goal to pick a new end date
+  ///
+  /// In en, this message translates to:
+  /// **'Extend'**
+  String get extendGoal;
+
+  /// Confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this goal?'**
+  String get deleteGoalConfirmTitle;
+
+  /// Confirmation dialog body
+  ///
+  /// In en, this message translates to:
+  /// **'Its progress and history will be lost. This cannot be undone.'**
+  String get deleteGoalConfirmBody;
+
+  /// Confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Abandon this goal?'**
+  String get abandonGoalConfirmTitle;
+
+  /// Confirmation dialog body
+  ///
+  /// In en, this message translates to:
+  /// **'Its progress is kept and you can reactivate it later.'**
+  String get abandonGoalConfirmBody;
+
+  /// Generic confirmation button
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// Title of the sheet validating pages read elsewhere
+  ///
+  /// In en, this message translates to:
+  /// **'Mark pages as read'**
+  String get markPagesRead;
+
+  /// Mark pages mode: everything up to a page
+  ///
+  /// In en, this message translates to:
+  /// **'Up to a page'**
+  String get untilPageMode;
+
+  /// Mark pages mode: from one page to another
+  ///
+  /// In en, this message translates to:
+  /// **'Page range'**
+  String get pageRangeMode;
+
+  /// Explanation under the until-page mode
+  ///
+  /// In en, this message translates to:
+  /// **'Marks every unread page of the goal up to this page, in reading order.'**
+  String get untilPageHint;
+
+  /// Label of the first page field
+  ///
+  /// In en, this message translates to:
+  /// **'From page'**
+  String get fromPageLabel;
+
+  /// Label of the last page field
+  ///
+  /// In en, this message translates to:
+  /// **'To page'**
+  String get toPageLabel;
+
+  /// Label of a page number field
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get pageFieldLabel;
+
+  /// Preview before confirming a manual validation
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No new page to mark} =1{1 page will be marked as read} other{{count} pages will be marked as read}}'**
+  String pagesToMarkSummary(int count);
+
+  /// Pages of the selection that are already validated
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 already read} other{{count} already read}}'**
+  String pagesAlreadyRead(int count);
+
+  /// Confirms a manual validation
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as read'**
+  String get markAsRead;
+
+  /// Snackbar after a manual validation
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page marked as read} other{{count} pages marked as read}}'**
+  String pagesMarked(int count);
+
+  /// Snackbar action reverting the last validation
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// Validation error of a page field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a page between 1 and {total}'**
+  String invalidPage(int total);
+
+  /// Label of the goal name field
+  ///
+  /// In en, this message translates to:
+  /// **'Goal name'**
+  String get goalName;
+
+  /// Hint of the goal name field
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Khatm Ramadan'**
+  String get goalNameHint;
+
+  /// Name suggested for a new goal
+  ///
+  /// In en, this message translates to:
+  /// **'Khatm {number}'**
+  String defaultGoalName(int number);
+
+  /// Section of the goal form
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get goalDuration;
+
+  /// Duration chip
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String durationDays(int count);
+
+  /// Duration chip opening a number field
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get customDuration;
+
+  /// Duration chip opening a date picker
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get pickEndDate;
+
+  /// Section of the goal form
+  ///
+  /// In en, this message translates to:
+  /// **'Starting point'**
+  String get goalStartPoint;
+
+  /// Starting point option
+  ///
+  /// In en, this message translates to:
+  /// **'Beginning of the Quran'**
+  String get startFromBeginning;
+
+  /// Starting point option: last page opened in the mushaf
+  ///
+  /// In en, this message translates to:
+  /// **'Current page'**
+  String get startFromCurrentPage;
+
+  /// Starting point option
+  ///
+  /// In en, this message translates to:
+  /// **'Chosen page'**
+  String get startFromChosenPage;
+
+  /// Section of the goal form
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get goalStartDate;
+
+  /// Start date option
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// Opens a date picker
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a date'**
+  String get chooseDate;
+
+  /// Title of the recap step
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get goalSummary;
+
+  /// Recap row
+  ///
+  /// In en, this message translates to:
+  /// **'Pages to read'**
+  String get pagesToRead;
+
+  /// Recap row
+  ///
+  /// In en, this message translates to:
+  /// **'About {pages} pages per day'**
+  String averagePerDay(String pages);
+
+  /// Final button of the creation form
+  ///
+  /// In en, this message translates to:
+  /// **'Create the goal'**
+  String get goalCreate;
+
+  /// Final button of the edit form
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get goalSave;
+
+  /// Goes from the form to the recap
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextStep;
+
+  /// Header of the home card showing the followed goal
+  ///
+  /// In en, this message translates to:
+  /// **'Reading in progress'**
+  String get homeReadingTitle;
+
+  /// Home card title when no goal exists
+  ///
+  /// In en, this message translates to:
+  /// **'Plan your Quran reading'**
+  String get homeReadingEmptyTitle;
+
+  /// Home card body when no goal exists
+  ///
+  /// In en, this message translates to:
+  /// **'Set a goal and know each day how many pages to read.'**
+  String get homeReadingEmptyBody;
+
+  /// Link from the home card to the goals screen
+  ///
+  /// In en, this message translates to:
+  /// **'All goals'**
+  String get seeAllGoals;
+
+  /// Title of the surah picker used to pick a page
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a surah'**
+  String get chooseSurah;
+
+  /// Next page to read in a goal
+  ///
+  /// In en, this message translates to:
+  /// **'Resume at page {page}'**
+  String resumeAtPage(int page);
+
+  /// Start and end dates of a goal
+  ///
+  /// In en, this message translates to:
+  /// **'{start} → {end}'**
+  String goalDates(String start, String end);
+
+  /// Completion date of a goal
+  ///
+  /// In en, this message translates to:
+  /// **'Completed on {date}'**
+  String completedOn(String date);
+
+  /// Mushaf mode where no goal is tracked
+  ///
+  /// In en, this message translates to:
+  /// **'Free reading'**
+  String get freeReading;
+
+  /// Subtitle of the free reading option
+  ///
+  /// In en, this message translates to:
+  /// **'Browse the Mushaf without touching any goal.'**
+  String get freeReadingDescription;
+
+  /// Title of the Mushaf reading actions sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Reading'**
+  String get readingActions;
+
+  /// Mushaf action
+  ///
+  /// In en, this message translates to:
+  /// **'Mark this page as read'**
+  String get markThisPageRead;
+
+  /// Mushaf action on an already validated page
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this page\'s validation'**
+  String get unmarkThisPage;
+
+  /// Mushaf action validating every unread page up to the current one
+  ///
+  /// In en, this message translates to:
+  /// **'I read until here'**
+  String get readUntilHere;
+
+  /// Confirmation of the read-until-here action
+  ///
+  /// In en, this message translates to:
+  /// **'Mark pages {from} to {to} as read in “{goal}”?'**
+  String readUntilHereConfirm(int from, int to, String goal);
+
+  /// Shown when read-until-here has nothing to add
+  ///
+  /// In en, this message translates to:
+  /// **'Every page up to here is already read.'**
+  String get readUntilHereNothing;
+
+  /// Mushaf action opening the page range sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Mark several pages'**
+  String get markSeveralPages;
+
+  /// Mushaf action opening the goals screen
+  ///
+  /// In en, this message translates to:
+  /// **'View my progress'**
+  String get viewProgress;
+
+  /// Mushaf action opening the goal switcher
+  ///
+  /// In en, this message translates to:
+  /// **'Switch goal'**
+  String get switchGoal;
+
+  /// Subtitle of the goal switcher sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Its last reading position will be restored.'**
+  String get switchGoalSubtitle;
+
+  /// Mushaf action leaving the tracked goal
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to free reading'**
+  String get switchToFreeReading;
+
+  /// Mushaf action from free reading
+  ///
+  /// In en, this message translates to:
+  /// **'Follow a goal'**
+  String get followAGoal;
+
+  /// Snackbar when a page was left before the tracking threshold
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} not counted — read too briefly'**
+  String pageNotCounted(int page);
+
+  /// Snackbar after a manual single page validation
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} marked as read'**
+  String pageMarkedRead(int page);
+
+  /// Snackbar when a goal reaches 100%
+  ///
+  /// In en, this message translates to:
+  /// **'Alhamdulillah! “{name}” is complete.'**
+  String goalCompletedToast(String name);
+
+  /// Settings entry
+  ///
+  /// In en, this message translates to:
+  /// **'Reading tracking'**
+  String get readingTrackingSettings;
+
+  /// Settings entry subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic page validation in the Mushaf'**
+  String get readingTrackingSubtitle;
+
+  /// Toggle label
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic reading tracking'**
+  String get autoTracking;
+
+  /// Toggle description
+  ///
+  /// In en, this message translates to:
+  /// **'A page counts as read in the followed goal after staying on it for the minimum time. You can always mark pages by hand.'**
+  String get autoTrackingDescription;
+
+  /// Threshold section label
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum time per page'**
+  String get autoTrackingThreshold;
+
+  /// Seconds, abbreviated
+  ///
+  /// In en, this message translates to:
+  /// **'{count} s'**
+  String secondsShort(int count);
+
+  /// Setting value
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get enabled;
+
+  /// Setting value
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get disabled;
+
+  /// Compact daily quota in the Mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'Today {read}/{target}'**
+  String todayShort(int read, int target);
+
+  /// Compact daily quota reached, Mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s goal reached ✓'**
+  String get todayDoneShort;
+
+  /// Short snackbar action validating one page
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as read'**
+  String get markReadShort;
+
+  /// Pages read in a row from the goal start
+  ///
+  /// In en, this message translates to:
+  /// **'Continuous progress up to page {page}'**
+  String continuousProgressLabel(int page);
+
+  /// Detail header when nothing is validated
+  ///
+  /// In en, this message translates to:
+  /// **'No page read yet'**
+  String get readingNotStarted;
+
+  /// Detail today card
+  ///
+  /// In en, this message translates to:
+  /// **'Target: {count} pages'**
+  String todayTarget(int count);
+
+  /// Detail today card
+  ///
+  /// In en, this message translates to:
+  /// **'Read: {count} pages'**
+  String todayRead(int count);
+
+  /// Detail today card
+  ///
+  /// In en, this message translates to:
+  /// **'About {pages} pages per day until the end'**
+  String recommendedPace(String pages);
+
+  /// Title of the pages map
+  ///
+  /// In en, this message translates to:
+  /// **'Pages'**
+  String get pagesSectionTitle;
+
+  /// Pages map legend
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get legendRead;
+
+  /// Pages map legend
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get legendUnread;
+
+  /// Pages map legend: unread page before a read one
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get legendSkipped;
+
+  /// Detail section listing skipped pages
+  ///
+  /// In en, this message translates to:
+  /// **'Missing pages'**
+  String get missingPages;
+
+  /// Detail section when there is no gap
+  ///
+  /// In en, this message translates to:
+  /// **'No skipped page.'**
+  String get noMissingPages;
+
+  /// A page range
+  ///
+  /// In en, this message translates to:
+  /// **'Pages {from}–{to}'**
+  String pageRangeLabel(int from, int to);
+
+  /// Detail section: pages per day
+  ///
+  /// In en, this message translates to:
+  /// **'Reading history'**
+  String get historyTitle;
+
+  /// History row with nothing read
+  ///
+  /// In en, this message translates to:
+  /// **'No page'**
+  String get noPagesThatDay;
+
+  /// Number of pages
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page} other{{count} pages}}'**
+  String pagesCount(int count);
+
+  /// Detail section: validation journal
+  ///
+  /// In en, this message translates to:
+  /// **'Validations'**
+  String get journalTitle;
+
+  /// Empty journal
+  ///
+  /// In en, this message translates to:
+  /// **'No validation yet.'**
+  String get noValidations;
+
+  /// Journal entry source
+  ///
+  /// In en, this message translates to:
+  /// **'automatic'**
+  String get validationSourceAuto;
+
+  /// Journal entry source
+  ///
+  /// In en, this message translates to:
+  /// **'manual'**
+  String get validationSourceManual;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Page'**
+  String get actionPage;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Page range'**
+  String get actionRange;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Read until here'**
+  String get actionReadUntil;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Juz'**
+  String get actionJuz;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Hizb'**
+  String get actionHizb;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Surah'**
+  String get actionSurah;
+
+  /// Journal action
+  ///
+  /// In en, this message translates to:
+  /// **'Validation removed'**
+  String get actionUnmark;
+
+  /// Opens the section sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Mark a Juz, Hizb or Surah'**
+  String get markSection;
+
+  /// Section type
+  ///
+  /// In en, this message translates to:
+  /// **'Juz'**
+  String get sectionJuz;
+
+  /// Section type
+  ///
+  /// In en, this message translates to:
+  /// **'Hizb'**
+  String get sectionHizb;
+
+  /// Section type
+  ///
+  /// In en, this message translates to:
+  /// **'Surah'**
+  String get sectionSurah;
+
+  /// Shared boundary page note
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} also holds the end of the previous section. Untick it if you did not read it entirely.'**
+  String sharedPagePrevious(int page);
+
+  /// Shared boundary page note
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} also holds the start of the next section. Untick it if you did not read it entirely.'**
+  String sharedPageNext(int page);
+
+  /// Checkbox for a shared page
+  ///
+  /// In en, this message translates to:
+  /// **'Include page {page}'**
+  String includePage(int page);
+
+  /// Range and page count of a section
+  ///
+  /// In en, this message translates to:
+  /// **'{range} · {count}'**
+  String sectionPagesSummary(String range, String count);
+
+  /// Confirm button of the section sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {name} as read'**
+  String markSectionConfirm(String name);
+
+  /// Stats page title
+  ///
+  /// In en, this message translates to:
+  /// **'My performance'**
+  String get statsTitle;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Pages read'**
+  String get statTotalPages;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Khatm completed'**
+  String get statKhatmCompleted;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Current streak'**
+  String get statCurrentStreak;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Best streak'**
+  String get statBestStreak;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Average per day (30 d)'**
+  String get statAverage;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Best day'**
+  String get statBestDay;
+
+  /// Stats tile
+  ///
+  /// In en, this message translates to:
+  /// **'Active reading time'**
+  String get statReadingTime;
+
+  /// Chart period chip
+  ///
+  /// In en, this message translates to:
+  /// **'{count} d'**
+  String periodDays(int count);
+
+  /// Chart title
+  ///
+  /// In en, this message translates to:
+  /// **'Pages per day'**
+  String get chartTitle;
+
+  /// Stats section
+  ///
+  /// In en, this message translates to:
+  /// **'By goal'**
+  String get byGoalTitle;
+
+  /// Stats section
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Khatm'**
+  String get completedKhatmTitle;
+
+  /// Stats empty state
+  ///
+  /// In en, this message translates to:
+  /// **'Read a few pages in a goal and your performance will appear here.'**
+  String get noStatsYet;
+
+  /// Duration
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min'**
+  String hoursMinutes(int hours, int minutes);
+
+  /// Duration
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String minutesOnly(int minutes);
+
+  /// Neutral closing line of the stats page
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going at your own pace.'**
+  String get encouragement;
+
+  /// Per-goal reminder toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder'**
+  String get reminderDaily;
+
+  /// Per-goal reminder time
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time'**
+  String get reminderTime;
+
+  /// Explanation under the per-goal reminder settings
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder is sent at this time as long as the day\'s quota is not reached.'**
+  String get reminderSheetHint;
+
+  /// Goal menu action opening the reminder settings
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get setReminder;
+
+  /// Global reminders toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Reading reminders'**
+  String get remindersGlobal;
+
+  /// Global reminders toggle description
+  ///
+  /// In en, this message translates to:
+  /// **'Allow reminders for the goals that ask for one. Nothing is sent once the day\'s quota is reached.'**
+  String get remindersGlobalDescription;
+
+  /// Shown when the notification permission is refused
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are turned off for the app. Enable them in the phone settings to receive reminders.'**
+  String get reminderPermissionDenied;
+
+  /// Notification title
+  ///
+  /// In en, this message translates to:
+  /// **'Your reading for today'**
+  String get reminderTitle;
+
+  /// Notification body for one goal
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page left for “{goal}”.} other{{count} pages left for “{goal}”.}}'**
+  String reminderBodySingle(int count, String goal);
+
+  /// Notification body when several goals share the time
+  ///
+  /// In en, this message translates to:
+  /// **'{count} goals are waiting for your reading.'**
+  String reminderBodyMulti(int count);
+
+  /// Completion sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Alhamdulillah!'**
+  String get goalCompletedTitle;
+
+  /// Completion sheet body
+  ///
+  /// In en, this message translates to:
+  /// **'You have completed your reading of the Quran.'**
+  String get goalCompletedBody;
+
+  /// Completion sheet row
+  ///
+  /// In en, this message translates to:
+  /// **'Actual duration: {days}'**
+  String actualDuration(String days);
+
+  /// Completion sheet action
+  ///
+  /// In en, this message translates to:
+  /// **'New Khatm'**
+  String get startNewKhatm;
+
+  /// Completion sheet action
+  ///
+  /// In en, this message translates to:
+  /// **'View history'**
+  String get viewHistory;
+
+  /// One-time hint title in the Mushaf
+  ///
+  /// In en, this message translates to:
+  /// **'Track your reading'**
+  String get readingGoalsHintTitle;
+
+  /// One-time hint body
+  ///
+  /// In en, this message translates to:
+  /// **'Create a goal to know each day how many pages to read, and validate your progress right here in the Mushaf.'**
+  String get readingGoalsHintBody;
+
+  /// Dismisses the hint
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get later;
 }
 
 class _AppLocalizationsDelegate

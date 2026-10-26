@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:qcf_quran/qcf_quran.dart' as qcf;
+import 'package:qcf_quran_plus/qcf_quran_plus.dart' as qcf;
 import 'package:quran/quran.dart' as quran;
 
 import '../../../domain/entities/bookmark.dart';
@@ -13,6 +13,7 @@ import '../../blocs/mushaf/mushaf_event.dart';
 import '../../cubits/bookmark_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../ayah_play_button.dart';
+import '../ayah_range_play_sheet.dart';
 import '../daily_inspiration_share_modal.dart';
 
 class MushafVerseActionsSheet extends StatefulWidget {
@@ -48,7 +49,7 @@ class MushafVerseActionsSheet extends StatefulWidget {
     Color? modalBackgroundColor;
     try {
       final mushafTheme = context.read<MushafBloc>().state.theme;
-      final pageBackground = mushafTheme.qcfTheme.pageBackgroundColor;
+      final pageBackground = mushafTheme.pageBackgroundColor;
       final isDark =
           ThemeData.estimateBrightnessForColor(pageBackground) ==
           Brightness.dark;
@@ -187,8 +188,8 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
     final localizations = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final mushafTheme = _mushafBloc.state.theme;
-    final baseBackground = mushafTheme.qcfTheme.pageBackgroundColor;
-    final baseText = mushafTheme.qcfTheme.verseTextColor;
+    final baseBackground = mushafTheme.pageBackgroundColor;
+    final baseText = mushafTheme.verseTextColor;
     final isDark =
         ThemeData.estimateBrightnessForColor(baseBackground) == Brightness.dark;
     final sheetBackground = isDark
@@ -306,6 +307,15 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
                     ayahNumber: _currentVerseNumber,
                     surahName: surahNameEnglish,
                     size: 24,
+                  ),
+                  rangePlayChild: AyahRangePlayButton(
+                    surahNumber: _currentSurahNumber,
+                    ayahNumber: _currentVerseNumber,
+                    size: 24,
+                    color: primaryAccent,
+                    // Close this sheet so the mini player controlling the
+                    // range is visible over the mushaf.
+                    onPlaybackStarted: () => Navigator.of(context).maybePop(),
                   ),
                   onBookmark: () async {
                     final bookmark = BookmarkedAyah(
@@ -570,6 +580,7 @@ class _StickyActionBar extends StatelessWidget {
   final Color iconColor;
   final VoidCallback onPlay;
   final Widget playChild;
+  final Widget rangePlayChild;
   final VoidCallback onBookmark;
   final VoidCallback onShare;
   final VoidCallback onCopy;
@@ -584,6 +595,7 @@ class _StickyActionBar extends StatelessWidget {
     required this.iconColor,
     required this.onPlay,
     required this.playChild,
+    required this.rangePlayChild,
     required this.onBookmark,
     required this.onShare,
     required this.onCopy,
@@ -609,6 +621,7 @@ class _StickyActionBar extends StatelessWidget {
             message: tooltipPlay,
             child: _IconActionButton(onTap: onPlay, child: playChild),
           ),
+          _IconActionButton(onTap: () {}, child: rangePlayChild),
           Tooltip(
             message: tooltipBookmark,
             child: _IconActionButton(

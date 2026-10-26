@@ -28,20 +28,13 @@ class ReciterListHeader extends StatelessWidget {
               : LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    colorScheme.onPrimary,
-                    colorScheme.onPrimary,
-                  ],
+                  colors: [colorScheme.onPrimary, colorScheme.onPrimary],
                 ),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           children: [
-            Icon(
-              Icons.record_voice_over,
-              size: 48,
-              color: colorScheme.primary,
-            ),
+            Icon(Icons.record_voice_over, size: 48, color: colorScheme.primary),
             const SizedBox(height: 12),
             Text(
               localizations.selectReciter,

@@ -67,8 +67,8 @@ class _FontSizeSelectorSheetState extends State<FontSizeSelectorSheet> {
             Text(
               widget.localizations.fontSizeDescription,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                color: colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
@@ -103,21 +103,21 @@ class _FontSizeSelectorSheetState extends State<FontSizeSelectorSheet> {
                     Text(
                       widget.localizations.small,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     Text(
                       '${_currentFontSize.toInt()}pt',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: colorScheme.primary,
-                          ),
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.primary,
+                      ),
                     ),
                     Text(
                       widget.localizations.large,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -125,8 +125,9 @@ class _FontSizeSelectorSheetState extends State<FontSizeSelectorSheet> {
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     activeTrackColor: colorScheme.primary,
-                    inactiveTrackColor:
-                        colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                    inactiveTrackColor: colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.3,
+                    ),
                     thumbColor: colorScheme.primary,
                     overlayColor: colorScheme.primary.withValues(alpha: 0.2),
                     trackHeight: 4.0,
@@ -138,10 +139,11 @@ class _FontSizeSelectorSheetState extends State<FontSizeSelectorSheet> {
                     value: _currentFontSize,
                     min: QuranSettingsCubit.minFontSize,
                     max: QuranSettingsCubit.maxFontSize,
-                    divisions: ((QuranSettingsCubit.maxFontSize -
-                                QuranSettingsCubit.minFontSize) /
-                            2)
-                        .round(),
+                    divisions:
+                        ((QuranSettingsCubit.maxFontSize -
+                                    QuranSettingsCubit.minFontSize) /
+                                2)
+                            .round(),
                     onChanged: (value) {
                       setState(() {
                         _currentFontSize = value;
@@ -167,9 +169,9 @@ class _FontSizeSelectorSheetState extends State<FontSizeSelectorSheet> {
               child: Text(
                 widget.localizations.close,
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onPrimary,
-                    ),
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onPrimary,
+                ),
               ),
             ),
             const SizedBox(height: 42),

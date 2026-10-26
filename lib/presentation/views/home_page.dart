@@ -10,6 +10,7 @@ import '../../service_locator.dart';
 import '../widgets/home_header.dart';
 import '../widgets/daily_inspiration_card.dart';
 import '../widgets/home_actions_grid.dart';
+import '../widgets/reading_goals/home_reading_card.dart';
 import '../utils/audio_error_formatter.dart';
 import '../widgets/snackbar.dart';
 
@@ -79,7 +80,13 @@ class HomePage extends StatelessWidget {
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
-                  sliver: SliverToBoxAdapter(child: const DailyInspirationCard()),
+                  sliver: SliverToBoxAdapter(
+                    child: const DailyInspirationCard(),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                  sliver: SliverToBoxAdapter(child: const HomeReadingCard()),
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(24, 36, 24, 0),
