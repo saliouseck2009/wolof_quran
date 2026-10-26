@@ -891,4 +891,359 @@ class AppLocalizationsEn extends AppLocalizations {
   String verseCountShort(int count) {
     return '$count v.';
   }
+
+  @override
+  String get readingGoals => 'My goals';
+
+  @override
+  String get readingGoalsSubtitle => 'Plan your Khatm';
+
+  @override
+  String get newReadingGoal => 'New goal';
+
+  @override
+  String get editReadingGoal => 'Edit goal';
+
+  @override
+  String get readingGoalsOngoing => 'Ongoing';
+
+  @override
+  String get readingGoalsPlanned => 'Planned';
+
+  @override
+  String get readingGoalsFinished => 'Finished';
+
+  @override
+  String get noReadingGoalsTitle => 'No reading goal yet';
+
+  @override
+  String get noReadingGoalsDescription =>
+      'Plan a Khatm at your own pace: pick a duration and the app tells you how many pages to read each day.';
+
+  @override
+  String get noReadingGoalsInSection => 'Nothing here for now';
+
+  @override
+  String get createReadingGoal => 'Create a goal';
+
+  @override
+  String get continueReading => 'Continue reading';
+
+  @override
+  String readingProgressLabel(int validated, int total) {
+    return '$validated/$total pages';
+  }
+
+  @override
+  String readingValidatedOf(int validated, int total) {
+    return '$validated pages read out of $total';
+  }
+
+  @override
+  String percentValue(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String readingTodayProgress(int read, int target) {
+    return 'Today: $read/$target pages';
+  }
+
+  @override
+  String get readingTodayDone => 'Today\'s goal reached ✓';
+
+  @override
+  String readingRemainingToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages left today',
+      one: '1 page left today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readingDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days left',
+      one: '1 day left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readingEndsOn(String date) {
+    return 'Ends on $date';
+  }
+
+  @override
+  String readingStartsOn(String date) {
+    return 'Starts on $date';
+  }
+
+  @override
+  String readingPaceAhead(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages ahead',
+      one: '1 page ahead',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readingPaceBehind(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages behind',
+      one: '1 page behind',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get readingPaceOnTrack => 'On track';
+
+  @override
+  String get readingStatusActive => 'Active';
+
+  @override
+  String get readingStatusPaused => 'Paused';
+
+  @override
+  String get readingStatusPlanned => 'Planned';
+
+  @override
+  String get readingStatusCompleted => 'Completed';
+
+  @override
+  String get readingStatusExpired => 'Expired';
+
+  @override
+  String get readingStatusAbandoned => 'Abandoned';
+
+  @override
+  String get readingGoalFollowed => 'Followed in the Mushaf';
+
+  @override
+  String get followGoal => 'Follow this goal';
+
+  @override
+  String get renameGoal => 'Rename';
+
+  @override
+  String get changeEndDate => 'Change end date';
+
+  @override
+  String get pauseGoal => 'Pause';
+
+  @override
+  String get resumeGoal => 'Resume';
+
+  @override
+  String get abandonGoal => 'Abandon';
+
+  @override
+  String get deleteGoal => 'Delete';
+
+  @override
+  String get duplicateGoal => 'New goal from this one';
+
+  @override
+  String get reactivateGoal => 'Reactivate';
+
+  @override
+  String get extendGoal => 'Extend';
+
+  @override
+  String get deleteGoalConfirmTitle => 'Delete this goal?';
+
+  @override
+  String get deleteGoalConfirmBody =>
+      'Its progress and history will be lost. This cannot be undone.';
+
+  @override
+  String get abandonGoalConfirmTitle => 'Abandon this goal?';
+
+  @override
+  String get abandonGoalConfirmBody =>
+      'Its progress is kept and you can reactivate it later.';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get markPagesRead => 'Mark pages as read';
+
+  @override
+  String get untilPageMode => 'Up to a page';
+
+  @override
+  String get pageRangeMode => 'Page range';
+
+  @override
+  String get untilPageHint =>
+      'Marks every unread page of the goal up to this page, in reading order.';
+
+  @override
+  String get fromPageLabel => 'From page';
+
+  @override
+  String get toPageLabel => 'To page';
+
+  @override
+  String get pageFieldLabel => 'Page';
+
+  @override
+  String pagesToMarkSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages will be marked as read',
+      one: '1 page will be marked as read',
+      zero: 'No new page to mark',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String pagesAlreadyRead(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count already read',
+      one: '1 already read',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get markAsRead => 'Mark as read';
+
+  @override
+  String pagesMarked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages marked as read',
+      one: '1 page marked as read',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String invalidPage(int total) {
+    return 'Enter a page between 1 and $total';
+  }
+
+  @override
+  String get goalName => 'Goal name';
+
+  @override
+  String get goalNameHint => 'e.g. Khatm Ramadan';
+
+  @override
+  String defaultGoalName(int number) {
+    return 'Khatm $number';
+  }
+
+  @override
+  String get goalDuration => 'Duration';
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get customDuration => 'Custom';
+
+  @override
+  String get pickEndDate => 'End date';
+
+  @override
+  String get goalStartPoint => 'Starting point';
+
+  @override
+  String get startFromBeginning => 'Beginning of the Quran';
+
+  @override
+  String get startFromCurrentPage => 'Current page';
+
+  @override
+  String get startFromChosenPage => 'Chosen page';
+
+  @override
+  String get goalStartDate => 'Start date';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get chooseDate => 'Choose a date';
+
+  @override
+  String get goalSummary => 'Summary';
+
+  @override
+  String get pagesToRead => 'Pages to read';
+
+  @override
+  String averagePerDay(String pages) {
+    return 'About $pages pages per day';
+  }
+
+  @override
+  String get goalCreate => 'Create the goal';
+
+  @override
+  String get goalSave => 'Save';
+
+  @override
+  String get nextStep => 'Next';
+
+  @override
+  String get homeReadingTitle => 'Reading in progress';
+
+  @override
+  String get homeReadingEmptyTitle => 'Plan your Quran reading';
+
+  @override
+  String get homeReadingEmptyBody =>
+      'Set a goal and know each day how many pages to read.';
+
+  @override
+  String get seeAllGoals => 'All goals';
+
+  @override
+  String get chooseSurah => 'Choose a surah';
+
+  @override
+  String resumeAtPage(int page) {
+    return 'Resume at page $page';
+  }
+
+  @override
+  String goalDates(String start, String end) {
+    return '$start → $end';
+  }
+
+  @override
+  String completedOn(String date) {
+    return 'Completed on $date';
+  }
 }

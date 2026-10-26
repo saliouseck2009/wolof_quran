@@ -93,8 +93,9 @@ class CustomSnackbar {
   static void showSnackbarAction(
     BuildContext context,
     String message,
-    Function()? onPressed,
-  ) {
+    Function()? onPressed, {
+    String actionLabel = 'Voir',
+  }) {
     final overlay = Overlay.of(context, rootOverlay: true);
     late OverlayEntry overlayEntry;
 
@@ -140,9 +141,9 @@ class CustomSnackbar {
                           overlayEntry.remove();
                           if (onPressed != null) onPressed();
                         },
-                        child: const Text(
-                          'Voir',
-                          style: TextStyle(
+                        child: Text(
+                          actionLabel,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,

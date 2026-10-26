@@ -889,4 +889,375 @@ class AppLocalizationsAr extends AppLocalizations {
   String verseCountShort(int count) {
     return '$count آية';
   }
+
+  @override
+  String get readingGoals => 'أهدافي';
+
+  @override
+  String get readingGoalsSubtitle => 'خطّط لختمتك';
+
+  @override
+  String get newReadingGoal => 'هدف جديد';
+
+  @override
+  String get editReadingGoal => 'تعديل الهدف';
+
+  @override
+  String get readingGoalsOngoing => 'جارية';
+
+  @override
+  String get readingGoalsPlanned => 'مخطّطة';
+
+  @override
+  String get readingGoalsFinished => 'منتهية';
+
+  @override
+  String get noReadingGoalsTitle => 'لا يوجد هدف قراءة بعد';
+
+  @override
+  String get noReadingGoalsDescription =>
+      'خطّط لختمة على وتيرتك: اختر مدة ويخبرك التطبيق بعدد الصفحات التي تقرؤها كل يوم.';
+
+  @override
+  String get noReadingGoalsInSection => 'لا شيء هنا حاليًا';
+
+  @override
+  String get createReadingGoal => 'إنشاء هدف';
+
+  @override
+  String get continueReading => 'متابعة القراءة';
+
+  @override
+  String readingProgressLabel(int validated, int total) {
+    return '$validated/$total صفحة';
+  }
+
+  @override
+  String readingValidatedOf(int validated, int total) {
+    return '$validated صفحة مقروءة من $total';
+  }
+
+  @override
+  String percentValue(int percent) {
+    return '$percent٪';
+  }
+
+  @override
+  String readingTodayProgress(int read, int target) {
+    return 'اليوم: $read/$target صفحة';
+  }
+
+  @override
+  String get readingTodayDone => 'تحقّق هدف اليوم ✓';
+
+  @override
+  String readingRemainingToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'بقيت $count صفحة لليوم',
+      few: 'بقيت $count صفحات لليوم',
+      two: 'بقيت صفحتان لليوم',
+      one: 'بقيت صفحة واحدة لليوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readingDaysLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count يومًا متبقيًا',
+      few: '$count أيام متبقية',
+      two: 'يومان متبقيان',
+      one: 'يوم واحد متبقٍ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readingEndsOn(String date) {
+    return 'ينتهي في $date';
+  }
+
+  @override
+  String readingStartsOn(String date) {
+    return 'يبدأ في $date';
+  }
+
+  @override
+  String readingPaceAhead(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'متقدم بـ $count صفحة',
+      few: 'متقدم بـ $count صفحات',
+      two: 'متقدم بصفحتين',
+      one: 'متقدم بصفحة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String readingPaceBehind(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'متأخر بـ $count صفحة',
+      few: 'متأخر بـ $count صفحات',
+      two: 'متأخر بصفحتين',
+      one: 'متأخر بصفحة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get readingPaceOnTrack => 'في الموعد';
+
+  @override
+  String get readingStatusActive => 'نشط';
+
+  @override
+  String get readingStatusPaused => 'متوقف مؤقتًا';
+
+  @override
+  String get readingStatusPlanned => 'مخطّط';
+
+  @override
+  String get readingStatusCompleted => 'مكتمل';
+
+  @override
+  String get readingStatusExpired => 'منتهي الصلاحية';
+
+  @override
+  String get readingStatusAbandoned => 'متروك';
+
+  @override
+  String get readingGoalFollowed => 'متابَع في المصحف';
+
+  @override
+  String get followGoal => 'متابعة هذا الهدف';
+
+  @override
+  String get renameGoal => 'إعادة التسمية';
+
+  @override
+  String get changeEndDate => 'تغيير تاريخ الانتهاء';
+
+  @override
+  String get pauseGoal => 'إيقاف مؤقت';
+
+  @override
+  String get resumeGoal => 'استئناف';
+
+  @override
+  String get abandonGoal => 'ترك الهدف';
+
+  @override
+  String get deleteGoal => 'حذف';
+
+  @override
+  String get duplicateGoal => 'هدف جديد من هذا الهدف';
+
+  @override
+  String get reactivateGoal => 'إعادة التفعيل';
+
+  @override
+  String get extendGoal => 'تمديد';
+
+  @override
+  String get deleteGoalConfirmTitle => 'حذف هذا الهدف؟';
+
+  @override
+  String get deleteGoalConfirmBody =>
+      'سيُفقد تقدمه وسجله. لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get abandonGoalConfirmTitle => 'ترك هذا الهدف؟';
+
+  @override
+  String get abandonGoalConfirmBody =>
+      'يُحفظ تقدمه ويمكنك إعادة تفعيله لاحقًا.';
+
+  @override
+  String get confirm => 'تأكيد';
+
+  @override
+  String get markPagesRead => 'تحديد صفحات كمقروءة';
+
+  @override
+  String get untilPageMode => 'حتى صفحة';
+
+  @override
+  String get pageRangeMode => 'نطاق صفحات';
+
+  @override
+  String get untilPageHint =>
+      'يحدد كل الصفحات غير المقروءة في الهدف حتى هذه الصفحة، بترتيب القراءة.';
+
+  @override
+  String get fromPageLabel => 'من الصفحة';
+
+  @override
+  String get toPageLabel => 'إلى الصفحة';
+
+  @override
+  String get pageFieldLabel => 'الصفحة';
+
+  @override
+  String pagesToMarkSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ستُحدد $count صفحة كمقروءة',
+      few: 'ستُحدد $count صفحات كمقروءة',
+      two: 'ستُحدد صفحتان كمقروءتين',
+      one: 'ستُحدد صفحة واحدة كمقروءة',
+      zero: 'لا توجد صفحة جديدة للتحديد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String pagesAlreadyRead(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مقروءة سابقًا',
+      few: '$count مقروءة سابقًا',
+      two: 'اثنتان مقروءتان سابقًا',
+      one: 'واحدة مقروءة سابقًا',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get markAsRead => 'تحديد كمقروءة';
+
+  @override
+  String pagesMarked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'حُددت $count صفحة كمقروءة',
+      few: 'حُددت $count صفحات كمقروءة',
+      two: 'حُددت صفحتان كمقروءتين',
+      one: 'حُددت صفحة واحدة كمقروءة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get undo => 'تراجع';
+
+  @override
+  String invalidPage(int total) {
+    return 'أدخل صفحة بين 1 و $total';
+  }
+
+  @override
+  String get goalName => 'اسم الهدف';
+
+  @override
+  String get goalNameHint => 'مثال: ختمة رمضان';
+
+  @override
+  String defaultGoalName(int number) {
+    return 'ختمة $number';
+  }
+
+  @override
+  String get goalDuration => 'المدة';
+
+  @override
+  String durationDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count يومًا',
+      few: '$count أيام',
+      two: 'يومان',
+      one: 'يوم واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get customDuration => 'مخصصة';
+
+  @override
+  String get pickEndDate => 'تاريخ الانتهاء';
+
+  @override
+  String get goalStartPoint => 'نقطة البداية';
+
+  @override
+  String get startFromBeginning => 'بداية القرآن';
+
+  @override
+  String get startFromCurrentPage => 'الصفحة الحالية';
+
+  @override
+  String get startFromChosenPage => 'صفحة مختارة';
+
+  @override
+  String get goalStartDate => 'تاريخ البدء';
+
+  @override
+  String get today => 'اليوم';
+
+  @override
+  String get chooseDate => 'اختيار تاريخ';
+
+  @override
+  String get goalSummary => 'الملخص';
+
+  @override
+  String get pagesToRead => 'الصفحات المطلوب قراءتها';
+
+  @override
+  String averagePerDay(String pages) {
+    return 'حوالي $pages صفحة في اليوم';
+  }
+
+  @override
+  String get goalCreate => 'إنشاء الهدف';
+
+  @override
+  String get goalSave => 'حفظ';
+
+  @override
+  String get nextStep => 'التالي';
+
+  @override
+  String get homeReadingTitle => 'قراءة جارية';
+
+  @override
+  String get homeReadingEmptyTitle => 'خطّط لقراءتك للقرآن';
+
+  @override
+  String get homeReadingEmptyBody =>
+      'حدد هدفًا واعرف كل يوم عدد الصفحات التي تقرؤها.';
+
+  @override
+  String get seeAllGoals => 'كل الأهداف';
+
+  @override
+  String get chooseSurah => 'اختيار سورة';
+
+  @override
+  String resumeAtPage(int page) {
+    return 'المتابعة من الصفحة $page';
+  }
+
+  @override
+  String goalDates(String start, String end) {
+    return '$start ← $end';
+  }
+
+  @override
+  String completedOn(String date) {
+    return 'اكتمل في $date';
+  }
 }
