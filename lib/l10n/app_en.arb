@@ -1615,5 +1615,154 @@
         "type": "String"
       }
     }
-  }
+  },
+  "freeReading": "Free reading",
+  "@freeReading": {
+    "description": "Mushaf mode where no goal is tracked"
+  },
+  "freeReadingDescription": "Browse the Mushaf without touching any goal.",
+  "@freeReadingDescription": {
+    "description": "Subtitle of the free reading option"
+  },
+  "readingActions": "Reading",
+  "@readingActions": {
+    "description": "Title of the Mushaf reading actions sheet"
+  },
+  "markThisPageRead": "Mark this page as read",
+  "@markThisPageRead": {
+    "description": "Mushaf action"
+  },
+  "unmarkThisPage": "Remove this page's validation",
+  "@unmarkThisPage": {
+    "description": "Mushaf action on an already validated page"
+  },
+  "readUntilHere": "I read until here",
+  "@readUntilHere": {
+    "description": "Mushaf action validating every unread page up to the current one"
+  },
+  "readUntilHereConfirm": "Mark pages {from} to {to} as read in “{goal}”?",
+  "@readUntilHereConfirm": {
+    "description": "Confirmation of the read-until-here action",
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "readUntilHereNothing": "Every page up to here is already read.",
+  "@readUntilHereNothing": {
+    "description": "Shown when read-until-here has nothing to add"
+  },
+  "markSeveralPages": "Mark several pages",
+  "@markSeveralPages": {
+    "description": "Mushaf action opening the page range sheet"
+  },
+  "viewProgress": "View my progress",
+  "@viewProgress": {
+    "description": "Mushaf action opening the goals screen"
+  },
+  "switchGoal": "Switch goal",
+  "@switchGoal": {
+    "description": "Mushaf action opening the goal switcher"
+  },
+  "switchGoalSubtitle": "Its last reading position will be restored.",
+  "@switchGoalSubtitle": {
+    "description": "Subtitle of the goal switcher sheet"
+  },
+  "switchToFreeReading": "Switch to free reading",
+  "@switchToFreeReading": {
+    "description": "Mushaf action leaving the tracked goal"
+  },
+  "followAGoal": "Follow a goal",
+  "@followAGoal": {
+    "description": "Mushaf action from free reading"
+  },
+  "pageNotCounted": "Page {page} not counted — read too briefly",
+  "@pageNotCounted": {
+    "description": "Snackbar when a page was left before the tracking threshold",
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "pageMarkedRead": "Page {page} marked as read",
+  "@pageMarkedRead": {
+    "description": "Snackbar after a manual single page validation",
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "goalCompletedToast": "Alhamdulillah! “{name}” is complete.",
+  "@goalCompletedToast": {
+    "description": "Snackbar when a goal reaches 100%",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "readingTrackingSettings": "Reading tracking",
+  "@readingTrackingSettings": {
+    "description": "Settings entry"
+  },
+  "readingTrackingSubtitle": "Automatic page validation in the Mushaf",
+  "@readingTrackingSubtitle": {
+    "description": "Settings entry subtitle"
+  },
+  "autoTracking": "Automatic reading tracking",
+  "@autoTracking": {
+    "description": "Toggle label"
+  },
+  "autoTrackingDescription": "A page counts as read in the followed goal after staying on it for the minimum time. You can always mark pages by hand.",
+  "@autoTrackingDescription": {
+    "description": "Toggle description"
+  },
+  "autoTrackingThreshold": "Minimum time per page",
+  "@autoTrackingThreshold": {
+    "description": "Threshold section label"
+  },
+  "secondsShort": "{count} s",
+  "@secondsShort": {
+    "description": "Seconds, abbreviated",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "enabled": "Enabled",
+  "@enabled": {
+    "description": "Setting value"
+  },
+  "disabled": "Disabled",
+  "@disabled": {
+    "description": "Setting value"
+  },
+  "todayShort": "Today {read}/{target}",
+  "@todayShort": {
+    "description": "Compact daily quota in the Mushaf bottom bar",
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "todayDoneShort": "Today's goal reached ✓",
+  "@todayDoneShort": {
+    "description": "Compact daily quota reached, Mushaf bottom bar"
+  },
+  "markReadShort": "Mark as read",
+  "@markReadShort": {"description": "Short snackbar action validating one page"}
 }

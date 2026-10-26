@@ -2175,6 +2175,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Completed on {date}'**
   String completedOn(String date);
+
+  /// Mushaf mode where no goal is tracked
+  ///
+  /// In en, this message translates to:
+  /// **'Free reading'**
+  String get freeReading;
+
+  /// Subtitle of the free reading option
+  ///
+  /// In en, this message translates to:
+  /// **'Browse the Mushaf without touching any goal.'**
+  String get freeReadingDescription;
+
+  /// Title of the Mushaf reading actions sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Reading'**
+  String get readingActions;
+
+  /// Mushaf action
+  ///
+  /// In en, this message translates to:
+  /// **'Mark this page as read'**
+  String get markThisPageRead;
+
+  /// Mushaf action on an already validated page
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this page\'s validation'**
+  String get unmarkThisPage;
+
+  /// Mushaf action validating every unread page up to the current one
+  ///
+  /// In en, this message translates to:
+  /// **'I read until here'**
+  String get readUntilHere;
+
+  /// Confirmation of the read-until-here action
+  ///
+  /// In en, this message translates to:
+  /// **'Mark pages {from} to {to} as read in “{goal}”?'**
+  String readUntilHereConfirm(int from, int to, String goal);
+
+  /// Shown when read-until-here has nothing to add
+  ///
+  /// In en, this message translates to:
+  /// **'Every page up to here is already read.'**
+  String get readUntilHereNothing;
+
+  /// Mushaf action opening the page range sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Mark several pages'**
+  String get markSeveralPages;
+
+  /// Mushaf action opening the goals screen
+  ///
+  /// In en, this message translates to:
+  /// **'View my progress'**
+  String get viewProgress;
+
+  /// Mushaf action opening the goal switcher
+  ///
+  /// In en, this message translates to:
+  /// **'Switch goal'**
+  String get switchGoal;
+
+  /// Subtitle of the goal switcher sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Its last reading position will be restored.'**
+  String get switchGoalSubtitle;
+
+  /// Mushaf action leaving the tracked goal
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to free reading'**
+  String get switchToFreeReading;
+
+  /// Mushaf action from free reading
+  ///
+  /// In en, this message translates to:
+  /// **'Follow a goal'**
+  String get followAGoal;
+
+  /// Snackbar when a page was left before the tracking threshold
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} not counted — read too briefly'**
+  String pageNotCounted(int page);
+
+  /// Snackbar after a manual single page validation
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} marked as read'**
+  String pageMarkedRead(int page);
+
+  /// Snackbar when a goal reaches 100%
+  ///
+  /// In en, this message translates to:
+  /// **'Alhamdulillah! “{name}” is complete.'**
+  String goalCompletedToast(String name);
+
+  /// Settings entry
+  ///
+  /// In en, this message translates to:
+  /// **'Reading tracking'**
+  String get readingTrackingSettings;
+
+  /// Settings entry subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic page validation in the Mushaf'**
+  String get readingTrackingSubtitle;
+
+  /// Toggle label
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic reading tracking'**
+  String get autoTracking;
+
+  /// Toggle description
+  ///
+  /// In en, this message translates to:
+  /// **'A page counts as read in the followed goal after staying on it for the minimum time. You can always mark pages by hand.'**
+  String get autoTrackingDescription;
+
+  /// Threshold section label
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum time per page'**
+  String get autoTrackingThreshold;
+
+  /// Seconds, abbreviated
+  ///
+  /// In en, this message translates to:
+  /// **'{count} s'**
+  String secondsShort(int count);
+
+  /// Setting value
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled'**
+  String get enabled;
+
+  /// Setting value
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get disabled;
+
+  /// Compact daily quota in the Mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'Today {read}/{target}'**
+  String todayShort(int read, int target);
+
+  /// Compact daily quota reached, Mushaf bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s goal reached ✓'**
+  String get todayDoneShort;
+
+  /// Short snackbar action validating one page
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as read'**
+  String get markReadShort;
 }
 
 class _AppLocalizationsDelegate

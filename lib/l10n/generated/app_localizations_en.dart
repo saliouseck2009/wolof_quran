@@ -1246,4 +1246,104 @@ class AppLocalizationsEn extends AppLocalizations {
   String completedOn(String date) {
     return 'Completed on $date';
   }
+
+  @override
+  String get freeReading => 'Free reading';
+
+  @override
+  String get freeReadingDescription =>
+      'Browse the Mushaf without touching any goal.';
+
+  @override
+  String get readingActions => 'Reading';
+
+  @override
+  String get markThisPageRead => 'Mark this page as read';
+
+  @override
+  String get unmarkThisPage => 'Remove this page\'s validation';
+
+  @override
+  String get readUntilHere => 'I read until here';
+
+  @override
+  String readUntilHereConfirm(int from, int to, String goal) {
+    return 'Mark pages $from to $to as read in “$goal”?';
+  }
+
+  @override
+  String get readUntilHereNothing => 'Every page up to here is already read.';
+
+  @override
+  String get markSeveralPages => 'Mark several pages';
+
+  @override
+  String get viewProgress => 'View my progress';
+
+  @override
+  String get switchGoal => 'Switch goal';
+
+  @override
+  String get switchGoalSubtitle =>
+      'Its last reading position will be restored.';
+
+  @override
+  String get switchToFreeReading => 'Switch to free reading';
+
+  @override
+  String get followAGoal => 'Follow a goal';
+
+  @override
+  String pageNotCounted(int page) {
+    return 'Page $page not counted — read too briefly';
+  }
+
+  @override
+  String pageMarkedRead(int page) {
+    return 'Page $page marked as read';
+  }
+
+  @override
+  String goalCompletedToast(String name) {
+    return 'Alhamdulillah! “$name” is complete.';
+  }
+
+  @override
+  String get readingTrackingSettings => 'Reading tracking';
+
+  @override
+  String get readingTrackingSubtitle =>
+      'Automatic page validation in the Mushaf';
+
+  @override
+  String get autoTracking => 'Automatic reading tracking';
+
+  @override
+  String get autoTrackingDescription =>
+      'A page counts as read in the followed goal after staying on it for the minimum time. You can always mark pages by hand.';
+
+  @override
+  String get autoTrackingThreshold => 'Minimum time per page';
+
+  @override
+  String secondsShort(int count) {
+    return '$count s';
+  }
+
+  @override
+  String get enabled => 'Enabled';
+
+  @override
+  String get disabled => 'Disabled';
+
+  @override
+  String todayShort(int read, int target) {
+    return 'Today $read/$target';
+  }
+
+  @override
+  String get todayDoneShort => 'Today\'s goal reached ✓';
+
+  @override
+  String get markReadShort => 'Mark as read';
 }

@@ -1,6 +1,7 @@
 import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/reading_goal.dart';
+import '../../domain/entities/reading_session.dart';
 import '../../domain/entities/reading_validation.dart';
 import '../../domain/repositories/reading_goal_repository.dart';
 import '../datasources/reading_goal_local_data_source.dart';
@@ -109,6 +110,14 @@ class ReadingGoalRepositoryImpl implements ReadingGoalRepository {
     }
     await _localDataSource.undoValidation(validation);
   }
+
+  @override
+  Future<void> saveSession(ReadingSession session) =>
+      _localDataSource.saveSession(session);
+
+  @override
+  Future<List<ReadingSession>> getSessions(String goalId) =>
+      _localDataSource.getSessions(goalId);
 
   @override
   Future<String?> getActiveGoalId() => _preferences.getActiveGoalId();

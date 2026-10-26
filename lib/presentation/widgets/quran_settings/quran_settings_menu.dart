@@ -12,6 +12,7 @@ class QuranSettingsMenu extends StatelessWidget {
   final VoidCallback onTranslationTap;
   final VoidCallback onFontSizeTap;
   final VoidCallback onRecitersTap;
+  final VoidCallback onReadingTrackingTap;
 
   const QuranSettingsMenu({
     super.key,
@@ -20,6 +21,7 @@ class QuranSettingsMenu extends StatelessWidget {
     required this.onTranslationTap,
     required this.onFontSizeTap,
     required this.onRecitersTap,
+    required this.onReadingTrackingTap,
   });
 
   @override
@@ -46,6 +48,16 @@ class QuranSettingsMenu extends StatelessWidget {
           subtitle: localizations.ayahFontSize,
           value: '${state.ayahFontSize.toInt()}pt',
           onTap: onFontSizeTap,
+        ),
+        const SizedBox(height: 16),
+        SettingsMenuItem(
+          icon: Icons.timer_outlined,
+          title: localizations.readingTrackingSettings,
+          subtitle: localizations.readingTrackingSubtitle,
+          value: state.autoTrackingEnabled
+              ? localizations.secondsShort(state.autoTrackingThresholdSeconds)
+              : localizations.disabled,
+          onTap: onReadingTrackingTap,
         ),
         const SizedBox(height: 16),
         BlocBuilder<AudioAvailabilityCubit, AudioAvailabilityState>(

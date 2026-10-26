@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wolof_quran/core/reading/local_date.dart';
 import 'package:wolof_quran/domain/entities/reading_goal.dart';
+import 'package:wolof_quran/domain/entities/reading_session.dart';
 import 'package:wolof_quran/domain/entities/reading_validation.dart';
 import 'package:wolof_quran/domain/repositories/reading_goal_repository.dart';
 import 'package:wolof_quran/l10n/generated/app_localizations.dart';
@@ -56,6 +57,18 @@ class _FakeRepository implements ReadingGoalRepository {
 
   @override
   Future<void> undoValidation(String validationId) async {}
+
+  final List<ReadingSession> sessions = [];
+
+  @override
+  Future<void> saveSession(ReadingSession session) async {
+    sessions.removeWhere((s) => s.id == session.id);
+    sessions.add(session);
+  }
+
+  @override
+  Future<List<ReadingSession>> getSessions(String goalId) async =>
+      sessions.where((s) => s.goalId == goalId).toList();
 
   @override
   Future<String?> getActiveGoalId() async => activeGoalId;

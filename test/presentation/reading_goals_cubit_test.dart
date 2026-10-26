@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wolof_quran/core/reading/local_date.dart';
 import 'package:wolof_quran/domain/entities/reading_goal.dart';
+import 'package:wolof_quran/domain/entities/reading_session.dart';
 import 'package:wolof_quran/domain/entities/reading_validation.dart';
 import 'package:wolof_quran/domain/repositories/reading_goal_repository.dart';
 import 'package:wolof_quran/presentation/cubits/reading_goals_cubit.dart';
@@ -112,6 +113,18 @@ class _InMemoryReadingGoalRepository implements ReadingGoalRepository {
       validation.pages.forEach(stored.remove);
     }
   }
+
+  final List<ReadingSession> sessions = [];
+
+  @override
+  Future<void> saveSession(ReadingSession session) async {
+    sessions.removeWhere((s) => s.id == session.id);
+    sessions.add(session);
+  }
+
+  @override
+  Future<List<ReadingSession>> getSessions(String goalId) async =>
+      sessions.where((s) => s.goalId == goalId).toList();
 
   @override
   Future<String?> getActiveGoalId() async => activeGoalId;
@@ -340,6 +353,24 @@ void main() {
       expect(cubit.state.progressOf(goal.id)!.phase, ReadingGoalPhase.planned);
       expect(cubit.state.planned.length, 1);
       expect(cubit.state.ongoing, isEmpty);
+    });
+
+    test('sessions record the time and pages of a reading stretch', () async {
+      final goal = await create();
+
+      final session = await cubit.startSession(goal.id);
+      await cubit.endSession(
+        session,
+        activeDuration: const Duration(minutes: 12),
+        pagesViewed: [5, 3, 4],
+      );
+
+      final stored = repository.sessions.single;
+      expect(stored.id, session.id);
+      expect(stored.goalId, goal.id);
+      expect(stored.endedAt, repository.now);
+      expect(stored.activeDuration, const Duration(minutes: 12));
+      expect(stored.pagesViewed, [3, 4, 5]);
     });
 
     test('load drops an active goal id that no longer exists', () async {

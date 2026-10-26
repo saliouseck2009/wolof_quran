@@ -1260,4 +1260,101 @@ class AppLocalizationsAr extends AppLocalizations {
   String completedOn(String date) {
     return 'اكتمل في $date';
   }
+
+  @override
+  String get freeReading => 'قراءة حرة';
+
+  @override
+  String get freeReadingDescription => 'تصفّح المصحف دون التأثير على أي هدف.';
+
+  @override
+  String get readingActions => 'القراءة';
+
+  @override
+  String get markThisPageRead => 'تحديد هذه الصفحة كمقروءة';
+
+  @override
+  String get unmarkThisPage => 'إلغاء تحديد هذه الصفحة';
+
+  @override
+  String get readUntilHere => 'قرأت حتى هنا';
+
+  @override
+  String readUntilHereConfirm(int from, int to, String goal) {
+    return 'تحديد الصفحات من $from إلى $to كمقروءة في «$goal»؟';
+  }
+
+  @override
+  String get readUntilHereNothing => 'كل الصفحات حتى هنا مقروءة بالفعل.';
+
+  @override
+  String get markSeveralPages => 'تحديد عدة صفحات';
+
+  @override
+  String get viewProgress => 'عرض تقدمي';
+
+  @override
+  String get switchGoal => 'تغيير الهدف';
+
+  @override
+  String get switchGoalSubtitle => 'ستُستعاد آخر موضع قراءة له.';
+
+  @override
+  String get switchToFreeReading => 'الانتقال إلى القراءة الحرة';
+
+  @override
+  String get followAGoal => 'متابعة هدف';
+
+  @override
+  String pageNotCounted(int page) {
+    return 'لم تُحتسب الصفحة $page — قراءة قصيرة جدًا';
+  }
+
+  @override
+  String pageMarkedRead(int page) {
+    return 'حُددت الصفحة $page كمقروءة';
+  }
+
+  @override
+  String goalCompletedToast(String name) {
+    return 'الحمد لله! اكتمل «$name».';
+  }
+
+  @override
+  String get readingTrackingSettings => 'تتبع القراءة';
+
+  @override
+  String get readingTrackingSubtitle => 'التحقق التلقائي من الصفحات في المصحف';
+
+  @override
+  String get autoTracking => 'تتبع القراءة التلقائي';
+
+  @override
+  String get autoTrackingDescription =>
+      'تُحتسب الصفحة مقروءة في الهدف المتابَع بعد عرضها لمدة دنيا. يمكنك دائمًا تحديد الصفحات يدويًا.';
+
+  @override
+  String get autoTrackingThreshold => 'الحد الأدنى للوقت لكل صفحة';
+
+  @override
+  String secondsShort(int count) {
+    return '$count ث';
+  }
+
+  @override
+  String get enabled => 'مفعّل';
+
+  @override
+  String get disabled => 'معطّل';
+
+  @override
+  String todayShort(int read, int target) {
+    return 'اليوم $read/$target';
+  }
+
+  @override
+  String get todayDoneShort => 'تحقّق هدف اليوم ✓';
+
+  @override
+  String get markReadShort => 'تحديد كمقروءة';
 }
