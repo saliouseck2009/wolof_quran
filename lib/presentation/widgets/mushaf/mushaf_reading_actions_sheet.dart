@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
+import '../../../core/reading/reading_plan_calculator.dart';
+import '../../../domain/entities/reading_goal_progress.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/reading_goals_cubit.dart';
+import '../reading_goals/reading_goal_form_widgets.dart';
 import '../reading_goals/reading_progress_bar.dart';
 
 enum MushafReadingAction {
@@ -49,14 +53,10 @@ class _ReadingActionsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return BlocBuilder<ReadingGoalsCubit, ReadingGoalsState>(
       builder: (context, state) {
         final progress = state.activeProgress;
-        final metrics = progress?.metrics;
-        final isPageValidated = progress?.isValidated(currentPage) ?? false;
 
         void pick(MushafReadingAction action) =>
             Navigator.of(context).pop(action);
@@ -66,157 +66,227 @@ class _ReadingActionsSheet extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          progress?.goal.name ?? localizations.freeReading,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          metrics == null
-                              ? localizations.freeReadingDescription
-                              : '${localizations.readingValidatedOf(metrics.validatedCount, metrics.totalPages)} · '
-                                    '${metrics.isTodayTargetReached ? localizations.todayDoneShort : localizations.todayShort(metrics.readToday, metrics.todayTarget)}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
+            children: progress != null
+                ? _goalActions(context, localizations, progress, pick)
+                : _freeReadingActions(
+                    localizations,
+                    hasGoals: state.ongoing.isNotEmpty,
+                    pick: pick,
                   ),
-                  const SizedBox(width: 8),
-                  IconButton.filledTonal(
-                    tooltip: MaterialLocalizations.of(
-                      context,
-                    ).closeButtonTooltip,
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded, size: 20),
-                  ),
-                ],
-              ),
-              if (metrics != null) ...[
-                const SizedBox(height: 12),
-                ReadingProgressBar(fraction: metrics.fraction),
-              ],
-              const SizedBox(height: 12),
-              if (progress != null) ...[
-                _ActionTile(
-                  icon: isPageValidated
-                      ? Icons.remove_done_rounded
-                      : Icons.check_circle_outline_rounded,
-                  label: isPageValidated
-                      ? localizations.unmarkThisPage
-                      : localizations.markThisPageRead,
-                  detail: localizations.pageNumberLabel(currentPage),
-                  onTap: () => pick(
-                    isPageValidated
-                        ? MushafReadingAction.unmarkPage
-                        : MushafReadingAction.markPage,
-                  ),
-                ),
-                _ActionTile(
-                  icon: Icons.fact_check_outlined,
-                  label: localizations.readUntilHere,
-                  onTap: () => pick(MushafReadingAction.readUntilHere),
-                ),
-                _ActionTile(
-                  icon: Icons.playlist_add_check_rounded,
-                  label: localizations.markSeveralPages,
-                  onTap: () => pick(MushafReadingAction.markSeveral),
-                ),
-                _ActionTile(
-                  icon: Icons.menu_book_rounded,
-                  label: localizations.markSection,
-                  onTap: () => pick(MushafReadingAction.markSection),
-                ),
-                _ActionTile(
-                  icon: Icons.insights_rounded,
-                  label: localizations.viewProgress,
-                  onTap: () => pick(MushafReadingAction.viewProgress),
-                ),
-                const Divider(height: 16),
-                _ActionTile(
-                  icon: Icons.swap_horiz_rounded,
-                  label: localizations.switchGoal,
-                  onTap: () => pick(MushafReadingAction.switchGoal),
-                ),
-                _ActionTile(
-                  icon: Icons.explore_outlined,
-                  label: localizations.switchToFreeReading,
-                  onTap: () => pick(MushafReadingAction.freeReading),
-                ),
-              ] else ...[
-                if (state.ongoing.isNotEmpty)
-                  _ActionTile(
-                    icon: Icons.flag_rounded,
-                    label: localizations.followAGoal,
-                    onTap: () => pick(MushafReadingAction.followGoal),
-                  ),
-                _ActionTile(
-                  icon: Icons.add_rounded,
-                  label: localizations.newReadingGoal,
-                  onTap: () => pick(MushafReadingAction.createGoal),
-                ),
-                _ActionTile(
-                  icon: Icons.insights_rounded,
-                  label: localizations.readingGoals,
-                  onTap: () => pick(MushafReadingAction.viewProgress),
-                ),
-              ],
-            ],
           ),
         );
       },
     );
   }
+
+  List<Widget> _goalActions(
+    BuildContext context,
+    AppLocalizations localizations,
+    ReadingGoalProgress progress,
+    void Function(MushafReadingAction) pick,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final metrics = progress.metrics;
+    final isPageValidated = progress.isValidated(currentPage);
+    final continuous = metrics.continuousProgress;
+    final isLastRead =
+        continuous > 0 &&
+        progress.goal.order.pageAt(continuous - 1) == currentPage;
+    final pageDetail = isLastRead
+        ? '${localizations.pageNumberLabel(currentPage)} · ${localizations.lastPageReadTag}'
+        : localizations.pageNumberLabel(currentPage);
+
+    return [
+      SheetHeader(
+        icon: Icons.menu_book_rounded,
+        title: progress.goal.name,
+        subtitle:
+            '${localizations.readingProgressLabel(metrics.validatedCount, metrics.totalPages)} · '
+            '${metrics.isTodayTargetReached ? localizations.todayDoneShort : localizations.todayShort(metrics.readToday, metrics.todayTarget)}',
+      ),
+      const SizedBox(height: 14),
+      Row(
+        children: [
+          Expanded(
+            child: _StatCard(
+              label: localizations.totalLabel,
+              fraction: metrics.fraction,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _StatCard(
+              label: localizations.today,
+              fraction: _todayFraction(metrics),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 14),
+      SheetActionRow(
+        icon: isPageValidated
+            ? Icons.delete_outline_rounded
+            : Icons.check_circle_outline_rounded,
+        title: isPageValidated
+            ? localizations.unmarkThisPage
+            : localizations.markThisPageRead,
+        subtitle: pageDetail,
+        filled: true,
+        tint: isPageValidated ? colorScheme.error : null,
+        onTap: () => pick(
+          isPageValidated
+              ? MushafReadingAction.unmarkPage
+              : MushafReadingAction.markPage,
+        ),
+      ),
+      const SizedBox(height: 6),
+      SheetActionRow(
+        icon: Icons.fact_check_outlined,
+        title: localizations.readUntilHere,
+        subtitle: localizations.readUntilHereSubtitle,
+        onTap: () => pick(MushafReadingAction.readUntilHere),
+      ),
+      SheetActionRow(
+        icon: Icons.playlist_add_check_rounded,
+        title: localizations.markSeveralPages,
+        subtitle: localizations.markSeveralPagesSubtitle,
+        onTap: () => pick(MushafReadingAction.markSeveral),
+      ),
+      SheetActionRow(
+        icon: Icons.auto_stories_outlined,
+        title: localizations.markSection,
+        subtitle: localizations.markSectionSubtitle,
+        onTap: () => pick(MushafReadingAction.markSection),
+      ),
+      SheetActionRow(
+        icon: Icons.insights_rounded,
+        title: localizations.viewProgress,
+        subtitle: localizations.viewProgressSubtitle,
+        onTap: () => pick(MushafReadingAction.viewProgress),
+      ),
+      const Padding(
+        padding: EdgeInsets.symmetric(vertical: 6),
+        child: SheetRowDivider(),
+      ),
+      SheetActionRow(
+        icon: Icons.swap_horiz_rounded,
+        title: localizations.switchGoal,
+        tint: colorScheme.onSurfaceVariant,
+        onTap: () => pick(MushafReadingAction.switchGoal),
+      ),
+      SheetActionRow(
+        icon: Icons.explore_outlined,
+        title: localizations.switchToFreeReading,
+        tint: colorScheme.onSurfaceVariant,
+        onTap: () => pick(MushafReadingAction.freeReading),
+      ),
+    ];
+  }
+
+  List<Widget> _freeReadingActions(
+    AppLocalizations localizations, {
+    required bool hasGoals,
+    required void Function(MushafReadingAction) pick,
+  }) {
+    return [
+      SheetHeader(
+        icon: Icons.schedule_rounded,
+        title: localizations.freeReading,
+        subtitle: localizations.freeReadingDescription,
+      ),
+      const SizedBox(height: 10),
+      const SheetRowDivider(),
+      const SizedBox(height: 6),
+      if (hasGoals) ...[
+        SheetActionRow(
+          icon: Icons.menu_book_rounded,
+          title: localizations.followAGoal,
+          subtitle: localizations.followAGoalSubtitle,
+          chevron: true,
+          onTap: () => pick(MushafReadingAction.followGoal),
+        ),
+        const SheetRowDivider(),
+      ],
+      SheetActionRow(
+        icon: Icons.add_rounded,
+        title: localizations.newReadingGoal,
+        subtitle: localizations.newGoalSubtitle,
+        chevron: true,
+        onTap: () => pick(MushafReadingAction.createGoal),
+      ),
+      const SheetRowDivider(),
+      SheetActionRow(
+        icon: Icons.insights_rounded,
+        title: localizations.readingGoals,
+        subtitle: localizations.viewProgress,
+        chevron: true,
+        onTap: () => pick(MushafReadingAction.viewProgress),
+      ),
+    ];
+  }
+
+  static double _todayFraction(ReadingPlanMetrics metrics) {
+    if (metrics.todayTarget == 0) {
+      return 1;
+    }
+    return (metrics.readToday / metrics.todayTarget).clamp(0.0, 1.0);
+  }
 }
 
-class _ActionTile extends StatelessWidget {
-  final IconData icon;
+/// Small card with an uppercase label, a percentage and a progress bar.
+class _StatCard extends StatelessWidget {
   final String label;
-  final String? detail;
-  final VoidCallback onTap;
+  final double fraction;
 
-  const _ActionTile({
-    required this.icon,
-    required this.label,
-    this.detail,
-    required this.onTap,
-  });
+  const _StatCard({required this.label, required this.fraction});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final locale = Localizations.localeOf(context).toString();
+    final percent = fraction * 100;
+    final text = NumberFormat(
+      percent < 10 ? '0.#' : '0',
+      locale,
+    ).format(percent);
 
-    return ListTile(
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: colorScheme.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, size: 20, color: colorScheme.primary),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      decoration: BoxDecoration(
+        color: colorScheme.onSurface.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(14),
       ),
-      title: Text(
-        label,
-        style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.6,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              Text(
+                '$text%',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ReadingProgressBar(fraction: fraction, height: 4),
+        ],
       ),
-      subtitle: detail == null ? null : Text(detail!),
     );
   }
 }

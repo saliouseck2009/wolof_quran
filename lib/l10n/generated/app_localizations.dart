@@ -1951,7 +1951,7 @@ abstract class AppLocalizations {
   /// Explanation under the until-page mode
   ///
   /// In en, this message translates to:
-  /// **'Marks every unread page of the goal up to this page, in reading order.'**
+  /// **'Marks every unread page up to this point.'**
   String get untilPageHint;
 
   /// Label of the first page field
@@ -2185,7 +2185,7 @@ abstract class AppLocalizations {
   /// Subtitle of the free reading option
   ///
   /// In en, this message translates to:
-  /// **'Browse the Mushaf without touching any goal.'**
+  /// **'Browse the Mushaf with no active goal. Resume whenever you like.'**
   String get freeReadingDescription;
 
   /// Title of the Mushaf reading actions sheet
@@ -2203,7 +2203,7 @@ abstract class AppLocalizations {
   /// Mushaf action on an already validated page
   ///
   /// In en, this message translates to:
-  /// **'Remove this page\'s validation'**
+  /// **'Remove validation'**
   String get unmarkThisPage;
 
   /// Mushaf action validating every unread page up to the current one
@@ -2781,6 +2781,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mark page {page} as read in “{goal}”?'**
   String readUntilHereConfirmSingle(int page, String goal);
+
+  /// Verse count next to a surah name
+  ///
+  /// In en, this message translates to:
+  /// **'{count} ayah'**
+  String surahAyahCount(int count);
+
+  /// No description provided for @totalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get totalLabel;
+
+  /// No description provided for @lastPageReadTag.
+  ///
+  /// In en, this message translates to:
+  /// **'last page read'**
+  String get lastPageReadTag;
+
+  /// Subtitle of the mark pages sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Last page read: {page}'**
+  String lastPageReadLabel(int page);
+
+  /// No description provided for @readUntilHereSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Validate every page up to this one'**
+  String get readUntilHereSubtitle;
+
+  /// No description provided for @markSeveralPagesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to a page, or a range'**
+  String get markSeveralPagesSubtitle;
+
+  /// No description provided for @markSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Validate by unit'**
+  String get markSectionSubtitle;
+
+  /// No description provided for @viewProgressSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics and days left'**
+  String get viewProgressSubtitle;
+
+  /// No description provided for @followAGoalSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume an ongoing khatm'**
+  String get followAGoalSubtitle;
+
+  /// No description provided for @newGoalSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a duration and a starting point'**
+  String get newGoalSubtitle;
+
+  /// No description provided for @freeReadingShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse the Mushaf without a goal.'**
+  String get freeReadingShort;
+
+  /// Shown next to the big page number
+  ///
+  /// In en, this message translates to:
+  /// **'page of {total}'**
+  String pageOfTotal(int total);
+
+  /// No description provided for @juzEndChip.
+  ///
+  /// In en, this message translates to:
+  /// **'End of juz'**
+  String get juzEndChip;
+
+  /// No description provided for @hizbEndChip.
+  ///
+  /// In en, this message translates to:
+  /// **'End of hizb'**
+  String get hizbEndChip;
+
+  /// Size of the selected page range
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page in range} other{{count} pages in range}}'**
+  String pagesInRange(int count);
+
+  /// No description provided for @rangeInverted.
+  ///
+  /// In en, this message translates to:
+  /// **'Reversed range — no new page to mark.'**
+  String get rangeInverted;
+
+  /// No description provided for @customDurationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom duration'**
+  String get customDurationLabel;
+
+  /// Average pages per day, short
+  ///
+  /// In en, this message translates to:
+  /// **'~{pages} pages/day'**
+  String pagesPerDayApprox(String pages);
+
+  /// No description provided for @chooseShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get chooseShort;
+
+  /// No description provided for @pickEndDateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an end date'**
+  String get pickEndDateAction;
 }
 
 class _AppLocalizationsDelegate

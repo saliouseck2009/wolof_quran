@@ -6,8 +6,9 @@ import '../../../core/mushaf/quran_page_data.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import 'surah_picker_sheet.dart';
 
-/// Number field for a mushaf page, with the surah and juz of that page as
-/// helper text and a button to jump to the first page of a surah.
+/// Number field for a mushaf page: a label above, the page in large digits,
+/// a button opening the surah picker and the juz and surah of that page as
+/// helper text below.
 class PagePickerField extends StatefulWidget {
   final String label;
   final int? value;
@@ -54,7 +55,12 @@ class _PagePickerFieldState extends State<PagePickerField> {
       widget.value! <= widget.totalPages;
 
   Future<void> _pickSurah() async {
-    final surahNumber = await showSurahPickerSheet(context);
+    final surahNumber = await showSurahPickerSheet(
+      context,
+      selectedSurah: _isValid
+          ? getPageInfo(widget.value!).primarySurahNumber
+          : null,
+    );
     if (surahNumber == null || !mounted) {
       return;
     }
@@ -66,47 +72,96 @@ class _PagePickerFieldState extends State<PagePickerField> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final value = widget.value;
+    final hasError = !_isValid && _controller.text.isNotEmpty;
     final String? helper;
     if (_isValid) {
       final info = getPageInfo(value!);
       helper =
           '${localizations.juzLabel(info.juzNumber)} · ${quran.getSurahName(info.primarySurahNumber)}';
-    } else if (_controller.text.isEmpty) {
-      helper = null;
-    } else {
+    } else if (hasError) {
       helper = localizations.invalidPage(widget.totalPages);
+    } else {
+      helper = null;
     }
 
-    return TextField(
-      controller: _controller,
-      autofocus: widget.autofocus,
-      keyboardType: TextInputType.number,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(4),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.label,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 6),
+        TextField(
+          controller: _controller,
+          autofocus: widget.autofocus,
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(4),
+          ],
+          onChanged: (text) => widget.onChanged(int.tryParse(text)),
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: colorScheme.onSurface,
+          ),
+          decoration: InputDecoration(
+            hintText: '1',
+            hintStyle: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 12,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: hasError
+                  ? BorderSide(color: colorScheme.error, width: 1.5)
+                  : BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(
+                color: hasError ? colorScheme.error : colorScheme.primary,
+                width: 1.5,
+              ),
+            ),
+            suffixIcon: IconButton(
+              tooltip: localizations.chooseSurah,
+              icon: Icon(
+                Icons.bookmark_border_rounded,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              onPressed: _pickSurah,
+            ),
+          ),
+        ),
+        if (helper != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            helper,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: hasError
+                  ? colorScheme.error
+                  : colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ],
-      onChanged: (text) => widget.onChanged(int.tryParse(text)),
-      decoration: InputDecoration(
-        labelText: widget.label,
-        helperText: helper,
-        helperMaxLines: 1,
-        errorText: _isValid || _controller.text.isEmpty
-            ? null
-            : localizations.invalidPage(widget.totalPages),
-        filled: true,
-        fillColor: colorScheme.surfaceContainerHighest,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
-        ),
-        suffixIcon: IconButton(
-          tooltip: localizations.chooseSurah,
-          icon: const Icon(Icons.menu_book_rounded),
-          onPressed: _pickSurah,
-        ),
-      ),
     );
   }
 }

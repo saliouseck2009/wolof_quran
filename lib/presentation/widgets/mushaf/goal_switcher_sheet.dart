@@ -5,7 +5,9 @@ import '../../../core/navigation/create_reading_goal_arguments.dart';
 import '../../../domain/entities/reading_goal_progress.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/reading_goals_cubit.dart';
+import '../../utils/reading_goal_formatting.dart';
 import '../../views/create_reading_goal_page.dart';
+import '../reading_goals/reading_goal_form_widgets.dart';
 import '../reading_goals/reading_progress_bar.dart';
 
 /// What the user picked in [showGoalSwitcherSheet]: a goal and the page to
@@ -41,13 +43,12 @@ class _GoalSwitcherSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return BlocBuilder<ReadingGoalsCubit, ReadingGoalsState>(
       builder: (context, state) {
         final goals = state.ongoing;
-        final maxHeight = MediaQuery.sizeOf(context).height * 0.75;
+        final maxHeight = MediaQuery.sizeOf(context).height * 0.8;
 
         return ConstrainedBox(
           constraints: BoxConstraints(maxHeight: maxHeight),
@@ -58,38 +59,10 @@ class _GoalSwitcherSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              localizations.switchGoal,
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              localizations.switchGoalSubtitle,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton.filledTonal(
-                        tooltip: MaterialLocalizations.of(
-                          context,
-                        ).closeButtonTooltip,
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close_rounded, size: 20),
-                      ),
-                    ],
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+                  child: SheetHeader(
+                    title: localizations.switchGoal,
+                    subtitle: localizations.switchGoalSubtitle,
                   ),
                 ),
                 Flexible(
@@ -97,19 +70,34 @@ class _GoalSwitcherSheet extends StatelessWidget {
                     shrinkWrap: true,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     children: [
-                      _ChoiceTile(
+                      _ChoiceCard(
                         selected: state.activeGoalId == null,
-                        leading: Icon(
-                          Icons.explore_outlined,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        title: localizations.freeReading,
-                        subtitle: localizations.freeReadingDescription,
                         onTap: () =>
                             Navigator.of(context).pop(const GoalSwitchChoice()),
+                        child: Row(
+                          children: [
+                            IconBadge(
+                              icon: Icons.schedule_rounded,
+                              size: 44,
+                              color: state.activeGoalId == null
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _TitleSubtitle(
+                                title: localizations.freeReading,
+                                subtitle: localizations.freeReadingShort,
+                              ),
+                            ),
+                            _SelectionMark(
+                              selected: state.activeGoalId == null,
+                            ),
+                          ],
+                        ),
                       ),
                       for (final progress in goals)
-                        _GoalTile(
+                        _GoalCard(
                           progress: progress,
                           selected: progress.goal.id == state.activeGoalId,
                           onTap: () => Navigator.of(context).pop(
@@ -125,12 +113,16 @@ class _GoalSwitcherSheet extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
+                      minimumSize: const Size.fromHeight(52),
+                      side: BorderSide(
+                        color: colorScheme.primary.withValues(alpha: 0.5),
+                        width: 1.5,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     onPressed: () {
@@ -154,12 +146,12 @@ class _GoalSwitcherSheet extends StatelessWidget {
   }
 }
 
-class _GoalTile extends StatelessWidget {
+class _GoalCard extends StatelessWidget {
   final ReadingGoalProgress progress;
   final bool selected;
   final VoidCallback onTap;
 
-  const _GoalTile({
+  const _GoalCard({
     required this.progress,
     required this.selected,
     required this.onTap,
@@ -171,100 +163,179 @@ class _GoalTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final metrics = progress.metrics;
+    final goal = progress.goal;
 
-    return _ChoiceTile(
+    return _ChoiceCard(
       selected: selected,
-      leading: Icon(Icons.flag_rounded, color: colorScheme.primary),
-      title: progress.goal.name,
-      subtitle:
-          '${localizations.readingProgressLabel(metrics.validatedCount, metrics.totalPages)} · '
-          '${metrics.isTodayTargetReached ? localizations.todayDoneShort : localizations.todayShort(metrics.readToday, metrics.todayTarget)}',
-      bottom: ReadingProgressBar(fraction: metrics.fraction, height: 4),
       onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              IconBadge(
+                icon: Icons.menu_book_rounded,
+                size: 44,
+                color: selected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _TitleSubtitle(
+                  title: goal.name,
+                  subtitle:
+                      '${localizations.durationDays(goal.durationDays)} · '
+                      '${localizations.readingEndsOn(ReadingGoalFormatting.date(context, goal.endDate))}',
+                ),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    localizations.today,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  Text(
+                    metrics.isTodayTargetReached
+                        ? '✓'
+                        : '${metrics.readToday}/${metrics.todayTarget}',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              if (selected) ...[
+                const SizedBox(width: 10),
+                const _SelectionMark(selected: true),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  localizations.readingProgressLabel(
+                    metrics.validatedCount,
+                    metrics.totalPages,
+                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              Text(
+                localizations.percentValue(metrics.percent),
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ReadingProgressBar(fraction: metrics.fraction, height: 5),
+        ],
+      ),
     );
   }
 }
 
-class _ChoiceTile extends StatelessWidget {
+class _ChoiceCard extends StatelessWidget {
   final bool selected;
-  final Widget leading;
-  final String title;
-  final String subtitle;
-  final Widget? bottom;
+  final Widget child;
   final VoidCallback onTap;
 
-  const _ChoiceTile({
+  const _ChoiceCard({
     required this.selected,
-    required this.leading,
-    required this.title,
-    required this.subtitle,
-    this.bottom,
+    required this.child,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Material(
         color: selected
-            ? colorScheme.primaryContainer.withValues(alpha: 0.4)
-            : colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(16),
+            ? colorScheme.primary.withValues(alpha: 0.07)
+            : colorScheme.onSurface.withValues(alpha: 0.04),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: selected ? colorScheme.primary : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    leading,
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            subtitle,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (selected) ...[
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.check_circle_rounded,
-                        color: colorScheme.primary,
-                      ),
-                    ],
-                  ],
-                ),
-                if (bottom != null) ...[const SizedBox(height: 10), bottom!],
-              ],
-            ),
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            child: child,
           ),
         ),
       ),
     );
+  }
+}
+
+class _TitleSubtitle extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _TitleSubtitle({required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          subtitle,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SelectionMark extends StatelessWidget {
+  final bool selected;
+
+  const _SelectionMark({required this.selected});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return selected
+        ? Icon(Icons.check_circle_rounded, color: colorScheme.primary, size: 24)
+        : Icon(
+            Icons.circle_outlined,
+            color: colorScheme.outline.withValues(alpha: 0.5),
+            size: 24,
+          );
   }
 }

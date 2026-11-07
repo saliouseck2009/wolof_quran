@@ -1093,8 +1093,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pageRangeMode => 'نطاق صفحات';
 
   @override
-  String get untilPageHint =>
-      'يحدد كل الصفحات غير المقروءة في الهدف حتى هذه الصفحة، بترتيب القراءة.';
+  String get untilPageHint => 'يحدد كل الصفحات غير المقروءة حتى هذه النقطة.';
 
   @override
   String get fromPageLabel => 'من الصفحة';
@@ -1265,7 +1264,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get freeReading => 'قراءة حرة';
 
   @override
-  String get freeReadingDescription => 'تصفّح المصحف دون التأثير على أي هدف.';
+  String get freeReadingDescription =>
+      'تصفّح المصحف دون هدف نشط. استأنف متى شئت.';
 
   @override
   String get readingActions => 'القراءة';
@@ -1274,7 +1274,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get markThisPageRead => 'تحديد هذه الصفحة كمقروءة';
 
   @override
-  String get unmarkThisPage => 'إلغاء تحديد هذه الصفحة';
+  String get unmarkThisPage => 'إلغاء التحديد';
 
   @override
   String get readUntilHere => 'قرأت حتى هنا';
@@ -1634,4 +1634,80 @@ class AppLocalizationsAr extends AppLocalizations {
   String readUntilHereConfirmSingle(int page, String goal) {
     return 'تحديد الصفحة $page كمقروءة في «$goal»؟';
   }
+
+  @override
+  String surahAyahCount(int count) {
+    return '$count آية';
+  }
+
+  @override
+  String get totalLabel => 'الإجمالي';
+
+  @override
+  String get lastPageReadTag => 'آخر صفحة مقروءة';
+
+  @override
+  String lastPageReadLabel(int page) {
+    return 'آخر صفحة مقروءة: $page';
+  }
+
+  @override
+  String get readUntilHereSubtitle => 'تحديد كل الصفحات حتى هذه الصفحة';
+
+  @override
+  String get markSeveralPagesSubtitle => 'حتى صفحة أو نطاق';
+
+  @override
+  String get markSectionSubtitle => 'تحديد حسب الوحدة';
+
+  @override
+  String get viewProgressSubtitle => 'الإحصاءات والأيام المتبقية';
+
+  @override
+  String get followAGoalSubtitle => 'استئناف ختمة جارية';
+
+  @override
+  String get newGoalSubtitle => 'اختيار مدة ونقطة بداية';
+
+  @override
+  String get freeReadingShort => 'تصفّح المصحف دون هدف.';
+
+  @override
+  String pageOfTotal(int total) {
+    return 'صفحة من $total';
+  }
+
+  @override
+  String get juzEndChip => 'نهاية الجزء';
+
+  @override
+  String get hizbEndChip => 'نهاية الحزب';
+
+  @override
+  String pagesInRange(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفحة في النطاق',
+      one: 'صفحة واحدة في النطاق',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rangeInverted => 'نطاق معكوس — لا صفحات جديدة للتحديد.';
+
+  @override
+  String get customDurationLabel => 'مدة مخصصة';
+
+  @override
+  String pagesPerDayApprox(String pages) {
+    return '~$pages صفحة/يوم';
+  }
+
+  @override
+  String get chooseShort => 'اختيار';
+
+  @override
+  String get pickEndDateAction => 'اختيار تاريخ الانتهاء';
 }

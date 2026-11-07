@@ -1411,7 +1411,7 @@
   "@pageRangeMode": {
     "description": "Mark pages mode: from one page to another"
   },
-  "untilPageHint": "Marks every unread page of the goal up to this page, in reading order.",
+  "untilPageHint": "Marks every unread page up to this point.",
   "@untilPageHint": {
     "description": "Explanation under the until-page mode"
   },
@@ -1620,7 +1620,7 @@
   "@freeReading": {
     "description": "Mushaf mode where no goal is tracked"
   },
-  "freeReadingDescription": "Browse the Mushaf without touching any goal.",
+  "freeReadingDescription": "Browse the Mushaf with no active goal. Resume whenever you like.",
   "@freeReadingDescription": {
     "description": "Subtitle of the free reading option"
   },
@@ -1632,7 +1632,7 @@
   "@markThisPageRead": {
     "description": "Mushaf action"
   },
-  "unmarkThisPage": "Remove this page's validation",
+  "unmarkThisPage": "Remove validation",
   "@unmarkThisPage": {
     "description": "Mushaf action on an already validated page"
   },
@@ -1910,5 +1910,30 @@
   "statBestDayOn": "Best day · {date}",
   "@statBestDayOn": {"description": "Stats tile label with the date", "placeholders": {"date": {"type": "String"}}},
   "readUntilHereConfirmSingle": "Mark page {page} as read in “{goal}”?",
-  "@readUntilHereConfirmSingle": {"description": "Read-until-here confirmation for one page", "placeholders": {"page": {"type": "int"}, "goal": {"type": "String"}}}
+  "@readUntilHereConfirmSingle": {"description": "Read-until-here confirmation for one page", "placeholders": {"page": {"type": "int"}, "goal": {"type": "String"}}},
+  "surahAyahCount": "{count} ayah",
+  "@surahAyahCount": {"description": "Verse count next to a surah name", "placeholders": {"count": {"type": "int"}}},
+  "totalLabel": "Total",
+  "lastPageReadTag": "last page read",
+  "lastPageReadLabel": "Last page read: {page}",
+  "@lastPageReadLabel": {"description": "Subtitle of the mark pages sheet", "placeholders": {"page": {"type": "int"}}},
+  "readUntilHereSubtitle": "Validate every page up to this one",
+  "markSeveralPagesSubtitle": "Up to a page, or a range",
+  "markSectionSubtitle": "Validate by unit",
+  "viewProgressSubtitle": "Statistics and days left",
+  "followAGoalSubtitle": "Resume an ongoing khatm",
+  "newGoalSubtitle": "Choose a duration and a starting point",
+  "freeReadingShort": "Browse the Mushaf without a goal.",
+  "pageOfTotal": "page of {total}",
+  "@pageOfTotal": {"description": "Shown next to the big page number", "placeholders": {"total": {"type": "int"}}},
+  "juzEndChip": "End of juz",
+  "hizbEndChip": "End of hizb",
+  "pagesInRange": "{count, plural, =1{1 page in range} other{{count} pages in range}}",
+  "@pagesInRange": {"description": "Size of the selected page range", "placeholders": {"count": {"type": "int"}}},
+  "rangeInverted": "Reversed range — no new page to mark.",
+  "customDurationLabel": "Custom duration",
+  "pagesPerDayApprox": "~{pages} pages/day",
+  "@pagesPerDayApprox": {"description": "Average pages per day, short", "placeholders": {"pages": {"type": "String"}}},
+  "chooseShort": "Choose",
+  "pickEndDateAction": "Choose an end date"
 }

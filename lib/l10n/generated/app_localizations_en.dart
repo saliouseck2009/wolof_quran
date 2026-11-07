@@ -1087,8 +1087,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pageRangeMode => 'Page range';
 
   @override
-  String get untilPageHint =>
-      'Marks every unread page of the goal up to this page, in reading order.';
+  String get untilPageHint => 'Marks every unread page up to this point.';
 
   @override
   String get fromPageLabel => 'From page';
@@ -1252,7 +1251,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get freeReadingDescription =>
-      'Browse the Mushaf without touching any goal.';
+      'Browse the Mushaf with no active goal. Resume whenever you like.';
 
   @override
   String get readingActions => 'Reading';
@@ -1261,7 +1260,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markThisPageRead => 'Mark this page as read';
 
   @override
-  String get unmarkThisPage => 'Remove this page\'s validation';
+  String get unmarkThisPage => 'Remove validation';
 
   @override
   String get readUntilHere => 'I read until here';
@@ -1621,4 +1620,80 @@ class AppLocalizationsEn extends AppLocalizations {
   String readUntilHereConfirmSingle(int page, String goal) {
     return 'Mark page $page as read in “$goal”?';
   }
+
+  @override
+  String surahAyahCount(int count) {
+    return '$count ayah';
+  }
+
+  @override
+  String get totalLabel => 'Total';
+
+  @override
+  String get lastPageReadTag => 'last page read';
+
+  @override
+  String lastPageReadLabel(int page) {
+    return 'Last page read: $page';
+  }
+
+  @override
+  String get readUntilHereSubtitle => 'Validate every page up to this one';
+
+  @override
+  String get markSeveralPagesSubtitle => 'Up to a page, or a range';
+
+  @override
+  String get markSectionSubtitle => 'Validate by unit';
+
+  @override
+  String get viewProgressSubtitle => 'Statistics and days left';
+
+  @override
+  String get followAGoalSubtitle => 'Resume an ongoing khatm';
+
+  @override
+  String get newGoalSubtitle => 'Choose a duration and a starting point';
+
+  @override
+  String get freeReadingShort => 'Browse the Mushaf without a goal.';
+
+  @override
+  String pageOfTotal(int total) {
+    return 'page of $total';
+  }
+
+  @override
+  String get juzEndChip => 'End of juz';
+
+  @override
+  String get hizbEndChip => 'End of hizb';
+
+  @override
+  String pagesInRange(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages in range',
+      one: '1 page in range',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rangeInverted => 'Reversed range — no new page to mark.';
+
+  @override
+  String get customDurationLabel => 'Custom duration';
+
+  @override
+  String pagesPerDayApprox(String pages) {
+    return '~$pages pages/day';
+  }
+
+  @override
+  String get chooseShort => 'Choose';
+
+  @override
+  String get pickEndDateAction => 'Choose an end date';
 }

@@ -1101,7 +1101,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get untilPageHint =>
-      'Marque toutes les pages non lues de l\'objectif jusqu\'à cette page, dans l\'ordre de lecture.';
+      'Marque toutes les pages non lues jusqu\'à ce point.';
 
   @override
   String get fromPageLabel => 'De la page';
@@ -1183,7 +1183,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get customDuration => 'Personnalisée';
+  String get customDuration => 'Perso';
 
   @override
   String get pickEndDate => 'Date de fin';
@@ -1265,7 +1265,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get freeReadingDescription =>
-      'Parcourez le Mushaf sans toucher à aucun objectif.';
+      'Parcourez le Mushaf sans objectif actif. Reprenez quand vous le souhaitez.';
 
   @override
   String get readingActions => 'Lecture';
@@ -1274,7 +1274,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get markThisPageRead => 'Marquer cette page comme lue';
 
   @override
-  String get unmarkThisPage => 'Retirer la validation de cette page';
+  String get unmarkThisPage => 'Retirer la validation';
 
   @override
   String get readUntilHere => 'J\'ai lu jusqu\'ici';
@@ -1635,4 +1635,82 @@ class AppLocalizationsFr extends AppLocalizations {
   String readUntilHereConfirmSingle(int page, String goal) {
     return 'Marquer la page $page comme lue dans « $goal » ?';
   }
+
+  @override
+  String surahAyahCount(int count) {
+    return '$count versets';
+  }
+
+  @override
+  String get totalLabel => 'Total';
+
+  @override
+  String get lastPageReadTag => 'dernière page lue';
+
+  @override
+  String lastPageReadLabel(int page) {
+    return 'Dernière page lue : $page';
+  }
+
+  @override
+  String get readUntilHereSubtitle =>
+      'Valider toutes les pages jusqu\'à celle-ci';
+
+  @override
+  String get markSeveralPagesSubtitle => 'Jusqu\'à une page ou une plage';
+
+  @override
+  String get markSectionSubtitle => 'Valider par unité';
+
+  @override
+  String get viewProgressSubtitle => 'Statistiques et jours restants';
+
+  @override
+  String get followAGoalSubtitle => 'Reprendre un khatm en cours';
+
+  @override
+  String get newGoalSubtitle => 'Choisir une durée et un point de départ';
+
+  @override
+  String get freeReadingShort => 'Parcourez le Mushaf sans objectif.';
+
+  @override
+  String pageOfTotal(int total) {
+    return 'page de $total';
+  }
+
+  @override
+  String get juzEndChip => 'Fin du Juz';
+
+  @override
+  String get hizbEndChip => 'Fin du Hizb';
+
+  @override
+  String pagesInRange(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages dans la plage',
+      one: '1 page dans la plage',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rangeInverted =>
+      'Plage inversée — aucune nouvelle page à marquer.';
+
+  @override
+  String get customDurationLabel => 'Durée personnalisée';
+
+  @override
+  String pagesPerDayApprox(String pages) {
+    return '~$pages pages/jour';
+  }
+
+  @override
+  String get chooseShort => 'Choisir';
+
+  @override
+  String get pickEndDateAction => 'Choisir une date de fin';
 }
