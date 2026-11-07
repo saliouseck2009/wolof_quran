@@ -12,6 +12,7 @@ import '../../core/config/app_links.dart';
 import '../../data/datasources/remote_config_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../service_locator.dart';
+import '../widgets/snackbar.dart';
 
 class SupportPage extends StatelessWidget {
   static const String routeName = '/support';
@@ -182,13 +183,9 @@ class SupportPage extends StatelessWidget {
     AppLocalizations localizations,
   ) {
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(localizations.copiedToClipboard),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
+    CustomSnackbar.showSuccessSnackbar(
+      context,
+      localizations.copiedToClipboard,
     );
   }
 }
