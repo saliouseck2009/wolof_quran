@@ -1064,9 +1064,25 @@
   "@supportSecurePayment": {
     "description": "Footer under the purchase button on iOS"
   },
-  "supportThankYou": "Thank you for your support!",
-  "@supportThankYou": {
-    "description": "Snackbar after a successful contribution"
+  "supportThankYouTitle": "Thank you for your support!",
+  "@supportThankYouTitle": {
+    "description": "Title of the thank-you view after a successful contribution"
+  },
+  "supportThankYouBody": "Your contribution helps keep Wolof Quran free for everyone. Sharing the app with your loved ones is another great way to support it.",
+  "@supportThankYouBody": {
+    "description": "Body of the thank-you view after a successful contribution"
+  },
+  "supportShareApp": "Share the app",
+  "@supportShareApp": {
+    "description": "Button on the thank-you view"
+  },
+  "supportShareText": "I use Wolof Quran to read and listen to the Quran with Wolof translation. Give it a try!",
+  "@supportShareText": {
+    "description": "Text shared with the store links from the thank-you view"
+  },
+  "supportContributeAgain": "Contribute again",
+  "@supportContributeAgain": {
+    "description": "Link on the thank-you view returning to the purchase button"
   },
   "supportIapUnavailable": "In-app purchases are not available on this device.",
   "@supportIapUnavailable": {

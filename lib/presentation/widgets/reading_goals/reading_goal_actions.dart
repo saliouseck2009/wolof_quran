@@ -7,6 +7,7 @@ import '../../../core/navigation/reading_goal_detail_arguments.dart';
 import '../../../core/reading/local_date.dart';
 import '../../../domain/entities/reading_goal.dart';
 import '../../../domain/entities/reading_goal_progress.dart';
+import '../../../domain/entities/reading_validation.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/reading_goals_cubit.dart';
 import '../../views/create_reading_goal_page.dart';
@@ -66,7 +67,6 @@ class ReadingGoalActions {
     ReadingGoalProgress progress, {
     int? initialPage,
   }) async {
-    final cubit = context.read<ReadingGoalsCubit>();
     final validation = await showMarkPagesSheet(
       context,
       progress: progress,
@@ -75,18 +75,7 @@ class ReadingGoalActions {
     if (validation == null || !context.mounted) {
       return;
     }
-    // The completion sheet takes over once the goal is done.
-    if (cubit.state.progressOf(progress.goal.id)?.goal.status ==
-        ReadingGoalStatus.completed) {
-      return;
-    }
-    final localizations = AppLocalizations.of(context)!;
-    CustomSnackbar.showSnackbarAction(
-      context,
-      localizations.pagesMarked(validation.pages.length),
-      () => cubit.undoValidation(validation.id),
-      actionLabel: localizations.undo,
-    );
+    showPagesMarkedSnackbar(context, validation);
   }
 
   static Future<void> markSection(
@@ -94,7 +83,6 @@ class ReadingGoalActions {
     ReadingGoalProgress progress, {
     int? currentPage,
   }) async {
-    final cubit = context.read<ReadingGoalsCubit>();
     final validation = await showMarkSectionSheet(
       context,
       progress: progress,
@@ -103,8 +91,17 @@ class ReadingGoalActions {
     if (validation == null || !context.mounted) {
       return;
     }
-    // The completion sheet takes over once the goal is done.
-    if (cubit.state.progressOf(progress.goal.id)?.goal.status ==
+    showPagesMarkedSnackbar(context, validation);
+  }
+
+  /// "N pages marked" with an undo action, unless the goal just got
+  /// completed: the completion sheet takes over then.
+  static void showPagesMarkedSnackbar(
+    BuildContext context,
+    ReadingValidation validation,
+  ) {
+    final cubit = context.read<ReadingGoalsCubit>();
+    if (cubit.state.progressOf(validation.goalId)?.goal.status ==
         ReadingGoalStatus.completed) {
       return;
     }

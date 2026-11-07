@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/config/app_links.dart';
 import '../../data/datasources/remote_config_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../service_locator.dart';
@@ -191,6 +193,7 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
   _SupportError? _error;
   bool _loading = true;
   bool _purchasing = false;
+  bool _thanked = false;
   late final StreamSubscription<List<PurchaseDetails>> _purchaseSubscription;
 
   @override
@@ -264,11 +267,10 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.supportThankYou),
-            ),
-          );
+          setState(() {
+            _thanked = true;
+            _error = null;
+          });
         }
       } else if (purchase.status == PurchaseStatus.error ||
           purchase.status == PurchaseStatus.canceled) {
@@ -321,75 +323,156 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              Image.asset('assets/icon/soutien.png', width: 88, height: 88),
-              const SizedBox(height: 20),
-              Text(
-                localizations.supportPageTitle,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                localizations.supportAppleBody,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: cs.onSurfaceVariant, height: 1.5),
-              ),
-              const SizedBox(height: 28),
-              if (_loading)
-                const CircularProgressIndicator()
-              else if (_product != null) ...[
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: _purchasing ? null : _buy,
-                    icon: _purchasing
-                        ? const SizedBox.square(
-                            dimension: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.favorite_rounded),
-                    label: Text(
-                      _purchasing
-                          ? localizations.supportProcessing
-                          : localizations.supportContribute(_product!.price),
-                    ),
+          child: _thanked
+              ? _ThankYouView(
+                  onShare: () => Share.share(
+                    '${localizations.supportShareText}\n\n'
+                    'Android: ${AppLinks.playStoreUrl}\n'
+                    'iOS: ${AppLinks.appStoreUrl}',
                   ),
+                  onMore: () => setState(() => _thanked = false),
+                )
+              : Column(
+                  children: [
+                    Image.asset(
+                      'assets/icon/soutien.png',
+                      width: 88,
+                      height: 88,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      localizations.supportPageTitle,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      localizations.supportAppleBody,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: cs.onSurfaceVariant, height: 1.5),
+                    ),
+                    const SizedBox(height: 28),
+                    if (_loading)
+                      const CircularProgressIndicator()
+                    else if (_product != null) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: _purchasing ? null : _buy,
+                          icon: _purchasing
+                              ? const SizedBox.square(
+                                  dimension: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.favorite_rounded),
+                          label: Text(
+                            _purchasing
+                                ? localizations.supportProcessing
+                                : localizations.supportContribute(
+                                    _product!.price,
+                                  ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        localizations.supportSecurePayment,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                    if (_error != null) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        switch (_error!) {
+                          _SupportError.storeUnavailable =>
+                            localizations.supportIapUnavailable,
+                          _SupportError.productUnavailable =>
+                            localizations.supportProductUnavailable,
+                          _SupportError.paymentFailed =>
+                            localizations.supportPaymentFailed,
+                        },
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: cs.error),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    Text(
+                      '${localizations.contactEmailLabel}: ${SupportPage._contactEmail}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  localizations.supportSecurePayment,
-                  style: Theme.of(context).textTheme.bodySmall,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              if (_error != null) ...[
-                const SizedBox(height: 16),
-                Text(
-                  switch (_error!) {
-                    _SupportError.storeUnavailable =>
-                      localizations.supportIapUnavailable,
-                    _SupportError.productUnavailable =>
-                      localizations.supportProductUnavailable,
-                    _SupportError.paymentFailed =>
-                      localizations.supportPaymentFailed,
-                  },
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: cs.error),
-                ),
-              ],
-              const SizedBox(height: 24),
-              Text(
-                '${localizations.contactEmailLabel}: ${SupportPage._contactEmail}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
         ),
       ),
+    );
+  }
+}
+
+/// Shown once a contribution went through: thanks, and an invitation to
+/// share the app, which is the other way to support it.
+class _ThankYouView extends StatelessWidget {
+  final VoidCallback onShare;
+  final VoidCallback onMore;
+
+  const _ThankYouView({required this.onShare, required this.onMore});
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return Column(
+      children: [
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.6, end: 1),
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.elasticOut,
+          builder: (context, scale, child) =>
+              Transform.scale(scale: scale, child: child),
+          child: Container(
+            width: 96,
+            height: 96,
+            decoration: BoxDecoration(
+              color: cs.primary.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.favorite_rounded, size: 48, color: cs.primary),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          localizations.supportThankYouTitle,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 12),
+        Text(
+          localizations.supportThankYouBody,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: cs.onSurfaceVariant, height: 1.5),
+        ),
+        const SizedBox(height: 28),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: onShare,
+            icon: const Icon(Icons.share_rounded),
+            label: Text(localizations.supportShareApp),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextButton(
+          onPressed: onMore,
+          child: Text(localizations.supportContributeAgain),
+        ),
+      ],
     );
   }
 }

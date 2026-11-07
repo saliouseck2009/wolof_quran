@@ -832,7 +832,21 @@ class AppLocalizationsFr extends AppLocalizations {
       'Paiement traité de façon sécurisée par Apple.';
 
   @override
-  String get supportThankYou => 'Merci pour votre soutien !';
+  String get supportThankYouTitle => 'Merci pour votre soutien !';
+
+  @override
+  String get supportThankYouBody =>
+      'Votre contribution aide à garder Coran Wolof gratuit pour tous. Partager l\'application à vos proches est une autre belle façon de la soutenir.';
+
+  @override
+  String get supportShareApp => 'Partager l\'application';
+
+  @override
+  String get supportShareText =>
+      'J\'utilise Coran Wolof pour lire et écouter le Coran avec la traduction en wolof. Essayez-la !';
+
+  @override
+  String get supportContributeAgain => 'Contribuer à nouveau';
 
   @override
   String get supportIapUnavailable =>

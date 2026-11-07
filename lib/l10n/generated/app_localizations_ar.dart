@@ -811,7 +811,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportSecurePayment => 'تتم معالجة الدفع بشكل آمن عبر Apple.';
 
   @override
-  String get supportThankYou => 'شكرًا لدعمك!';
+  String get supportThankYouTitle => 'شكرًا لدعمك!';
+
+  @override
+  String get supportThankYouBody =>
+      'مساهمتك تساعد على إبقاء تطبيق القرآن بالولوف مجانيًا للجميع. مشاركة التطبيق مع أحبّتك طريقة رائعة أخرى لدعمه.';
+
+  @override
+  String get supportShareApp => 'مشاركة التطبيق';
+
+  @override
+  String get supportShareText =>
+      'أستخدم تطبيق القرآن بالولوف لقراءة القرآن والاستماع إليه مع الترجمة بالولوف. جرّبه!';
+
+  @override
+  String get supportContributeAgain => 'المساهمة مرة أخرى';
 
   @override
   String get supportIapUnavailable =>

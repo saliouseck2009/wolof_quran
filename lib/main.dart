@@ -151,6 +151,7 @@ class MyApp extends StatelessWidget {
                   return BlocBuilder<ThemeCubit, ThemeMode>(
                     builder: (context, themeMode) {
                       return MaterialApp(
+                        navigatorKey: AppRoutes.navigatorKey,
                         onGenerateTitle: (context) {
                           return AppLocalizations.of(context)?.appTitle ??
                               'Wolof Quran';

@@ -392,12 +392,7 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
     if (validation == null || !mounted) {
       return;
     }
-    CustomSnackbar.showSnackbarAction(
-      context,
-      localizations.pagesMarked(validation.pages.length),
-      () => cubit.undoValidation(validation.id),
-      actionLabel: localizations.undo,
-    );
+    ReadingGoalActions.showPagesMarkedSnackbar(context, validation);
   }
 
   Future<void> _openGoalSwitcher() async {
@@ -1043,14 +1038,26 @@ class _PageLabel extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (isValidated) ...[
-              Icon(
-                Icons.check_circle_rounded,
-                size: 14,
-                color: theme.bottomBarText,
-              ),
-              const SizedBox(width: 4),
-            ],
+            // The check pops in when the page gets validated, so an
+            // automatic validation is noticed without a snackbar.
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 450),
+              switchInCurve: Curves.elasticOut,
+              switchOutCurve: Curves.easeIn,
+              transitionBuilder: (child, animation) =>
+                  ScaleTransition(scale: animation, child: child),
+              child: isValidated
+                  ? Padding(
+                      key: const ValueKey('validated'),
+                      padding: const EdgeInsetsDirectional.only(end: 4),
+                      child: Icon(
+                        Icons.check_circle_rounded,
+                        size: 14,
+                        color: theme.bottomBarText,
+                      ),
+                    )
+                  : const SizedBox.shrink(key: ValueKey('unvalidated')),
+            ),
             Text(
               localizations.pageNumberLabel(pageNumber),
               style: TextStyle(

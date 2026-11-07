@@ -1558,11 +1558,35 @@ abstract class AppLocalizations {
   /// **'Payment securely processed by Apple.'**
   String get supportSecurePayment;
 
-  /// Snackbar after a successful contribution
+  /// Title of the thank-you view after a successful contribution
   ///
   /// In en, this message translates to:
   /// **'Thank you for your support!'**
-  String get supportThankYou;
+  String get supportThankYouTitle;
+
+  /// Body of the thank-you view after a successful contribution
+  ///
+  /// In en, this message translates to:
+  /// **'Your contribution helps keep Wolof Quran free for everyone. Sharing the app with your loved ones is another great way to support it.'**
+  String get supportThankYouBody;
+
+  /// Button on the thank-you view
+  ///
+  /// In en, this message translates to:
+  /// **'Share the app'**
+  String get supportShareApp;
+
+  /// Text shared with the store links from the thank-you view
+  ///
+  /// In en, this message translates to:
+  /// **'I use Wolof Quran to read and listen to the Quran with Wolof translation. Give it a try!'**
+  String get supportShareText;
+
+  /// Link on the thank-you view returning to the purchase button
+  ///
+  /// In en, this message translates to:
+  /// **'Contribute again'**
+  String get supportContributeAgain;
 
   /// Error when the store is not available
   ///

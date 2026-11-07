@@ -340,20 +340,19 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
         FormSectionLabel(localizations.goalDuration),
         Row(
           children: [
-            Expanded(child: durationChip(7)),
-            const SizedBox(width: 8),
-            Expanded(child: durationChip(15)),
-            const SizedBox(width: 8),
-            Expanded(child: durationChip(30)),
+            for (final days in _durationPresets.take(3)) ...[
+              if (days != _durationPresets.first) const SizedBox(width: 8),
+              Expanded(child: durationChip(days)),
+            ],
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(child: durationChip(60)),
-            const SizedBox(width: 8),
-            Expanded(child: durationChip(90)),
-            const SizedBox(width: 8),
+            for (final days in _durationPresets.skip(3)) ...[
+              Expanded(child: durationChip(days)),
+              const SizedBox(width: 8),
+            ],
             Expanded(
               child: QuickChoiceChip(
                 expanded: true,
@@ -386,16 +385,13 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
         const SizedBox(height: 12),
         _InfoLine(
           icon: Icons.schedule_rounded,
-          text: _durationMode == _DurationMode.custom
-              ? '${localizations.pagesPerDayApprox(ReadingGoalFormatting.average(context, average))} · '
-                    '${localizations.readingEndsOn(ReadingGoalFormatting.date(context, _endDate))}'
-              : '${localizations.durationDays(_durationDays)} · '
-                    '${localizations.readingEndsOn(ReadingGoalFormatting.date(context, _endDate))}',
-          emphasis: _durationMode == _DurationMode.custom
-              ? localizations.pagesPerDayApprox(
-                  ReadingGoalFormatting.average(context, average),
-                )
-              : localizations.durationDays(_durationDays),
+          text:
+              '${localizations.pagesPerDayApprox(ReadingGoalFormatting.average(context, average))} · '
+              '${localizations.durationDays(_durationDays)} · '
+              '${localizations.readingEndsOn(ReadingGoalFormatting.date(context, _endDate))}',
+          emphasis: localizations.pagesPerDayApprox(
+            ReadingGoalFormatting.average(context, average),
+          ),
         ),
         if (!_isEdit) ...[
           const SizedBox(height: 26),
@@ -626,17 +622,7 @@ class _CustomDurationCard extends StatelessWidget {
               ),
             ],
           ),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackHeight: 4,
-              activeTrackColor: colorScheme.primary,
-              inactiveTrackColor: colorScheme.primary.withValues(alpha: 0.2),
-              thumbColor: colorScheme.surface,
-              overlayColor: colorScheme.primary.withValues(alpha: 0.12),
-              activeTickMarkColor: Colors.transparent,
-              inactiveTickMarkColor: Colors.transparent,
-              showValueIndicator: ShowValueIndicator.never,
-            ),
+          GoalSliderTheme(
             child: Slider(
               value: days.toDouble(),
               min: 1,

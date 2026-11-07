@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -13,15 +15,35 @@ class ScheduledReminder {
   final String body;
   final DateTime at;
 
+  /// What a tap on the notification opens, see [ReminderPayload].
+  final String payload;
+
   const ScheduledReminder({
     required this.id,
     required this.title,
     required this.body,
     required this.at,
+    required this.payload,
   });
 
   @override
   String toString() => 'ScheduledReminder($id, $at, $title)';
+}
+
+/// Payload carried by a reminder notification: the goal to resume, or the
+/// goals list when several goals are due.
+class ReminderPayload {
+  const ReminderPayload._();
+
+  static const goals = 'goals';
+  static const _goalPrefix = 'goal:';
+
+  static String goal(String goalId) => '$_goalPrefix$goalId';
+
+  /// The goal id of a single-goal payload, `null` otherwise.
+  static String? goalIdOf(String payload) => payload.startsWith(_goalPrefix)
+      ? payload.substring(_goalPrefix.length)
+      : null;
 }
 
 /// Localized texts of a reminder; built by the caller, which has the
@@ -41,6 +63,10 @@ class ReminderCopy {
 /// Platform side of reminders, swapped for a fake in tests.
 abstract class ReminderScheduler {
   Future<void> initialize();
+
+  /// Payloads of the reminders the user tapped, including the one that
+  /// launched the app.
+  Stream<String> get taps;
 
   Future<bool> requestPermission();
 
@@ -70,6 +96,9 @@ class ReadingReminderService {
        _now = now ?? DateTime.now;
 
   Future<void> initialize() => _scheduler.initialize();
+
+  /// See [ReminderScheduler.taps].
+  Stream<String> get taps => _scheduler.taps;
 
   Future<bool> requestPermission() => _scheduler.requestPermission();
 
@@ -139,6 +168,9 @@ class ReadingReminderService {
             title: copy.title,
             body: body,
             at: at,
+            payload: due.length == 1
+                ? ReminderPayload.goal(due.single.goal.id)
+                : ReminderPayload.goals,
           ),
         );
       }
@@ -168,10 +200,21 @@ class LocalNotificationsReminderScheduler implements ReminderScheduler {
   static const _channelName = 'Reading reminders';
 
   final FlutterLocalNotificationsPlugin _plugin;
+  final _taps = StreamController<String>.broadcast();
   bool _initialized = false;
 
   LocalNotificationsReminderScheduler({FlutterLocalNotificationsPlugin? plugin})
     : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+
+  @override
+  Stream<String> get taps => _taps.stream;
+
+  void _onResponse(NotificationResponse response) {
+    final payload = response.payload;
+    if (payload != null && payload.isNotEmpty) {
+      _taps.add(payload);
+    }
+  }
 
   @override
   Future<void> initialize() async {
@@ -180,6 +223,7 @@ class LocalNotificationsReminderScheduler implements ReminderScheduler {
     }
     tz_data.initializeTimeZones();
     await _plugin.initialize(
+      onDidReceiveNotificationResponse: _onResponse,
       settings: const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/launcher_icon'),
         iOS: DarwinInitializationSettings(
@@ -195,6 +239,12 @@ class LocalNotificationsReminderScheduler implements ReminderScheduler {
       ),
     );
     _initialized = true;
+    // A tap that launched the app is not delivered through the callback.
+    final launch = await _plugin.getNotificationAppLaunchDetails();
+    final response = launch?.notificationResponse;
+    if (launch?.didNotificationLaunchApp == true && response != null) {
+      _onResponse(response);
+    }
   }
 
   @override
@@ -238,6 +288,7 @@ class LocalNotificationsReminderScheduler implements ReminderScheduler {
       id: reminder.id,
       title: reminder.title,
       body: reminder.body,
+      payload: reminder.payload,
       scheduledDate: at,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(

@@ -304,7 +304,7 @@ class _MarkPagesSheetState extends State<_MarkPagesSheet> {
           ),
         ),
         const SizedBox(height: 4),
-        _SliderTheme(
+        GoalSliderTheme(
           child: Slider(
             value: _untilPage.toDouble(),
             min: 1,
@@ -420,7 +420,7 @@ class _MarkPagesSheetState extends State<_MarkPagesSheet> {
                   ),
                 ],
               ),
-              _SliderTheme(
+              GoalSliderTheme(
                 child: RangeSlider(
                   values: RangeValues(
                     lowIndex.toDouble(),
@@ -463,133 +463,6 @@ class _MarkPagesSheetState extends State<_MarkPagesSheet> {
         color: theme.colorScheme.onSurfaceVariant,
         fontWeight: FontWeight.w600,
       );
-}
-
-class _SliderTheme extends StatelessWidget {
-  final Widget child;
-
-  const _SliderTheme({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return SliderTheme(
-      data: SliderTheme.of(context).copyWith(
-        trackHeight: 4,
-        activeTrackColor: colorScheme.primary,
-        inactiveTrackColor: colorScheme.onSurface.withValues(alpha: 0.1),
-        thumbColor: colorScheme.surface,
-        overlayColor: colorScheme.primary.withValues(alpha: 0.12),
-        thumbShape: const _OutlinedThumb(),
-        rangeThumbShape: const _OutlinedRangeThumb(),
-        showValueIndicator: ShowValueIndicator.never,
-        trackShape: const _PaddedTrackShape(),
-        activeTickMarkColor: Colors.transparent,
-        inactiveTickMarkColor: Colors.transparent,
-      ),
-      child: child,
-    );
-  }
-}
-
-class _PaddedTrackShape extends RoundedRectSliderTrackShape {
-  const _PaddedTrackShape();
-
-  @override
-  Rect getPreferredRect({
-    required RenderBox parentBox,
-    Offset offset = Offset.zero,
-    required SliderThemeData sliderTheme,
-    bool isEnabled = false,
-    bool isDiscrete = false,
-  }) {
-    final height = sliderTheme.trackHeight ?? 4;
-    final top = offset.dy + (parentBox.size.height - height) / 2;
-    return Rect.fromLTWH(
-      offset.dx + 12,
-      top,
-      parentBox.size.width - 24,
-      height,
-    );
-  }
-}
-
-void _paintThumb(Canvas canvas, Offset center, Color fill, Color ring) {
-  canvas.drawCircle(
-    center,
-    12,
-    Paint()
-      ..color = Colors.black.withValues(alpha: 0.12)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
-  );
-  canvas.drawCircle(center, 11, Paint()..color = fill);
-  canvas.drawCircle(
-    center,
-    11,
-    Paint()
-      ..color = ring
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3,
-  );
-}
-
-class _OutlinedThumb extends SliderComponentShape {
-  const _OutlinedThumb();
-
-  @override
-  Size getPreferredSize(bool isEnabled, bool isDiscrete) => const Size(24, 24);
-
-  @override
-  void paint(
-    PaintingContext context,
-    Offset center, {
-    required Animation<double> activationAnimation,
-    required Animation<double> enableAnimation,
-    required bool isDiscrete,
-    required TextPainter labelPainter,
-    required RenderBox parentBox,
-    required SliderThemeData sliderTheme,
-    required TextDirection textDirection,
-    required double value,
-    required double textScaleFactor,
-    required Size sizeWithOverflow,
-  }) {
-    _paintThumb(
-      context.canvas,
-      center,
-      sliderTheme.thumbColor ?? Colors.white,
-      sliderTheme.activeTrackColor ?? Colors.green,
-    );
-  }
-}
-
-class _OutlinedRangeThumb extends RangeSliderThumbShape {
-  const _OutlinedRangeThumb();
-
-  @override
-  Size getPreferredSize(bool isEnabled, bool isDiscrete) => const Size(24, 24);
-
-  @override
-  void paint(
-    PaintingContext context,
-    Offset center, {
-    required Animation<double> activationAnimation,
-    required Animation<double> enableAnimation,
-    bool isDiscrete = false,
-    bool isEnabled = false,
-    bool? isOnTop,
-    TextDirection? textDirection,
-    required SliderThemeData sliderTheme,
-    Thumb? thumb,
-    bool? isPressed,
-  }) {
-    _paintThumb(
-      context.canvas,
-      center,
-      sliderTheme.thumbColor ?? Colors.white,
-      sliderTheme.activeTrackColor ?? Colors.green,
-    );
-  }
 }
 
 class _RoundButton extends StatelessWidget {

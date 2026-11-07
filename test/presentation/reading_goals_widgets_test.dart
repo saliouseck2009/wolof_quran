@@ -157,7 +157,7 @@ void main() {
         find.text('Il reste 11 pages à lire aujourd\'hui'),
         findsOneWidget,
       );
-      expect(find.text('Continuer la lecture'), findsOneWidget);
+      expect(find.text('Reprendre à la page 11'), findsOneWidget);
     });
   });
 

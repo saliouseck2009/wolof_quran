@@ -153,7 +153,7 @@ class _GoalReadingCard extends StatelessWidget {
             onPressed: () =>
                 ReadingGoalActions.continueReading(context, progress),
             icon: const Icon(Icons.auto_stories_rounded, size: 18),
-            label: Text(localizations.continueReading),
+            label: Text(localizations.resumeAtPage(progress.resumePage)),
           ),
         ],
       ),

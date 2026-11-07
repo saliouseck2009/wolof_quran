@@ -819,7 +819,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportSecurePayment => 'Payment securely processed by Apple.';
 
   @override
-  String get supportThankYou => 'Thank you for your support!';
+  String get supportThankYouTitle => 'Thank you for your support!';
+
+  @override
+  String get supportThankYouBody =>
+      'Your contribution helps keep Wolof Quran free for everyone. Sharing the app with your loved ones is another great way to support it.';
+
+  @override
+  String get supportShareApp => 'Share the app';
+
+  @override
+  String get supportShareText =>
+      'I use Wolof Quran to read and listen to the Quran with Wolof translation. Give it a try!';
+
+  @override
+  String get supportContributeAgain => 'Contribute again';
 
   @override
   String get supportIapUnavailable =>
