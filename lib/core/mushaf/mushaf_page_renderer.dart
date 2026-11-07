@@ -101,6 +101,13 @@ class MushafPageRenderer {
   /// centred in the page.
   static const _lineInset = 16.0;
 
+  /// The package wrapped every verse in a WidgetSpan, which made the line
+  /// paragraph 45 px tall for a 34 px glyph box sitting 11 px from the top
+  /// (measured with the real fonts). The glyphs were stretched into the
+  /// line from that taller box, so the same proportions are kept here.
+  static const _lineTopRatio = 11 / 34;
+  static const _lineBoxRatio = 45 / 34;
+
   static List<QuranPage>? _pages;
   static ui.Image? _banner;
   static Future<ui.Image>? _bannerLoading;
@@ -196,7 +203,7 @@ class MushafPageRenderer {
     ];
     var contentHeight = 0.0;
     for (final painter in painters) {
-      contentHeight += painter.height;
+      contentHeight += painter.height * _lineBoxRatio;
     }
     if (surah != null) {
       contentHeight += _surahHeaderHeight(spec);
@@ -217,14 +224,15 @@ class MushafPageRenderer {
     final hits = <_LineHit>[];
     for (var i = 0; i < lines.length; i++) {
       final painter = painters[i];
+      final boxHeight = painter.height * _lineBoxRatio;
       final rect = Rect.fromLTWH(
         (spec.size.width - painter.width) / 2,
         y,
         painter.width,
-        painter.height,
+        boxHeight,
       );
       hits.add(_paintLine(canvas, lines[i], style, rect, fill: false));
-      y += painter.height;
+      y += boxHeight;
       painter.dispose();
     }
     return hits;
@@ -242,7 +250,8 @@ class MushafPageRenderer {
   }) {
     final painter = line.painter(style);
     final naturalWidth = painter.width;
-    final naturalHeight = painter.height;
+    final glyphTop = painter.height * _lineTopRatio;
+    final naturalHeight = painter.height * _lineBoxRatio;
     double scaleX;
     double scaleY;
     Offset origin;
@@ -266,7 +275,7 @@ class MushafPageRenderer {
     canvas.save();
     canvas.translate(origin.dx, origin.dy);
     canvas.scale(scaleX, scaleY);
-    painter.paint(canvas, Offset.zero);
+    painter.paint(canvas, Offset(0, glyphTop));
     canvas.restore();
     painter.dispose();
     return _LineHit(
@@ -278,6 +287,7 @@ class MushafPageRenderer {
         naturalWidth * scaleX,
         naturalHeight * scaleY,
       ),
+      glyphTop: glyphTop,
       scaleX: scaleX,
       scaleY: scaleY,
     );
@@ -414,6 +424,7 @@ class _LineHit {
   final _LineData line;
   final _LineStyle style;
   final Rect rect;
+  final double glyphTop;
   final double scaleX;
   final double scaleY;
 
@@ -421,6 +432,7 @@ class _LineHit {
     required this.line,
     required this.style,
     required this.rect,
+    required this.glyphTop,
     required this.scaleX,
     required this.scaleY,
   });
@@ -433,7 +445,7 @@ class _LineHit {
     final painter = line.painter(style);
     final local = Offset(
       (offset.dx - rect.left) / scaleX,
-      (offset.dy - rect.top) / scaleY,
+      (offset.dy - rect.top) / scaleY - glyphTop,
     );
     final position = painter.getPositionForOffset(local);
     painter.dispose();
