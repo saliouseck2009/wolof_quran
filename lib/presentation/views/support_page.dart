@@ -174,6 +174,8 @@ class SupportPage extends StatelessWidget {
   }
 }
 
+enum _SupportError { storeUnavailable, productUnavailable, paymentFailed }
+
 class _AppleSupportView extends StatefulWidget {
   const _AppleSupportView();
 
@@ -186,7 +188,7 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
   static const _productId = 'com.saliouseck.wolofquran.support';
   final _iap = InAppPurchase.instance;
   ProductDetails? _product;
-  String? _error;
+  _SupportError? _error;
   bool _loading = true;
   bool _purchasing = false;
   late final StreamSubscription<List<PurchaseDetails>> _purchaseSubscription;
@@ -197,38 +199,40 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
     _purchaseSubscription = _iap.purchaseStream.listen(
       _onPurchasesUpdated,
       onError: (Object error) {
-        if (mounted)
+        if (mounted) {
           setState(() {
-            _error = error.toString();
+            _error = _SupportError.paymentFailed;
             _purchasing = false;
           });
+        }
       },
     );
     _loadProduct();
   }
 
   Future<void> _loadProduct() async {
-    final available = await _iap.isAvailable();
-    if (!available) {
-      if (mounted)
-        setState(() {
-          _error = 'Les achats intégrés ne sont pas disponibles.';
-          _loading = false;
-        });
-      return;
+    ProductDetails? product;
+    _SupportError? error;
+    try {
+      if (!await _iap.isAvailable()) {
+        error = _SupportError.storeUnavailable;
+      } else {
+        final response = await _iap.queryProductDetails({_productId});
+        if (response.productDetails.isNotEmpty) {
+          product = response.productDetails.first;
+        } else {
+          error = _SupportError.productUnavailable;
+        }
+      }
+    } catch (_) {
+      error = _SupportError.productUnavailable;
     }
-    final response = await _iap.queryProductDetails({_productId});
-    if (mounted) {
-      setState(() {
-        _product = response.productDetails.isEmpty
-            ? null
-            : response.productDetails.first;
-        _error =
-            response.error?.message ??
-            (_product == null ? 'Produit temporairement indisponible.' : null);
-        _loading = false;
-      });
-    }
+    if (!mounted) return;
+    setState(() {
+      _product = product;
+      _error = error;
+      _loading = false;
+    });
   }
 
   Future<void> _buy() async {
@@ -238,9 +242,20 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
       _purchasing = true;
       _error = null;
     });
-    await _iap.buyConsumable(
-      purchaseParam: PurchaseParam(productDetails: product),
-    );
+    var started = false;
+    try {
+      started = await _iap.buyConsumable(
+        purchaseParam: PurchaseParam(productDetails: product),
+      );
+    } catch (_) {
+      started = false;
+    }
+    if (!started && mounted) {
+      setState(() {
+        _purchasing = false;
+        _error = _SupportError.paymentFailed;
+      });
+    }
   }
 
   Future<void> _onPurchasesUpdated(List<PurchaseDetails> purchases) async {
@@ -248,18 +263,30 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
       if (purchase.productID != _productId) continue;
       if (purchase.status == PurchaseStatus.purchased ||
           purchase.status == PurchaseStatus.restored) {
-        if (mounted)
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Merci pour votre soutien !')),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.supportThankYou),
+            ),
           );
-      } else if (purchase.status == PurchaseStatus.error) {
-        if (mounted)
-          setState(
-            () => _error = purchase.error?.message ?? 'Le paiement a échoué.',
-          );
+        }
+      } else if (purchase.status == PurchaseStatus.error ||
+          purchase.status == PurchaseStatus.canceled) {
+        if (mounted) {
+          setState(() {
+            _error = purchase.status == PurchaseStatus.error
+                ? _SupportError.paymentFailed
+                : null;
+          });
+        }
       }
-      if (purchase.pendingCompletePurchase)
-        await _iap.completePurchase(purchase);
+      if (purchase.pendingCompletePurchase) {
+        try {
+          await _iap.completePurchase(purchase);
+        } catch (_) {
+          // Nothing the user can do; the store will retry on next launch.
+        }
+      }
     }
     if (mounted) setState(() => _purchasing = false);
   }
@@ -299,7 +326,7 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
               Image.asset('assets/icon/soutien.png', width: 88, height: 88),
               const SizedBox(height: 20),
               Text(
-                'Soutenir Coran Wolof',
+                localizations.supportPageTitle,
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
@@ -307,7 +334,7 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Votre contribution via Apple aide à maintenir l’application gratuite.',
+                localizations.supportAppleBody,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: cs.onSurfaceVariant, height: 1.5),
               ),
@@ -327,14 +354,14 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
                         : const Icon(Icons.favorite_rounded),
                     label: Text(
                       _purchasing
-                          ? 'Traitement…'
-                          : 'Contribuer ${_product!.price}',
+                          ? localizations.supportProcessing
+                          : localizations.supportContribute(_product!.price),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Paiement traité de façon sécurisée par Apple.',
+                  localizations.supportSecurePayment,
                   style: Theme.of(context).textTheme.bodySmall,
                   textAlign: TextAlign.center,
                 ),
@@ -342,9 +369,16 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
               if (_error != null) ...[
                 const SizedBox(height: 16),
                 Text(
-                  _error!,
+                  switch (_error!) {
+                    _SupportError.storeUnavailable =>
+                      localizations.supportIapUnavailable,
+                    _SupportError.productUnavailable =>
+                      localizations.supportProductUnavailable,
+                    _SupportError.paymentFailed =>
+                      localizations.supportPaymentFailed,
+                  },
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.redAccent),
+                  style: TextStyle(color: cs.error),
                 ),
               ],
               const SizedBox(height: 24),

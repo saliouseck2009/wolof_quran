@@ -1042,13 +1042,43 @@
   "@supportPageTitle": {
     "description": "Title of the support/donation page"
   },
-  "supportUnavailableOnIosTitle": "Support is unavailable on iOS",
-  "@supportUnavailableOnIosTitle": {
-    "description": "Title shown on iOS when external donation methods are disabled"
+  "supportAppleBody": "Your contribution through Apple helps keep the app free.",
+  "@supportAppleBody": {
+    "description": "Body text of the iOS support page (in-app purchase)"
   },
-  "supportUnavailableOnIosBody": "To comply with App Store policies, this support section is currently disabled on iOS.",
-  "@supportUnavailableOnIosBody": {
-    "description": "Body text shown on iOS when support page is disabled"
+  "supportContribute": "Contribute {price}",
+  "@supportContribute": {
+    "description": "Purchase button on the iOS support page",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "€2.99"
+      }
+    }
+  },
+  "supportProcessing": "Processing…",
+  "@supportProcessing": {
+    "description": "Purchase button label while the payment is in progress"
+  },
+  "supportSecurePayment": "Payment securely processed by Apple.",
+  "@supportSecurePayment": {
+    "description": "Footer under the purchase button on iOS"
+  },
+  "supportThankYou": "Thank you for your support!",
+  "@supportThankYou": {
+    "description": "Snackbar after a successful contribution"
+  },
+  "supportIapUnavailable": "In-app purchases are not available on this device.",
+  "@supportIapUnavailable": {
+    "description": "Error when the store is not available"
+  },
+  "supportProductUnavailable": "The contribution is temporarily unavailable. Please try again later.",
+  "@supportProductUnavailable": {
+    "description": "Error when the product could not be loaded"
+  },
+  "supportPaymentFailed": "The payment could not be completed.",
+  "@supportPaymentFailed": {
+    "description": "Error when the purchase fails or is cancelled by the store"
   },
   "payWithWave": "Wave",
   "@payWithWave": {
@@ -1495,6 +1525,15 @@
   "durationDays": "{count, plural, =1{1 day} other{{count} days}}",
   "@durationDays": {
     "description": "Duration chip",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysUnit": "{count, plural, =1{day} other{days}}",
+  "@daysUnit": {
+    "description": "Unit shown next to a large day count in the custom duration card",
     "placeholders": {
       "count": {
         "type": "int"

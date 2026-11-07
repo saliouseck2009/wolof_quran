@@ -804,11 +804,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportPageTitle => 'Support Wolof Quran';
 
   @override
-  String get supportUnavailableOnIosTitle => 'Support is unavailable on iOS';
+  String get supportAppleBody =>
+      'Your contribution through Apple helps keep the app free.';
 
   @override
-  String get supportUnavailableOnIosBody =>
-      'To comply with App Store policies, this support section is currently disabled on iOS.';
+  String supportContribute(String price) {
+    return 'Contribute $price';
+  }
+
+  @override
+  String get supportProcessing => 'Processing…';
+
+  @override
+  String get supportSecurePayment => 'Payment securely processed by Apple.';
+
+  @override
+  String get supportThankYou => 'Thank you for your support!';
+
+  @override
+  String get supportIapUnavailable =>
+      'In-app purchases are not available on this device.';
+
+  @override
+  String get supportProductUnavailable =>
+      'The contribution is temporarily unavailable. Please try again later.';
+
+  @override
+  String get supportPaymentFailed => 'The payment could not be completed.';
 
   @override
   String get payWithWave => 'Wave';
@@ -1164,6 +1186,17 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other: '$count days',
       one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysUnit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days',
+      one: 'day',
     );
     return '$_temp0';
   }

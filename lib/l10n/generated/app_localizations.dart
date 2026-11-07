@@ -1534,17 +1534,53 @@ abstract class AppLocalizations {
   /// **'Support Wolof Quran'**
   String get supportPageTitle;
 
-  /// Title shown on iOS when external donation methods are disabled
+  /// Body text of the iOS support page (in-app purchase)
   ///
   /// In en, this message translates to:
-  /// **'Support is unavailable on iOS'**
-  String get supportUnavailableOnIosTitle;
+  /// **'Your contribution through Apple helps keep the app free.'**
+  String get supportAppleBody;
 
-  /// Body text shown on iOS when support page is disabled
+  /// Purchase button on the iOS support page
   ///
   /// In en, this message translates to:
-  /// **'To comply with App Store policies, this support section is currently disabled on iOS.'**
-  String get supportUnavailableOnIosBody;
+  /// **'Contribute {price}'**
+  String supportContribute(String price);
+
+  /// Purchase button label while the payment is in progress
+  ///
+  /// In en, this message translates to:
+  /// **'Processing…'**
+  String get supportProcessing;
+
+  /// Footer under the purchase button on iOS
+  ///
+  /// In en, this message translates to:
+  /// **'Payment securely processed by Apple.'**
+  String get supportSecurePayment;
+
+  /// Snackbar after a successful contribution
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your support!'**
+  String get supportThankYou;
+
+  /// Error when the store is not available
+  ///
+  /// In en, this message translates to:
+  /// **'In-app purchases are not available on this device.'**
+  String get supportIapUnavailable;
+
+  /// Error when the product could not be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'The contribution is temporarily unavailable. Please try again later.'**
+  String get supportProductUnavailable;
+
+  /// Error when the purchase fails or is cancelled by the store
+  ///
+  /// In en, this message translates to:
+  /// **'The payment could not be completed.'**
+  String get supportPaymentFailed;
 
   /// Title for Wave payment section
   ///
@@ -2037,6 +2073,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 day} other{{count} days}}'**
   String durationDays(int count);
+
+  /// Unit shown next to a large day count in the custom duration card
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{day} other{days}}'**
+  String daysUnit(int count);
 
   /// Duration chip opening a number field
   ///

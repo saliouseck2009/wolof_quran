@@ -816,12 +816,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get supportPageTitle => 'Soutenir Coran Wolof';
 
   @override
-  String get supportUnavailableOnIosTitle =>
-      'Le soutien est indisponible sur iOS';
+  String get supportAppleBody =>
+      'Votre contribution via Apple aide à maintenir l\'application gratuite.';
 
   @override
-  String get supportUnavailableOnIosBody =>
-      'Pour respecter les règles de l\'App Store, cette section de soutien est actuellement désactivée sur iOS.';
+  String supportContribute(String price) {
+    return 'Contribuer $price';
+  }
+
+  @override
+  String get supportProcessing => 'Traitement…';
+
+  @override
+  String get supportSecurePayment =>
+      'Paiement traité de façon sécurisée par Apple.';
+
+  @override
+  String get supportThankYou => 'Merci pour votre soutien !';
+
+  @override
+  String get supportIapUnavailable =>
+      'Les achats intégrés ne sont pas disponibles sur cet appareil.';
+
+  @override
+  String get supportProductUnavailable =>
+      'La contribution est temporairement indisponible. Réessayez plus tard.';
+
+  @override
+  String get supportPaymentFailed => 'Le paiement n\'a pas pu aboutir.';
 
   @override
   String get payWithWave => 'Wave';
@@ -1178,6 +1200,17 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other: '$count jours',
       one: '1 jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysUnit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'jours',
+      one: 'jour',
     );
     return '$_temp0';
   }

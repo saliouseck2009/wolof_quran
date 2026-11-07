@@ -796,11 +796,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportPageTitle => 'دعم القرآن بالولوف';
 
   @override
-  String get supportUnavailableOnIosTitle => 'الدعم غير متاح على iOS';
+  String get supportAppleBody =>
+      'مساهمتك عبر Apple تساعد على إبقاء التطبيق مجانيًا.';
 
   @override
-  String get supportUnavailableOnIosBody =>
-      'للالتزام بسياسات App Store، تم تعطيل قسم الدعم هذا حالياً على iOS.';
+  String supportContribute(String price) {
+    return 'المساهمة بـ $price';
+  }
+
+  @override
+  String get supportProcessing => 'جارٍ المعالجة…';
+
+  @override
+  String get supportSecurePayment => 'تتم معالجة الدفع بشكل آمن عبر Apple.';
+
+  @override
+  String get supportThankYou => 'شكرًا لدعمك!';
+
+  @override
+  String get supportIapUnavailable =>
+      'المشتريات داخل التطبيق غير متاحة على هذا الجهاز.';
+
+  @override
+  String get supportProductUnavailable =>
+      'المساهمة غير متاحة مؤقتًا. يرجى المحاولة لاحقًا.';
+
+  @override
+  String get supportPaymentFailed => 'تعذر إتمام الدفع.';
 
   @override
   String get payWithWave => 'Wave';
@@ -1178,6 +1200,19 @@ class AppLocalizationsAr extends AppLocalizations {
       few: '$count أيام',
       two: 'يومان',
       one: 'يوم واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysUnit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'يومًا',
+      few: 'أيام',
+      two: 'يومان',
+      one: 'يوم',
     );
     return '$_temp0';
   }

@@ -617,10 +617,7 @@ class _CustomDurationCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 3),
                 child: Text(
-                  localizations
-                      .durationDays(days)
-                      .replaceFirst('$days', '')
-                      .trim(),
+                  localizations.daysUnit(days),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colorScheme.primary,
