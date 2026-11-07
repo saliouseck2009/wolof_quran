@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:qcf_quran_plus/qcf_quran_plus.dart' as qcf;
 import 'package:quran/quran.dart' as quran;
 
+import 'reading_order.dart';
+
 enum QuranSectionType { juz, hizb, surah }
 
 /// A juz, hizb or surah expressed as mushaf pages. Sections can start or
@@ -93,6 +95,24 @@ class QuranSections {
           ];
       }
     });
+  }
+
+  /// Last page of the next juz, hizb or surah ending strictly after [page]
+  /// in [order], so a shortcut keeps working past the 604 → 1 wrap of a
+  /// goal that starts mid-mushaf. Returns [page] when no section ends
+  /// after it.
+  static int nextEndAfter(QuranSectionType type, int page, ReadingOrder order) {
+    final current = order.indexOf(page);
+    var best = page;
+    var bestIndex = order.totalPages;
+    for (final section in of(type)) {
+      final index = order.indexOf(section.lastPage);
+      if (index > current && index < bestIndex) {
+        best = section.lastPage;
+        bestIndex = index;
+      }
+    }
+    return best;
   }
 
   static QuranSection get(QuranSectionType type, int number) =>

@@ -78,10 +78,13 @@ class _MarkPagesSheetState extends State<_MarkPagesSheet> {
           return (const [], 0);
         }
         final added = cubit.pagesUntil(widget.goalId, _untilPage);
+        final order = progress.goal.order;
         final first = progress.metrics.firstUnvalidatedPage;
-        final selected = first == null
-            ? 0
-            : progress.goal.order.pagesBetween(first, _untilPage).length;
+        if (first == null || order.isBefore(_untilPage, first)) {
+          // Every page up to the cursor is already read.
+          return (added, order.indexOf(_untilPage) + 1);
+        }
+        final selected = order.pagesBetween(first, _untilPage).length;
         return (added, selected - added.length);
       case _MarkMode.range:
         if (!_isPage(_fromPage, total) ||
@@ -114,22 +117,6 @@ class _MarkPagesSheetState extends State<_MarkPagesSheet> {
     }
   }
 
-  /// Last page of the juz, hizb or surah containing [page]; when [page]
-  /// already is that last page, the end of the next section.
-  static int _endOf(QuranSectionType type, int page) {
-    final sections = QuranSections.of(type);
-    var index = type == QuranSectionType.surah
-        ? getPageInfo(page).primarySurahNumber - 1
-        : sections.lastIndexWhere((s) => s.firstPage <= page);
-    if (index < 0) {
-      index = 0;
-    }
-    if (sections[index].lastPage <= page && index < sections.length - 1) {
-      index++;
-    }
-    return sections[index].lastPage;
-  }
-
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -145,8 +132,8 @@ class _MarkPagesSheetState extends State<_MarkPagesSheet> {
         if (progress == null) {
           return const SizedBox.shrink();
         }
-        final total = progress.goal.totalPages;
         final (added, alreadyRead) = _preview(cubit, progress);
+        final inverted = _mode == _MarkMode.range && _isInverted(progress);
         final continuous = progress.metrics.continuousProgress;
         final lastRead = continuous == 0
             ? null
@@ -177,21 +164,21 @@ class _MarkPagesSheetState extends State<_MarkPagesSheet> {
                 ),
                 const SizedBox(height: 18),
                 if (_mode == _MarkMode.untilPage)
-                  _buildUntilPage(context, localizations, total)
+                  _buildUntilPage(context, localizations, progress)
                 else
                   _buildRange(context, localizations, progress),
                 const SizedBox(height: 16),
                 _InfoRow(
-                  icon: _mode == _MarkMode.range && _isInverted(progress)
+                  icon: inverted
                       ? Icons.warning_amber_rounded
                       : Icons.info_outline_rounded,
-                  warning: _mode == _MarkMode.range && _isInverted(progress),
-                  text: _mode == _MarkMode.range && _isInverted(progress)
+                  warning: inverted,
+                  text: inverted
                       ? localizations.rangeInverted
-                      : added.isEmpty
-                      ? (_mode == _MarkMode.untilPage
-                            ? localizations.untilPageHint
-                            : localizations.pagesToMarkSummary(0))
+                      : added.isEmpty &&
+                            alreadyRead == 0 &&
+                            _mode == _MarkMode.untilPage
+                      ? localizations.untilPageHint
                       : alreadyRead > 0
                       ? '${localizations.pagesToMarkSummary(added.length)} · '
                             '${localizations.pagesAlreadyRead(alreadyRead)}'
@@ -214,10 +201,12 @@ class _MarkPagesSheetState extends State<_MarkPagesSheet> {
   Widget _buildUntilPage(
     BuildContext context,
     AppLocalizations localizations,
-    int total,
+    ReadingGoalProgress progress,
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final total = progress.goal.totalPages;
+    final order = progress.goal.order;
     final info = getPageInfo(_untilPage);
 
     void setPage(int page) => setState(() => _untilPage = page.clamp(1, total));
@@ -340,20 +329,37 @@ class _MarkPagesSheetState extends State<_MarkPagesSheet> {
             Expanded(
               child: _QuickJumpChip(
                 label: localizations.juzEndChip,
-                onTap: () => setPage(_endOf(QuranSectionType.juz, _untilPage)),
+                onTap: () => setPage(
+                  QuranSections.nextEndAfter(
+                    QuranSectionType.juz,
+                    _untilPage,
+                    order,
+                  ),
+                ),
               ),
             ),
             Expanded(
               child: _QuickJumpChip(
                 label: localizations.hizbEndChip,
-                onTap: () => setPage(_endOf(QuranSectionType.hizb, _untilPage)),
+                onTap: () => setPage(
+                  QuranSections.nextEndAfter(
+                    QuranSectionType.hizb,
+                    _untilPage,
+                    order,
+                  ),
+                ),
               ),
             ),
             Expanded(
               child: _QuickJumpChip(
                 label: localizations.surahEndChip,
-                onTap: () =>
-                    setPage(_endOf(QuranSectionType.surah, _untilPage)),
+                onTap: () => setPage(
+                  QuranSections.nextEndAfter(
+                    QuranSectionType.surah,
+                    _untilPage,
+                    order,
+                  ),
+                ),
               ),
             ),
           ],

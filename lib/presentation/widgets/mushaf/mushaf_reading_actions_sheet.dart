@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/reading/reading_plan_calculator.dart';
 import '../../../domain/entities/reading_goal_progress.dart';
@@ -244,12 +243,8 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final locale = Localizations.localeOf(context).toString();
-    final percent = fraction * 100;
-    final text = NumberFormat(
-      percent < 10 ? '0.#' : '0',
-      locale,
-    ).format(percent);
+    final localizations = AppLocalizations.of(context)!;
+    final percent = (fraction * 100).floor();
 
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
@@ -275,7 +270,7 @@ class _StatCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '$text%',
+                localizations.percentValue(percent),
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: colorScheme.primary,
