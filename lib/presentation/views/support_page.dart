@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -22,15 +25,7 @@ class SupportPage extends StatelessWidget {
     final primary = colorScheme.primary;
     final isIos = defaultTargetPlatform == TargetPlatform.iOS;
 
-    if (isIos) {
-      return _SupportUnavailableOnIosView(
-        localizations: localizations,
-        colorScheme: colorScheme,
-        isDark: isDark,
-        primary: primary,
-        contactEmail: _contactEmail,
-      );
-    }
+    if (isIos) return const _AppleSupportView();
 
     final config = locator<RemoteConfigService>().config;
     final languageCode = Localizations.localeOf(context).languageCode;
@@ -179,75 +174,183 @@ class SupportPage extends StatelessWidget {
   }
 }
 
-class _SupportUnavailableOnIosView extends StatelessWidget {
-  final AppLocalizations localizations;
-  final ColorScheme colorScheme;
-  final bool isDark;
-  final Color primary;
-  final String contactEmail;
+class _AppleSupportView extends StatefulWidget {
+  const _AppleSupportView();
 
-  const _SupportUnavailableOnIosView({
-    required this.localizations,
-    required this.colorScheme,
-    required this.isDark,
-    required this.primary,
-    required this.contactEmail,
-  });
+  @override
+  State<_AppleSupportView> createState() => _AppleSupportViewState();
+}
+
+class _AppleSupportViewState extends State<_AppleSupportView> {
+  // Create this consumable product in App Store Connect with this exact ID.
+  static const _productId = 'com.saliouseck.wolofquran.support';
+  final _iap = InAppPurchase.instance;
+  ProductDetails? _product;
+  String? _error;
+  bool _loading = true;
+  bool _purchasing = false;
+  late final StreamSubscription<List<PurchaseDetails>> _purchaseSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _purchaseSubscription = _iap.purchaseStream.listen(
+      _onPurchasesUpdated,
+      onError: (Object error) {
+        if (mounted)
+          setState(() {
+            _error = error.toString();
+            _purchasing = false;
+          });
+      },
+    );
+    _loadProduct();
+  }
+
+  Future<void> _loadProduct() async {
+    final available = await _iap.isAvailable();
+    if (!available) {
+      if (mounted)
+        setState(() {
+          _error = 'Les achats intégrés ne sont pas disponibles.';
+          _loading = false;
+        });
+      return;
+    }
+    final response = await _iap.queryProductDetails({_productId});
+    if (mounted) {
+      setState(() {
+        _product = response.productDetails.isEmpty
+            ? null
+            : response.productDetails.first;
+        _error =
+            response.error?.message ??
+            (_product == null ? 'Produit temporairement indisponible.' : null);
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _buy() async {
+    final product = _product;
+    if (product == null || _purchasing) return;
+    setState(() {
+      _purchasing = true;
+      _error = null;
+    });
+    await _iap.buyConsumable(
+      purchaseParam: PurchaseParam(productDetails: product),
+    );
+  }
+
+  Future<void> _onPurchasesUpdated(List<PurchaseDetails> purchases) async {
+    for (final purchase in purchases) {
+      if (purchase.productID != _productId) continue;
+      if (purchase.status == PurchaseStatus.purchased ||
+          purchase.status == PurchaseStatus.restored) {
+        if (mounted)
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Merci pour votre soutien !')),
+          );
+      } else if (purchase.status == PurchaseStatus.error) {
+        if (mounted)
+          setState(
+            () => _error = purchase.error?.message ?? 'Le paiement a échoué.',
+          );
+      }
+      if (purchase.pendingCompletePurchase)
+        await _iap.completePurchase(purchase);
+    }
+    if (mounted) setState(() => _purchasing = false);
+  }
+
+  @override
+  void dispose() {
+    _purchaseSubscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+    final isDark = cs.brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: cs.surface,
       appBar: AppBar(
         title: Text(
           localizations.supportPageTitle,
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: colorScheme.onPrimary,
+            color: cs.onPrimary,
             fontSize: 18,
           ),
         ),
-        backgroundColor: isDark ? colorScheme.surface : primary,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+        backgroundColor: isDark ? cs.surface : cs.primary,
+        iconTheme: IconThemeData(color: cs.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: isDark
-                ? colorScheme.surfaceContainer
-                : colorScheme.onPrimary,
-            borderRadius: BorderRadius.circular(16),
-          ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Image.asset('assets/icon/soutien.png', width: 88, height: 88),
+              const SizedBox(height: 20),
               Text(
-                localizations.supportUnavailableOnIosTitle,
+                'Soutenir Coran Wolof',
                 style: Theme.of(
                   context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                localizations.supportUnavailableOnIosBody,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  height: 1.5,
-                ),
+                'Votre contribution via Apple aide à maintenir l’application gratuite.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: cs.onSurfaceVariant, height: 1.5),
               ),
-              const SizedBox(height: 16),
-              Text(
-                '${localizations.contactEmailLabel}: $contactEmail',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
+              const SizedBox(height: 28),
+              if (_loading)
+                const CircularProgressIndicator()
+              else if (_product != null) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _purchasing ? null : _buy,
+                    icon: _purchasing
+                        ? const SizedBox.square(
+                            dimension: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.favorite_rounded),
+                    label: Text(
+                      _purchasing
+                          ? 'Traitement…'
+                          : 'Contribuer ${_product!.price}',
+                    ),
+                  ),
                 ),
+                const SizedBox(height: 12),
+                Text(
+                  'Paiement traité de façon sécurisée par Apple.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+              if (_error != null) ...[
+                const SizedBox(height: 16),
+                Text(
+                  _error!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.redAccent),
+                ),
+              ],
+              const SizedBox(height: 24),
+              Text(
+                '${localizations.contactEmailLabel}: ${SupportPage._contactEmail}',
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),
