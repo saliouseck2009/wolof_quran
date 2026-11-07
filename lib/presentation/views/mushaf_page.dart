@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
-import 'package:qcf_quran_plus/qcf_quran_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../core/mushaf/mushaf_theme.dart';
@@ -24,6 +23,7 @@ import '../cubits/quran_settings_cubit.dart';
 import '../cubits/reading_goals_cubit.dart';
 import '../utils/mushaf_reading_tracker.dart';
 import '../widgets/mushaf/goal_switcher_sheet.dart';
+import '../widgets/mushaf/mushaf_page_view.dart';
 import '../widgets/mushaf/mushaf_reading_actions_sheet.dart';
 import '../widgets/mushaf/mushaf_verse_actions_sheet.dart';
 import '../../data/datasources/reading_preferences_data_source.dart';
@@ -470,29 +470,17 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
                 onSurahTap: _openSurahList,
                 onReadingTap: _openReadingActions,
               ),
-              body: QuranPageView(
-                pageController: _controller,
-                highlights: const [],
+              body: MushafPageView(
+                controller: _controller,
                 pageBackgroundColor: theme.pageBackgroundColor,
-                isDarkMode: mushafIsDark,
+                verseColor: theme.verseTextColor,
+                accentColor: mushafAccentTextColor,
+                isDark: mushafIsDark,
                 isTajweed: state.isTajweedEnabled,
-                ayahStyle: TextStyle(color: theme.verseTextColor),
-                surahHeaderBuilder: (context, surahNumber) {
-                  return _MushafSurahHeader(
-                    surahNumber: surahNumber,
-                    textColor: mushafAccentTextColor,
-                  );
-                },
-                basmallahBuilder: (context, surahNumber) {
-                  return _MushafBasmallah(
-                    surahNumber: surahNumber,
-                    textColor: mushafAccentTextColor,
-                  );
-                },
                 onPageChanged: (pageNumber) {
                   context.read<MushafBloc>().add(MushafPageChanged(pageNumber));
                 },
-                onLongPress: (surahNumber, verseNumber, details) {
+                onLongPress: (surahNumber, verseNumber) {
                   if (!mounted) {
                     return;
                   }
@@ -1166,79 +1154,6 @@ class _MushafHintContent {
     required this.tajweedMessage,
     required this.actionLabel,
   });
-}
-
-class _MushafSurahHeader extends StatelessWidget {
-  const _MushafSurahHeader({
-    required this.surahNumber,
-    required this.textColor,
-  });
-
-  final int surahNumber;
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    const imagePath = 'assets/surah_banner.png';
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final availableWidth = constraints.maxWidth;
-        final headerWidth = availableWidth * 0.9;
-        final dynamicFontSize = headerWidth * 0.085;
-
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          width: double.infinity,
-          alignment: Alignment.center,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Image(
-                image: const AssetImage(imagePath, package: 'qcf_quran_plus'),
-                width: headerWidth,
-                fit: BoxFit.contain,
-              ),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  text: '$surahNumber',
-                  style: QuranTextStyles.surahHeaderStyle(
-                    fontSize: dynamicFontSize,
-                    color: textColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _MushafBasmallah extends StatelessWidget {
-  const _MushafBasmallah({required this.surahNumber, required this.textColor});
-
-  final int surahNumber;
-  final Color textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final basmallahText = surahNumber == 97 || surahNumber == 95
-        ? '齃𧻓𥳐龎'
-        : '齃𧻓𥳐𥉉';
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 5),
-        child: Text(
-          basmallahText,
-          style: QuranTextStyles.basmallahStyle(fontSize: 20, color: textColor),
-        ),
-      ),
-    );
-  }
 }
 
 Color _resolveReadableForeground({

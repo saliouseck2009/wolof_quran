@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:qcf_quran_plus/qcf_quran_plus.dart';
 import 'package:wolof_quran/core/helpers/bloc_observer.dart';
 import 'package:wolof_quran/core/services/audio_player_service.dart';
 import 'package:wolof_quran/core/services/audio_download_queue_service.dart';
@@ -45,17 +44,6 @@ void main() async {
   await setupDependencies();
   Bloc.observer = SimpleBlocObserver();
   runApp(const MyApp());
-  _preloadMushafFontsInBackground();
-}
-
-void _preloadMushafFontsInBackground() {
-  Future<void>(() async {
-    try {
-      await QcfFontLoader.setupFontsAtStartup(onProgress: (_) {});
-    } catch (_) {
-      // Preload is optional; ignore failures to avoid impacting app startup.
-    }
-  });
 }
 
 class MyApp extends StatelessWidget {
