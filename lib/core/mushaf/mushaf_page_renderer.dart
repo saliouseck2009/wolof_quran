@@ -97,8 +97,9 @@ class MushafPageRenderer {
   static const _lineHeight = 1.45;
   static const _horizontalPadding = 8.0;
 
-  /// Keeps the outermost glyphs of stretched lines off the screen edges.
-  static const _lineInset = 6.0;
+  /// The package laid each stretched line out in a (width - 32) box
+  /// centred in the page.
+  static const _lineInset = 16.0;
 
   static List<QuranPage>? _pages;
   static ui.Image? _banner;
@@ -343,7 +344,12 @@ class MushafPageRenderer {
   }
 
   static TextPainter _basmallahPainter(MushafPageSpec spec, int surah) {
-    final text = surah == 97 || surah == 95 ? '齃𧻓𥳐龎' : '齃𧻓𥳐𥉉';
+    // CJK compatibility code points mapped by the QCF4_BSML font. They are
+    // escaped because text tooling normalises them to their canonical
+    // ideographs, which the font does not have.
+    final text = surah == 97 || surah == 95
+        ? '\uFAD8\uFAD7\uFAD6\uFAD9'
+        : '\uFAD8\uFAD7\uFAD6\uFAD5';
     return TextPainter(
       text: TextSpan(
         text: text,
