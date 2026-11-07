@@ -816,6 +816,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get supportPageTitle => 'Soutenir Coran Wolof';
 
   @override
+  String get supportUnavailableOnIosTitle =>
+      'Le soutien est indisponible sur iOS';
+
+  @override
+  String get supportUnavailableOnIosBody =>
+      'Pour respecter les règles de l\'App Store, cette section de soutien est actuellement désactivée sur iOS.';
+
+  @override
   String get supportAppleBody =>
       'Votre contribution via Apple aide à maintenir l\'application gratuite.';
 

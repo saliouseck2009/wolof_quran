@@ -796,6 +796,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportPageTitle => 'دعم القرآن بالولوف';
 
   @override
+  String get supportUnavailableOnIosTitle => 'الدعم غير متاح على iOS';
+
+  @override
+  String get supportUnavailableOnIosBody =>
+      'للالتزام بسياسات App Store، تم تعطيل قسم الدعم هذا حالياً على iOS.';
+
+  @override
   String get supportAppleBody =>
       'مساهمتك عبر Apple تساعد على إبقاء التطبيق مجانيًا.';
 

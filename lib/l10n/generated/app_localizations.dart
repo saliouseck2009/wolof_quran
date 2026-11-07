@@ -1534,6 +1534,18 @@ abstract class AppLocalizations {
   /// **'Support Wolof Quran'**
   String get supportPageTitle;
 
+  /// Title shown on iOS while the Apple contribution is off
+  ///
+  /// In en, this message translates to:
+  /// **'Support is unavailable on iOS'**
+  String get supportUnavailableOnIosTitle;
+
+  /// Body text shown on iOS while the Apple contribution is off
+  ///
+  /// In en, this message translates to:
+  /// **'To comply with App Store policies, this support section is currently disabled on iOS.'**
+  String get supportUnavailableOnIosBody;
+
   /// Body text of the iOS support page (in-app purchase)
   ///
   /// In en, this message translates to:

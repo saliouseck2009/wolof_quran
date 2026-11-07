@@ -17,6 +17,12 @@ class SupportPage extends StatelessWidget {
   static const String routeName = '/support';
   static const String _contactEmail = 'saliouseck2009@gmail.com';
 
+  /// Apple in-app contribution. Off until the App Store Connect product
+  /// (`_AppleSupportViewState._productId`), the paid-apps agreement and the
+  /// banking details are configured; the settings entries stay hidden on
+  /// iOS meanwhile.
+  static const bool appleContributionEnabled = false;
+
   const SupportPage({super.key});
 
   @override
@@ -27,7 +33,18 @@ class SupportPage extends StatelessWidget {
     final primary = colorScheme.primary;
     final isIos = defaultTargetPlatform == TargetPlatform.iOS;
 
-    if (isIos) return const _AppleSupportView();
+    if (isIos) {
+      if (appleContributionEnabled) {
+        return const _AppleSupportView();
+      }
+      return _SupportUnavailableOnIosView(
+        localizations: localizations,
+        colorScheme: colorScheme,
+        isDark: isDark,
+        primary: primary,
+        contactEmail: _contactEmail,
+      );
+    }
 
     final config = locator<RemoteConfigService>().config;
     final languageCode = Localizations.localeOf(context).languageCode;
@@ -171,6 +188,85 @@ class SupportPage extends StatelessWidget {
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+}
+
+/// Shown on iOS while the Apple contribution is off.
+class _SupportUnavailableOnIosView extends StatelessWidget {
+  final AppLocalizations localizations;
+  final ColorScheme colorScheme;
+  final bool isDark;
+  final Color primary;
+  final String contactEmail;
+
+  const _SupportUnavailableOnIosView({
+    required this.localizations,
+    required this.colorScheme,
+    required this.isDark,
+    required this.primary,
+    required this.contactEmail,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+        title: Text(
+          localizations.supportPageTitle,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onPrimary,
+            fontSize: 18,
+          ),
+        ),
+        backgroundColor: isDark ? colorScheme.surface : primary,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: isDark
+                ? colorScheme.surfaceContainer
+                : colorScheme.onPrimary,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                localizations.supportUnavailableOnIosTitle,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                localizations.supportUnavailableOnIosBody,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '${localizations.contactEmailLabel}: $contactEmail',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

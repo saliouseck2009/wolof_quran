@@ -257,6 +257,8 @@
   "supportProject": "دعم المشروع",
   "supportSubtitle": "ساهم في استمرارية التطبيق",
   "supportPageTitle": "دعم القرآن بالولوف",
+  "supportUnavailableOnIosTitle": "الدعم غير متاح على iOS",
+  "supportUnavailableOnIosBody": "للالتزام بسياسات App Store، تم تعطيل قسم الدعم هذا حالياً على iOS.",
   "supportAppleBody": "مساهمتك عبر Apple تساعد على إبقاء التطبيق مجانيًا.",
   "supportContribute": "المساهمة بـ {price}",
   "supportProcessing": "جارٍ المعالجة…",

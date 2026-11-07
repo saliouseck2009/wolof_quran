@@ -804,6 +804,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportPageTitle => 'Support Wolof Quran';
 
   @override
+  String get supportUnavailableOnIosTitle => 'Support is unavailable on iOS';
+
+  @override
+  String get supportUnavailableOnIosBody =>
+      'To comply with App Store policies, this support section is currently disabled on iOS.';
+
+  @override
   String get supportAppleBody =>
       'Your contribution through Apple helps keep the app free.';
 
