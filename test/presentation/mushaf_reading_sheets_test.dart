@@ -152,7 +152,7 @@ void main() {
       );
 
       expect(find.text('Khatm Ramadan'), findsOneWidget);
-      expect(find.text('Retirer la validation de cette page'), findsOneWidget);
+      expect(find.text('Retirer la validation'), findsOneWidget);
       expect(find.text("J'ai lu jusqu'ici"), findsOneWidget);
       expect(find.text('Passer en lecture libre'), findsOneWidget);
       expect(find.text('Suivre un objectif'), findsNothing);

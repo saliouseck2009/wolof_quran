@@ -27,6 +27,10 @@ import 'package:wolof_quran/core/navigation/create_reading_goal_arguments.dart';
 import 'package:wolof_quran/core/navigation/reading_goal_detail_arguments.dart';
 
 class AppRoutes {
+  /// Root navigator, for navigation triggered outside the widget tree such
+  /// as a tap on a reminder notification.
+  static final navigatorKey = GlobalKey<NavigatorState>();
+
   static Route onGenerateRoutes(RouteSettings settings) {
     final args = settings.arguments;
 

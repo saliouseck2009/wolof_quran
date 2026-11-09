@@ -12,6 +12,9 @@ class _FakeScheduler implements ReminderScheduler {
   Future<void> initialize() async {}
 
   @override
+  Stream<String> get taps => const Stream.empty();
+
+  @override
   Future<bool> requestPermission() async => true;
 
   @override

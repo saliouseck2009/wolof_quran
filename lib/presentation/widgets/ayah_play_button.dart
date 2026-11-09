@@ -11,13 +11,18 @@ import 'snackbar.dart';
 
 /// A reusable play button widget for ayah audio playback
 /// that integrates with QuranSettingsCubit for selected reciter
-/// and AyahPlaybackCubit for playback control
+/// and AyahPlaybackCubit for playback control.
+///
+/// With a [label] it renders as a pill (icon + text) on [backgroundColor]
+/// instead of a bare icon button.
 class AyahPlayButton extends StatelessWidget {
   final int surahNumber;
   final int ayahNumber;
   final String? surahName;
   final double size;
   final Color? color;
+  final String? label;
+  final Color? backgroundColor;
 
   const AyahPlayButton({
     super.key,
@@ -26,7 +31,33 @@ class AyahPlayButton extends StatelessWidget {
     this.surahName,
     this.size = 24.0,
     this.color,
+    this.label,
+    this.backgroundColor,
   });
+
+  Widget _pill({
+    required IconData icon,
+    required Color color,
+    required VoidCallback? onPressed,
+  }) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: size, color: color),
+      label: Text(
+        label!,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      ),
+      style: TextButton.styleFrom(
+        foregroundColor: color,
+        backgroundColor: backgroundColor,
+        minimumSize: const Size(0, 40),
+        padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 16, 0),
+        shape: const StadiumBorder(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +69,13 @@ class AyahPlayButton extends StatelessWidget {
       builder: (context, settingsState) {
         // Only show button if we have a selected reciter
         if (settingsState.selectedReciter == null) {
+          if (label != null) {
+            return _pill(
+              icon: Icons.play_disabled,
+              color: colorScheme.onSurfaceVariant,
+              onPressed: null,
+            );
+          }
           return Icon(
             Icons.play_disabled,
             size: size,
@@ -98,6 +136,15 @@ class AyahPlayButton extends StatelessWidget {
                       iconData = Icons.pause;
                     } else {
                       iconData = Icons.play_arrow;
+                    }
+
+                    if (label != null) {
+                      return _pill(
+                        icon: iconData,
+                        color: resolvedColor,
+                        onPressed: () =>
+                            _handlePlayButtonPress(context, selectedReciter.id),
+                      );
                     }
 
                     return IconButton(

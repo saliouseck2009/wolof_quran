@@ -11,6 +11,8 @@ import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../../core/config/app_links.dart';
 import 'package:wolof_quran/core/mushaf/mushaf_theme.dart';
 import 'package:wolof_quran/core/utils/constants/constants.dart';
 import '../../domain/entities/ayah_audio.dart';
@@ -70,11 +72,6 @@ class DailyInspirationShareModal extends StatefulWidget {
 
 class _DailyInspirationShareModalState
     extends State<DailyInspirationShareModal> {
-  static const String _playStoreUrl =
-      'https://play.google.com/store/apps/details?id=com.saliouseck.wolofquran&hl=fr';
-  static const String _appStoreUrl =
-      'https://apps.apple.com/sn/app/coran-wolof/id6761394820?l=fr-FR';
-
   final GlobalKey _captureKey = GlobalKey();
   final GlobalKey _shareImageButtonKey = GlobalKey();
   final GlobalKey _shareVideoButtonKey = GlobalKey();
@@ -560,7 +557,7 @@ class _DailyInspirationShareModalState
       widget.surahName,
       widget.verseNumber,
     );
-    return '$baseText\n\nAndroid: $_playStoreUrl\niOS: $_appStoreUrl';
+    return '$baseText\n\nAndroid: ${AppLinks.playStoreUrl}\niOS: ${AppLinks.appStoreUrl}';
   }
 
   Future<void> _shareWithGuard({

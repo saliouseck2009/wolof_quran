@@ -78,6 +78,11 @@ class _ReadingGoalsPageState extends State<ReadingGoalsPage> {
             }
             return FloatingActionButton.extended(
               onPressed: _createGoal,
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
               icon: const Icon(Icons.add_rounded),
               label: Text(localizations.newReadingGoal),
             );

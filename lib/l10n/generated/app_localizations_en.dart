@@ -811,6 +811,56 @@ class AppLocalizationsEn extends AppLocalizations {
       'To comply with App Store policies, this support section is currently disabled on iOS.';
 
   @override
+  String get supportIosWebBody =>
+      'All the information to support the project is on our web page, which opens in Safari.';
+
+  @override
+  String get supportOpenWebPage => 'Open the support page';
+
+  @override
+  String get supportAppleBody =>
+      'Your contribution through Apple helps keep the app free.';
+
+  @override
+  String supportContribute(String price) {
+    return 'Contribute $price';
+  }
+
+  @override
+  String get supportProcessing => 'Processing…';
+
+  @override
+  String get supportSecurePayment => 'Payment securely processed by Apple.';
+
+  @override
+  String get supportThankYouTitle => 'Thank you for your support!';
+
+  @override
+  String get supportThankYouBody =>
+      'Your contribution helps keep Wolof Quran free for everyone. Sharing the app with your loved ones is another great way to support it.';
+
+  @override
+  String get supportShareApp => 'Share the app';
+
+  @override
+  String get supportShareText =>
+      'I use Wolof Quran to read and listen to the Quran with Wolof translation. Give it a try!';
+
+  @override
+  String get supportContributeAgain => 'Contribute again';
+
+  @override
+  String get supportIapUnavailable =>
+      'In-app purchases are not available on this device.';
+
+  @override
+  String get supportProductUnavailable =>
+      'The contribution is temporarily unavailable. Please try again later.';
+
+  @override
+  String get supportPaymentFailed => 'The payment could not be completed.';
+
+  @override
   String get payWithWave => 'Wave';
 
   @override
@@ -1052,7 +1102,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteGoal => 'Delete';
 
   @override
-  String get duplicateGoal => 'New goal from this one';
+  String get duplicateGoal => 'Duplicate goal';
 
   @override
   String get reactivateGoal => 'Reactivate';
@@ -1087,8 +1137,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pageRangeMode => 'Page range';
 
   @override
-  String get untilPageHint =>
-      'Marks every unread page of the goal up to this page, in reading order.';
+  String get untilPageHint => 'Marks every unread page up to this point.';
 
   @override
   String get fromPageLabel => 'From page';
@@ -1165,6 +1214,17 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other: '$count days',
       one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String daysUnit(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'days',
+      one: 'day',
     );
     return '$_temp0';
   }
@@ -1252,7 +1312,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get freeReadingDescription =>
-      'Browse the Mushaf without touching any goal.';
+      'Browse the Mushaf with no active goal. Resume whenever you like.';
 
   @override
   String get readingActions => 'Reading';
@@ -1261,7 +1321,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markThisPageRead => 'Mark this page as read';
 
   @override
-  String get unmarkThisPage => 'Remove this page\'s validation';
+  String get unmarkThisPage => 'Remove validation';
 
   @override
   String get readUntilHere => 'I read until here';
@@ -1444,7 +1504,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionUnmark => 'Validation removed';
 
   @override
-  String get markSection => 'Mark a Juz, Hizb or Surah';
+  String get markSection => 'Mark Juz / Hizb / Surah';
 
   @override
   String get sectionJuz => 'Juz';
@@ -1605,4 +1665,149 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get later => 'Later';
+
+  @override
+  String get markPagesShort => 'Mark pages';
+
+  @override
+  String get markSectionShort => 'Mark a section';
+
+  @override
+  String statBestDayOn(String date) {
+    return 'Best day · $date';
+  }
+
+  @override
+  String readUntilHereConfirmSingle(int page, String goal) {
+    return 'Mark page $page as read in “$goal”?';
+  }
+
+  @override
+  String surahAyahCount(int count) {
+    return '$count ayah';
+  }
+
+  @override
+  String get totalLabel => 'Total';
+
+  @override
+  String get lastPageReadTag => 'last page read';
+
+  @override
+  String lastPageReadLabel(int page) {
+    return 'Last page read: $page';
+  }
+
+  @override
+  String get readUntilHereSubtitle => 'Validate every page up to this one';
+
+  @override
+  String get markSeveralPagesSubtitle => 'Up to a page, or a range';
+
+  @override
+  String get markSectionSubtitle => 'Validate by unit';
+
+  @override
+  String get viewProgressSubtitle => 'Statistics and days left';
+
+  @override
+  String get followAGoalSubtitle => 'Resume an ongoing khatm';
+
+  @override
+  String get newGoalSubtitle => 'Choose a duration and a starting point';
+
+  @override
+  String get freeReadingShort => 'Browse the Mushaf without a goal.';
+
+  @override
+  String pageOfTotal(int total) {
+    return 'page of $total';
+  }
+
+  @override
+  String get juzEndChip => 'End of juz';
+
+  @override
+  String get hizbEndChip => 'End of hizb';
+
+  @override
+  String pagesInRange(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages in range',
+      one: '1 page in range',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get rangeInverted => 'Reversed range — no new page to mark.';
+
+  @override
+  String get customDurationLabel => 'Custom duration';
+
+  @override
+  String pagesPerDayApprox(String pages) {
+    return '~$pages pages/day';
+  }
+
+  @override
+  String get chooseShort => 'Choose';
+
+  @override
+  String get pickEndDateAction => 'Choose an end date';
+
+  @override
+  String readingPagesToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages today',
+      one: '1 page today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String surahCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count surahs',
+      one: '1 surah',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String mushafPageCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages',
+      one: '1 page',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ongoingGoalsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count in progress',
+      one: '1 in progress',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get verseOfTheDay => 'Verse of the day';
+
+  @override
+  String get listenAction => 'Listen';
+
+  @override
+  String get anotherVerse => 'Another verse';
 }

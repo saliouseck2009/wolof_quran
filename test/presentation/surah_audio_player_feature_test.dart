@@ -803,12 +803,37 @@ void main() {
     final localizations = AppLocalizations.of(context)!;
 
     expect(find.text(localizations.recitation), findsOneWidget);
-    expect(find.text(localizations.listenAudio), findsOneWidget);
 
     await tester.tap(find.text(localizations.recitation));
     await tester.pumpAndSettle();
 
     expect(find.text('audio-screen'), findsOneWidget);
+  });
+
+  testWidgets('HomeActionsGrid counts ongoing goals and opens bookmarks', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildLocalizedApp(
+        routes: {
+          '/bookmarks': (context) =>
+              const Scaffold(body: Center(child: Text('bookmarks-screen'))),
+        },
+        child: const Scaffold(body: HomeActionsGrid(ongoingGoals: 2)),
+      ),
+    );
+
+    final context = tester.element(find.byType(HomeActionsGrid));
+    final localizations = AppLocalizations.of(context)!;
+
+    expect(find.text('2 in progress'), findsOneWidget);
+    expect(find.text('114 surahs'), findsOneWidget);
+    expect(find.text('604 pages'), findsOneWidget);
+
+    await tester.tap(find.text(localizations.bookmarks));
+    await tester.pumpAndSettle();
+
+    expect(find.text('bookmarks-screen'), findsOneWidget);
   });
 
   test(

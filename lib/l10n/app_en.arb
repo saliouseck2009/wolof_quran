@@ -1044,11 +1044,73 @@
   },
   "supportUnavailableOnIosTitle": "Support is unavailable on iOS",
   "@supportUnavailableOnIosTitle": {
-    "description": "Title shown on iOS when external donation methods are disabled"
+    "description": "Title shown on iOS while the Apple contribution is off"
   },
   "supportUnavailableOnIosBody": "To comply with App Store policies, this support section is currently disabled on iOS.",
   "@supportUnavailableOnIosBody": {
-    "description": "Body text shown on iOS when support page is disabled"
+    "description": "Body text shown on iOS while the Apple contribution is off"
+  },
+  "supportIosWebBody": "All the information to support the project is on our web page, which opens in Safari.",
+  "@supportIosWebBody": {
+    "description": "Body text shown on iOS above the button that opens the external support web page"
+  },
+  "supportOpenWebPage": "Open the support page",
+  "@supportOpenWebPage": {
+    "description": "Button label on iOS that opens the external support web page in Safari"
+  },
+  "supportAppleBody": "Your contribution through Apple helps keep the app free.",
+  "@supportAppleBody": {
+    "description": "Body text of the iOS support page (in-app purchase)"
+  },
+  "supportContribute": "Contribute {price}",
+  "@supportContribute": {
+    "description": "Purchase button on the iOS support page",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "€2.99"
+      }
+    }
+  },
+  "supportProcessing": "Processing…",
+  "@supportProcessing": {
+    "description": "Purchase button label while the payment is in progress"
+  },
+  "supportSecurePayment": "Payment securely processed by Apple.",
+  "@supportSecurePayment": {
+    "description": "Footer under the purchase button on iOS"
+  },
+  "supportThankYouTitle": "Thank you for your support!",
+  "@supportThankYouTitle": {
+    "description": "Title of the thank-you view after a successful contribution"
+  },
+  "supportThankYouBody": "Your contribution helps keep Wolof Quran free for everyone. Sharing the app with your loved ones is another great way to support it.",
+  "@supportThankYouBody": {
+    "description": "Body of the thank-you view after a successful contribution"
+  },
+  "supportShareApp": "Share the app",
+  "@supportShareApp": {
+    "description": "Button on the thank-you view"
+  },
+  "supportShareText": "I use Wolof Quran to read and listen to the Quran with Wolof translation. Give it a try!",
+  "@supportShareText": {
+    "description": "Text shared with the store links from the thank-you view"
+  },
+  "supportContributeAgain": "Contribute again",
+  "@supportContributeAgain": {
+    "description": "Link on the thank-you view returning to the purchase button"
+  },
+  "supportIapUnavailable": "In-app purchases are not available on this device.",
+  "@supportIapUnavailable": {
+    "description": "Error when the store is not available"
+  },
+  "supportProductUnavailable": "The contribution is temporarily unavailable. Please try again later.",
+  "@supportProductUnavailable": {
+    "description": "Error when the product could not be loaded"
+  },
+  "supportPaymentFailed": "The payment could not be completed.",
+  "@supportPaymentFailed": {
+    "description": "Error when the purchase fails or is cancelled by the store"
   },
   "payWithWave": "Wave",
   "@payWithWave": {
@@ -1367,7 +1429,7 @@
   "@deleteGoal": {
     "description": "Goal menu action"
   },
-  "duplicateGoal": "New goal from this one",
+  "duplicateGoal": "Duplicate goal",
   "@duplicateGoal": {
     "description": "Goal menu action creating a goal with the same settings"
   },
@@ -1411,7 +1473,7 @@
   "@pageRangeMode": {
     "description": "Mark pages mode: from one page to another"
   },
-  "untilPageHint": "Marks every unread page of the goal up to this page, in reading order.",
+  "untilPageHint": "Marks every unread page up to this point.",
   "@untilPageHint": {
     "description": "Explanation under the until-page mode"
   },
@@ -1495,6 +1557,15 @@
   "durationDays": "{count, plural, =1{1 day} other{{count} days}}",
   "@durationDays": {
     "description": "Duration chip",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysUnit": "{count, plural, =1{day} other{days}}",
+  "@daysUnit": {
+    "description": "Unit shown next to a large day count in the custom duration card",
     "placeholders": {
       "count": {
         "type": "int"
@@ -1620,7 +1691,7 @@
   "@freeReading": {
     "description": "Mushaf mode where no goal is tracked"
   },
-  "freeReadingDescription": "Browse the Mushaf without touching any goal.",
+  "freeReadingDescription": "Browse the Mushaf with no active goal. Resume whenever you like.",
   "@freeReadingDescription": {
     "description": "Subtitle of the free reading option"
   },
@@ -1632,7 +1703,7 @@
   "@markThisPageRead": {
     "description": "Mushaf action"
   },
-  "unmarkThisPage": "Remove this page's validation",
+  "unmarkThisPage": "Remove validation",
   "@unmarkThisPage": {
     "description": "Mushaf action on an already validated page"
   },
@@ -1817,7 +1888,7 @@
   "@actionSurah": {"description": "Journal action"},
   "actionUnmark": "Validation removed",
   "@actionUnmark": {"description": "Journal action"},
-  "markSection": "Mark a Juz, Hizb or Surah",
+  "markSection": "Mark Juz / Hizb / Surah",
   "@markSection": {"description": "Opens the section sheet"},
   "sectionJuz": "Juz",
   "@sectionJuz": {"description": "Section type"},
@@ -1902,5 +1973,52 @@
   "readingGoalsHintBody": "Create a goal to know each day how many pages to read, and validate your progress right here in the Mushaf.",
   "@readingGoalsHintBody": {"description": "One-time hint body"},
   "later": "Later",
-  "@later": {"description": "Dismisses the hint"}
+  "@later": {"description": "Dismisses the hint"},
+  "markPagesShort": "Mark pages",
+  "@markPagesShort": {"description": "Short button label opening the mark pages sheet"},
+  "markSectionShort": "Mark a section",
+  "@markSectionShort": {"description": "Short button label opening the section sheet"},
+  "statBestDayOn": "Best day · {date}",
+  "@statBestDayOn": {"description": "Stats tile label with the date", "placeholders": {"date": {"type": "String"}}},
+  "readUntilHereConfirmSingle": "Mark page {page} as read in “{goal}”?",
+  "@readUntilHereConfirmSingle": {"description": "Read-until-here confirmation for one page", "placeholders": {"page": {"type": "int"}, "goal": {"type": "String"}}},
+  "surahAyahCount": "{count} ayah",
+  "@surahAyahCount": {"description": "Verse count next to a surah name", "placeholders": {"count": {"type": "int"}}},
+  "totalLabel": "Total",
+  "lastPageReadTag": "last page read",
+  "lastPageReadLabel": "Last page read: {page}",
+  "@lastPageReadLabel": {"description": "Subtitle of the mark pages sheet", "placeholders": {"page": {"type": "int"}}},
+  "readUntilHereSubtitle": "Validate every page up to this one",
+  "markSeveralPagesSubtitle": "Up to a page, or a range",
+  "markSectionSubtitle": "Validate by unit",
+  "viewProgressSubtitle": "Statistics and days left",
+  "followAGoalSubtitle": "Resume an ongoing khatm",
+  "newGoalSubtitle": "Choose a duration and a starting point",
+  "freeReadingShort": "Browse the Mushaf without a goal.",
+  "pageOfTotal": "page of {total}",
+  "@pageOfTotal": {"description": "Shown next to the big page number", "placeholders": {"total": {"type": "int"}}},
+  "juzEndChip": "End of juz",
+  "hizbEndChip": "End of hizb",
+  "pagesInRange": "{count, plural, =1{1 page in range} other{{count} pages in range}}",
+  "@pagesInRange": {"description": "Size of the selected page range", "placeholders": {"count": {"type": "int"}}},
+  "rangeInverted": "Reversed range — no new page to mark.",
+  "customDurationLabel": "Custom duration",
+  "pagesPerDayApprox": "~{pages} pages/day",
+  "@pagesPerDayApprox": {"description": "Average pages per day, short", "placeholders": {"pages": {"type": "String"}}},
+  "chooseShort": "Choose",
+  "pickEndDateAction": "Choose an end date",
+  "readingPagesToday": "{count, plural, =1{1 page today} other{{count} pages today}}",
+  "@readingPagesToday": {"description": "Short form of the pages still to read today, for the compact home strip", "placeholders": {"count": {"type": "int"}}},
+  "surahCountLabel": "{count, plural, =1{1 surah} other{{count} surahs}}",
+  "@surahCountLabel": {"description": "Number of surahs, under the Surahs home tile", "placeholders": {"count": {"type": "int"}}},
+  "mushafPageCountLabel": "{count, plural, =1{1 page} other{{count} pages}}",
+  "@mushafPageCountLabel": {"description": "Number of mushaf pages, under the Mushaf home tile", "placeholders": {"count": {"type": "int"}}},
+  "ongoingGoalsCount": "{count, plural, =1{1 in progress} other{{count} in progress}}",
+  "@ongoingGoalsCount": {"description": "Number of ongoing reading goals, under the goals home tile", "placeholders": {"count": {"type": "int"}}},
+  "verseOfTheDay": "Verse of the day",
+  "@verseOfTheDay": {"description": "Label of the home card showing a random verse"},
+  "listenAction": "Listen",
+  "@listenAction": {"description": "Short button label that plays a verse"},
+  "anotherVerse": "Another verse",
+  "@anotherVerse": {"description": "Tooltip of the button that draws another verse of the day"}
 }

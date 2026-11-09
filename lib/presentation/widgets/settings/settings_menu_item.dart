@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/home_card_colors.dart';
+
 class SettingsMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -7,6 +9,13 @@ class SettingsMenuItem extends StatelessWidget {
   final String value;
   final VoidCallback onTap;
   final bool showArrow;
+
+  /// Replaces the default trailing icon (edit pencil, or arrow when
+  /// [showArrow] is set).
+  final IconData? trailingIcon;
+
+  /// Tints the card, e.g. while a menu anchored to it is open.
+  final bool highlighted;
 
   const SettingsMenuItem({
     super.key,
@@ -16,17 +25,27 @@ class SettingsMenuItem extends StatelessWidget {
     required this.value,
     required this.onTap,
     this.showArrow = false,
+    this.trailingIcon,
+    this.highlighted = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
+    final cardColor = isDark
+        ? colorScheme.surfaceContainer
+        : colorScheme.onPrimary;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
-        color: isDark ? colorScheme.surfaceContainer : colorScheme.onPrimary,
+        color: highlighted
+            ? Color.alphaBlend(
+                homeAccentColor(colorScheme).withValues(alpha: 0.08),
+                cardColor,
+              )
+            : cardColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Material(
@@ -104,9 +123,11 @@ class SettingsMenuItem extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    showArrow ? Icons.arrow_forward_ios : Icons.edit,
+                    trailingIcon ??
+                        (showArrow ? Icons.arrow_forward_ios : Icons.edit),
                     color: isDark ? colorScheme.onPrimary : colorScheme.primary,
-                    size: 16,
+                    // A chevron glyph fills less of its box than the pencil.
+                    size: trailingIcon == null ? 16 : 20,
                   ),
                 ),
               ],

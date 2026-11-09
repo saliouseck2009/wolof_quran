@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../core/config/localization/localization_service.dart';
 import '../../core/services/app_info_service.dart';
@@ -10,10 +9,9 @@ import 'privacy_policy_page.dart';
 import 'support_page.dart';
 import '../cubits/language_cubit.dart';
 import '../cubits/theme_cubit.dart';
-import '../widgets/settings/language_selector_sheet.dart';
+import '../widgets/settings/settings_choice_menu_item.dart';
 import '../widgets/settings/settings_header.dart';
 import '../widgets/settings/settings_menu_item.dart';
-import '../widgets/settings/theme_selector_sheet.dart';
 
 class SettingsPage extends StatefulWidget {
   static const String routeName = "/settings";
@@ -37,7 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final isIos = defaultTargetPlatform == TargetPlatform.iOS;
+    final showSupport = SupportPage.isAvailable;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -70,18 +68,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 return _SettingsMenu(
                   localizations: localizations,
                   appVersion: snapshot.data ?? '--',
-                  onShowLanguage: () =>
-                      _showLanguageSelector(context, localizations),
-                  onShowTheme: () => _showThemeSelector(context, localizations),
                   onShowAbout: () =>
                       Navigator.pushNamed(context, AboutPage.routeName),
                   onShowPrivacyPolicy: () =>
                       Navigator.pushNamed(context, PrivacyPolicyPage.routeName),
-                  showSupport: !isIos,
-                  onShowSupport: isIos
-                      ? null
-                      : () =>
-                            Navigator.pushNamed(context, SupportPage.routeName),
+                  showSupport: showSupport,
+                  onShowSupport: showSupport
+                      ? () =>
+                            Navigator.pushNamed(context, SupportPage.routeName)
+                      : null,
                 );
               },
             ),
@@ -91,37 +86,11 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-
-  void _showLanguageSelector(
-    BuildContext context,
-    AppLocalizations localizations,
-  ) async {
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => LanguageSelectorSheet(localizations: localizations),
-    );
-  }
-
-  void _showThemeSelector(
-    BuildContext context,
-    AppLocalizations localizations,
-  ) async {
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => ThemeSelectorSheet(localizations: localizations),
-    );
-  }
 }
 
 class _SettingsMenu extends StatelessWidget {
   final AppLocalizations localizations;
   final String appVersion;
-  final VoidCallback onShowLanguage;
-  final VoidCallback onShowTheme;
   final VoidCallback onShowAbout;
   final VoidCallback onShowPrivacyPolicy;
   final bool showSupport;
@@ -130,8 +99,6 @@ class _SettingsMenu extends StatelessWidget {
   const _SettingsMenu({
     required this.localizations,
     required this.appVersion,
-    required this.onShowLanguage,
-    required this.onShowTheme,
     required this.onShowAbout,
     required this.onShowPrivacyPolicy,
     required this.showSupport,
@@ -141,24 +108,55 @@ class _SettingsMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentLocale = context.watch<LanguageCubit>().state;
-    final languageValue = LocalizationService.getLanguageName(currentLocale);
+    final themeCubit = context.watch<ThemeCubit>();
+    final currentTheme = themeCubit.state;
 
     return Column(
       children: [
-        SettingsMenuItem(
+        SettingsChoiceMenuItem<String>(
           icon: Icons.language,
           title: localizations.language,
           subtitle: localizations.changeAppLanguage,
-          value: languageValue,
-          onTap: onShowLanguage,
+          value: LocalizationService.getLanguageName(currentLocale),
+          selected: currentLocale.languageCode,
+          choices: [
+            for (final locale in LocalizationService.supportedLocales)
+              SettingsChoice(
+                value: locale.languageCode,
+                label: LocalizationService.getLanguageName(locale),
+                // The name in the current language helps whoever cannot
+                // read the native one.
+                secondary: locale.languageCode == currentLocale.languageCode
+                    ? null
+                    : _languageNameInAppLanguage(locale),
+              ),
+          ],
+          onSelected: (code) => context.read<LanguageCubit>().changeLanguage(
+            LocalizationService.supportedLocales.firstWhere(
+              (locale) => locale.languageCode == code,
+            ),
+          ),
         ),
         const SizedBox(height: 16),
-        SettingsMenuItem(
+        SettingsChoiceMenuItem<ThemeMode>(
           icon: Icons.palette,
           title: localizations.theme,
           subtitle: localizations.chooseAppTheme,
-          value: _getCurrentThemeName(context, localizations),
-          onTap: onShowTheme,
+          value: themeCubit.getThemeName(currentTheme, localizations),
+          selected: currentTheme,
+          choices: [
+            for (final (mode, icon) in const [
+              (ThemeMode.light, Icons.light_mode_outlined),
+              (ThemeMode.dark, Icons.dark_mode_outlined),
+              (ThemeMode.system, Icons.contrast_rounded),
+            ])
+              SettingsChoice(
+                value: mode,
+                label: themeCubit.getThemeName(mode, localizations),
+                icon: icon,
+              ),
+          ],
+          onSelected: themeCubit.changeTheme,
         ),
         const SizedBox(height: 16),
         SettingsMenuItem(
@@ -203,12 +201,11 @@ class _SettingsMenu extends StatelessWidget {
     );
   }
 
-  String _getCurrentThemeName(
-    BuildContext context,
-    AppLocalizations localizations,
-  ) {
-    final themeCubit = context.read<ThemeCubit>();
-    final currentTheme = themeCubit.state;
-    return themeCubit.getThemeName(currentTheme, localizations);
+  String _languageNameInAppLanguage(Locale locale) {
+    return switch (locale.languageCode) {
+      'en' => localizations.english,
+      'ar' => localizations.arabic,
+      _ => localizations.french,
+    };
   }
 }

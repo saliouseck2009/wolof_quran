@@ -15,6 +15,7 @@ import '../../cubits/quran_settings_cubit.dart';
 import '../ayah_play_button.dart';
 import '../ayah_range_play_sheet.dart';
 import '../daily_inspiration_share_modal.dart';
+import '../snackbar.dart';
 
 class MushafVerseActionsSheet extends StatefulWidget {
   final BuildContext pageContext;
@@ -358,8 +359,9 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
                     if (!context.mounted) {
                       return;
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(localizations.copyLabel)),
+                    CustomSnackbar.showSuccessSnackbar(
+                      context,
+                      localizations.copiedToClipboard,
                     );
                   },
                   isBookmarked: isBookmarked,

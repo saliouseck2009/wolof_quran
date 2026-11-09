@@ -291,10 +291,12 @@ class _TilesGrid extends StatelessWidget {
       ),
       (
         Icons.calendar_today_outlined,
+        bestDay == null ? '—' : '${stats.bestDayPages}',
         bestDay == null
-            ? '—'
-            : '${stats.bestDayPages} · ${ReadingGoalFormatting.date(context, bestDay)}',
-        localizations.statBestDay,
+            ? localizations.statBestDay
+            : localizations.statBestDayOn(
+                ReadingGoalFormatting.date(context, bestDay),
+              ),
       ),
       (Icons.timer_outlined, timeLabel, localizations.statReadingTime),
     ];

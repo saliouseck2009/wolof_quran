@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wolof_quran/core/mushaf/quran_page_data.dart';
 import 'package:wolof_quran/core/reading/quran_sections.dart';
+import 'package:wolof_quran/core/reading/reading_order.dart';
 
 void main() {
   group('QuranSections', () {
@@ -69,6 +70,66 @@ void main() {
 
       final fatiha = QuranSections.get(QuranSectionType.surah, 1);
       expect(fatiha.pagesIncluding(sharedFirst: false, sharedLast: false), [1]);
+    });
+  });
+
+  group('QuranSections.nextEndAfter', () {
+    const mushafOrder = ReadingOrder(startPage: 1, totalPages: 604);
+    const wrappedOrder = ReadingOrder(startPage: 300, totalPages: 604);
+
+    test('jumps to the end of the current section', () {
+      final juz1 = QuranSections.get(QuranSectionType.juz, 1);
+      expect(
+        QuranSections.nextEndAfter(QuranSectionType.juz, 5, mushafOrder),
+        juz1.lastPage,
+      );
+    });
+
+    test('from a section end, jumps to the next section end', () {
+      final juz1 = QuranSections.get(QuranSectionType.juz, 1);
+      final juz2 = QuranSections.get(QuranSectionType.juz, 2);
+      expect(
+        QuranSections.nextEndAfter(
+          QuranSectionType.juz,
+          juz1.lastPage,
+          mushafOrder,
+        ),
+        juz2.lastPage,
+      );
+    });
+
+    test('stays on the last page of the order when nothing follows', () {
+      expect(
+        QuranSections.nextEndAfter(QuranSectionType.juz, 604, mushafOrder),
+        604,
+      );
+      expect(
+        QuranSections.nextEndAfter(QuranSectionType.surah, 604, mushafOrder),
+        604,
+      );
+    });
+
+    test('follows the wrap of a goal starting mid-mushaf', () {
+      final juz1 = QuranSections.get(QuranSectionType.juz, 1);
+      final hizb1 = QuranSections.get(QuranSectionType.hizb, 1);
+      final fatiha = QuranSections.get(QuranSectionType.surah, 1);
+      expect(
+        QuranSections.nextEndAfter(QuranSectionType.juz, 604, wrappedOrder),
+        juz1.lastPage,
+      );
+      expect(
+        QuranSections.nextEndAfter(QuranSectionType.hizb, 604, wrappedOrder),
+        hizb1.lastPage,
+      );
+      expect(
+        QuranSections.nextEndAfter(QuranSectionType.surah, 604, wrappedOrder),
+        fatiha.lastPage,
+      );
+      // The page before the start is the last of the order.
+      expect(
+        QuranSections.nextEndAfter(QuranSectionType.juz, 299, wrappedOrder),
+        299,
+      );
     });
   });
 }
