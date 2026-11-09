@@ -4,12 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/audio_availability_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
+import '../settings/settings_choice_menu_item.dart';
 import '../settings/settings_menu_item.dart';
 
 class QuranSettingsMenu extends StatelessWidget {
   final QuranSettingsState state;
   final AppLocalizations localizations;
-  final VoidCallback onTranslationTap;
+  final ValueChanged<TranslationOption> onTranslationSelected;
   final VoidCallback onFontSizeTap;
   final VoidCallback onRecitersTap;
   final VoidCallback onReadingTrackingTap;
@@ -18,7 +19,7 @@ class QuranSettingsMenu extends StatelessWidget {
     super.key,
     required this.state,
     required this.localizations,
-    required this.onTranslationTap,
+    required this.onTranslationSelected,
     required this.onFontSizeTap,
     required this.onRecitersTap,
     required this.onReadingTrackingTap,
@@ -34,12 +35,20 @@ class QuranSettingsMenu extends StatelessWidget {
 
     return Column(
       children: [
-        SettingsMenuItem(
+        SettingsChoiceMenuItem<TranslationOption>(
           icon: Icons.translate,
           title: localizations.translationSettings,
           subtitle: localizations.currentTranslation,
           value: currentTranslationValue,
-          onTap: onTranslationTap,
+          selected: currentTranslationOption ??
+              QuranSettingsCubit.availableTranslations.first,
+          choices: [
+            for (final option in QuranSettingsCubit.availableTranslations)
+              SettingsChoice(value: option, label: option.displayName),
+          ],
+          onSelected: onTranslationSelected,
+          // Twelve long names: the menu takes the row width and scrolls.
+          fullWidthMenu: true,
         ),
         const SizedBox(height: 16),
         SettingsMenuItem(

@@ -399,7 +399,7 @@ void main() {
                 return QuranSettingsMenu(
                   state: const QuranSettingsState(selectedReciter: reciter),
                   localizations: AppLocalizations.of(context)!,
-                  onTranslationTap: () {},
+                  onTranslationSelected: (_) {},
                   onFontSizeTap: () {},
                   onRecitersTap: () {},
                   onReadingTrackingTap: () {},

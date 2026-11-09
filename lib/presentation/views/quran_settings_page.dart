@@ -12,7 +12,6 @@ import '../widgets/quran_settings/font_size_selector_sheet.dart';
 import '../widgets/quran_settings/quran_settings_header.dart';
 import '../widgets/quran_settings/quran_settings_menu.dart';
 import '../widgets/quran_settings/reading_tracking_settings_sheet.dart';
-import '../widgets/quran_settings/translation_selector_sheet.dart';
 import '../widgets/settings/settings_menu_item.dart';
 import 'support_page.dart';
 
@@ -75,10 +74,9 @@ class _QuranSettingsView extends StatelessWidget {
                 QuranSettingsMenu(
                   state: state,
                   localizations: localizations,
-                  onTranslationTap: () =>
-                      _showTranslationSelector(context, state, localizations),
-                  onFontSizeTap: () =>
-                      _showFontSizeSelector(context, state, localizations),
+                  onTranslationSelected: (option) =>
+                      _selectTranslation(context, option, localizations),
+                  onFontSizeTap: () => showFontSizeSettingsSheet(context),
                   onRecitersTap: () {
                     Navigator.pushNamed(context, '/reciter-list');
                   },
@@ -106,57 +104,19 @@ class _QuranSettingsView extends StatelessWidget {
     );
   }
 
-  void _showTranslationSelector(
+  void _selectTranslation(
     BuildContext context,
-    QuranSettingsState state,
+    TranslationOption option,
     AppLocalizations localizations,
-  ) async {
-    final result = await showModalBottomSheet<TranslationOption?>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (modalContext) => TranslationSelectorSheet(
-        currentTranslation: state.selectedTranslation,
-        localizations: localizations,
-        onTranslationSelected: (translation) {
-          log('🎯 Translation selected in modal: $translation');
-          context.read<QuranSettingsCubit>().updateTranslation(translation);
-        },
-      ),
+  ) {
+    log('🎯 Translation selected: ${option.translation}');
+    context.read<QuranSettingsCubit>().updateTranslation(option.translation);
+    CustomSnackbar.showSnackbar(
+      context,
+      localizations.translationUpdated(option.language),
+      duration: 2,
     );
-
-    // If translation was changed, show feedback and return true to parent
-    if (result != null && context.mounted) {
-      CustomSnackbar.showSnackbar(
-        context,
-        localizations.translationUpdated(result.language),
-        duration: 2,
-      );
-      Navigator.pop(context, true);
-    }
-  }
-
-  void _showFontSizeSelector(
-    BuildContext context,
-    QuranSettingsState state,
-    AppLocalizations localizations,
-  ) async {
-    final result = await showModalBottomSheet<double?>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (modalContext) => FontSizeSelectorSheet(
-        currentFontSize: state.ayahFontSize,
-        localizations: localizations,
-        onFontSizeChanged: (fontSize) {
-          context.read<QuranSettingsCubit>().updateAyahFontSize(fontSize);
-        },
-      ),
-    );
-
-    // If font size was changed, return true to parent
-    if (result != null && context.mounted) {
-      Navigator.pop(context, true);
-    }
+    // Tells the page that opened the settings to reload its translation.
+    Navigator.pop(context, true);
   }
 }

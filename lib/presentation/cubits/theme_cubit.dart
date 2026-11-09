@@ -71,26 +71,4 @@ class ThemeCubit extends Cubit<ThemeMode> {
         return localizations.system;
     }
   }
-
-  IconData getThemeIcon(ThemeMode themeMode) {
-    switch (themeMode) {
-      case ThemeMode.light:
-        return Icons.light_mode;
-      case ThemeMode.dark:
-        return Icons.dark_mode;
-      case ThemeMode.system:
-        return Icons.settings_system_daydream;
-    }
-  }
-
-  Color getThemeColor(ThemeMode themeMode) {
-    switch (themeMode) {
-      case ThemeMode.light:
-        return const Color(0xFFDAA520); // Gold
-      case ThemeMode.dark:
-        return const Color(0xFF1B4332); // Primary Green
-      case ThemeMode.system:
-        return const Color(0xFF52B788); // Accent
-    }
-  }
 }
