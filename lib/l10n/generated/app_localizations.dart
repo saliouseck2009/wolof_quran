@@ -2979,6 +2979,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose an end date'**
   String get pickEndDateAction;
+
+  /// Short form of the pages still to read today, for the compact home strip
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page today} other{{count} pages today}}'**
+  String readingPagesToday(int count);
+
+  /// Number of surahs, under the Surahs home tile
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 surah} other{{count} surahs}}'**
+  String surahCountLabel(int count);
+
+  /// Number of mushaf pages, under the Mushaf home tile
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page} other{{count} pages}}'**
+  String mushafPageCountLabel(int count);
+
+  /// Number of ongoing reading goals, under the goals home tile
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 in progress} other{{count} in progress}}'**
+  String ongoingGoalsCount(int count);
+
+  /// Label of the home card showing a random verse
+  ///
+  /// In en, this message translates to:
+  /// **'Verse of the day'**
+  String get verseOfTheDay;
+
+  /// Short button label that plays a verse
+  ///
+  /// In en, this message translates to:
+  /// **'Listen'**
+  String get listenAction;
+
+  /// Tooltip of the button that draws another verse of the day
+  ///
+  /// In en, this message translates to:
+  /// **'Another verse'**
+  String get anotherVerse;
 }
 
 class _AppLocalizationsDelegate

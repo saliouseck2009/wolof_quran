@@ -1750,4 +1750,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickEndDateAction => 'Choose an end date';
+
+  @override
+  String readingPagesToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages today',
+      one: '1 page today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String surahCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count surahs',
+      one: '1 surah',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String mushafPageCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages',
+      one: '1 page',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ongoingGoalsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count in progress',
+      one: '1 in progress',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get verseOfTheDay => 'Verse of the day';
+
+  @override
+  String get listenAction => 'Listen';
+
+  @override
+  String get anotherVerse => 'Another verse';
 }

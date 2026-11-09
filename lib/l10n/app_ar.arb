@@ -498,5 +498,12 @@
   "customDurationLabel": "مدة مخصصة",
   "pagesPerDayApprox": "~{pages} صفحة/يوم",
   "chooseShort": "اختيار",
-  "pickEndDateAction": "اختيار تاريخ الانتهاء"
+  "pickEndDateAction": "اختيار تاريخ الانتهاء",
+  "readingPagesToday": "{count, plural, =1{صفحة واحدة اليوم} =2{صفحتان اليوم} few{{count} صفحات اليوم} other{{count} صفحة اليوم}}",
+  "surahCountLabel": "{count, plural, =1{سورة واحدة} =2{سورتان} few{{count} سور} other{{count} سورة}}",
+  "mushafPageCountLabel": "{count, plural, =1{صفحة واحدة} =2{صفحتان} few{{count} صفحات} other{{count} صفحة}}",
+  "ongoingGoalsCount": "{count, plural, =1{هدف واحد جارٍ} =2{هدفان جاريان} few{{count} أهداف جارية} other{{count} هدفًا جاريًا}}",
+  "verseOfTheDay": "آية اليوم",
+  "listenAction": "استمع",
+  "anotherVerse": "آية أخرى"
 }

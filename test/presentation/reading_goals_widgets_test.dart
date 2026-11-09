@@ -151,13 +151,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Khatm Ramadan'), findsOneWidget);
-      expect(find.text('10/604 pages'), findsOneWidget);
+      expect(find.text('1 %'), findsOneWidget);
       // Target 21, read 10 → 11 left.
-      expect(
-        find.text('Il reste 11 pages à lire aujourd\'hui'),
-        findsOneWidget,
-      );
-      expect(find.text('Reprendre à la page 11'), findsOneWidget);
+      expect(find.text('11 pages aujourd\'hui'), findsOneWidget);
+      expect(find.text('Page 11'), findsOneWidget);
     });
   });
 

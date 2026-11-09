@@ -5,6 +5,7 @@ import 'package:wolof_quran/presentation/cubits/daily_inspiration_cubit.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/bookmark_cubit.dart';
+import '../cubits/reading_goals_cubit.dart';
 import '../../domain/repositories/bookmark_repository.dart';
 import '../../service_locator.dart';
 import '../widgets/home_header.dart';
@@ -79,18 +80,30 @@ class HomePage extends StatelessWidget {
                   sliver: SliverToBoxAdapter(child: const HomeHeader()),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
                   sliver: SliverToBoxAdapter(
                     child: const DailyInspirationCard(),
                   ),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                   sliver: SliverToBoxAdapter(child: const HomeReadingCard()),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 36, 24, 0),
-                  sliver: SliverToBoxAdapter(child: const HomeActionsGrid()),
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                  sliver: SliverToBoxAdapter(
+                    child:
+                        BlocSelector<
+                          ReadingGoalsCubit,
+                          ReadingGoalsState,
+                          int?
+                        >(
+                          selector: (state) =>
+                              state.isLoading ? null : state.ongoing.length,
+                          builder: (context, ongoingGoals) =>
+                              HomeActionsGrid(ongoingGoals: ongoingGoals),
+                        ),
+                  ),
                 ),
                 const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
               ],

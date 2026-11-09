@@ -5,12 +5,11 @@ import '../../../core/navigation/create_reading_goal_arguments.dart';
 import '../../../domain/entities/reading_goal_progress.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/reading_goals_cubit.dart';
+import '../../utils/home_card_colors.dart';
 import '../../views/create_reading_goal_page.dart';
-import '../../views/reading_goals_page.dart';
 import 'reading_goal_actions.dart';
-import 'reading_progress_bar.dart';
 
-/// Home card showing the goal followed in the mushaf (or the first ongoing
+/// Home strip showing the goal followed in the mushaf (or the first ongoing
 /// one) with today's quota, or an invitation to create a first goal.
 class HomeReadingCard extends StatelessWidget {
   const HomeReadingCard({super.key});
@@ -34,6 +33,8 @@ class HomeReadingCard extends StatelessWidget {
   }
 }
 
+/// Compact strip: progress ring, goal name, today's quota and a button that
+/// reopens the mushaf at the next page. Tapping the strip opens the goal.
 class _GoalReadingCard extends StatelessWidget {
   final ReadingGoalProgress progress;
 
@@ -42,120 +43,141 @@ class _GoalReadingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final accent = homeAccentColor(colorScheme);
     final metrics = progress.metrics;
     final todayReached = metrics.isTodayTargetReached;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: colorScheme.onSurface.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(20),
+    return Material(
+      color: homeCardColor(colorScheme),
+      borderRadius: BorderRadius.circular(22),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => ReadingGoalActions.openDetail(context, progress.goal.id),
+        child: Padding(
+          padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 14, 14),
+          child: Row(
+            children: [
+              _ProgressRing(
+                fraction: metrics.fraction,
+                label: localizations.percentValue(metrics.percent),
+                color: accent,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      progress.goal.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      todayReached
+                          ? localizations.readingTodayDone
+                          : localizations.readingPagesToday(
+                              metrics.remainingForToday,
+                            ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: todayReached
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: todayReached
+                            ? accent
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              FilledButton(
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(0, 44),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: () =>
+                    ReadingGoalActions.continueReading(context, progress),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(localizations.pageNumberLabel(progress.resumePage)),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.arrow_forward_rounded, size: 18),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.flag_rounded, size: 16, color: colorScheme.primary),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  localizations.homeReadingTitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              _LinkButton(
-                label: localizations.seeAllGoals,
-                onTap: () =>
-                    Navigator.pushNamed(context, ReadingGoalsPage.routeName),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Text(
-            progress.goal.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 10),
-          ReadingProgressBar(fraction: metrics.fraction),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  localizations.readingProgressLabel(
-                    metrics.validatedCount,
-                    metrics.totalPages,
-                  ),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              Text(
-                localizations.percentValue(metrics.percent),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(
-                todayReached
-                    ? Icons.check_circle_rounded
-                    : Icons.today_outlined,
-                size: 16,
-                color: todayReached
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  todayReached
-                      ? localizations.readingTodayDone
-                      : localizations.readingRemainingToday(
-                          metrics.remainingForToday,
-                        ),
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: todayReached
-                        ? colorScheme.primary
-                        : colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            style: FilledButton.styleFrom(
-              minimumSize: const Size.fromHeight(46),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+    );
+  }
+}
+
+class _ProgressRing extends StatelessWidget {
+  final double fraction;
+  final String label;
+  final Color color;
+
+  const _ProgressRing({
+    required this.fraction,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: label,
+      excludeSemantics: true,
+      child: SizedBox(
+        width: 46,
+        height: 46,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox.expand(
+              child: CircularProgressIndicator(
+                value: fraction.clamp(0.0, 1.0),
+                strokeWidth: 5,
+                // A round cap draws a dot at 0 %, so only round a real arc.
+                strokeCap: fraction > 0 ? StrokeCap.round : StrokeCap.butt,
+                color: color,
+                backgroundColor: color.withValues(alpha: 0.14),
               ),
             ),
-            onPressed: () =>
-                ReadingGoalActions.continueReading(context, progress),
-            icon: const Icon(Icons.auto_stories_rounded, size: 18),
-            label: Text(localizations.resumeAtPage(progress.resumePage)),
-          ),
-        ],
+            SizedBox(
+              width: 30,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -170,12 +192,14 @@ class _EmptyReadingCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    final accent = homeAccentColor(colorScheme);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colorScheme.onSurface.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(20),
+        color: homeCardColor(colorScheme),
+        borderRadius: BorderRadius.circular(22),
       ),
       child: Row(
         children: [
@@ -183,14 +207,10 @@ class _EmptyReadingCard extends StatelessWidget {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: colorScheme.primary.withValues(alpha: 0.1),
+              color: accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              Icons.flag_rounded,
-              size: 20,
-              color: colorScheme.primary,
-            ),
+            child: Icon(Icons.flag_rounded, size: 20, color: accent),
           ),
           const SizedBox(width: 14),
           Expanded(

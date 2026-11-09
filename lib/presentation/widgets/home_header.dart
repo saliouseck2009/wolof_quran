@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../l10n/generated/app_localizations.dart';
+import '../utils/home_card_colors.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -17,7 +18,7 @@ class HomeHeader extends StatelessWidget {
           child: Icon(
             Icons.auto_stories_outlined,
             size: 50,
-            color: colorScheme.primary,
+            color: homeAccentColor(colorScheme),
           ),
         ),
 
@@ -33,34 +34,51 @@ class HomeHeader extends StatelessWidget {
             ),
           ),
         ),
-        const _SettingsButton(),
+        _HeaderButton(
+          icon: Icons.search_rounded,
+          tooltip: localizations.search,
+          routeName: '/search',
+        ),
+        const SizedBox(width: 8),
+        _HeaderButton(
+          icon: Icons.settings_outlined,
+          tooltip: localizations.settings,
+          routeName: '/settings',
+        ),
       ],
     );
   }
 }
 
-class _SettingsButton extends StatelessWidget {
-  const _SettingsButton();
+class _HeaderButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final String routeName;
+
+  const _HeaderButton({
+    required this.icon,
+    required this.tooltip,
+    required this.routeName,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
 
     return IconButton(
-      onPressed: () => Navigator.pushNamed(context, '/settings'),
-      tooltip: localizations.settings,
+      onPressed: () => Navigator.pushNamed(context, routeName),
+      tooltip: tooltip,
       icon: Icon(
-        Icons.settings_outlined,
-        color: colorScheme.onSurfaceVariant,
+        icon,
+        color: colorScheme.onSurface.withValues(alpha: 0.75),
         size: 20,
       ),
       style: IconButton.styleFrom(
-        backgroundColor: colorScheme.onSurface.withValues(alpha: 0.06),
-        minimumSize: const Size(40, 40),
-        maximumSize: const Size(40, 40),
+        backgroundColor: homeCardColor(colorScheme),
+        minimumSize: const Size(44, 44),
+        maximumSize: const Size(44, 44),
         padding: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
     );
   }

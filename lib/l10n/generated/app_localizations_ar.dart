@@ -1766,4 +1766,65 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pickEndDateAction => 'اختيار تاريخ الانتهاء';
+
+  @override
+  String readingPagesToday(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفحة اليوم',
+      few: '$count صفحات اليوم',
+      two: 'صفحتان اليوم',
+      one: 'صفحة واحدة اليوم',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String surahCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count سورة',
+      few: '$count سور',
+      two: 'سورتان',
+      one: 'سورة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String mushafPageCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صفحة',
+      few: '$count صفحات',
+      two: 'صفحتان',
+      one: 'صفحة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String ongoingGoalsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count هدفًا جاريًا',
+      few: '$count أهداف جارية',
+      two: 'هدفان جاريان',
+      one: 'هدف واحد جارٍ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get verseOfTheDay => 'آية اليوم';
+
+  @override
+  String get listenAction => 'استمع';
+
+  @override
+  String get anotherVerse => 'آية أخرى';
 }

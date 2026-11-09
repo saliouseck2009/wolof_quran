@@ -1998,5 +1998,19 @@
   "pagesPerDayApprox": "~{pages} pages/day",
   "@pagesPerDayApprox": {"description": "Average pages per day, short", "placeholders": {"pages": {"type": "String"}}},
   "chooseShort": "Choose",
-  "pickEndDateAction": "Choose an end date"
+  "pickEndDateAction": "Choose an end date",
+  "readingPagesToday": "{count, plural, =1{1 page today} other{{count} pages today}}",
+  "@readingPagesToday": {"description": "Short form of the pages still to read today, for the compact home strip", "placeholders": {"count": {"type": "int"}}},
+  "surahCountLabel": "{count, plural, =1{1 surah} other{{count} surahs}}",
+  "@surahCountLabel": {"description": "Number of surahs, under the Surahs home tile", "placeholders": {"count": {"type": "int"}}},
+  "mushafPageCountLabel": "{count, plural, =1{1 page} other{{count} pages}}",
+  "@mushafPageCountLabel": {"description": "Number of mushaf pages, under the Mushaf home tile", "placeholders": {"count": {"type": "int"}}},
+  "ongoingGoalsCount": "{count, plural, =1{1 in progress} other{{count} in progress}}",
+  "@ongoingGoalsCount": {"description": "Number of ongoing reading goals, under the goals home tile", "placeholders": {"count": {"type": "int"}}},
+  "verseOfTheDay": "Verse of the day",
+  "@verseOfTheDay": {"description": "Label of the home card showing a random verse"},
+  "listenAction": "Listen",
+  "@listenAction": {"description": "Short button label that plays a verse"},
+  "anotherVerse": "Another verse",
+  "@anotherVerse": {"description": "Tooltip of the button that draws another verse of the day"}
 }
