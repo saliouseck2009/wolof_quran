@@ -24,6 +24,15 @@ class SupportPage extends StatelessWidget {
   /// iOS meanwhile.
   static const bool appleContributionEnabled = false;
 
+  /// Whether the support entries should be shown on this platform. On iOS
+  /// they lead to the Apple contribution or, while it is off, to the
+  /// external support web page unless it is switched off remotely.
+  static bool get isAvailable {
+    if (defaultTargetPlatform != TargetPlatform.iOS) return true;
+    if (appleContributionEnabled) return true;
+    return locator<RemoteConfigService>().config.iosSupportEnabled;
+  }
+
   const SupportPage({super.key});
 
   @override
@@ -37,6 +46,20 @@ class SupportPage extends StatelessWidget {
     if (isIos) {
       if (appleContributionEnabled) {
         return const _AppleSupportView();
+      }
+      final config = locator<RemoteConfigService>().config;
+      if (config.iosSupportEnabled) {
+        return _IosWebSupportView(
+          localizations: localizations,
+          colorScheme: colorScheme,
+          isDark: isDark,
+          primary: primary,
+          message: config.messageForLocale(
+            Localizations.localeOf(context).languageCode,
+          ),
+          url: config.iosSupportUrl,
+          contactEmail: _contactEmail,
+        );
       }
       return _SupportUnavailableOnIosView(
         localizations: localizations,
@@ -190,7 +213,168 @@ class SupportPage extends StatelessWidget {
   }
 }
 
-/// Shown on iOS while the Apple contribution is off.
+/// Shown on iOS while the Apple contribution is off: presents the project and
+/// opens the external support web page in Safari.
+class _IosWebSupportView extends StatelessWidget {
+  final AppLocalizations localizations;
+  final ColorScheme colorScheme;
+  final bool isDark;
+  final Color primary;
+  final String message;
+  final String url;
+  final String contactEmail;
+
+  const _IosWebSupportView({
+    required this.localizations,
+    required this.colorScheme,
+    required this.isDark,
+    required this.primary,
+    required this.message,
+    required this.url,
+    required this.contactEmail,
+  });
+
+  Future<void> _openPage() async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Scaffold(
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+        title: Text(
+          localizations.supportPageTitle,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: colorScheme.onPrimary,
+            fontSize: 18,
+          ),
+        ),
+        backgroundColor: isDark ? colorScheme.surface : primary,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? colorScheme.surfaceContainerLow
+                    : primary.withValues(alpha: 0.04),
+              ),
+              padding: const EdgeInsets.fromLTRB(28, 32, 28, 28),
+              child: Column(
+                children: [
+                  Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? colorScheme.surfaceContainer
+                          : Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Image.asset(
+                      'assets/icon/soutien.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    localizations.supportPageTitle,
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: colorScheme.onSurface,
+                      letterSpacing: -0.3,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      height: 1.65,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? colorScheme.surfaceContainer
+                      : colorScheme.onPrimary,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: colorScheme.onSurface.withValues(alpha: 0.06),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      localizations.supportIosWebBody,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: _openPage,
+                        icon: const Icon(Icons.open_in_new_rounded, size: 18),
+                        label: Text(
+                          localizations.supportOpenWebPage,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '${localizations.contactEmailLabel}: $contactEmail',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown on iOS while the Apple contribution is off and the external support
+/// page is switched off remotely.
 class _SupportUnavailableOnIosView extends StatelessWidget {
   final AppLocalizations localizations;
   final ColorScheme colorScheme;

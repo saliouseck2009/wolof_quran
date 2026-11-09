@@ -250,6 +250,8 @@
   "supportPageTitle": "Soutenir Coran Wolof",
   "supportUnavailableOnIosTitle": "Le soutien est indisponible sur iOS",
   "supportUnavailableOnIosBody": "Pour respecter les règles de l'App Store, cette section de soutien est actuellement désactivée sur iOS.",
+  "supportIosWebBody": "Toutes les informations pour soutenir le projet sont sur notre page web, qui s'ouvre dans Safari.",
+  "supportOpenWebPage": "Ouvrir la page de soutien",
   "supportAppleBody": "Votre contribution via Apple aide à maintenir l'application gratuite.",
   "supportContribute": "Contribuer {price}",
   "supportProcessing": "Traitement…",

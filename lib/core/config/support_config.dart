@@ -12,6 +12,11 @@ class SupportConfig {
   final String messageAr;
   final bool enabled;
 
+  /// Web page opened in Safari from the iOS support screen (the Apple
+  /// in-app contribution is off meanwhile). Switchable remotely.
+  final String iosSupportUrl;
+  final bool iosSupportEnabled;
+
   const SupportConfig({
     required this.waveUrl,
     required this.waveLabel,
@@ -21,7 +26,12 @@ class SupportConfig {
     required this.messageEn,
     required this.messageAr,
     required this.enabled,
+    this.iosSupportUrl = defaultIosSupportUrl,
+    this.iosSupportEnabled = true,
   });
+
+  static const String defaultIosSupportUrl =
+      'https://saliouseck2009.github.io/wolof_quran/soutenir/';
 
   /// Hardcoded defaults — used when no remote config is available.
   static const SupportConfig defaults = SupportConfig(
@@ -49,6 +59,10 @@ class SupportConfig {
       messageEn: json['message_en'] as String? ?? defaults.messageEn,
       messageAr: json['message_ar'] as String? ?? defaults.messageAr,
       enabled: json['enabled'] as bool? ?? defaults.enabled,
+      iosSupportUrl:
+          json['ios_support_url'] as String? ?? defaults.iosSupportUrl,
+      iosSupportEnabled:
+          json['ios_support_enabled'] as bool? ?? defaults.iosSupportEnabled,
     );
   }
 
@@ -61,6 +75,8 @@ class SupportConfig {
         'message_en': messageEn,
         'message_ar': messageAr,
         'enabled': enabled,
+        'ios_support_url': iosSupportUrl,
+        'ios_support_enabled': iosSupportEnabled,
       };
 
   /// Returns the localised encouragement message for the given [languageCode].

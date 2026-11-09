@@ -824,6 +824,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Pour respecter les règles de l\'App Store, cette section de soutien est actuellement désactivée sur iOS.';
 
   @override
+  String get supportIosWebBody =>
+      'Toutes les informations pour soutenir le projet sont sur notre page web, qui s\'ouvre dans Safari.';
+
+  @override
+  String get supportOpenWebPage => 'Ouvrir la page de soutien';
+
+  @override
   String get supportAppleBody =>
       'Votre contribution via Apple aide à maintenir l\'application gratuite.';
 

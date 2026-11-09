@@ -1050,6 +1050,14 @@
   "@supportUnavailableOnIosBody": {
     "description": "Body text shown on iOS while the Apple contribution is off"
   },
+  "supportIosWebBody": "All the information to support the project is on our web page, which opens in Safari.",
+  "@supportIosWebBody": {
+    "description": "Body text shown on iOS above the button that opens the external support web page"
+  },
+  "supportOpenWebPage": "Open the support page",
+  "@supportOpenWebPage": {
+    "description": "Button label on iOS that opens the external support web page in Safari"
+  },
   "supportAppleBody": "Your contribution through Apple helps keep the app free.",
   "@supportAppleBody": {
     "description": "Body text of the iOS support page (in-app purchase)"

@@ -1546,6 +1546,18 @@ abstract class AppLocalizations {
   /// **'To comply with App Store policies, this support section is currently disabled on iOS.'**
   String get supportUnavailableOnIosBody;
 
+  /// Body text shown on iOS above the button that opens the external support web page
+  ///
+  /// In en, this message translates to:
+  /// **'All the information to support the project is on our web page, which opens in Safari.'**
+  String get supportIosWebBody;
+
+  /// Button label on iOS that opens the external support web page in Safari
+  ///
+  /// In en, this message translates to:
+  /// **'Open the support page'**
+  String get supportOpenWebPage;
+
   /// Body text of the iOS support page (in-app purchase)
   ///
   /// In en, this message translates to:

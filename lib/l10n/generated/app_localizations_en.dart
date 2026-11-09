@@ -811,6 +811,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'To comply with App Store policies, this support section is currently disabled on iOS.';
 
   @override
+  String get supportIosWebBody =>
+      'All the information to support the project is on our web page, which opens in Safari.';
+
+  @override
+  String get supportOpenWebPage => 'Open the support page';
+
+  @override
   String get supportAppleBody =>
       'Your contribution through Apple helps keep the app free.';
 

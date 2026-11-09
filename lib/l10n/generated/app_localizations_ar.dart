@@ -803,6 +803,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'للالتزام بسياسات App Store، تم تعطيل قسم الدعم هذا حالياً على iOS.';
 
   @override
+  String get supportIosWebBody =>
+      'جميع المعلومات لدعم المشروع متوفرة على صفحتنا على الويب، التي تُفتح في Safari.';
+
+  @override
+  String get supportOpenWebPage => 'فتح صفحة الدعم';
+
+  @override
   String get supportAppleBody =>
       'مساهمتك عبر Apple تساعد على إبقاء التطبيق مجانيًا.';
 

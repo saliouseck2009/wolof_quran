@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -40,7 +39,6 @@ class _QuranSettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final isIos = defaultTargetPlatform == TargetPlatform.iOS;
 
     return Scaffold(
       backgroundColor: colorScheme.brightness == Brightness.dark
@@ -83,7 +81,7 @@ class _QuranSettingsView extends StatelessWidget {
                   onReadingTrackingTap: () =>
                       showReadingTrackingSettingsSheet(context),
                 ),
-                if (!isIos) ...[
+                if (SupportPage.isAvailable) ...[
                   const SizedBox(height: 24),
                   SettingsMenuItem(
                     icon: Icons.favorite_outline,

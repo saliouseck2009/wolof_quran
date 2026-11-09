@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../core/config/localization/localization_service.dart';
 import '../../core/services/app_info_service.dart';
@@ -36,7 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final isIos = defaultTargetPlatform == TargetPlatform.iOS;
+    final showSupport = SupportPage.isAvailable;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -73,11 +72,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       Navigator.pushNamed(context, AboutPage.routeName),
                   onShowPrivacyPolicy: () =>
                       Navigator.pushNamed(context, PrivacyPolicyPage.routeName),
-                  showSupport: !isIos,
-                  onShowSupport: isIos
-                      ? null
-                      : () =>
-                            Navigator.pushNamed(context, SupportPage.routeName),
+                  showSupport: showSupport,
+                  onShowSupport: showSupport
+                      ? () =>
+                            Navigator.pushNamed(context, SupportPage.routeName)
+                      : null,
                 );
               },
             ),
