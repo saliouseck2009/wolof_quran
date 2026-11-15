@@ -159,6 +159,39 @@ void main() {
   });
 
   group('ReadingGoalsPage', () {
+    testWidgets('lays goal cards out in two columns on a tablet', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1180, 820);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final repository = _FakeRepository()
+        ..goals['a'] = goal('a', 'Premier')
+        ..goals['b'] = goal('b', 'Deuxième')
+        ..goals['c'] = goal('c', 'Troisième')
+        ..activeGoalId = 'a';
+      final cubit = ReadingGoalsCubit(
+        repository: repository,
+        today: () => today,
+        totalPages: 604,
+      );
+      addTearDown(cubit.close);
+      await cubit.load();
+
+      await tester.pumpWidget(_wrap(cubit, const ReadingGoalsPage()));
+      await tester.pumpAndSettle();
+
+      final first = tester.getRect(find.byKey(const ValueKey('a')));
+      final second = tester.getRect(find.byKey(const ValueKey('b')));
+      final third = tester.getRect(find.byKey(const ValueKey('c')));
+      expect(second.top, first.top);
+      expect(second.left, first.right + 12);
+      expect(second.width, first.width);
+      expect(third.left, first.left);
+      expect(third.top, greaterThan(first.top));
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('lists goals by phase with their status', (tester) async {
       final repository = _FakeRepository()
         ..goals['a'] = goal('a', 'Actif')

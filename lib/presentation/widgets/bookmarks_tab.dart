@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/config/theme/app_color.dart';
+import 'package:wolof_quran/core/layout/breakpoints.dart';
+import 'package:wolof_quran/core/layout/content_constraint.dart';
 import 'package:wolof_quran/core/navigation/surah_detail_arguments.dart';
 import 'package:wolof_quran/presentation/widgets/search/search_results_list.dart';
 import 'package:wolof_quran/presentation/widgets/snackbar.dart';
@@ -104,6 +106,9 @@ class BookmarksTab extends StatelessWidget {
                     // Header with clear all button
                     if (state.bookmarks.isNotEmpty)
                       Container(
+                        constraints: const BoxConstraints(
+                          maxWidth: ContentWidths.reading,
+                        ),
                         padding: const EdgeInsets.only(
                           left: 16,
                           right: 4,
@@ -154,110 +159,116 @@ class BookmarksTab extends StatelessWidget {
                         key: const PageStorageKey<String>('bookmarks-list'),
                         slivers: [
                           for (final section in sections)
-                            SliverMainAxisGroup(
-                              slivers: [
-                                SliverPersistentHeader(
-                                  pinned: true,
-                                  delegate: SurahHeaderDelegate(
-                                    accentGreen: accentGreen,
-                                    colorScheme: colorScheme,
-                                    isDark: isDark,
-                                    surahName: section.surahName,
-                                    surahNumber: section.surahNumber,
+                            SliverContentConstraint(
+                              maxWidth: ContentWidths.reading,
+                              sliver: SliverMainAxisGroup(
+                                slivers: [
+                                  SliverPersistentHeader(
+                                    pinned: true,
+                                    delegate: SurahHeaderDelegate(
+                                      accentGreen: accentGreen,
+                                      colorScheme: colorScheme,
+                                      isDark: isDark,
+                                      surahName: section.surahName,
+                                      surahNumber: section.surahNumber,
+                                    ),
+                                    // delegate: _BookmarksSurahHeaderDelegate(
+                                    //   colorScheme: colorScheme,
+                                    //   surahName: section.surahName,
+                                    //   surahNumber: section.surahNumber,
+                                    // ),
                                   ),
-                                  // delegate: _BookmarksSurahHeaderDelegate(
-                                  //   colorScheme: colorScheme,
-                                  //   surahName: section.surahName,
-                                  //   surahNumber: section.surahNumber,
-                                  // ),
-                                ),
-                                SliverList(
-                                  delegate: SliverChildBuilderDelegate((
-                                    context,
-                                    index,
-                                  ) {
-                                    final bookmark = section.bookmarks[index];
-                                    return Dismissible(
-                                      key: ValueKey<String>(bookmark.key),
-                                      direction: DismissDirection.endToStart,
-                                      dismissThresholds: const {
-                                        DismissDirection.endToStart: 0.35,
-                                      },
-                                      background: _buildDismissBackground(
-                                        context,
-                                        localizations,
-                                      ),
-                                      onDismissed: (_) => _removeBookmark(
-                                        context,
-                                        localizations,
-                                        bookmark,
-                                      ),
-                                      child: Container(
-                                        margin: const EdgeInsets.only(
-                                          bottom: 12,
+                                  SliverList(
+                                    delegate: SliverChildBuilderDelegate((
+                                      context,
+                                      index,
+                                    ) {
+                                      final bookmark = section.bookmarks[index];
+                                      return Dismissible(
+                                        key: ValueKey<String>(bookmark.key),
+                                        direction: DismissDirection.endToStart,
+                                        dismissThresholds: const {
+                                          DismissDirection.endToStart: 0.35,
+                                        },
+                                        background: _buildDismissBackground(
+                                          context,
+                                          localizations,
                                         ),
-                                        child: AyahCard(
-                                          verseNumber: bookmark.verseNumber,
-                                          arabicText: bookmark.arabicText,
-                                          translationSource:
-                                              _translationSourceName(
-                                                currentTranslation,
-                                              ),
-                                          translation: _liveTranslation(
-                                            bookmark,
-                                            currentTranslation,
+                                        onDismissed: (_) => _removeBookmark(
+                                          context,
+                                          localizations,
+                                          bookmark,
+                                        ),
+                                        child: Container(
+                                          margin: const EdgeInsets.only(
+                                            bottom: 12,
                                           ),
-                                          surahNumber: bookmark.surahNumber,
-                                          surahName: bookmark.surahName,
-                                          actions: [
-                                            AyahPlayButton(
-                                              surahNumber: bookmark.surahNumber,
-                                              ayahNumber: bookmark.verseNumber,
-                                              surahName: bookmark.surahName,
+                                          child: AyahCard(
+                                            verseNumber: bookmark.verseNumber,
+                                            arabicText: bookmark.arabicText,
+                                            translationSource:
+                                                _translationSourceName(
+                                                  currentTranslation,
+                                                ),
+                                            translation: _liveTranslation(
+                                              bookmark,
+                                              currentTranslation,
                                             ),
-                                            IconButton(
-                                              icon: Icon(
-                                                Icons.delete_outline,
-                                                color: Theme.of(
-                                                  context,
-                                                ).colorScheme.error,
+                                            surahNumber: bookmark.surahNumber,
+                                            surahName: bookmark.surahName,
+                                            actions: [
+                                              AyahPlayButton(
+                                                surahNumber:
+                                                    bookmark.surahNumber,
+                                                ayahNumber:
+                                                    bookmark.verseNumber,
+                                                surahName: bookmark.surahName,
                                               ),
-                                              tooltip: localizations.clear,
-                                              onPressed: () => _removeBookmark(
-                                                context,
-                                                localizations,
-                                                bookmark,
+                                              IconButton(
+                                                icon: Icon(
+                                                  Icons.delete_outline,
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.error,
+                                                ),
+                                                tooltip: localizations.clear,
+                                                onPressed: () =>
+                                                    _removeBookmark(
+                                                      context,
+                                                      localizations,
+                                                      bookmark,
+                                                    ),
                                               ),
-                                            ),
-                                            IconButton(
-                                              icon: Icon(
-                                                Icons.open_in_new,
-                                                color: Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurfaceVariant,
+                                              IconButton(
+                                                icon: Icon(
+                                                  Icons.open_in_new,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pushNamed(
+                                                    context,
+                                                    '/surah-detail',
+                                                    arguments:
+                                                        SurahDetailArguments(
+                                                          surahNumber: bookmark
+                                                              .surahNumber,
+                                                          initialAyahNumber:
+                                                              bookmark
+                                                                  .verseNumber,
+                                                        ),
+                                                  );
+                                                },
                                               ),
-                                              onPressed: () {
-                                                Navigator.pushNamed(
-                                                  context,
-                                                  '/surah-detail',
-                                                  arguments:
-                                                      SurahDetailArguments(
-                                                        surahNumber: bookmark
-                                                            .surahNumber,
-                                                        initialAyahNumber:
-                                                            bookmark
-                                                                .verseNumber,
-                                                      ),
-                                                );
-                                              },
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }, childCount: section.bookmarks.length),
-                                ),
-                              ],
+                                      );
+                                    }, childCount: section.bookmarks.length),
+                                  ),
+                                ],
+                              ),
                             ),
                         ],
                       ),

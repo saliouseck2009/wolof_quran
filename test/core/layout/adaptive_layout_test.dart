@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:wolof_quran/core/layout/adaptive_list.dart';
 import 'package:wolof_quran/core/layout/breakpoints.dart';
 import 'package:wolof_quran/core/layout/content_constraint.dart';
 
@@ -70,19 +71,19 @@ void main() {
   group('SliverContentConstraint', () {
     test('side padding keeps the page margin on narrow windows', () {
       expect(
-        SliverContentConstraint.sidePadding(390, maxWidth: 1100, margin: 24),
+        contentSidePadding(390, maxWidth: 1100, margin: 24),
         24,
       );
       expect(
-        SliverContentConstraint.sidePadding(820, maxWidth: 1100, margin: 24),
+        contentSidePadding(820, maxWidth: 1100, margin: 24),
         32,
       );
-      expect(SliverContentConstraint.sidePadding(390, maxWidth: 1100), 0);
+      expect(contentSidePadding(390, maxWidth: 1100), 0);
     });
 
     test('side padding centres the column on wide windows', () {
       expect(
-        SliverContentConstraint.sidePadding(1366, maxWidth: 1100, margin: 24),
+        contentSidePadding(1366, maxWidth: 1100, margin: 24),
         133,
       );
     });
@@ -109,6 +110,84 @@ void main() {
       final rect = tester.getRect(find.byKey(const Key('content')));
       expect(rect.width, 1100);
       expect(rect.left, 133);
+    });
+  });
+
+  group('AdaptiveColumns', () {
+    test('fits as many columns as the minimum item width allows', () {
+      expect(AdaptiveColumns.count(358), 1);
+      expect(AdaptiveColumns.count(691), 1);
+      expect(AdaptiveColumns.count(692), 2);
+      expect(AdaptiveColumns.count(756), 2);
+      expect(AdaptiveColumns.count(1084), 3);
+      expect(AdaptiveColumns.count(2000), 3);
+      expect(AdaptiveColumns.count(2000, maxColumns: 2), 2);
+    });
+
+    test('counts the rows, the last one possibly incomplete', () {
+      expect(AdaptiveColumns.rowCount(114, 1), 114);
+      expect(AdaptiveColumns.rowCount(114, 2), 57);
+      expect(AdaptiveColumns.rowCount(114, 3), 38);
+      expect(AdaptiveColumns.rowCount(7, 3), 3);
+      expect(AdaptiveColumns.rowCount(0, 3), 0);
+    });
+  });
+
+  group('AdaptiveListView', () {
+    Future<void> pumpList(
+      WidgetTester tester,
+      double width, {
+      int maxColumns = 3,
+    }) async {
+      tester.view.physicalSize = Size(width, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: AdaptiveListView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            maxColumns: maxColumns,
+            itemCount: 5,
+            itemBuilder: (context, index) =>
+                SizedBox(key: Key('item$index'), height: 50),
+          ),
+        ),
+      );
+    }
+
+    Rect item(WidgetTester tester, int index) =>
+        tester.getRect(find.byKey(Key('item$index')));
+
+    testWidgets('is a plain one-column list on a phone', (tester) async {
+      await pumpList(tester, 390);
+      expect(item(tester, 0), const Rect.fromLTWH(16, 8, 358, 50));
+      expect(item(tester, 1), const Rect.fromLTWH(16, 58, 358, 50));
+      expect(find.byType(Row), findsNothing);
+    });
+
+    testWidgets('fills rows in reading order on a tablet', (tester) async {
+      await pumpList(tester, 820);
+      // 32 of margin on a medium window, two columns 12 apart.
+      expect(item(tester, 0), const Rect.fromLTWH(32, 8, 372, 50));
+      expect(item(tester, 1), const Rect.fromLTWH(416, 8, 372, 50));
+      expect(item(tester, 2), const Rect.fromLTWH(32, 58, 372, 50));
+      expect(item(tester, 4).left, 32);
+    });
+
+    testWidgets('caps and centres its content on a very wide window', (
+      tester,
+    ) async {
+      await pumpList(tester, 1366);
+      expect(item(tester, 0).left, 133);
+      expect(item(tester, 2).right, 1366 - 133);
+      expect(item(tester, 3).top, 58);
+    });
+
+    testWidgets('stays one column when asked to', (tester) async {
+      await pumpList(tester, 1366, maxColumns: 1);
+      expect(item(tester, 0).width, 1100);
+      expect(item(tester, 1).top, 58);
     });
   });
 }

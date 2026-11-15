@@ -2,6 +2,23 @@ import 'package:flutter/widgets.dart';
 
 import 'breakpoints.dart';
 
+/// Side padding that centres a [maxWidth] column in [available] width.
+///
+/// [margin] is the phone margin of the screen; it grows with the window
+/// (see [pageMarginFor]) and is always kept, even when the content is
+/// narrower than [maxWidth].
+double contentSidePadding(
+  double available, {
+  double maxWidth = ContentWidths.page,
+  double margin = 0,
+}) {
+  final pageMargin = margin == 0
+      ? 0.0
+      : pageMarginFor(available, compact: margin);
+  final centring = (available - maxWidth) / 2;
+  return centring > pageMargin ? centring : pageMargin;
+}
+
 /// Centres [child] and stops it from growing wider than [maxWidth].
 ///
 /// On a phone the child fills the width as before; on a tablet it stays
@@ -33,9 +50,7 @@ class ContentConstraint extends StatelessWidget {
 /// [ContentConstraint] for slivers: pads [sliver] on both sides so its
 /// content is centred and at most [maxWidth] wide.
 ///
-/// [margin] is the phone margin of the screen; it grows with the window
-/// (see [pageMarginFor]) and is always kept, even when the content is
-/// narrower than [maxWidth].
+/// See [contentSidePadding] for [margin].
 class SliverContentConstraint extends StatelessWidget {
   final double maxWidth;
   final double margin;
@@ -48,25 +63,12 @@ class SliverContentConstraint extends StatelessWidget {
     required this.sliver,
   });
 
-  /// Side padding that centres a [maxWidth] column in [available] width.
-  static double sidePadding(
-    double available, {
-    required double maxWidth,
-    double margin = 0,
-  }) {
-    final pageMargin = margin == 0
-        ? 0.0
-        : pageMarginFor(available, compact: margin);
-    final centring = (available - maxWidth) / 2;
-    return centring > pageMargin ? centring : pageMargin;
-  }
-
   @override
   Widget build(BuildContext context) {
     return SliverLayoutBuilder(
       builder: (context, constraints) => SliverPadding(
         padding: EdgeInsets.symmetric(
-          horizontal: sidePadding(
+          horizontal: contentSidePadding(
             constraints.crossAxisExtent,
             maxWidth: maxWidth,
             margin: margin,

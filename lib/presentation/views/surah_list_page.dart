@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
+import '../../core/layout/adaptive_list.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 
@@ -104,21 +106,19 @@ class _SurahListViewState extends State<_SurahListView> {
                 // Surah List
                 state.filteredSurahs.isEmpty && state.isSearching
                     ? const SurahListNoResults()
-                    : SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate((
-                            context,
-                            index,
-                          ) {
-                            final surahNumber = state.filteredSurahs[index];
-                            return _buildSurahCard(
+                    : SliverContentConstraint(
+                        margin: 16,
+                        sliver: SliverPadding(
+                          padding: const EdgeInsets.only(top: 8, bottom: 96),
+                          sliver: SliverAdaptiveList(
+                            itemCount: state.filteredSurahs.length,
+                            itemBuilder: (context, index) => _buildSurahCard(
                               context,
-                              surahNumber,
+                              state.filteredSurahs[index],
                               state,
                               localizations,
-                            );
-                          }, childCount: state.filteredSurahs.length),
+                            ),
+                          ),
                         ),
                       ),
               ],

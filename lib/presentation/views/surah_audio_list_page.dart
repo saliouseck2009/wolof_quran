@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
 import '../../core/config/theme/app_color.dart';
+import '../../core/layout/adaptive_list.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../core/services/audio_download_queue_service.dart';
 import '../../core/services/audio_player_service.dart';
 import '../../domain/entities/reciter.dart';
@@ -276,78 +278,80 @@ class _SurahAudioListBody extends StatelessWidget {
                               playerState: playerState,
                               translation: translation,
                             ),
-                            SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(
-                                16,
-                                8,
-                                16,
-                                120,
-                              ),
-                              sliver: SliverList.builder(
-                                itemCount: 114,
-                                itemBuilder: (context, index) {
-                                  final surahNumber = index + 1;
-                                  final isDownloaded = chaptersState
-                                      .isSurahDownloaded(surahNumber);
-                                  final isAvailableRemotely =
-                                      !hasAvailabilityData ||
-                                      (remoteAvailableSet?.contains(
-                                            surahNumber,
-                                          ) ??
-                                          false);
-                                  final queueTask = queueState.taskFor(
-                                    reciter.id,
-                                    surahNumber,
-                                  );
-                                  final isDownloading =
-                                      queueTask?.status ==
-                                      QueuedAudioDownloadStatus.downloading;
-                                  final isQueued =
-                                      queueTask?.status ==
-                                      QueuedAudioDownloadStatus.queued;
-                                  final isFailed =
-                                      queueTask?.status ==
-                                      QueuedAudioDownloadStatus.failed;
-                                  final downloadProgress =
-                                      queueTask?.progress ?? 0.0;
-                                  final queuePosition = queueState
-                                      .queuedPositionFor(
-                                        reciter.id,
-                                        surahNumber,
-                                      );
-                                  final isNowPlaying =
-                                      playerState.hasActiveSurah &&
-                                      playerState.surahNumber == surahNumber &&
-                                      playerState.reciterId == reciter.id;
-
-                                  final translatedName =
-                                      QuranSettingsCubit.getSurahNameInTranslation(
-                                        surahNumber,
-                                        translation,
-                                      );
-
-                                  return _SurahTrackTile(
-                                    surahNumber: surahNumber,
-                                    surahNameArabic: quran.getSurahNameArabic(
+                            SliverContentConstraint(
+                              margin: 16,
+                              sliver: SliverPadding(
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 120,
+                                ),
+                                sliver: SliverAdaptiveList(
+                                  itemCount: 114,
+                                  itemBuilder: (context, index) {
+                                    final surahNumber = index + 1;
+                                    final isDownloaded = chaptersState
+                                        .isSurahDownloaded(surahNumber);
+                                    final isAvailableRemotely =
+                                        !hasAvailabilityData ||
+                                        (remoteAvailableSet?.contains(
+                                              surahNumber,
+                                            ) ??
+                                            false);
+                                    final queueTask = queueState.taskFor(
+                                      reciter.id,
                                       surahNumber,
-                                    ),
-                                    surahNameTranslated: translatedName,
-                                    versesCount: quran.getVerseCount(
-                                      surahNumber,
-                                    ),
-                                    isDownloaded: isDownloaded,
-                                    isDownloading: isDownloading,
-                                    isQueued: isQueued,
-                                    isFailed: isFailed,
-                                    queuePosition: queuePosition,
-                                    downloadProgress: downloadProgress,
-                                    isAvailableRemotely: isAvailableRemotely,
-                                    isNowPlaying: isNowPlaying,
-                                    playerState: playerState,
-                                    reciterId: reciter.id,
-                                    localizations: localizations,
-                                  );
-                                },
+                                    );
+                                    final isDownloading =
+                                        queueTask?.status ==
+                                        QueuedAudioDownloadStatus.downloading;
+                                    final isQueued =
+                                        queueTask?.status ==
+                                        QueuedAudioDownloadStatus.queued;
+                                    final isFailed =
+                                        queueTask?.status ==
+                                        QueuedAudioDownloadStatus.failed;
+                                    final downloadProgress =
+                                        queueTask?.progress ?? 0.0;
+                                    final queuePosition = queueState
+                                        .queuedPositionFor(
+                                          reciter.id,
+                                          surahNumber,
+                                        );
+                                    final isNowPlaying =
+                                        playerState.hasActiveSurah &&
+                                        playerState.surahNumber ==
+                                            surahNumber &&
+                                        playerState.reciterId == reciter.id;
+
+                                    final translatedName =
+                                        QuranSettingsCubit.getSurahNameInTranslation(
+                                          surahNumber,
+                                          translation,
+                                        );
+
+                                    return _SurahTrackTile(
+                                      surahNumber: surahNumber,
+                                      surahNameArabic: quran.getSurahNameArabic(
+                                        surahNumber,
+                                      ),
+                                      surahNameTranslated: translatedName,
+                                      versesCount: quran.getVerseCount(
+                                        surahNumber,
+                                      ),
+                                      isDownloaded: isDownloaded,
+                                      isDownloading: isDownloading,
+                                      isQueued: isQueued,
+                                      isFailed: isFailed,
+                                      queuePosition: queuePosition,
+                                      downloadProgress: downloadProgress,
+                                      isAvailableRemotely: isAvailableRemotely,
+                                      isNowPlaying: isNowPlaying,
+                                      playerState: playerState,
+                                      reciterId: reciter.id,
+                                      localizations: localizations,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ],

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
+import '../../../core/layout/adaptive_list.dart';
+import '../../../core/layout/content_constraint.dart';
 import '../../../domain/entities/reciter.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../blocs/reciter_chapters_bloc.dart';
@@ -176,13 +178,23 @@ class ReciterChaptersContent extends StatelessWidget {
   ) {
     return Column(
       children: [
-        ReciterChaptersSummary(
-          downloadedCount: state.downloadedSurahNumbers.length,
-          accentColor: accentGreen,
-          isDark: isDark,
+        // Lines up with the list below, which is capped and centred.
+        LayoutBuilder(
+          builder: (context, constraints) => Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal:
+                  contentSidePadding(constraints.maxWidth, margin: 16) - 16,
+            ),
+            child: ReciterChaptersSummary(
+              downloadedCount: state.downloadedSurahNumbers.length,
+              accentColor: accentGreen,
+              isDark: isDark,
+            ),
+          ),
         ),
-        ListView.builder(
+        AdaptiveListView(
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 48),
+          maxColumns: 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: 114,
