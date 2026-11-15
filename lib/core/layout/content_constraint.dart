@@ -19,6 +19,24 @@ double contentSidePadding(
   return centring > pageMargin ? centring : pageMargin;
 }
 
+/// [padding] for a scroll view as wide as the window, with its sides
+/// grown so the content is centred and at most [maxWidth] wide.
+///
+/// Capping with padding, not by shrinking the scroll view, keeps the
+/// whole width of the window scrollable.
+EdgeInsets centredPadding(
+  BuildContext context,
+  EdgeInsets padding, {
+  double maxWidth = ContentWidths.page,
+}) {
+  final side = contentSidePadding(
+    MediaQuery.sizeOf(context).width,
+    maxWidth: maxWidth,
+    margin: padding.left,
+  );
+  return padding.copyWith(left: side, right: side);
+}
+
 /// Centres [child] and stops it from growing wider than [maxWidth].
 ///
 /// On a phone the child fills the width as before; on a tablet it stays
