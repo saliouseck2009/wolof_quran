@@ -506,8 +506,12 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
                   );
                 },
               ),
-              bottomNavigationBar: _MushafBottomBar(
-                onGoalTap: _openGoalSwitcher,
+              bottomNavigationBar: ListenableBuilder(
+                listenable: _controller,
+                builder: (context, _) => _MushafBottomBar(
+                  visiblePages: _controller.visiblePages,
+                  onGoalTap: _openGoalSwitcher,
+                ),
               ),
             );
           },
@@ -964,9 +968,11 @@ class _ThemePickerSheet extends StatelessWidget {
 }
 
 class _MushafBottomBar extends StatelessWidget {
+  /// The pages on screen: two on a tablet in landscape.
+  final List<int> visiblePages;
   final VoidCallback onGoalTap;
 
-  const _MushafBottomBar({required this.onGoalTap});
+  const _MushafBottomBar({required this.visiblePages, required this.onGoalTap});
 
   @override
   Widget build(BuildContext context) {
@@ -977,6 +983,10 @@ class _MushafBottomBar extends StatelessWidget {
         final pageInfo = state.pageInfo;
         final theme = state.theme;
         final pageNumber = pageInfo?.pageNumber ?? 1;
+        // The bloc knows the page being read; the view, its neighbour.
+        final pages = visiblePages.contains(pageNumber)
+            ? visiblePages
+            : [pageNumber];
 
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
@@ -1008,7 +1018,7 @@ class _MushafBottomBar extends StatelessWidget {
                   child: Align(
                     alignment: AlignmentDirectional.centerEnd,
                     heightFactor: 1,
-                    child: _PageLabel(theme: theme, pageNumber: pageNumber),
+                    child: _PageLabel(theme: theme, pages: pages),
                   ),
                 ),
               ],
@@ -1020,12 +1030,18 @@ class _MushafBottomBar extends StatelessWidget {
   }
 }
 
-/// Page number, with a check when the page is read in the followed goal.
+/// Page number, or both numbers of a spread, with a check when every
+/// page shown is read in the followed goal.
 class _PageLabel extends StatelessWidget {
   final MushafThemeData theme;
-  final int pageNumber;
+  final List<int> pages;
 
-  const _PageLabel({required this.theme, required this.pageNumber});
+  const _PageLabel({required this.theme, required this.pages});
+
+  bool _allValidated(ReadingGoalsState state) {
+    final progress = state.activeProgress;
+    return progress != null && pages.every(progress.isValidated);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1033,11 +1049,9 @@ class _PageLabel extends StatelessWidget {
 
     return BlocBuilder<ReadingGoalsCubit, ReadingGoalsState>(
       buildWhen: (previous, current) =>
-          previous.activeProgress?.isValidated(pageNumber) !=
-          current.activeProgress?.isValidated(pageNumber),
+          _allValidated(previous) != _allValidated(current),
       builder: (context, state) {
-        final isValidated =
-            state.activeProgress?.isValidated(pageNumber) ?? false;
+        final isValidated = _allValidated(state);
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1062,7 +1076,9 @@ class _PageLabel extends StatelessWidget {
                   : const SizedBox.shrink(key: ValueKey('unvalidated')),
             ),
             Text(
-              localizations.pageNumberLabel(pageNumber),
+              pages.length > 1
+                  ? localizations.pageRangeLabel(pages.first, pages.last)
+                  : localizations.pageNumberLabel(pages.single),
               style: TextStyle(
                 color: theme.bottomBarText,
                 fontSize: 13,
