@@ -90,7 +90,7 @@ class _MushafPageView extends StatefulWidget {
 }
 
 class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
-  late final PageController _controller;
+  late final MushafViewController _controller;
   final MushafRepository _mushafRepository = MushafRepository();
   bool _didCheckLongPressHint = false;
 
@@ -108,7 +108,8 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
   @override
   void initState() {
     super.initState();
-    _controller = PageController(initialPage: widget.initialPage - 1);
+    _controller = MushafViewController(initialPage: widget.initialPage)
+      ..addListener(_handleVisiblePagesChanged);
     WakelockPlus.enable();
 
     _goalsCubit = context.read<ReadingGoalsCubit>();
@@ -197,8 +198,22 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
   // Pages, goals and sessions
   // ---------------------------------------------------------------------------
 
+  /// Two facing pages on a tablet in landscape: the tracker counts both.
+  void _handleVisiblePagesChanged() {
+    _tracker.onPageChanged(
+      _controller.page,
+      facingPages: _controller.facingPages,
+    );
+  }
+
   void _handlePageViewed(int page) {
-    _tracker.onPageChanged(page);
+    _tracker.onPageChanged(
+      page,
+      facingPages: [
+        for (final visible in _controller.visiblePages)
+          if (visible != page) visible,
+      ],
+    );
     _pageViewedDebounce?.cancel();
     _pageViewedDebounce = Timer(const Duration(milliseconds: 500), () {
       if (mounted) {
@@ -422,7 +437,7 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
             if (targetPage == null) {
               return;
             }
-            _controller.jumpToPage(targetPage - 1);
+            _controller.jumpToPage(targetPage);
           },
         ),
         BlocListener<MushafBloc, MushafState>(

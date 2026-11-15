@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/layout/breakpoints.dart';
+import '../../../core/layout/content_constraint.dart';
 import '../../cubits/audio_management_cubit.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../../cubits/surah_detail_cubit.dart';
@@ -161,13 +163,20 @@ class _SurahDetailContentState extends State<SurahDetailContent> {
           if ((widget.surahNumber != 9 && widget.surahNumber != 1) &&
               (widget.state.displayMode == AyahDisplayMode.both ||
                   widget.state.displayMode == AyahDisplayMode.arabicOnly))
-            const SurahBasmalaWidget(),
-          SurahAyahsList(
-            surahNumber: widget.surahNumber,
-            ayahs: widget.state.ayahs,
-            translationSource: widget.state.translationSource,
-            displayMode: widget.state.displayMode,
-            ayahKeys: _ayahKeys,
+            const SliverContentConstraint(
+              maxWidth: ContentWidths.reading,
+              sliver: SurahBasmalaWidget(),
+            ),
+          // A readable column: verses are not stretched across a tablet.
+          SliverContentConstraint(
+            maxWidth: ContentWidths.reading,
+            sliver: SurahAyahsList(
+              surahNumber: widget.surahNumber,
+              ayahs: widget.state.ayahs,
+              translationSource: widget.state.translationSource,
+              displayMode: widget.state.displayMode,
+              ayahKeys: _ayahKeys,
+            ),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 64)),
         ],

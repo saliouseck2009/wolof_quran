@@ -2,19 +2,130 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qcf_quran_plus/qcf_quran_plus.dart';
 
+import '../../../core/layout/breakpoints.dart';
 import '../../../core/mushaf/mushaf_page_cache.dart';
 import '../../../core/mushaf/mushaf_page_renderer.dart';
 
 typedef MushafVerseCallback = void Function(int surahNumber, int verseNumber);
 
-/// Swipeable mushaf, one page per screen.
+/// How the pages are laid out in the space given to the mushaf.
+enum MushafLayout {
+  /// One page that fits the viewport: phones and tablets in portrait.
+  single,
+
+  /// One page as wide as the viewport, scrolling vertically: a phone
+  /// held in landscape, too short to show a whole page.
+  scrolling,
+
+  /// Two facing pages, like an open mushaf: tablets in landscape.
+  spread;
+
+  /// A glyph keeps its natural proportions when a page is about this
+  /// wide for its height; wider than that, the lines are stretched.
+  static const double pageAspectRatio = 0.72;
+
+  /// Below this height two facing pages have lines too thin to read.
+  static const double minSpreadHeight = 480;
+
+  static MushafLayout of(Size viewport) {
+    if (viewport.width <= viewport.height) {
+      return MushafLayout.single;
+    }
+    if (viewport.width >= Breakpoints.expanded &&
+        viewport.height >= minSpreadHeight) {
+      return MushafLayout.spread;
+    }
+    return MushafLayout.scrolling;
+  }
+
+  /// Logical size of one rendered page in a [viewport].
+  Size pageSize(Size viewport) {
+    switch (this) {
+      case MushafLayout.single:
+        final width = viewport.height * pageAspectRatio;
+        return Size(
+          width < viewport.width ? width : viewport.width,
+          viewport.height,
+        );
+      case MushafLayout.scrolling:
+        // The page keeps portrait proportions and scrolls.
+        return Size(viewport.width, viewport.width);
+      case MushafLayout.spread:
+        final half = (viewport.width - MushafPageView.spineWidth) / 2;
+        final width = viewport.height * pageAspectRatio;
+        return Size(width < half ? width : half, viewport.height);
+    }
+  }
+
+  int get pagesPerView => this == MushafLayout.spread ? 2 : 1;
+
+  /// Index, in the swipeable view, of the screen showing [page].
+  int indexOf(int page) => (page - 1) ~/ pagesPerView;
+
+  /// Pages shown at [index], in reading order.
+  List<int> pagesAt(int index) => [
+    for (var i = 0; i < pagesPerView; i++) index * pagesPerView + i + 1,
+  ];
+}
+
+/// Drives a [MushafPageView] in page numbers, whatever its layout.
+///
+/// [page] is the page being read; [visiblePages] also holds the facing
+/// page when two are shown. Listeners are told when either changes.
+class MushafViewController extends ChangeNotifier {
+  MushafViewController({required int initialPage})
+    : _page = initialPage,
+      _visiblePages = [initialPage];
+
+  int _page;
+  List<int> _visiblePages;
+  void Function(int page)? _jump;
+
+  int get page => _page;
+
+  /// The pages on screen, in reading order.
+  List<int> get visiblePages => List.unmodifiable(_visiblePages);
+
+  /// The visible pages other than [page].
+  List<int> get facingPages => [
+    for (final visible in _visiblePages)
+      if (visible != _page) visible,
+  ];
+
+  void jumpToPage(int page) {
+    final jump = _jump;
+    if (jump == null) {
+      _page = page;
+      _visiblePages = [page];
+      return;
+    }
+    jump(page);
+  }
+
+  void _update(int page, List<int> visiblePages) {
+    if (page == _page && listEquals(visiblePages, _visiblePages)) {
+      return;
+    }
+    _page = page;
+    _visiblePages = visiblePages;
+    notifyListeners();
+  }
+}
+
+/// Swipeable mushaf: one page per screen, or two facing pages on a
+/// tablet in landscape (see [MushafLayout]).
 ///
 /// Each page is rendered once into a GPU image by [MushafPageRenderer]
 /// (text shaping, stretching and tajweed colouring included), so a swipe
-/// only translates two textures. The previous and next pages are rendered
-/// ahead of the swipe and a few more are kept in [MushafPageCache].
+/// only translates textures. The previous and next screens are rendered
+/// ahead of the swipe and a few more pages are kept in [MushafPageCache].
 class MushafPageView extends StatefulWidget {
-  final PageController controller;
+  /// Gap between two facing pages, with the fold line in its middle.
+  static const double spineWidth = 17;
+
+  final MushafViewController controller;
+
+  /// Called with the page being read when a swipe or a jump changes it.
   final ValueChanged<int>? onPageChanged;
   final MushafVerseCallback? onLongPress;
   final Color pageBackgroundColor;
@@ -42,22 +153,86 @@ class MushafPageView extends StatefulWidget {
 class _MushafPageViewState extends State<MushafPageView> {
   final _cache = MushafPageCache();
 
+  /// The swipe controller of the current layout: its index counts pages
+  /// or spreads, so it is replaced when the layout changes.
+  PageController? _pageController;
+  MushafLayout? _layout;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller._jump = _jumpToPage;
+  }
+
+  @override
+  void didUpdateWidget(covariant MushafPageView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller._jump = null;
+      widget.controller._jump = _jumpToPage;
+    }
+  }
+
   @override
   void dispose() {
+    widget.controller._jump = null;
+    _pageController?.dispose();
     _cache.clear();
     super.dispose();
   }
 
+  /// The swipe controller for [layout], opened on the page being read.
+  PageController _controllerFor(MushafLayout layout) {
+    final current = _pageController;
+    if (current != null && _layout == layout) {
+      return current;
+    }
+    final page = widget.controller.page;
+    final index = layout.indexOf(page);
+    _layout = layout;
+    final created = _pageController = PageController(initialPage: index);
+    // Rotating keeps the page being read; only its neighbour changes.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      current?.dispose();
+      if (mounted && _layout == layout) {
+        widget.controller._update(page, layout.pagesAt(index));
+      }
+    });
+    return created;
+  }
+
+  void _jumpToPage(int page) {
+    final layout = _layout;
+    final pageController = _pageController;
+    if (layout == null || pageController == null) {
+      widget.controller._update(page, [page]);
+      return;
+    }
+    final index = layout.indexOf(page);
+    // Set first: the swipe callback then sees the target is on screen
+    // and keeps it, instead of falling back to the first page shown.
+    widget.controller._update(page, layout.pagesAt(index));
+    if (pageController.hasClients) {
+      pageController.jumpToPage(index);
+    }
+  }
+
+  void _onIndexChanged(int index) {
+    final layout = _layout;
+    if (layout == null) {
+      return;
+    }
+    final pages = layout.pagesAt(index);
+    final current = widget.controller.page;
+    final page = pages.contains(current) ? current : pages.first;
+    widget.controller._update(page, pages);
+    widget.onPageChanged?.call(page);
+  }
+
   MushafPageSpec _specFor(int page, Size size, double devicePixelRatio) {
-    final orientation = size.width > size.height
-        ? Orientation.landscape
-        : Orientation.portrait;
     return MushafPageSpec(
       page: page,
-      // In landscape the page keeps its portrait proportions and scrolls.
-      size: orientation == Orientation.portrait
-          ? size
-          : Size(size.width, size.width),
+      size: size,
       devicePixelRatio: devicePixelRatio,
       backgroundColor: widget.pageBackgroundColor,
       verseColor: widget.verseColor,
@@ -76,22 +251,77 @@ class _MushafPageViewState extends State<MushafPageView> {
         color: widget.pageBackgroundColor,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final size = constraints.biggest;
+            final viewport = constraints.biggest;
+            final layout = MushafLayout.of(viewport);
+            final pageSize = layout.pageSize(viewport);
+            final pageController = _controllerFor(layout);
+
+            Widget pageAt(int page) => _MushafPage(
+              key: ValueKey('mushaf_page_$page'),
+              cache: _cache,
+              controller: pageController,
+              spec: _specFor(page, pageSize, devicePixelRatio),
+              scrolls: layout == MushafLayout.scrolling,
+              onLongPress: widget.onLongPress,
+            );
+
             return PageView.builder(
-              controller: widget.controller,
-              // Builds, hence renders, the previous and next pages ahead.
+              // A new layout counts its screens differently.
+              key: ValueKey(layout),
+              controller: pageController,
+              // Builds, hence renders, the previous and next screens ahead.
               allowImplicitScrolling: true,
-              itemCount: totalPagesCount,
-              onPageChanged: (index) => widget.onPageChanged?.call(index + 1),
-              itemBuilder: (context, index) => _MushafPage(
-                key: ValueKey('mushaf_page_${index + 1}'),
-                cache: _cache,
-                controller: widget.controller,
-                spec: _specFor(index + 1, size, devicePixelRatio),
-                onLongPress: widget.onLongPress,
-              ),
+              itemCount: (totalPagesCount / layout.pagesPerView).ceil(),
+              onPageChanged: _onIndexChanged,
+              itemBuilder: (context, index) {
+                final pages = layout.pagesAt(index);
+                if (pages.length == 1) {
+                  return Center(
+                    child: SizedBox(
+                      width: pageSize.width,
+                      child: pageAt(pages.single),
+                    ),
+                  );
+                }
+                // Right to left, like the book: the first page of the
+                // spread is on the right.
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(width: pageSize.width, child: pageAt(pages[0])),
+                    _Spine(color: widget.verseColor),
+                    if (pages[1] <= totalPagesCount)
+                      SizedBox(width: pageSize.width, child: pageAt(pages[1]))
+                    else
+                      SizedBox(width: pageSize.width),
+                  ],
+                );
+              },
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+/// The fold between two facing pages.
+class _Spine extends StatelessWidget {
+  final Color color;
+
+  const _Spine({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MushafPageView.spineWidth,
+      child: Center(
+        child: FractionallySizedBox(
+          heightFactor: 0.94,
+          child: ColoredBox(
+            color: color.withValues(alpha: 0.12),
+            child: const SizedBox(width: 1),
+          ),
         ),
       ),
     );
@@ -107,6 +337,9 @@ class _MushafPage extends StatefulWidget {
   final MushafPageCache cache;
   final PageController controller;
   final MushafPageSpec spec;
+
+  /// Whether the page is taller than the viewport and scrolls.
+  final bool scrolls;
   final MushafVerseCallback? onLongPress;
 
   const _MushafPage({
@@ -114,6 +347,7 @@ class _MushafPage extends StatefulWidget {
     required this.cache,
     required this.controller,
     required this.spec,
+    required this.scrolls,
     required this.onLongPress,
   });
 
@@ -213,9 +447,6 @@ class _MushafPageState extends State<_MushafPage> {
         filterQuality: FilterQuality.none,
       ),
     );
-    final viewportHeight = MediaQuery.sizeOf(context).height;
-    return widget.spec.size.height > viewportHeight
-        ? SingleChildScrollView(child: page)
-        : page;
+    return widget.scrolls ? SingleChildScrollView(child: page) : page;
   }
 }
