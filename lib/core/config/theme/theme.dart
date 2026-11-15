@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 
+import "../../layout/breakpoints.dart";
 import "app_color.dart";
 
 class MaterialTheme {
@@ -239,6 +240,8 @@ class MaterialTheme {
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: colorScheme.surface,
         modalBackgroundColor: colorScheme.surface,
+        // On a tablet a sheet stays a centred column, not a full-width band.
+        constraints: const BoxConstraints(maxWidth: ContentWidths.sheet),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
