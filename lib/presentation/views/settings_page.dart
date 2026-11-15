@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/layout/breakpoints.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../core/config/localization/localization_service.dart';
 import '../../core/services/app_info_service.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -56,7 +58,11 @@ class _SettingsPageState extends State<SettingsPage> {
         scrolledUnderElevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: centredPadding(
+          context,
+          const EdgeInsets.all(16),
+          maxWidth: ContentWidths.form,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

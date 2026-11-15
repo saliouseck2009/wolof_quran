@@ -8,6 +8,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/layout/breakpoints.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../core/config/app_links.dart';
 import '../../data/datasources/remote_config_service.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -100,7 +102,11 @@ class SupportPage extends StatelessWidget {
                     ? colorScheme.surfaceContainerLow
                     : primary.withValues(alpha: 0.04),
               ),
-              padding: const EdgeInsets.fromLTRB(28, 32, 28, 28),
+              padding: centredPadding(
+                context,
+                const EdgeInsets.fromLTRB(28, 32, 28, 28),
+                maxWidth: ContentWidths.form,
+              ),
               child: Column(
                 children: [
                   // Support icon
@@ -148,7 +154,11 @@ class SupportPage extends StatelessWidget {
 
             // ── Payment methods ──
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+              padding: centredPadding(
+                context,
+                const EdgeInsets.fromLTRB(20, 24, 20, 32),
+                maxWidth: ContentWidths.form,
+              ),
               child: Column(
                 children: [
                   // Wave card
@@ -270,7 +280,11 @@ class _IosWebSupportView extends StatelessWidget {
                     ? colorScheme.surfaceContainerLow
                     : primary.withValues(alpha: 0.04),
               ),
-              padding: const EdgeInsets.fromLTRB(28, 32, 28, 28),
+              padding: centredPadding(
+                context,
+                const EdgeInsets.fromLTRB(28, 32, 28, 28),
+                maxWidth: ContentWidths.form,
+              ),
               child: Column(
                 children: [
                   Container(
@@ -311,7 +325,11 @@ class _IosWebSupportView extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+              padding: centredPadding(
+                context,
+                const EdgeInsets.fromLTRB(20, 24, 20, 32),
+                maxWidth: ContentWidths.form,
+              ),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
@@ -409,7 +427,11 @@ class _SupportUnavailableOnIosView extends StatelessWidget {
         scrolledUnderElevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: centredPadding(
+          context,
+          const EdgeInsets.all(20),
+          maxWidth: ContentWidths.form,
+        ),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.all(20),
@@ -599,7 +621,11 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: centredPadding(
+            context,
+            const EdgeInsets.all(24),
+            maxWidth: ContentWidths.form,
+          ),
           child: _thanked
               ? _ThankYouView(
                   onShare: () => Share.share(

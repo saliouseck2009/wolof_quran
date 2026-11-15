@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/layout/breakpoints.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/reciter_cubit.dart';
@@ -63,7 +65,11 @@ class _QuranSettingsView extends StatelessWidget {
       body: BlocBuilder<QuranSettingsCubit, QuranSettingsState>(
         builder: (context, state) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: centredPadding(
+              context,
+              const EdgeInsets.all(16),
+              maxWidth: ContentWidths.form,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

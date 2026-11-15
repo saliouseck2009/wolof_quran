@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/layout/breakpoints.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../l10n/generated/app_localizations.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
@@ -52,7 +54,11 @@ class PrivacyPolicyPage extends StatelessWidget {
         scrolledUnderElevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        padding: centredPadding(
+          context,
+          const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          maxWidth: ContentWidths.reading,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
