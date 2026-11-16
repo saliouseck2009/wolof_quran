@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -6,13 +5,12 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ffmpeg_kit_flutter_new_min_gpl/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/config/app_links.dart';
+import '../../core/services/verse_video_builder.dart';
 import 'package:wolof_quran/core/mushaf/mushaf_theme.dart';
 import 'package:wolof_quran/core/utils/constants/constants.dart';
 import '../../domain/entities/ayah_audio.dart';
@@ -850,19 +848,12 @@ class _DailyInspirationShareModalState
     final outputPath =
         '${tempDir.path}/chapter_${widget.surahNumber}_verse_${widget.verseNumber}_$timestamp.mp4';
 
-    final command =
-        '-y -loop 1 -i "$imagePath" -i "$audioPath" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(1080-iw)/2:(1920-ih)/2,format=yuv420p" -c:v libx264 -preset veryfast -tune stillimage -c:a aac -b:a 192k -shortest "$outputPath"';
-
-    final session = await FFmpegKit.execute(command);
-    final returnCode = await session.getReturnCode();
-
-    if (!ReturnCode.isSuccess(returnCode)) {
-      final output = await session.getOutput();
-      log('FFmpeg command failed with output: $output');
-      return null;
-    }
-
-    return outputPath;
+    final result = await VerseVideoBuilder().build(
+      segments: [VerseVideoSegment(imagePath: imagePath, audioPath: audioPath)],
+      workDir: tempDir,
+      outputPath: outputPath,
+    );
+    return result.path;
   }
 
   void _showMessage(String message) {
