@@ -1,0 +1,172 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:wolof_quran/core/config/seasonal_theme_config.dart';
+import 'package:wolof_quran/core/config/theme/seasonal_theme.dart';
+import 'package:wolof_quran/core/config/theme/theme.dart';
+import 'package:wolof_quran/l10n/generated/app_localizations.dart';
+import 'package:wolof_quran/presentation/cubits/seasonal_theme_cubit.dart';
+import 'package:wolof_quran/presentation/widgets/seasonal/ramadan_banner.dart';
+import 'package:wolof_quran/presentation/widgets/settings/seasonal_theme_settings_item.dart';
+
+import '../../support/fake_seasonal_theme_repository.dart';
+
+/// An app whose theme follows [cubit], like the real one.
+Widget _app({
+  required SeasonalThemeCubit cubit,
+  required Widget child,
+  Locale locale = const Locale('fr'),
+}) {
+  return BlocProvider.value(
+    value: cubit,
+    child: BlocBuilder<SeasonalThemeCubit, SeasonalThemeState>(
+      builder: (context, state) => MaterialApp(
+        locale: locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: MaterialTheme(season: state.active).light(),
+        home: Scaffold(body: SingleChildScrollView(child: child)),
+      ),
+    ),
+  );
+}
+
+void main() {
+  late FakeSeasonalThemeRepository repository;
+
+  SeasonalThemeCubit createCubit({
+    SeasonalThemeConfig config = FakeSeasonalThemeRepository.ramadanOn,
+  }) {
+    repository = FakeSeasonalThemeRepository(config: config);
+    final cubit = SeasonalThemeCubit(repository: repository);
+    addTearDown(cubit.close);
+    return cubit;
+  }
+
+  group('RamadanBanner', () {
+    testWidgets('greets during Ramadan', (tester) async {
+      await tester.pumpWidget(
+        _app(cubit: createCubit(), child: const RamadanBanner()),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ramadan Moubarak'), findsOneWidget);
+      expect(find.text('Le mois du Coran'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('Ramadan Moubarak. Le mois du Coran'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('takes no room out of season', (tester) async {
+      await tester.pumpWidget(
+        _app(
+          cubit: createCubit(config: SeasonalThemeConfig.disabled),
+          child: const RamadanBanner(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Ramadan Moubarak'), findsNothing);
+      expect(tester.getSize(find.byType(RamadanBanner)).height, 0);
+    });
+
+    testWidgets('appears and leaves with the remote switch', (tester) async {
+      final cubit = createCubit(config: SeasonalThemeConfig.disabled);
+      await tester.pumpWidget(_app(cubit: cubit, child: const RamadanBanner()));
+      await tester.pumpAndSettle();
+      expect(find.text('Ramadan Moubarak'), findsNothing);
+
+      repository.push(FakeSeasonalThemeRepository.ramadanOn);
+      await tester.pumpAndSettle();
+      expect(find.text('Ramadan Moubarak'), findsOneWidget);
+
+      repository.push(SeasonalThemeConfig.disabled);
+      await tester.pumpAndSettle();
+      expect(find.text('Ramadan Moubarak'), findsNothing);
+    });
+
+    testWidgets('fits a small phone with enlarged text, in Arabic too', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(320 * 3, 640 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      for (final locale in const [Locale('fr'), Locale('en'), Locale('ar')]) {
+        await tester.pumpWidget(
+          _app(
+            cubit: createCubit(),
+            locale: locale,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24),
+              child: RamadanBanner(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull, reason: '$locale');
+      }
+    });
+  });
+
+  group('SeasonalThemeSettingsItem', () {
+    testWidgets('is hidden out of season', (tester) async {
+      await tester.pumpWidget(
+        _app(
+          cubit: createCubit(config: SeasonalThemeConfig.disabled),
+          child: const SeasonalThemeSettingsItem(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Thème Ramadan'), findsNothing);
+      expect(tester.getSize(find.byType(SeasonalThemeSettingsItem)).height, 0);
+    });
+
+    testWidgets('lets the user leave and come back to the Ramadan look', (
+      tester,
+    ) async {
+      final cubit = createCubit();
+      await tester.pumpWidget(
+        _app(cubit: cubit, child: const SeasonalThemeSettingsItem()),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Activé'), findsOneWidget);
+      expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+      expect(
+        SeasonalTheme.of(tester.element(find.byType(Scaffold))),
+        SeasonalTheme.ramadan,
+      );
+
+      await tester.tap(find.text('Thème Ramadan'));
+      await tester.pumpAndSettle();
+
+      expect(cubit.state.active, SeasonalTheme.none);
+      expect(repository.disabledByUser, {SeasonalTheme.ramadan});
+      // The standard theme is back, the switch stays to come back.
+      expect(
+        SeasonalTheme.of(tester.element(find.byType(Scaffold))),
+        SeasonalTheme.none,
+      );
+      expect(find.text('Désactivé'), findsOneWidget);
+      expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
+
+      // A tap on the switch goes through it to the row, which toggles.
+      await tester.tap(find.byType(Switch), warnIfMissed: false);
+      await tester.pumpAndSettle();
+
+      expect(cubit.state.active, SeasonalTheme.ramadan);
+      expect(repository.disabledByUser, isEmpty);
+    });
+  });
+}

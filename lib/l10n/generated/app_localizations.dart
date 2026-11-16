@@ -3195,6 +3195,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Another verse'**
   String get anotherVerse;
+
+  /// Greeting on the home banner shown during Ramadan
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan Mubarak'**
+  String get ramadanGreeting;
+
+  /// Line under the Ramadan greeting on the home banner
+  ///
+  /// In en, this message translates to:
+  /// **'The month of the Quran'**
+  String get ramadanTagline;
+
+  /// Settings switch shown during Ramadan to keep or leave the seasonal look
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan theme'**
+  String get ramadanTheme;
+
+  /// Explains the Ramadan theme switch in the settings
+  ///
+  /// In en, this message translates to:
+  /// **'Dress the app in the colors of Ramadan'**
+  String get ramadanThemeSubtitle;
 }
 
 class _AppLocalizationsDelegate

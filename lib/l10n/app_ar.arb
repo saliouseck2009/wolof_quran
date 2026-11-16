@@ -534,5 +534,9 @@
   "ongoingGoalsCount": "{count, plural, =1{هدف واحد جارٍ} =2{هدفان جاريان} few{{count} أهداف جارية} other{{count} هدفًا جاريًا}}",
   "verseOfTheDay": "آية اليوم",
   "listenAction": "استمع",
-  "anotherVerse": "آية أخرى"
+  "anotherVerse": "آية أخرى",
+  "ramadanGreeting": "رمضان مبارك",
+  "ramadanTagline": "شهر القرآن",
+  "ramadanTheme": "مظهر رمضان",
+  "ramadanThemeSubtitle": "تزيين التطبيق بألوان رمضان"
 }

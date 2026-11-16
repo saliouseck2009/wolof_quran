@@ -1911,4 +1911,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get anotherVerse => 'Another verse';
+
+  @override
+  String get ramadanGreeting => 'Ramadan Mubarak';
+
+  @override
+  String get ramadanTagline => 'The month of the Quran';
+
+  @override
+  String get ramadanTheme => 'Ramadan theme';
+
+  @override
+  String get ramadanThemeSubtitle => 'Dress the app in the colors of Ramadan';
 }

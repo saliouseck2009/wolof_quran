@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../core/config/theme/app_color.dart';
 import '../cubits/search_cubit.dart';
 import '../cubits/bookmark_cubit.dart' as bookmark_cubit;
 import '../widgets/bookmarks_tab.dart';
@@ -83,9 +83,7 @@ class _SearchViewState extends State<SearchView> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.brightness == Brightness.dark
-          ? AppColor.surfaceDark
-          : colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       body: IndexedStack(
         index: _currentIndex,
         children: [_buildSearchTab(localizations, colorScheme), BookmarksTab()],
@@ -224,12 +222,36 @@ class _SearchHeader extends StatelessWidget {
   final AppLocalizations localizations;
   final Widget Function(bool isCollapsed) searchBarBuilder;
 
+  Color get _background => colorScheme.brightness == Brightness.dark
+      ? colorScheme.surface
+      : colorScheme.primary;
+
+  /// This header stands in for an app bar, so it sets the status bar icons
+  /// the way an app bar does: the style of the theme when it forces one,
+  /// otherwise the icons that read on the header color.
   @override
   Widget build(BuildContext context) {
+    final onDarkHeader =
+        ThemeData.estimateBrightnessForColor(_background) == Brightness.dark;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value:
+          Theme.of(context).appBarTheme.systemOverlayStyle ??
+          SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarBrightness: onDarkHeader
+                ? Brightness.dark
+                : Brightness.light,
+            statusBarIconBrightness: onDarkHeader
+                ? Brightness.light
+                : Brightness.dark,
+          ),
+      child: _buildHeader(context),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
     return Container(
-      color: colorScheme.brightness == Brightness.dark
-          ? AppColor.surfaceDark
-          : colorScheme.primary,
+      color: _background,
       child: SafeArea(
         bottom: false,
         child: Column(

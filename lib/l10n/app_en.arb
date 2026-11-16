@@ -2140,5 +2140,13 @@
   "listenAction": "Listen",
   "@listenAction": {"description": "Short button label that plays a verse"},
   "anotherVerse": "Another verse",
-  "@anotherVerse": {"description": "Tooltip of the button that draws another verse of the day"}
+  "@anotherVerse": {"description": "Tooltip of the button that draws another verse of the day"},
+  "ramadanGreeting": "Ramadan Mubarak",
+  "@ramadanGreeting": {"description": "Greeting on the home banner shown during Ramadan"},
+  "ramadanTagline": "The month of the Quran",
+  "@ramadanTagline": {"description": "Line under the Ramadan greeting on the home banner"},
+  "ramadanTheme": "Ramadan theme",
+  "@ramadanTheme": {"description": "Settings switch shown during Ramadan to keep or leave the seasonal look"},
+  "ramadanThemeSubtitle": "Dress the app in the colors of Ramadan",
+  "@ramadanThemeSubtitle": {"description": "Explains the Ramadan theme switch in the settings"}
 }

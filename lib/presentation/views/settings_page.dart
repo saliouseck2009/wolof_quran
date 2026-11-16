@@ -9,6 +9,7 @@ import 'privacy_policy_page.dart';
 import 'support_page.dart';
 import '../cubits/language_cubit.dart';
 import '../cubits/theme_cubit.dart';
+import '../widgets/settings/seasonal_theme_settings_item.dart';
 import '../widgets/settings/settings_choice_menu_item.dart';
 import '../widgets/settings/settings_header.dart';
 import '../widgets/settings/settings_menu_item.dart';
@@ -158,6 +159,7 @@ class _SettingsMenu extends StatelessWidget {
           ],
           onSelected: themeCubit.changeTheme,
         ),
+        const SeasonalThemeSettingsItem(),
         const SizedBox(height: 16),
         SettingsMenuItem(
           icon: Icons.settings_applications,

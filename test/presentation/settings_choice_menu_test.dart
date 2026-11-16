@@ -5,10 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wolof_quran/l10n/generated/app_localizations.dart';
 import 'package:wolof_quran/presentation/cubits/language_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/seasonal_theme_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/theme_cubit.dart';
 import 'package:wolof_quran/presentation/views/settings_page.dart';
 import 'package:wolof_quran/presentation/widgets/settings/settings_choice_menu_item.dart';
 import 'package:wolof_quran/presentation/widgets/settings/settings_menu_item.dart';
+
+import '../support/fake_seasonal_theme_repository.dart';
 
 void main() {
   group('SettingsChoiceMenuItem', () {
@@ -67,9 +70,7 @@ void main() {
           .inflate(6); // the menu padding
     }
 
-    testWidgets('opens under the row, aligned on its end edge', (
-      tester,
-    ) async {
+    testWidgets('opens under the row, aligned on its end edge', (tester) async {
       await pumpItem(tester);
       await tester.tap(find.text('Langue'));
       await tester.pumpAndSettle();
@@ -141,14 +142,19 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       final languageCubit = LanguageCubit();
       final themeCubit = ThemeCubit();
+      final seasonalThemeCubit = SeasonalThemeCubit(
+        repository: FakeSeasonalThemeRepository(),
+      );
       addTearDown(languageCubit.close);
       addTearDown(themeCubit.close);
+      addTearDown(seasonalThemeCubit.close);
 
       await tester.pumpWidget(
         MultiBlocProvider(
           providers: [
             BlocProvider.value(value: languageCubit),
             BlocProvider.value(value: themeCubit),
+            BlocProvider.value(value: seasonalThemeCubit),
           ],
           child: MaterialApp(
             locale: const Locale('fr'),

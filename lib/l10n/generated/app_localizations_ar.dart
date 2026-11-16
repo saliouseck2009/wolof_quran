@@ -1935,4 +1935,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get anotherVerse => 'آية أخرى';
+
+  @override
+  String get ramadanGreeting => 'رمضان مبارك';
+
+  @override
+  String get ramadanTagline => 'شهر القرآن';
+
+  @override
+  String get ramadanTheme => 'مظهر رمضان';
+
+  @override
+  String get ramadanThemeSubtitle => 'تزيين التطبيق بألوان رمضان';
 }

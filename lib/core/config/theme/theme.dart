@@ -2,9 +2,16 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 
 import "app_color.dart";
+import "ramadan_color.dart";
+import "seasonal_theme.dart";
 
+/// Builds the app themes. Out of season it is the standard teal and gold
+/// look; a [season] swaps the palette and adds its [SeasonalDecor], the
+/// component styles stay the same.
 class MaterialTheme {
-  const MaterialTheme();
+  final SeasonalTheme season;
+
+  const MaterialTheme({this.season = SeasonalTheme.none});
 
   static final ColorScheme _lightScheme = ColorScheme(
     brightness: Brightness.light,
@@ -30,7 +37,9 @@ class MaterialTheme {
     surfaceContainerLow: AppColor.surfaceContainerLight.withValues(alpha: 0.5),
     surfaceContainer: AppColor.surfaceContainerLight,
     surfaceContainerHigh: AppColor.surfaceContainerLight,
-    surfaceContainerHighest: AppColor.surfaceContainerLight.withValues(alpha: 0.8), // Slightly distinct
+    surfaceContainerHighest: AppColor.surfaceContainerLight.withValues(
+      alpha: 0.8,
+    ), // Slightly distinct
     outline: AppColor.outlineLight,
   );
 
@@ -62,11 +71,86 @@ class MaterialTheme {
     outline: AppColor.outlineDark,
   );
 
-  ThemeData light() => _theme(_lightScheme);
+  static final ColorScheme _ramadanLightScheme = ColorScheme(
+    brightness: Brightness.light,
+    primary: RamadanColor.primary,
+    onPrimary: RamadanColor.onPrimary,
+    primaryContainer: RamadanColor.primaryContainer,
+    onPrimaryContainer: RamadanColor.onPrimaryContainer,
+    secondary: RamadanColor.secondary,
+    onSecondary: RamadanColor.onSecondary,
+    secondaryContainer: RamadanColor.secondaryContainer,
+    onSecondaryContainer: RamadanColor.onSecondaryContainer,
+    tertiary: RamadanColor.tertiary,
+    onTertiary: RamadanColor.onTertiary,
+    tertiaryContainer: RamadanColor.tertiaryContainer,
+    onTertiaryContainer: RamadanColor.onTertiaryContainer,
+    error: AppColor.error,
+    onError: AppColor.onError,
+    errorContainer: AppColor.errorContainer,
+    onErrorContainer: AppColor.onErrorContainer,
+    surface: RamadanColor.surfaceLight,
+    onSurface: RamadanColor.onSurfaceLight,
+    surfaceContainerLowest: RamadanColor.surfaceLight,
+    surfaceContainerLow: RamadanColor.surfaceContainerLight.withValues(
+      alpha: 0.5,
+    ),
+    surfaceContainer: RamadanColor.surfaceContainerLight,
+    surfaceContainerHigh: RamadanColor.surfaceContainerLight,
+    surfaceContainerHighest: RamadanColor.surfaceContainerLight.withValues(
+      alpha: 0.8,
+    ),
+    outline: RamadanColor.outlineLight,
+  );
 
-  ThemeData dark() => _theme(_darkScheme);
+  static final ColorScheme _ramadanDarkScheme = ColorScheme(
+    brightness: Brightness.dark,
+    primary: RamadanColor.primaryDark,
+    onPrimary: RamadanColor.onPrimary,
+    primaryContainer: RamadanColor.primaryContainer,
+    onPrimaryContainer: RamadanColor.onPrimaryContainer,
+    secondary: RamadanColor.secondaryDark,
+    onSecondary: RamadanColor.onSecondary,
+    secondaryContainer: RamadanColor.secondaryContainer,
+    onSecondaryContainer: RamadanColor.onSecondaryContainer,
+    tertiary: RamadanColor.tertiaryDark,
+    onTertiary: RamadanColor.onTertiaryDark,
+    tertiaryContainer: RamadanColor.tertiaryContainer,
+    onTertiaryContainer: RamadanColor.onTertiaryContainer,
+    error: AppColor.error,
+    onError: AppColor.onError,
+    errorContainer: AppColor.errorContainer,
+    onErrorContainer: AppColor.onErrorContainer,
+    surface: RamadanColor.surfaceDark,
+    onSurface: RamadanColor.onSurfaceDark,
+    surfaceContainerLowest: RamadanColor.surfaceDark,
+    surfaceContainerLow: RamadanColor.surfaceContainerLowDark,
+    surfaceContainer: RamadanColor.surfaceContainerDark,
+    surfaceContainerHigh: RamadanColor.surfaceContainerHighDark,
+    surfaceContainerHighest: RamadanColor.surfaceContainerHighestDark,
+    outline: RamadanColor.outlineDark,
+  );
 
-  static ThemeData _theme(ColorScheme colorScheme) {
+  static const SeasonalDecor _ramadanDecor = SeasonalDecor(
+    season: SeasonalTheme.ramadan,
+    skyStart: RamadanColor.skyStart,
+    skyEnd: RamadanColor.skyEnd,
+    ornament: RamadanColor.ornament,
+    glow: RamadanColor.glow,
+    onSky: RamadanColor.onSky,
+  );
+
+  ThemeData light() => switch (season) {
+    SeasonalTheme.none => _theme(_lightScheme),
+    SeasonalTheme.ramadan => _theme(_ramadanLightScheme, _ramadanDecor),
+  };
+
+  ThemeData dark() => switch (season) {
+    SeasonalTheme.none => _theme(_darkScheme),
+    SeasonalTheme.ramadan => _theme(_ramadanDarkScheme, _ramadanDecor),
+  };
+
+  static ThemeData _theme(ColorScheme colorScheme, [SeasonalDecor? decor]) {
     final isDark = colorScheme.brightness == Brightness.dark;
     final baseTextTheme = ThemeData(
       brightness: colorScheme.brightness,
@@ -114,6 +198,7 @@ class MaterialTheme {
       useMaterial3: true,
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
+      extensions: [?decor],
       fontFamily: "Poppins",
       textTheme: textTheme,
       scaffoldBackgroundColor: colorScheme.surface,
@@ -127,12 +212,15 @@ class MaterialTheme {
           color: colorScheme.onSurface,
           fontWeight: FontWeight.w600,
         ),
-        systemOverlayStyle: isDark
+        // The seasonal app bars are much darker than the standard ones:
+        // without a forced style each bar picks the status bar icons that
+        // read on its own color.
+        systemOverlayStyle: decor != null
+            ? null
+            : isDark
             ? SystemUiOverlayStyle.light
             : SystemUiOverlayStyle.dark,
-        iconTheme: IconThemeData(
-          color: colorScheme.onSurface,
-        ),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
       cardTheme: CardThemeData(
         color: colorScheme.surfaceContainerHighest,
@@ -245,7 +333,9 @@ class MaterialTheme {
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: colorScheme.surface,
-        titleTextStyle: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+        ),
         contentTextStyle: textTheme.bodyMedium,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),

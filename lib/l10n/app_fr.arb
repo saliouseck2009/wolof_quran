@@ -525,5 +525,9 @@
   "ongoingGoalsCount": "{count, plural, =1{1 en cours} other{{count} en cours}}",
   "verseOfTheDay": "Verset du jour",
   "listenAction": "Écouter",
-  "anotherVerse": "Autre verset"
+  "anotherVerse": "Autre verset",
+  "ramadanGreeting": "Ramadan Moubarak",
+  "ramadanTagline": "Le mois du Coran",
+  "ramadanTheme": "Thème Ramadan",
+  "ramadanThemeSubtitle": "Habiller l'application aux couleurs du Ramadan"
 }
