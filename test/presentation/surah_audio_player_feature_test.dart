@@ -1526,4 +1526,93 @@ void main() {
     expect(find.byIcon(Icons.shuffle_rounded), findsOneWidget);
     expect(miniPlayerCubit.state.playbackMode, PlaybackMode.shuffle);
   });
+
+  group('Fullscreen player layout', () {
+    Future<void> pumpPlayer(WidgetTester tester, Size size) async {
+      final downloadRepository = _ConfigurableDownloadRepository();
+      final audioRepository = _FakeAudioRepository();
+      _registerLocatorDependencies(
+        audioRepository: audioRepository,
+        downloadRepository: downloadRepository,
+      );
+      final audioService = AudioPlayerService();
+      final miniPlayerCubit = _SpySurahMiniPlayerCubit(
+        audioPlayerService: audioService,
+        downloadRepository: downloadRepository,
+        audioRepository: audioRepository,
+      );
+      addTearDown(() async {
+        await miniPlayerCubit.close();
+      });
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        _buildLocalizedApp(
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider<SurahMiniPlayerCubit>.value(value: miniPlayerCubit),
+              BlocProvider<QuranSettingsCubit>(
+                create: (_) => _TestQuranSettingsCubit(),
+              ),
+            ],
+            child: const Scaffold(body: SurahFullscreenPlayer()),
+          ),
+        ),
+      );
+      miniPlayerCubit.showForTest(
+        surahNumber: 1,
+        uiState: SurahMiniPlayerUiState.fullscreen,
+        playbackMode: PlaybackMode.off,
+      );
+      await tester.pump();
+    }
+
+    Rect artwork(WidgetTester tester) =>
+        tester.getRect(find.byIcon(Icons.music_note_rounded));
+    Rect seekBar(WidgetTester tester) => tester.getRect(find.byType(Slider));
+
+    testWidgets('a phone stacks the artwork above the controls', (
+      tester,
+    ) async {
+      await pumpPlayer(tester, const Size(390, 844));
+
+      expect(seekBar(tester).top, greaterThan(artwork(tester).bottom));
+      expect(seekBar(tester).width, greaterThan(300));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a tablet in portrait keeps the controls from stretching', (
+      tester,
+    ) async {
+      await pumpPlayer(tester, const Size(820, 1180));
+
+      final bar = seekBar(tester);
+      expect(bar.top, greaterThan(artwork(tester).bottom));
+      expect(bar.width, lessThanOrEqualTo(560));
+      expect(bar.center.dx, closeTo(410, 1));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('landscape puts the artwork beside the controls', (
+      tester,
+    ) async {
+      await pumpPlayer(tester, const Size(1180, 820));
+
+      expect(artwork(tester).center.dx, lessThan(590));
+      expect(seekBar(tester).left, greaterThan(590));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a phone in landscape fits without overflowing', (
+      tester,
+    ) async {
+      await pumpPlayer(tester, const Size(844, 390));
+
+      expect(artwork(tester).center.dx, lessThan(422));
+      expect(seekBar(tester).left, greaterThan(422));
+      expect(tester.takeException(), isNull);
+    });
+  });
 }

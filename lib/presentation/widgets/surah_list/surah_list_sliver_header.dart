@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/config/theme/app_color.dart';
+import '../../../core/layout/breakpoints.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
 class SurahListSliverHeader extends StatelessWidget {
@@ -52,7 +53,12 @@ class SurahListSliverHeader extends StatelessWidget {
                 ? Padding(
                     key: const ValueKey('search-collapsed'),
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: searchBarBuilder(true),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: ContentWidths.form,
+                      ),
+                      child: searchBarBuilder(true),
+                    ),
                   )
                 : Text(
                     localizations.surahs,
@@ -89,7 +95,12 @@ class SurahListSliverHeader extends StatelessWidget {
                     alignment: Alignment.bottomCenter,
                     child: isCollapsed
                         ? const SizedBox.shrink()
-                        : searchBarBuilder(false),
+                        : ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: ContentWidths.form,
+                            ),
+                            child: searchBarBuilder(false),
+                          ),
                   ),
                 ),
               ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
+import '../../../core/layout/breakpoints.dart';
 import '../../../core/services/audio_player_service.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/quran_settings_cubit.dart';
@@ -57,7 +58,11 @@ class SurahMiniPlayerOverlay extends StatelessWidget {
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOutCubic,
                   height: isExpanded ? expandedHeight : 76,
+                  // Full width on a phone, a centred bar on a tablet.
                   width: double.infinity,
+                  constraints: const BoxConstraints(
+                    maxWidth: ContentWidths.sheet,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surfaceContainerHigh,
                     // color: Theme.of(context).colorScheme.onPrimary,

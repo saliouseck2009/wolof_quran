@@ -108,6 +108,10 @@ class MushafPageRenderer {
   static const _lineTopRatio = 11 / 34;
   static const _lineBoxRatio = 45 / 34;
 
+  /// Share of the height left by the surah headers that the lines take
+  /// when a page has to be fitted, the rest being a bottom margin.
+  static const _overflowFill = 0.98;
+
   static List<QuranPage>? _pages;
   static ui.Image? _banner;
   static Future<ui.Image>? _bannerLoading;
@@ -161,14 +165,59 @@ class MushafPageRenderer {
   ) {
     final width = spec.size.width;
     final lineCount = lines.isEmpty ? 1 : lines.length;
-    final hits = <_LineHit>[];
-    var y = 0.0;
+
+    // Same figures as the package so pages keep their proportions.
+    final lineHeights = <double>[];
+    var linesHeight = 0.0;
+    var decorationsHeight = 0.0;
     for (final line in lines) {
-      // Same figures as the package so pages keep their proportions.
       final headerOffset =
           page.numberOfNewSurahs *
           (line.surahNumber != null && line.surahNumber != 9 ? 110 : 80);
       final lineHeight = (spec.size.height - headerOffset) * 0.95 / lineCount;
+      lineHeights.add(lineHeight > 0 ? lineHeight : 40);
+      linesHeight += lineHeights.last;
+      if (line.startsSurah) {
+        decorationsHeight += _surahHeaderHeight(spec);
+        if (line.surahNumber != 9) {
+          decorationsHeight += _basmallahHeight(spec, line.surahNumber!);
+        }
+      }
+    }
+    // Those figures reserve a fixed height per surah header, sized for a
+    // phone. The banner grows with the page width, so on a wide page with
+    // several surahs the last lines would fall below the page: the lines
+    // then share what the headers really leave.
+    final room = (spec.size.height - decorationsHeight) * _overflowFill;
+    final scale = linesHeight + decorationsHeight > spec.size.height && room > 0
+        ? room / linesHeight
+        : 1.0;
+
+    // A short line that ends a surah is centred, not stretched. It is
+    // drawn as large as the stretched lines around it: at its natural
+    // size it would look tiny on a wide page, where they are enlarged.
+    final lineWidth = width - 2 * _lineInset;
+    var stretchSum = 0.0;
+    var stretchedLines = 0;
+    for (final line in lines) {
+      if (line.centered) {
+        continue;
+      }
+      final painter = line.painter(style);
+      if (painter.width > 0) {
+        stretchSum += lineWidth / painter.width;
+        stretchedLines++;
+      }
+      painter.dispose();
+    }
+    final centredScale = stretchedLines == 0
+        ? 1.0
+        : (stretchSum / stretchedLines).clamp(1.0, double.infinity);
+
+    final hits = <_LineHit>[];
+    var y = 0.0;
+    for (var i = 0; i < lines.length; i++) {
+      final line = lines[i];
       if (line.startsSurah) {
         y += _paintSurahHeader(canvas, spec, banner, line.surahNumber!, y);
         if (line.surahNumber != 9) {
@@ -178,10 +227,19 @@ class MushafPageRenderer {
       final rect = Rect.fromLTWH(
         _lineInset,
         y,
-        width - 2 * _lineInset,
-        lineHeight > 0 ? lineHeight : 40,
+        lineWidth,
+        lineHeights[i] * scale,
       );
-      hits.add(_paintLine(canvas, line, style, rect, fill: !line.centered));
+      hits.add(
+        _paintLine(
+          canvas,
+          line,
+          style,
+          rect,
+          fill: !line.centered,
+          maxScale: centredScale,
+        ),
+      );
       y += rect.height;
     }
     return hits;
@@ -247,6 +305,7 @@ class MushafPageRenderer {
     _LineStyle style,
     Rect rect, {
     required bool fill,
+    double maxScale = 1.0,
   }) {
     final painter = line.painter(style);
     final naturalWidth = painter.width;
@@ -263,7 +322,7 @@ class MushafPageRenderer {
       final scale = [
         rect.width / naturalWidth,
         rect.height / naturalHeight,
-        1.0,
+        maxScale,
       ].reduce((a, b) => a < b ? a : b);
       scaleX = scale;
       scaleY = scale;

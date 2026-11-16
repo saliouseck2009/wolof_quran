@@ -189,6 +189,62 @@ void main() {
     });
   });
 
+  group('ReadingGoalDetailPage layout', () {
+    Future<void> pumpDetail(WidgetTester tester, Size size) async {
+      repository
+        ..goals['g1'] = goal('g1', 'Khatm Ramadan')
+        ..pages['g1'] = {for (var p = 1; p <= 10; p++) p: now};
+      final cubit = ReadingGoalsCubit(
+        repository: repository,
+        today: () => today,
+        totalPages: 604,
+      );
+      addTearDown(cubit.close);
+      await cubit.load();
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        _wrap(cubit, const ReadingGoalDetailPage(goalId: 'g1')),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a phone stacks the sections in one column', (tester) async {
+      await pumpDetail(tester, const Size(390, 6000));
+
+      final progress = tester.getRect(find.text('10 pages lues sur 604'));
+      final pages = tester.getRect(find.text('Pages'));
+      expect(pages.top, greaterThan(progress.bottom));
+      expect(pages.left, 16);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a tablet in portrait keeps one centred column', (
+      tester,
+    ) async {
+      await pumpDetail(tester, const Size(820, 6000));
+
+      final progress = tester.getRect(find.text('10 pages lues sur 604'));
+      final pages = tester.getRect(find.text('Pages'));
+      expect(pages.top, greaterThan(progress.bottom));
+      expect(pages.left, (820 - 640) / 2);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a tablet in landscape puts the pages beside the summary', (
+      tester,
+    ) async {
+      await pumpDetail(tester, const Size(1180, 2000));
+
+      final progress = tester.getRect(find.text('10 pages lues sur 604'));
+      final pages = tester.getRect(find.text('Pages'));
+      expect(pages.left, greaterThan(1180 / 2));
+      expect(pages.top, lessThan(progress.bottom));
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   group('ReadingStatsPage', () {
     testWidgets('shows an empty state without any page read', (tester) async {
       final cubit = ReadingGoalsCubit(

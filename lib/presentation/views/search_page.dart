@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/layout/breakpoints.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../core/config/theme/app_color.dart';
 import '../cubits/search_cubit.dart';
@@ -82,66 +83,118 @@ class _SearchViewState extends State<SearchView> {
     final localizations = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
 
+    // A bar at the bottom on phones, a rail on the side once the window
+    // is wide enough for it not to squeeze the content.
+    final useRail = WindowSizeClass.of(context).isWide;
+    final tabs = IndexedStack(
+      index: _currentIndex,
+      children: [_buildSearchTab(localizations, colorScheme), BookmarksTab()],
+    );
+
     return Scaffold(
       backgroundColor: colorScheme.brightness == Brightness.dark
           ? AppColor.surfaceDark
           : colorScheme.surface,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [_buildSearchTab(localizations, colorScheme), BookmarksTab()],
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: colorScheme.brightness == Brightness.dark
-              ? colorScheme.surfaceContainer
-              : colorScheme.surfaceContainer,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -4),
+      body: useRail
+          ? Row(
+              children: [
+                // The header colour runs across the status bar, above the
+                // rail too, so the system icons sit on a single colour.
+                ColoredBox(
+                  color: colorScheme.brightness == Brightness.dark
+                      ? AppColor.surfaceDark
+                      : colorScheme.primary,
+                  child: SafeArea(
+                    right: false,
+                    bottom: false,
+                    child: NavigationRail(
+                      selectedIndex: _currentIndex,
+                      backgroundColor: colorScheme.surfaceContainer,
+                      indicatorColor: colorScheme.primary.withValues(
+                        alpha: 0.1,
+                      ),
+                      labelType: NavigationRailLabelType.all,
+                      groupAlignment: -0.85,
+                      onDestinationSelected: _selectTab,
+                      destinations: [
+                        NavigationRailDestination(
+                          icon: const Icon(Icons.search_outlined),
+                          selectedIcon: Icon(
+                            Icons.search,
+                            color: colorScheme.primary,
+                          ),
+                          label: Text(localizations.search),
+                        ),
+                        NavigationRailDestination(
+                          icon: const Icon(Icons.bookmark_outline),
+                          selectedIcon: Icon(
+                            Icons.bookmark,
+                            color: colorScheme.primary,
+                          ),
+                          label: Text(localizations.bookmarks),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(child: tabs),
+              ],
+            )
+          : tabs,
+      bottomNavigationBar: useRail
+          ? null
+          : Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainer,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                child: NavigationBar(
+                  selectedIndex: _currentIndex,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  indicatorColor: colorScheme.primary.withValues(alpha: 0.1),
+                  height: 64,
+                  labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+                  onDestinationSelected: _selectTab,
+                  destinations: [
+                    NavigationDestination(
+                      icon: const Icon(Icons.search_outlined),
+                      selectedIcon: Icon(
+                        Icons.search,
+                        color: colorScheme.primary,
+                      ),
+                      label: localizations.search,
+                    ),
+                    NavigationDestination(
+                      icon: const Icon(Icons.bookmark_outline),
+                      selectedIcon: Icon(
+                        Icons.bookmark,
+                        color: colorScheme.primary,
+                      ),
+                      label: localizations.bookmarks,
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
-        child: SafeArea(
-          child: NavigationBar(
-            selectedIndex: _currentIndex,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            indicatorColor: colorScheme.primary.withValues(alpha: 0.1),
-            height: 64,
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-            onDestinationSelected: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-              if (index != 0) {
-                _searchFocusNode.unfocus();
-              }
-            },
-            destinations: [
-              NavigationDestination(
-                icon: const Icon(Icons.search_outlined),
-                selectedIcon: Icon(
-                  Icons.search,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                label: localizations.search,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.bookmark_outline),
-                selectedIcon: Icon(
-                  Icons.bookmark,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                label: localizations.bookmarks,
-              ),
-            ],
-          ),
-        ),
-      ),
     );
+  }
+
+  void _selectTab(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+    if (index != 0) {
+      _searchFocusNode.unfocus();
+    }
   }
 
   Widget _buildSearchTab(
@@ -255,9 +308,15 @@ class _SearchHeader extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-              child: searchBarBuilder(false),
+            // Centred over the results column on wide windows.
+            Center(
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxWidth: ContentWidths.reading,
+                ),
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                child: searchBarBuilder(false),
+              ),
             ),
           ],
         ),

@@ -147,6 +147,53 @@ void main() {
       expect(tracker.elapsedOnCurrentPage, Duration.zero);
     });
 
+    group('two facing pages', () {
+      test('each page needs its own threshold of reading time', () {
+        tracker.onPageChanged(5, facingPages: [6]);
+        advance(45);
+        tracker.onPageChanged(7, facingPages: [8]);
+
+        expect(read, [5]);
+        expect(tracker.pagesViewed, {5, 6, 7, 8});
+
+        advance(65);
+        tracker.onPageChanged(9, facingPages: [10]);
+
+        expect(read, [5, 7, 8]);
+        expect(tooShort, isEmpty);
+      });
+
+      test('the time goes to the facing page when the first is read', () {
+        validated.add(5);
+        tracker.onPageChanged(5, facingPages: [6]);
+        advance(35);
+        tracker.onPageChanged(7, facingPages: [8]);
+
+        expect(read, [6]);
+      });
+
+      test('a spread left too early hints at its first unread page', () {
+        validated.add(5);
+        tracker.onPageChanged(5, facingPages: [6]);
+        advance(8);
+        tracker.onPageChanged(7, facingPages: [8]);
+
+        expect(read, isEmpty);
+        expect(tooShort, [6]);
+      });
+
+      test('rotating keeps the time already spent on the page', () {
+        tracker.onPageChanged(6);
+        advance(20);
+        // Landscape: page 5 appears beside page 6.
+        tracker.onPageChanged(6, facingPages: [5]);
+        advance(45);
+        tracker.onPageChanged(7, facingPages: [8]);
+
+        expect(read, [6, 5]);
+      });
+    });
+
     test('a higher threshold applies to the next page', () {
       tracker.onPageChanged(120);
       tracker.threshold = const Duration(seconds: 60);

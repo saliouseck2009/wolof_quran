@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/config/theme/app_color.dart';
+import '../../core/layout/adaptive_list.dart';
+import '../../core/layout/breakpoints.dart';
 import '../../core/navigation/create_reading_goal_arguments.dart';
 import '../../domain/entities/reading_goal_progress.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -107,7 +109,10 @@ class _ReadingGoalsPageState extends State<ReadingGoalsPage> {
             }
             return Column(
               children: [
-                Padding(
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: ContentWidths.form,
+                  ),
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   child: SegmentedSwitch<_GoalsSection>(
                     value: _section,
@@ -146,11 +151,12 @@ class _ReadingGoalsPageState extends State<ReadingGoalsPage> {
                                 ?.copyWith(color: colorScheme.onSurfaceVariant),
                           ),
                         )
-                      : ListView.builder(
+                      : AdaptiveListView(
                           key: PageStorageKey<String>(
                             'reading-goals-$_section',
                           ),
                           padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+                          maxColumns: 2,
                           itemCount: goals.length,
                           itemBuilder: (context, index) {
                             final progress = goals[index];
@@ -187,7 +193,8 @@ class _EmptyState extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Center(
-      child: Padding(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 480),
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

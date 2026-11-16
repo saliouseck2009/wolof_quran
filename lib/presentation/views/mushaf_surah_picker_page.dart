@@ -4,6 +4,8 @@ import 'package:qcf_quran_plus/qcf_quran_plus.dart' as qcf;
 import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 
+import '../../core/layout/adaptive_list.dart';
+import '../../core/layout/breakpoints.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../blocs/mushaf/mushaf_surah_list_bloc.dart';
@@ -134,7 +136,8 @@ class _MushafSurahPickerViewState extends State<_MushafSurahPickerView> {
       appBar: AppBar(title: Text(localizations.selectSurah)),
       body: Column(
         children: [
-          Padding(
+          Container(
+            constraints: const BoxConstraints(maxWidth: ContentWidths.reading),
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: BlocBuilder<MushafSurahListBloc, MushafSurahListState>(
               builder: (context, state) {
@@ -194,8 +197,9 @@ class _MushafSurahPickerViewState extends State<_MushafSurahPickerView> {
                   items.add(_SurahEntry(surah));
                 }
 
-                return ListView.builder(
+                return AdaptiveListView(
                   controller: _scrollController,
+                  maxWidth: ContentWidths.reading - 32,
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                   itemCount: items.length,
                   itemBuilder: (context, index) {

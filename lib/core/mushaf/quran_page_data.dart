@@ -92,31 +92,30 @@ class PageInfo extends Equatable {
 
 final Map<int, HizbInfo> _hizbQuarterPages = _computeHizbQuarterPages();
 
+/// The page each quarter of a hizb starts on, from the 240 rub el hizb
+/// positions of the mushaf (surah and verse of each one).
 Map<int, HizbInfo> _computeHizbQuarterPages() {
+  const quarters = [
+    HizbQuarter.full,
+    HizbQuarter.oneQuarter,
+    HizbQuarter.half,
+    HizbQuarter.threeQuarter,
+  ];
   final map = <int, HizbInfo>{};
-  for (int juz = 0; juz < 30; juz++) {
-    final start = juzStartPages[juz];
-    final end = juz < 29 ? juzStartPages[juz + 1] : 605;
-    final pages = end - start;
-    final hizbBase = juz * 2 + 1;
-
-    const quarters = [
-      HizbQuarter.full,
-      HizbQuarter.oneQuarter,
-      HizbQuarter.half,
-      HizbQuarter.threeQuarter,
-    ];
-
-    for (int quarterIndex = 0; quarterIndex < 8; quarterIndex++) {
-      final page = start + (pages * quarterIndex / 8).round();
-      final hizb = hizbBase + (quarterIndex >= 4 ? 1 : 0);
-      final quarter = quarters[quarterIndex % 4];
-      map[page] = HizbInfo(hizbNumber: hizb, quarter: quarter);
-    }
+  for (var index = 0; index < qcf.quarters.length; index++) {
+    final start = qcf.quarters[index] as Map;
+    final page = qcf.getPageNumber(start['surah'] as int, start['ayah'] as int);
+    // Should two quarters start on one page, the page shows the first.
+    map.putIfAbsent(
+      page,
+      () => HizbInfo(hizbNumber: index ~/ 4 + 1, quarter: quarters[index % 4]),
+    );
   }
   return map;
 }
 
+/// The quarter of a hizb that starts on [pageNumber], or `null` when none
+/// does.
 HizbInfo? getHizbInfoForPage(int pageNumber) {
   return _hizbQuarterPages[pageNumber];
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/layout/breakpoints.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../core/config/theme/app_color.dart';
 import '../../core/mushaf/quran_page_data.dart';
 import '../../core/navigation/create_reading_goal_arguments.dart';
@@ -309,7 +311,11 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
 
     return ListView(
       key: const ValueKey('form'),
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+      padding: centredPadding(
+        context,
+        const EdgeInsets.fromLTRB(20, 20, 20, 24),
+        maxWidth: ContentWidths.form,
+      ),
       children: [
         FormSectionLabel(localizations.goalName),
         TextField(
@@ -496,7 +502,11 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
 
     return ListView(
       key: const ValueKey('summary'),
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+      padding: centredPadding(
+        context,
+        const EdgeInsets.fromLTRB(20, 20, 20, 32),
+        maxWidth: ContentWidths.form,
+      ),
       children: [
         Text(
           _resolvedName(localizations),
@@ -729,7 +739,12 @@ class _BottomBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+          // The button lines up with the form above it.
+          padding: centredPadding(
+            context,
+            const EdgeInsets.fromLTRB(20, 12, 20, 12),
+            maxWidth: ContentWidths.form,
+          ),
           child: child,
         ),
       ),

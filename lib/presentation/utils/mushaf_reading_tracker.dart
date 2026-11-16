@@ -24,6 +24,9 @@ class MushafReadingTracker {
   bool _visible;
   int? _currentPage;
 
+  /// Pages shown beside the current one (the facing page of a spread).
+  List<int> _facingPages = const [];
+
   Duration _accumulated = Duration.zero;
   DateTime? _runningSince;
   DateTime? _lastHintAt;
@@ -66,14 +69,26 @@ class MushafReadingTracker {
     return _accumulated + _now().difference(since);
   }
 
-  void onPageChanged(int page) {
+  /// [facingPages] are the other pages on screen when the mushaf shows
+  /// two at once. Each page on screen needs its own [threshold] of time:
+  /// the current one is counted first, then the facing ones in order.
+  void onPageChanged(int page, {List<int> facingPages = const []}) {
     if (page == _currentPage) {
+      // Same page, another layout (the device was rotated): the time
+      // spent so far is kept.
+      _facingPages = List.of(facingPages);
+      if (_goalId != null) {
+        pagesViewed.addAll(facingPages);
+      }
       return;
     }
     _leavePage(PageLeaveReason.pageChanged);
     _currentPage = page;
+    _facingPages = List.of(facingPages);
     if (_goalId != null) {
-      pagesViewed.add(page);
+      pagesViewed
+        ..add(page)
+        ..addAll(facingPages);
     }
     _resume();
   }
@@ -104,7 +119,9 @@ class MushafReadingTracker {
     _goalId = goalId;
     final page = _currentPage;
     if (goalId != null && page != null) {
-      pagesViewed.add(page);
+      pagesViewed
+        ..add(page)
+        ..addAll(_facingPages);
     }
     _resume();
   }
@@ -127,6 +144,7 @@ class MushafReadingTracker {
   void dispose() {
     _leavePage(PageLeaveReason.disposed);
     _currentPage = null;
+    _facingPages = const [];
   }
 
   void _resume() {
@@ -154,18 +172,29 @@ class MushafReadingTracker {
     if (page == null || goalId == null || !_enabled) {
       return;
     }
-    if (_isValidated(page)) {
+    final unread = [
+      for (final shown in [page, ..._facingPages])
+        if (!_isValidated(shown)) shown,
+    ];
+    if (unread.isEmpty) {
       return;
     }
-    if (elapsed >= threshold) {
-      _onPageRead(page);
+    // One threshold of reading time per page still to read.
+    var remaining = elapsed;
+    var read = 0;
+    while (read < unread.length && remaining >= threshold) {
+      _onPageRead(unread[read]);
+      remaining -= threshold;
+      read++;
+    }
+    if (read > 0) {
       return;
     }
     if (reason == PageLeaveReason.pageChanged &&
         elapsed >= minDurationForHint &&
         _canHint()) {
       _lastHintAt = _now();
-      _onPageTooShort(page);
+      _onPageTooShort(unread.first);
     }
   }
 

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/layout/adaptive_list.dart';
+import '../../core/layout/breakpoints.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../core/config/theme/app_color.dart';
 import '../../core/navigation/mushaf_arguments.dart';
 import '../../core/reading/reading_plan_calculator.dart';
@@ -46,23 +49,6 @@ class _DetailView extends StatelessWidget {
   final String goalId;
 
   const _DetailView({required this.goalId});
-
-  Future<void> _openPage(
-    BuildContext context,
-    ReadingGoalProgress progress,
-    int page,
-  ) async {
-    final cubit = context.read<ReadingGoalsCubit>();
-    await cubit.setActiveGoal(progress.goal.id);
-    if (!context.mounted) {
-      return;
-    }
-    await Navigator.pushNamed(
-      context,
-      MushafPage.routeName,
-      arguments: MushafArguments(initialPage: page),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,53 +97,136 @@ class _DetailView extends StatelessWidget {
               ),
             ],
           ),
-          body: CustomScrollView(
-            slivers: [
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                sliver: SliverList.list(
-                  children: [
-                    _OverviewCard(progress: progress, isFollowed: isFollowed),
-                    const SizedBox(height: 12),
-                    if (progress.phase != ReadingGoalPhase.completed &&
-                        progress.phase != ReadingGoalPhase.abandoned)
-                      _TodayCard(progress: progress),
-                    const SizedBox(height: 12),
-                    _ActionsRow(progress: progress),
-                    const SizedBox(height: 24),
-                    _SectionTitle(localizations.pagesSectionTitle),
-                    const SizedBox(height: 10),
-                    ReadingPagesMap(
-                      progress: progress,
-                      onPageTap: (page) => _openPage(context, progress, page),
-                    ),
-                    const SizedBox(height: 10),
-                    const _Legend(),
-                    const SizedBox(height: 24),
-                    _SectionTitle(localizations.missingPages),
-                    const SizedBox(height: 10),
-                    _MissingPages(
-                      progress: progress,
-                      onPageTap: (page) => _openPage(context, progress, page),
-                    ),
-                    const SizedBox(height: 24),
-                    _SectionTitle(localizations.historyTitle),
-                    const SizedBox(height: 10),
-                    _History(progress: progress),
-                    const SizedBox(height: 24),
-                    _SectionTitle(localizations.journalTitle),
-                    const SizedBox(height: 10),
-                  ],
-                ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
-                sliver: _Journal(progress: progress),
-              ),
-            ],
-          ),
+          body: _DetailBody(progress: progress, isFollowed: isFollowed),
         );
       },
+    );
+  }
+}
+
+/// The sections of a goal, in one column or, on an expanded window (a
+/// tablet in landscape), in two: the figures beside the pages map.
+class _DetailBody extends StatelessWidget {
+  final ReadingGoalProgress progress;
+  final bool isFollowed;
+
+  const _DetailBody({required this.progress, required this.isFollowed});
+
+  Future<void> _openPage(
+    BuildContext context,
+    ReadingGoalProgress progress,
+    int page,
+  ) async {
+    final cubit = context.read<ReadingGoalsCubit>();
+    await cubit.setActiveGoal(progress.goal.id);
+    if (!context.mounted) {
+      return;
+    }
+    await Navigator.pushNamed(
+      context,
+      MushafPage.routeName,
+      arguments: MushafArguments(initialPage: page),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final twoColumns = WindowSizeClass.of(context) == WindowSizeClass.expanded;
+
+    final summary = <Widget>[
+      _OverviewCard(progress: progress, isFollowed: isFollowed),
+      const SizedBox(height: 12),
+      if (progress.phase != ReadingGoalPhase.completed &&
+          progress.phase != ReadingGoalPhase.abandoned)
+        _TodayCard(progress: progress),
+      const SizedBox(height: 12),
+      _ActionsRow(progress: progress),
+    ];
+    final pages = <Widget>[
+      _SectionTitle(localizations.pagesSectionTitle),
+      const SizedBox(height: 10),
+      ReadingPagesMap(
+        progress: progress,
+        onPageTap: (page) => _openPage(context, progress, page),
+      ),
+      const SizedBox(height: 10),
+      const _Legend(),
+      const SizedBox(height: 24),
+      _SectionTitle(localizations.missingPages),
+      const SizedBox(height: 10),
+      _MissingPages(
+        progress: progress,
+        onPageTap: (page) => _openPage(context, progress, page),
+      ),
+    ];
+    final history = <Widget>[
+      _SectionTitle(localizations.historyTitle),
+      const SizedBox(height: 10),
+      _History(progress: progress),
+    ];
+    final journalTitle = <Widget>[
+      const SizedBox(height: 24),
+      _SectionTitle(localizations.journalTitle),
+      const SizedBox(height: 10),
+    ];
+    // One column stays a comfortable width on a tablet in portrait.
+    final maxWidth = twoColumns ? ContentWidths.page : ContentWidths.form;
+
+    return CustomScrollView(
+      slivers: [
+        SliverContentConstraint(
+          maxWidth: maxWidth,
+          margin: 16,
+          sliver: SliverPadding(
+            padding: const EdgeInsets.only(top: 16),
+            sliver: SliverList.list(
+              children: twoColumns
+                  ? [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                ...summary,
+                                const SizedBox(height: 24),
+                                ...history,
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: pages,
+                            ),
+                          ),
+                        ],
+                      ),
+                      ...journalTitle,
+                    ]
+                  : [
+                      ...summary,
+                      const SizedBox(height: 24),
+                      ...pages,
+                      const SizedBox(height: 24),
+                      ...history,
+                      ...journalTitle,
+                    ],
+            ),
+          ),
+        ),
+        SliverContentConstraint(
+          maxWidth: maxWidth,
+          margin: 16,
+          sliver: SliverPadding(
+            padding: const EdgeInsets.only(bottom: 40),
+            sliver: _Journal(progress: progress, columns: twoColumns ? 2 : 1),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -742,7 +811,10 @@ class _HistoryRow extends StatelessWidget {
 class _Journal extends StatelessWidget {
   final ReadingGoalProgress progress;
 
-  const _Journal({required this.progress});
+  /// Entries per row: two beside each other on an expanded window.
+  final int columns;
+
+  const _Journal({required this.progress, this.columns = 1});
 
   static String _actionLabel(
     AppLocalizations localizations,
@@ -797,7 +869,8 @@ class _Journal extends StatelessWidget {
             ),
           );
         }
-        return SliverList.builder(
+        return SliverAdaptiveList(
+          maxColumns: columns,
           itemCount: state.validations.length,
           itemBuilder: (context, index) {
             final validation = state.validations[index];

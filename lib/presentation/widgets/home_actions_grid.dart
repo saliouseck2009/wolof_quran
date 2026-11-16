@@ -8,7 +8,8 @@ import '../views/reading_goals_page.dart';
 import '../views/surah_audio_list_page.dart';
 
 /// Home menu laid out as a mosaic: the surahs in a tall featured tile, the
-/// other entries in small tiles, two per row. A new entry only needs a
+/// other entries in small tiles, two per row, or three when it is given
+/// enough width (a tablet in portrait). A new entry only needs a
 /// [_MenuEntry] appended to the list.
 class HomeActionsGrid extends StatelessWidget {
   /// Number of ongoing reading goals, or null while they are loading.
@@ -18,6 +19,7 @@ class HomeActionsGrid extends StatelessWidget {
 
   static const double _gap = 12;
   static const double _tileHeight = 104;
+  static const double _threeColumnsMinWidth = 560;
 
   @override
   Widget build(BuildContext context) {
@@ -64,51 +66,78 @@ class HomeActionsGrid extends StatelessWidget {
     final tileHeight = MediaQuery.textScalerOf(
       context,
     ).scale(_tileHeight).clamp(_tileHeight, _tileHeight * 2);
-    final besideFeatured = entries.take(2).toList();
-    final rest = entries.skip(2).toList();
 
-    return Column(
-      children: [
-        SizedBox(
-          height: tileHeight * 2 + _gap,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: _MenuTile(entry: featured, featured: true)),
-              const SizedBox(width: _gap),
-              Expanded(
-                child: Column(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // The mosaic follows the room it is given, not the device: three
+        // columns once the tiles would otherwise become wide slabs.
+        final columns = constraints.maxWidth >= _threeColumnsMinWidth ? 3 : 2;
+        final tileWidth =
+            (constraints.maxWidth - _gap * (columns - 1)) / columns;
+        // The featured tile is two rows tall; the columns left beside it
+        // each take two entries.
+        final besideFeatured = entries.take((columns - 1) * 2).toList();
+        final rest = entries.skip(besideFeatured.length).toList();
+
+        return Column(
+          children: [
+            SizedBox(
+              height: tileHeight * 2 + _gap,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    width: tileWidth,
+                    child: _MenuTile(entry: featured, featured: true),
+                  ),
+                  for (var c = 0; c < columns - 1; c++) ...[
+                    const SizedBox(width: _gap),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (var r = 0; r < 2; r++) ...[
+                            if (r > 0) const SizedBox(height: _gap),
+                            Expanded(
+                              // Entries fill the block row by row.
+                              child:
+                                  r * (columns - 1) + c < besideFeatured.length
+                                  ? _MenuTile(
+                                      entry:
+                                          besideFeatured[r * (columns - 1) + c],
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            for (var i = 0; i < rest.length; i += columns) ...[
+              const SizedBox(height: _gap),
+              SizedBox(
+                height: tileHeight,
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    for (var i = 0; i < besideFeatured.length; i++) ...[
-                      if (i > 0) const SizedBox(height: _gap),
-                      Expanded(child: _MenuTile(entry: besideFeatured[i])),
+                    for (var c = 0; c < columns; c++) ...[
+                      if (c > 0) const SizedBox(width: _gap),
+                      Expanded(
+                        child: i + c < rest.length
+                            ? _MenuTile(entry: rest[i + c])
+                            : const SizedBox.shrink(),
+                      ),
                     ],
                   ],
                 ),
               ),
             ],
-          ),
-        ),
-        for (var i = 0; i < rest.length; i += 2) ...[
-          const SizedBox(height: _gap),
-          SizedBox(
-            height: tileHeight,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(child: _MenuTile(entry: rest[i])),
-                const SizedBox(width: _gap),
-                Expanded(
-                  child: i + 1 < rest.length
-                      ? _MenuTile(entry: rest[i + 1])
-                      : const SizedBox.shrink(),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ],
+          ],
+        );
+      },
     );
   }
 }

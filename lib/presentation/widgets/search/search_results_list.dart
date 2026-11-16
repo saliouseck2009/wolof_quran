@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/layout/breakpoints.dart';
+import '../../../core/layout/content_constraint.dart';
 import '../../../core/navigation/surah_detail_arguments.dart';
 import '../../../domain/entities/bookmark.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -31,107 +33,117 @@ class SearchResultsList extends StatelessWidget {
 
     return Column(
       children: [
-        _ResultsSummary(
-          contentColor: contentColor,
-          localizations: localizations,
-          state: state,
+        ContentConstraint(
+          maxWidth: ContentWidths.reading,
+          child: _ResultsSummary(
+            contentColor: contentColor,
+            localizations: localizations,
+            state: state,
+          ),
         ),
         Expanded(
           child: CustomScrollView(
             key: const PageStorageKey<String>('search-results-list'),
             slivers: [
               for (final section in surahSections)
-                SliverMainAxisGroup(
-                  slivers: [
-                    SliverPersistentHeader(
-                      pinned: true,
-                      delegate: SurahHeaderDelegate(
-                        accentGreen: accentGreen,
-                        colorScheme: colorScheme,
-                        isDark: isDark,
-                        surahName: section.surahName,
-                        surahNumber: section.surahNumber,
+                // A readable column on tablets; the pinned surah header
+                // stays aligned with its verses.
+                SliverContentConstraint(
+                  maxWidth: ContentWidths.reading,
+                  sliver: SliverMainAxisGroup(
+                    slivers: [
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: SurahHeaderDelegate(
+                          accentGreen: accentGreen,
+                          colorScheme: colorScheme,
+                          isDark: isDark,
+                          surahName: section.surahName,
+                          surahNumber: section.surahNumber,
+                        ),
                       ),
-                    ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final result = section.results[index];
-                        return AyahCard(
-                          verseNumber: result.verseNumber,
-                          arabicText: result.arabicText,
-                          translationSource: state.translationSource,
-                          translation: result.translation,
-                          surahNumber: result.surahNumber,
-                          surahName: result.surahName,
-                          actions: [
-                            AyahPlayButton(
-                              surahNumber: result.surahNumber,
-                              ayahNumber: result.verseNumber,
-                              surahName: result.surahName,
-                            ),
-                            IconButton(
-                              icon:
-                                  BlocBuilder<
-                                    bookmark_cubit.BookmarkCubit,
-                                    bookmark_cubit.BookmarkState
-                                  >(
-                                    builder: (context, bookmarkState) {
-                                      final isBookmarked = context
-                                          .read<bookmark_cubit.BookmarkCubit>()
-                                          .isBookmarked(
-                                            result.surahNumber,
-                                            result.verseNumber,
-                                          );
-
-                                      return Icon(
-                                        isBookmarked
-                                            ? Icons.bookmark
-                                            : Icons.bookmark_border,
-                                        color: isBookmarked
-                                            ? colorScheme.primary
-                                            : colorScheme.outline,
-                                        size: 20,
-                                      );
-                                    },
-                                  ),
-                              onPressed: () {
-                                final bookmarkCubit = context
-                                    .read<bookmark_cubit.BookmarkCubit>();
-                                final bookmark = BookmarkedAyah(
-                                  surahNumber: result.surahNumber,
-                                  verseNumber: result.verseNumber,
-                                  surahName: result.surahName,
-                                  arabicText: result.arabicText,
-                                  translation: result.translation,
-                                  translationSource: state.translationSource,
-                                  createdAt: DateTime.now(),
-                                );
-
-                                bookmarkCubit.toggleBookmark(bookmark);
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.open_in_new,
-                                color: colorScheme.onSurfaceVariant,
-                                size: 20,
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final result = section.results[index];
+                          return AyahCard(
+                            verseNumber: result.verseNumber,
+                            arabicText: result.arabicText,
+                            translationSource: state.translationSource,
+                            translation: result.translation,
+                            surahNumber: result.surahNumber,
+                            surahName: result.surahName,
+                            actions: [
+                              AyahPlayButton(
+                                surahNumber: result.surahNumber,
+                                ayahNumber: result.verseNumber,
+                                surahName: result.surahName,
                               ),
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/surah-detail',
-                                  arguments: SurahDetailArguments(
+                              IconButton(
+                                icon:
+                                    BlocBuilder<
+                                      bookmark_cubit.BookmarkCubit,
+                                      bookmark_cubit.BookmarkState
+                                    >(
+                                      builder: (context, bookmarkState) {
+                                        final isBookmarked = context
+                                            .read<
+                                              bookmark_cubit.BookmarkCubit
+                                            >()
+                                            .isBookmarked(
+                                              result.surahNumber,
+                                              result.verseNumber,
+                                            );
+
+                                        return Icon(
+                                          isBookmarked
+                                              ? Icons.bookmark
+                                              : Icons.bookmark_border,
+                                          color: isBookmarked
+                                              ? colorScheme.primary
+                                              : colorScheme.outline,
+                                          size: 20,
+                                        );
+                                      },
+                                    ),
+                                onPressed: () {
+                                  final bookmarkCubit = context
+                                      .read<bookmark_cubit.BookmarkCubit>();
+                                  final bookmark = BookmarkedAyah(
                                     surahNumber: result.surahNumber,
-                                    initialAyahNumber: result.verseNumber,
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        );
-                      }, childCount: section.results.length),
-                    ),
-                  ],
+                                    verseNumber: result.verseNumber,
+                                    surahName: result.surahName,
+                                    arabicText: result.arabicText,
+                                    translation: result.translation,
+                                    translationSource: state.translationSource,
+                                    createdAt: DateTime.now(),
+                                  );
+
+                                  bookmarkCubit.toggleBookmark(bookmark);
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.open_in_new,
+                                  color: colorScheme.onSurfaceVariant,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/surah-detail',
+                                    arguments: SurahDetailArguments(
+                                      surahNumber: result.surahNumber,
+                                      initialAyahNumber: result.verseNumber,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        }, childCount: section.results.length),
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),

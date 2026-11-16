@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/layout/breakpoints.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../core/config/theme/app_color.dart';
 import '../../core/reading/local_date.dart';
 import '../../core/reading/reading_stats_calculator.dart';
@@ -97,113 +99,143 @@ class _StatsViewState extends State<_StatsView> {
               ),
             );
           }
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
-            children: [
-              _TilesGrid(stats: stats, today: state.today),
-              const SizedBox(height: 24),
-              _title(theme, localizations.chartTitle),
-              const SizedBox(height: 10),
-              _Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        for (final days in _periods)
-                          QuickChoiceChip(
-                            label: localizations.periodDays(days),
-                            selected: _period == days,
-                            onTap: () => setState(() => _period = days),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 140,
-                      child: _PagesChart(
-                        data: stats.lastDays(state.today, _period),
-                        color: colorScheme.primary,
-                        trackColor: colorScheme.onSurface.withValues(
-                          alpha: 0.06,
-                        ),
-                        labelStyle: theme.textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        locale: Localizations.localeOf(context).toString(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              _title(theme, localizations.byGoalTitle),
-              const SizedBox(height: 10),
-              _Card(
-                child: Column(
-                  children: [
-                    for (final entry in stats.perGoal)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    entry.goal.name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  '${localizations.readingProgressLabel(entry.validatedCount, entry.goal.totalPages)} · '
-                                  '${localizations.percentValue((entry.fraction * 100).floor())}',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            ReadingProgressBar(fraction: entry.fraction),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              if (stats.completedGoals.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                _title(theme, localizations.completedKhatmTitle),
-                const SizedBox(height: 10),
-                _Card(
-                  child: Column(
+          // On an expanded window the figures sit beside the charts.
+          final twoColumns =
+              WindowSizeClass.of(context) == WindowSizeClass.expanded;
+          final tiles = <Widget>[_TilesGrid(stats: stats, today: state.today)];
+          final details = <Widget>[
+            _title(theme, localizations.chartTitle),
+            const SizedBox(height: 10),
+            _Card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 8,
                     children: [
-                      for (final goal in stats.completedGoals)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(
-                            Icons.verified_rounded,
-                            color: colorScheme.tertiary,
-                          ),
-                          title: Text(
-                            goal.name,
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          subtitle: Text(
-                            '${localizations.goalDates(ReadingGoalFormatting.date(context, goal.startDate), ReadingGoalFormatting.date(context, goal.completedAt == null ? goal.endDate : LocalDate.fromDateTime(goal.completedAt!)))} · '
-                            '${localizations.durationDays(goal.startDate.daysUntil(goal.completedAt == null ? goal.endDate : LocalDate.fromDateTime(goal.completedAt!)) + 1)}',
-                          ),
+                      for (final days in _periods)
+                        QuickChoiceChip(
+                          label: localizations.periodDays(days),
+                          selected: _period == days,
+                          onTap: () => setState(() => _period = days),
                         ),
                     ],
                   ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 140,
+                    child: _PagesChart(
+                      data: stats.lastDays(state.today, _period),
+                      color: colorScheme.primary,
+                      trackColor: colorScheme.onSurface.withValues(alpha: 0.06),
+                      labelStyle: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      locale: Localizations.localeOf(context).toString(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            _title(theme, localizations.byGoalTitle),
+            const SizedBox(height: 10),
+            _Card(
+              child: Column(
+                children: [
+                  for (final entry in stats.perGoal)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  entry.goal.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '${localizations.readingProgressLabel(entry.validatedCount, entry.goal.totalPages)} · '
+                                '${localizations.percentValue((entry.fraction * 100).floor())}',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          ReadingProgressBar(fraction: entry.fraction),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (stats.completedGoals.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              _title(theme, localizations.completedKhatmTitle),
+              const SizedBox(height: 10),
+              _Card(
+                child: Column(
+                  children: [
+                    for (final goal in stats.completedGoals)
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          Icons.verified_rounded,
+                          color: colorScheme.tertiary,
+                        ),
+                        title: Text(
+                          goal.name,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          '${localizations.goalDates(ReadingGoalFormatting.date(context, goal.startDate), ReadingGoalFormatting.date(context, goal.completedAt == null ? goal.endDate : LocalDate.fromDateTime(goal.completedAt!)))} · '
+                          '${localizations.durationDays(goal.startDate.daysUntil(goal.completedAt == null ? goal.endDate : LocalDate.fromDateTime(goal.completedAt!)) + 1)}',
+                        ),
+                      ),
+                  ],
                 ),
+              ),
+            ],
+          ];
+          return ListView(
+            padding: centredPadding(
+              context,
+              const EdgeInsets.fromLTRB(16, 16, 16, 40),
+              maxWidth: twoColumns ? ContentWidths.page : ContentWidths.form,
+            ),
+            children: [
+              if (twoColumns)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: tiles,
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: details,
+                      ),
+                    ),
+                  ],
+                )
+              else ...[
+                ...tiles,
+                const SizedBox(height: 24),
+                ...details,
               ],
               const SizedBox(height: 24),
               Center(

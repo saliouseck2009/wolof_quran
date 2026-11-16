@@ -90,7 +90,7 @@ class _MushafPageView extends StatefulWidget {
 }
 
 class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
-  late final PageController _controller;
+  late final MushafViewController _controller;
   final MushafRepository _mushafRepository = MushafRepository();
   bool _didCheckLongPressHint = false;
 
@@ -108,7 +108,8 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
   @override
   void initState() {
     super.initState();
-    _controller = PageController(initialPage: widget.initialPage - 1);
+    _controller = MushafViewController(initialPage: widget.initialPage)
+      ..addListener(_handleVisiblePagesChanged);
     WakelockPlus.enable();
 
     _goalsCubit = context.read<ReadingGoalsCubit>();
@@ -197,8 +198,22 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
   // Pages, goals and sessions
   // ---------------------------------------------------------------------------
 
+  /// Two facing pages on a tablet in landscape: the tracker counts both.
+  void _handleVisiblePagesChanged() {
+    _tracker.onPageChanged(
+      _controller.page,
+      facingPages: _controller.facingPages,
+    );
+  }
+
   void _handlePageViewed(int page) {
-    _tracker.onPageChanged(page);
+    _tracker.onPageChanged(
+      page,
+      facingPages: [
+        for (final visible in _controller.visiblePages)
+          if (visible != page) visible,
+      ],
+    );
     _pageViewedDebounce?.cancel();
     _pageViewedDebounce = Timer(const Duration(milliseconds: 500), () {
       if (mounted) {
@@ -422,7 +437,7 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
             if (targetPage == null) {
               return;
             }
-            _controller.jumpToPage(targetPage - 1);
+            _controller.jumpToPage(targetPage);
           },
         ),
         BlocListener<MushafBloc, MushafState>(
@@ -491,8 +506,12 @@ class _MushafPageViewState extends State<_MushafPageView> with RouteAware {
                   );
                 },
               ),
-              bottomNavigationBar: _MushafBottomBar(
-                onGoalTap: _openGoalSwitcher,
+              bottomNavigationBar: ListenableBuilder(
+                listenable: _controller,
+                builder: (context, _) => _MushafBottomBar(
+                  visiblePages: _controller.visiblePages,
+                  onGoalTap: _openGoalSwitcher,
+                ),
               ),
             );
           },
@@ -949,9 +968,14 @@ class _ThemePickerSheet extends StatelessWidget {
 }
 
 class _MushafBottomBar extends StatelessWidget {
+  /// The pages on screen: two on a tablet in landscape.
+  final List<int> visiblePages;
   final VoidCallback onGoalTap;
 
-  const _MushafBottomBar({required this.onGoalTap});
+  const _MushafBottomBar({required this.visiblePages, required this.onGoalTap});
+
+  /// Space between the goal button and a page number beside it.
+  static const double _spreadLabelGap = 28;
 
   @override
   Widget build(BuildContext context) {
@@ -962,6 +986,82 @@ class _MushafBottomBar extends StatelessWidget {
         final pageInfo = state.pageInfo;
         final theme = state.theme;
         final pageNumber = pageInfo?.pageNumber ?? 1;
+        final hizb = pageInfo?.hizbInfo != null
+            ? Text(
+                pageInfo!.hizbInfo!.localizedText(localizations),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: theme.bottomBarSubtext, fontSize: 12),
+              )
+            : const SizedBox.shrink();
+        final goal = _ReadingGoalIndicator(theme: theme, onTap: onGoalTap);
+        // The bloc knows the page being read; the view, its neighbour.
+        final isSpread =
+            visiblePages.length == 2 && visiblePages.contains(pageNumber);
+
+        final List<Widget> children;
+        if (isSpread) {
+          // Each number sits on the side of its page, around the goal
+          // button: the first page of a spread is the right-hand one,
+          // whatever the direction of the app's language.
+          final isRtl = Directionality.of(context) == TextDirection.rtl;
+          final rightPage = visiblePages.first;
+          final leftPage = visiblePages.last;
+          children = [
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      heightFactor: 1,
+                      child: hizb,
+                    ),
+                  ),
+                  _PageLabel(
+                    theme: theme,
+                    pageNumber: isRtl ? rightPage : leftPage,
+                  ),
+                  const SizedBox(width: _spreadLabelGap),
+                ],
+              ),
+            ),
+            goal,
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                heightFactor: 1,
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    start: _spreadLabelGap,
+                  ),
+                  child: _PageLabel(
+                    theme: theme,
+                    pageNumber: isRtl ? leftPage : rightPage,
+                  ),
+                ),
+              ),
+            ),
+          ];
+        } else {
+          children = [
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                heightFactor: 1,
+                child: hizb,
+              ),
+            ),
+            goal,
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerEnd,
+                heightFactor: 1,
+                child: _PageLabel(theme: theme, pageNumber: pageNumber),
+              ),
+            ),
+          ];
+        }
 
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
@@ -969,35 +1069,7 @@ class _MushafBottomBar extends StatelessWidget {
           child: SafeArea(
             top: false,
             minimum: const EdgeInsets.only(bottom: 2),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    heightFactor: 1,
-                    child: pageInfo?.hizbInfo != null
-                        ? Text(
-                            pageInfo!.hizbInfo!.localizedText(localizations),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: theme.bottomBarSubtext,
-                              fontSize: 12,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ),
-                _ReadingGoalIndicator(theme: theme, onTap: onGoalTap),
-                Expanded(
-                  child: Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    heightFactor: 1,
-                    child: _PageLabel(theme: theme, pageNumber: pageNumber),
-                  ),
-                ),
-              ],
-            ),
+            child: Row(children: children),
           ),
         );
       },

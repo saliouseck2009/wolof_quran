@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/layout/breakpoints.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../core/services/app_info_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../widgets/snackbar.dart';
@@ -58,7 +60,11 @@ class _AboutPageState extends State<AboutPage> {
           final appVersion = snapshot.data ?? '--';
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: centredPadding(
+              context,
+              const EdgeInsets.all(16),
+              maxWidth: ContentWidths.reading,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

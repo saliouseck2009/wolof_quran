@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/daily_inspiration_cubit.dart';
+import '../../core/layout/breakpoints.dart';
+import '../../core/layout/content_constraint.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/bookmark_cubit.dart';
@@ -71,45 +73,73 @@ class HomePage extends StatelessWidget {
         ],
         child: Scaffold(
           backgroundColor: colorScheme.surface,
-          body: SafeArea(
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                  sliver: SliverToBoxAdapter(child: const HomeHeader()),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-                  sliver: SliverToBoxAdapter(
-                    child: const DailyInspirationCard(),
+          body: const SafeArea(child: _HomeBody()),
+        ),
+      ),
+    );
+  }
+}
+
+/// The home content, laid out for the width of the window.
+///
+/// Compact and medium windows stack everything in one column; an
+/// expanded one (a tablet in landscape) puts the verse and the reading
+/// card beside the menu, so the whole home fits without scrolling.
+class _HomeBody extends StatelessWidget {
+  const _HomeBody();
+
+  static const double _margin = 24;
+
+  @override
+  Widget build(BuildContext context) {
+    final sizeClass = WindowSizeClass.of(context);
+    final menu = BlocSelector<ReadingGoalsCubit, ReadingGoalsState, int?>(
+      selector: (state) => state.isLoading ? null : state.ongoing.length,
+      builder: (context, ongoingGoals) =>
+          HomeActionsGrid(ongoingGoals: ongoingGoals),
+    );
+
+    return CustomScrollView(
+      physics: const BouncingScrollPhysics(),
+      slivers: [
+        _section(top: 16, child: const HomeHeader()),
+        if (sizeClass == WindowSizeClass.expanded)
+          _section(
+            top: 24,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      DailyInspirationCard(),
+                      SizedBox(height: 16),
+                      HomeReadingCard(),
+                    ],
                   ),
                 ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                  sliver: SliverToBoxAdapter(child: const HomeReadingCard()),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-                  sliver: SliverToBoxAdapter(
-                    child:
-                        BlocSelector<
-                          ReadingGoalsCubit,
-                          ReadingGoalsState,
-                          int?
-                        >(
-                          selector: (state) =>
-                              state.isLoading ? null : state.ongoing.length,
-                          builder: (context, ongoingGoals) =>
-                              HomeActionsGrid(ongoingGoals: ongoingGoals),
-                        ),
-                  ),
-                ),
-                const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
+                const SizedBox(width: 24),
+                Expanded(child: menu),
               ],
             ),
-          ),
-        ),
+          )
+        else ...[
+          _section(top: 24, child: const DailyInspirationCard()),
+          _section(top: 16, child: const HomeReadingCard()),
+          _section(top: 24, child: menu),
+        ],
+        const SliverPadding(padding: EdgeInsets.only(bottom: 40)),
+      ],
+    );
+  }
+
+  Widget _section({required double top, required Widget child}) {
+    return SliverContentConstraint(
+      margin: _margin,
+      sliver: SliverPadding(
+        padding: EdgeInsets.only(top: top),
+        sliver: SliverToBoxAdapter(child: child),
       ),
     );
   }

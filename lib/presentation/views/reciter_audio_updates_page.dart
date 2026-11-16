@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
+import '../../core/layout/adaptive_list.dart';
+import '../../core/layout/breakpoints.dart';
 import '../../domain/entities/reciter.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/audio_availability_cubit.dart';
@@ -89,6 +91,9 @@ class _ReciterAudioUpdatesPageState extends State<ReciterAudioUpdatesPage> {
                 children: [
                   Container(
                     width: double.infinity,
+                    constraints: const BoxConstraints(
+                      maxWidth: ContentWidths.reading - 32,
+                    ),
                     margin: const EdgeInsets.all(16),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -104,7 +109,8 @@ class _ReciterAudioUpdatesPageState extends State<ReciterAudioUpdatesPage> {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
+                    child: AdaptiveListView(
+                      maxWidth: ContentWidths.reading - 32,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,

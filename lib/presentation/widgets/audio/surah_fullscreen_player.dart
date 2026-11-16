@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
+import '../../../core/layout/breakpoints.dart';
 import '../../../core/config/theme/app_color.dart';
 import '../../../core/services/audio_player_service.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -76,6 +77,8 @@ class _FullscreenContent extends StatelessWidget {
 
   const _FullscreenContent({required this.state});
 
+  static const double _controlsWidth = 560;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -105,73 +108,101 @@ class _FullscreenContent extends StatelessWidget {
         child: Scaffold(
           backgroundColor: colorScheme.surface,
           body: SafeArea(
-            child: Column(
-              children: [
-                // ── Header ────────────────────────────────────────────────
-                _FullscreenHeader(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final header = _FullscreenHeader(
                   tokens: t,
                   reciterName: activeReciterName,
                   onCollapse: () => _dismiss(context),
-                ),
-
-                const SizedBox(height: 8),
-
-                // ── Center content ───────────────────────────────────────
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Center(
-                      child: _CenterNowPlayingCard(
-                        state: state,
-                        tokens: t,
-                        surahTitle: _surahTitleWithNumber(
-                          context,
-                          state.surahNumber,
-                          fallbackName: state.surahName,
-                        ),
+                );
+                final nowPlaying = Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Center(
+                    child: _CenterNowPlayingCard(
+                      state: state,
+                      tokens: t,
+                      surahTitle: _surahTitleWithNumber(
+                        context,
+                        state.surahNumber,
+                        fallbackName: state.surahName,
                       ),
                     ),
                   ),
-                ),
+                );
+                // Seek bar, transport buttons and repeat mode; they stop
+                // growing on a tablet instead of spanning the window.
+                final controls = ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: _controlsWidth),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _SeekBar(state: state, total: total, tokens: t),
+                      const SizedBox(height: 12),
+                      _FullscreenControls(
+                        state: state,
+                        isPlaying: isPlaying,
+                        tokens: t,
+                        colorScheme: colorScheme,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () => context
+                                .read<SurahMiniPlayerCubit>()
+                                .cyclePlaybackMode(),
+                            icon: Icon(
+                              _playbackModeIcon(state.playbackMode),
+                              color: state.playbackMode == PlaybackMode.off
+                                  ? t.disabled
+                                  : t.accent,
+                            ),
+                            tooltip: _playbackModeTooltip(
+                              AppLocalizations.of(context)!,
+                              state.playbackMode,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
 
-                // ── Seek bar ──────────────────────────────────────────────
-                _SeekBar(state: state, total: total, tokens: t),
-                const SizedBox(height: 12),
-
-                // ── Controls ──────────────────────────────────────────────
-                _FullscreenControls(
-                  state: state,
-                  isPlaying: isPlaying,
-                  tokens: t,
-                  colorScheme: colorScheme,
-                ),
-
-                const SizedBox(height: 8),
-
-                // ── Repeat ────────────────────────────────────────────────
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                // A wide and short window (landscape): the artwork sits
+                // beside the controls instead of being squeezed above.
+                final sideBySide =
+                    constraints.maxWidth >= Breakpoints.medium &&
+                    constraints.maxWidth > constraints.maxHeight * 1.2;
+                if (sideBySide) {
+                  return Column(
+                    children: [
+                      header,
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Expanded(child: nowPlaying),
+                            Expanded(
+                              child: Center(
+                                child: SingleChildScrollView(child: controls),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Column(
                   children: [
-                    IconButton(
-                      onPressed: () => context
-                          .read<SurahMiniPlayerCubit>()
-                          .cyclePlaybackMode(),
-                      icon: Icon(
-                        _playbackModeIcon(state.playbackMode),
-                        color: state.playbackMode == PlaybackMode.off
-                            ? t.disabled
-                            : t.accent,
-                      ),
-                      tooltip: _playbackModeTooltip(
-                        AppLocalizations.of(context)!,
-                        state.playbackMode,
-                      ),
-                    ),
+                    header,
+                    const SizedBox(height: 8),
+                    Expanded(child: nowPlaying),
+                    controls,
+                    const SizedBox(height: 8),
                   ],
-                ),
-
-                const SizedBox(height: 8),
-              ],
+                );
+              },
             ),
           ),
         ),
@@ -276,7 +307,9 @@ class _CenterNowPlayingCard extends StatelessWidget {
           final availableHeight = constraints.maxHeight.isFinite
               ? constraints.maxHeight
               : 420.0;
-          final artworkSize = (availableHeight - 124).clamp(140.0, 260.0);
+          // Room for a larger artwork on a tablet; phones keep theirs.
+          final maxArtwork = constraints.maxWidth >= 480 ? 340.0 : 260.0;
+          final artworkSize = (availableHeight - 124).clamp(140.0, maxArtwork);
           final spacingAfterArtwork = artworkSize >= 220 ? 20.0 : 12.0;
           final spacingBeforeArabic = artworkSize >= 220 ? 6.0 : 4.0;
 
