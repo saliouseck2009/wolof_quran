@@ -404,6 +404,44 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String shareDefaultTextRange(
+    String surahName,
+    int firstVerse,
+    int lastVerse,
+  ) {
+    return 'Inspiration quotidienne - $surahName - Versets $firstVerse–$lastVerse';
+  }
+
+  @override
+  String get shareVersesTitle => 'Versets';
+
+  @override
+  String get shareFromVerse => 'Du verset';
+
+  @override
+  String get shareToVerse => 'au verset';
+
+  @override
+  String shareVideoTooLong(int minutes) {
+    return 'Vidéo trop longue (maximum $minutes min). Choisissez moins de versets.';
+  }
+
+  @override
+  String shareVideoLongForStatus(int seconds) {
+    return 'Plus de $seconds s : un statut WhatsApp coupera la vidéo.';
+  }
+
+  @override
+  String shareAudioMissingVerses(String verses) {
+    return 'Audio non téléchargé pour les versets : $verses.';
+  }
+
+  @override
+  String shareVideoProgress(int current, int total) {
+    return 'Verset $current sur $total';
+  }
+
+  @override
   String get bookmarkAdded => 'Marque-page ajouté';
 
   @override

@@ -814,6 +814,54 @@ abstract class AppLocalizations {
   /// **'Daily Inspiration - {surahName} - Verse {verseNumber}'**
   String shareDefaultText(String surahName, int verseNumber);
 
+  /// Default text shared alongside a video of several verses
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Inspiration - {surahName} - Verses {firstVerse}–{lastVerse}'**
+  String shareDefaultTextRange(String surahName, int firstVerse, int lastVerse);
+
+  /// Title of the verse range section of the share sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Verses'**
+  String get shareVersesTitle;
+
+  /// Label before the first verse of the shared range
+  ///
+  /// In en, this message translates to:
+  /// **'From verse'**
+  String get shareFromVerse;
+
+  /// Label before the last verse of the shared range
+  ///
+  /// In en, this message translates to:
+  /// **'to verse'**
+  String get shareToVerse;
+
+  /// Shown when the chosen verses make a video over the limit
+  ///
+  /// In en, this message translates to:
+  /// **'Video too long (maximum {minutes} min). Pick fewer verses.'**
+  String shareVideoTooLong(int minutes);
+
+  /// Warning for a video longer than a WhatsApp status
+  ///
+  /// In en, this message translates to:
+  /// **'Longer than {seconds} s: a WhatsApp status will cut the video.'**
+  String shareVideoLongForStatus(int seconds);
+
+  /// Verses of the range without a downloaded audio file
+  ///
+  /// In en, this message translates to:
+  /// **'No downloaded audio for verses: {verses}.'**
+  String shareAudioMissingVerses(String verses);
+
+  /// Progress of the video generation, verse by verse
+  ///
+  /// In en, this message translates to:
+  /// **'Verse {current} of {total}'**
+  String shareVideoProgress(int current, int total);
+
   /// Confirmation message when bookmark is added
   ///
   /// In en, this message translates to:

@@ -344,6 +344,7 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
                         activePage.title,
                         surahNameEnglish,
                         _currentSurahNumber,
+                        translationId: activePage.translation,
                       );
                     });
                   },
@@ -496,6 +497,7 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
         _TranslationPage(
           title: selectedOption?.displayName ?? localizations.translation,
           text: selectedText,
+          translation: selectedTranslation,
         ),
       );
     }
@@ -513,7 +515,13 @@ class _MushafVerseActionsSheetState extends State<MushafVerseActionsSheet> {
       if (text == null || text.trim().isEmpty) {
         continue;
       }
-      pages.add(_TranslationPage(title: option.displayName, text: text));
+      pages.add(
+        _TranslationPage(
+          title: option.displayName,
+          text: text,
+          translation: option.translation,
+        ),
+      );
     }
 
     if (pages.isEmpty) {
@@ -567,7 +575,14 @@ class _TranslationPage {
   final String title;
   final String text;
 
-  const _TranslationPage({required this.title, required this.text});
+  /// Translation [text] comes from; `null` for the Arabic fallback page.
+  final quran.Translation? translation;
+
+  const _TranslationPage({
+    required this.title,
+    required this.text,
+    this.translation,
+  });
 }
 
 class _VerseReference {

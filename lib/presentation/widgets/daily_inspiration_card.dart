@@ -131,7 +131,10 @@ class _VerseCard extends StatelessWidget {
             padding: const EdgeInsetsDirectional.only(end: 8),
             child: _CardLabel(
               trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: isDark
                       ? colorScheme.surfaceContainerHigh
@@ -252,6 +255,7 @@ class _VerseCard extends StatelessWidget {
                   _translationSourceName(state.currentTranslation),
                   state.surahName,
                   state.surahNumber,
+                  translationId: state.currentTranslation,
                 ),
               ),
               IconButton(

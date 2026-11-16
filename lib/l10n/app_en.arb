@@ -544,6 +544,72 @@
       }
     }
   },
+  "shareDefaultTextRange": "Daily Inspiration - {surahName} - Verses {firstVerse}–{lastVerse}",
+  "@shareDefaultTextRange": {
+    "description": "Default text shared alongside a video of several verses",
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      },
+      "firstVerse": {
+        "type": "int"
+      },
+      "lastVerse": {
+        "type": "int"
+      }
+    }
+  },
+  "shareVersesTitle": "Verses",
+  "@shareVersesTitle": {
+    "description": "Title of the verse range section of the share sheet"
+  },
+  "shareFromVerse": "From verse",
+  "@shareFromVerse": {
+    "description": "Label before the first verse of the shared range"
+  },
+  "shareToVerse": "to verse",
+  "@shareToVerse": {
+    "description": "Label before the last verse of the shared range"
+  },
+  "shareVideoTooLong": "Video too long (maximum {minutes} min). Pick fewer verses.",
+  "@shareVideoTooLong": {
+    "description": "Shown when the chosen verses make a video over the limit",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "shareVideoLongForStatus": "Longer than {seconds} s: a WhatsApp status will cut the video.",
+  "@shareVideoLongForStatus": {
+    "description": "Warning for a video longer than a WhatsApp status",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "shareAudioMissingVerses": "No downloaded audio for verses: {verses}.",
+  "@shareAudioMissingVerses": {
+    "description": "Verses of the range without a downloaded audio file",
+    "placeholders": {
+      "verses": {
+        "type": "String"
+      }
+    }
+  },
+  "shareVideoProgress": "Verse {current} of {total}",
+  "@shareVideoProgress": {
+    "description": "Progress of the video generation, verse by verse",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "bookmarkAdded": "Bookmark added",
   "@bookmarkAdded": {
     "description": "Confirmation message when bookmark is added"

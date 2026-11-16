@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
+import 'package:quran/quran.dart' as quran;
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/config/app_links.dart';
@@ -19,6 +20,7 @@ import '../blocs/mushaf/mushaf_bloc.dart';
 import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
+import '../utils/verse_video_selection.dart';
 import 'snackbar.dart';
 
 void showDailyInspirationShareModal(
@@ -28,8 +30,9 @@ void showDailyInspirationShareModal(
   String translation,
   String translationSource,
   String surahName,
-  int surahNumber,
-) {
+  int surahNumber, {
+  quran.Translation? translationId,
+}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -41,6 +44,7 @@ void showDailyInspirationShareModal(
       translationSource: translationSource,
       surahName: surahName,
       surahNumber: surahNumber,
+      translationId: translationId,
     ),
   );
 }
@@ -53,6 +57,11 @@ class DailyInspirationShareModal extends StatefulWidget {
   final String surahName;
   final int surahNumber;
 
+  /// Translation [translation] is taken from. The other verses of a
+  /// shared range are read from it; found from [translationSource], then
+  /// from the settings, when not given.
+  final quran.Translation? translationId;
+
   const DailyInspirationShareModal({
     super.key,
     required this.verseNumber,
@@ -61,6 +70,7 @@ class DailyInspirationShareModal extends StatefulWidget {
     required this.translationSource,
     required this.surahName,
     required this.surahNumber,
+    this.translationId,
   });
 
   @override
@@ -75,6 +85,126 @@ class _DailyInspirationShareModalState
   final GlobalKey _shareVideoButtonKey = GlobalKey();
 
   bool _isSharing = false;
+
+  // Verses to share: [_firstVerse] to [_lastVerse] of the surah, one
+  // card each. [_previewVerse] is the card on screen.
+  late int _firstVerse = widget.verseNumber;
+  late int _lastVerse = widget.verseNumber;
+  late int _previewVerse = widget.verseNumber;
+
+  /// Audios of the surah for the selected reciter, once loaded.
+  List<AyahAudio>? _surahAudios;
+  final Map<String, Duration> _probedDurations = {};
+
+  /// Audios of the selected verses; `null` until loaded, or when the
+  /// reciter has no audio for this surah on the device.
+  VerseAudioSelection? _audioSelection;
+  int _selectionRequest = 0;
+
+  VerseVideoBuilder? _videoBuilder;
+  bool _videoCancelled = false;
+
+  /// Verses encoded so far and their total, while a video is built.
+  final ValueNotifier<(int, int)?> _videoProgress = ValueNotifier(null);
+
+  int get _verseCount => quran.getVerseCount(widget.surahNumber);
+
+  /// Whether the verse is a real one of a surah with more than one
+  /// verse: some callers open the sheet without a surah number.
+  bool get _canPickRange =>
+      widget.surahNumber >= 1 &&
+      widget.surahNumber <= 114 &&
+      widget.verseNumber >= 1 &&
+      widget.verseNumber <= _verseCount &&
+      _verseCount > 1;
+
+  int get _selectedVerseCount => _lastVerse - _firstVerse + 1;
+
+  int get _maxLastVerse {
+    final byLimit = _firstVerse + VerseVideoLimits.maxVerses - 1;
+    return byLimit < _verseCount ? byLimit : _verseCount;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _refreshAudioSelection();
+    });
+  }
+
+  @override
+  void dispose() {
+    _videoProgress.dispose();
+    super.dispose();
+  }
+
+  void _setFirstVerse(int verse) {
+    setState(() {
+      _firstVerse = verse;
+      if (_lastVerse < verse) _lastVerse = verse;
+      if (_lastVerse > _maxLastVerse) _lastVerse = _maxLastVerse;
+      _previewVerse = _previewVerse.clamp(_firstVerse, _lastVerse);
+      _audioSelection = null;
+    });
+    _refreshAudioSelection();
+  }
+
+  void _setLastVerse(int verse) {
+    setState(() {
+      _lastVerse = verse;
+      _previewVerse = _previewVerse.clamp(_firstVerse, _lastVerse);
+      _audioSelection = null;
+    });
+    _refreshAudioSelection();
+  }
+
+  void _showPreviewVerse(int verse) {
+    if (verse < _firstVerse || verse > _lastVerse) return;
+    setState(() => _previewVerse = verse);
+  }
+
+  quran.Translation? get _rangeTranslation {
+    final given = widget.translationId;
+    if (given != null) return given;
+    for (final option in QuranSettingsCubit.availableTranslations) {
+      if (option.displayName == widget.translationSource) {
+        return option.translation;
+      }
+    }
+    try {
+      return context.read<QuranSettingsCubit>().state.selectedTranslation;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Arabic text and translation of [verse]. The verse the sheet was
+  /// opened on keeps the texts it was given.
+  (String, String) _textsOf(int verse) {
+    if (verse == widget.verseNumber) {
+      return (widget.arabicText, widget.translation);
+    }
+    final arabic = quran.getVerse(
+      widget.surahNumber,
+      verse,
+      verseEndSymbol: false,
+    );
+    final translation = _rangeTranslation;
+    var translated = '';
+    if (translation != null) {
+      try {
+        translated = quran.getVerseTranslation(
+          widget.surahNumber,
+          verse,
+          translation: translation,
+        );
+      } catch (_) {
+        translated = '';
+      }
+    }
+    return (arabic, translated);
+  }
 
   // Customization options
   late Color _selectedBackgroundColor;
@@ -186,8 +316,24 @@ class _DailyInspirationShareModalState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  RepaintBoundary(key: _captureKey, child: _buildPreviewCard()),
+                  GestureDetector(
+                    onHorizontalDragEnd: _onPreviewSwipe,
+                    child: RepaintBoundary(
+                      key: _captureKey,
+                      child: _buildPreviewCard(),
+                    ),
+                  ),
+                  if (_selectedVerseCount > 1) ...[
+                    const SizedBox(height: 8),
+                    _buildPreviewPager(),
+                  ],
                   const SizedBox(height: 32),
+                  if (_canPickRange) ...[
+                    _buildSectionTitle(localizations.shareVersesTitle),
+                    const SizedBox(height: 12),
+                    _buildRangeSelector(localizations),
+                    const SizedBox(height: 32),
+                  ],
                   _buildSectionTitle(localizations.backgroundStyle),
                   const SizedBox(height: 16),
                   _buildBackgroundColorSelector(),
@@ -227,7 +373,11 @@ class _DailyInspirationShareModalState
                       Expanded(
                         child: OutlinedButton.icon(
                           key: _shareVideoButtonKey,
-                          onPressed: _shareVideo,
+                          onPressed:
+                              _audioSelection?.length ==
+                                  VerseVideoLength.tooLong
+                              ? null
+                              : _shareVideo,
                           icon: Icon(
                             Icons.movie_creation_outlined,
                             color: colorScheme.primary,
@@ -270,7 +420,179 @@ class _DailyInspirationShareModalState
     );
   }
 
+  void _onPreviewSwipe(DragEndDetails details) {
+    final velocity = details.primaryVelocity ?? 0;
+    if (velocity.abs() < 100) return;
+    final towardsEnd = Directionality.of(context) == TextDirection.rtl
+        ? velocity > 0
+        : velocity < 0;
+    _showPreviewVerse(_previewVerse + (towardsEnd ? 1 : -1));
+  }
+
+  /// Moves between the cards of the range, under the preview.
+  Widget _buildPreviewPager() {
+    final colorScheme = Theme.of(context).colorScheme;
+    final localizations = MaterialLocalizations.of(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          key: const ValueKey('share-preview-previous'),
+          tooltip: localizations.previousPageTooltip,
+          onPressed: _previewVerse > _firstVerse
+              ? () => _showPreviewVerse(_previewVerse - 1)
+              : null,
+          icon: const Icon(Icons.chevron_left),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(
+            '${_previewVerse - _firstVerse + 1} / $_selectedVerseCount',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontFeatures: const [ui.FontFeature.tabularFigures()],
+            ),
+          ),
+        ),
+        IconButton(
+          key: const ValueKey('share-preview-next'),
+          tooltip: localizations.nextPageTooltip,
+          onPressed: _previewVerse < _lastVerse
+              ? () => _showPreviewVerse(_previewVerse + 1)
+              : null,
+          icon: const Icon(Icons.chevron_right),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRangeSelector(AppLocalizations localizations) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final selection = _audioSelection;
+    final duration = selection?.totalDuration;
+    final count = localizations.versesCount(_selectedVerseCount);
+    final summary = duration == null
+        ? count
+        : '$count · ${_formatDuration(duration)}';
+
+    String? notice;
+    var noticeIsError = false;
+    if (selection != null) {
+      if (selection.audios.isNotEmpty && selection.missingVerses.isNotEmpty) {
+        notice = localizations.shareAudioMissingVerses(
+          selection.missingVerses.join(', '),
+        );
+        noticeIsError = true;
+      } else if (selection.length == VerseVideoLength.tooLong) {
+        notice = localizations.shareVideoTooLong(
+          VerseVideoLimits.maxDuration.inMinutes,
+        );
+        noticeIsError = true;
+      } else if (selection.length == VerseVideoLength.longForStatus) {
+        notice = localizations.shareVideoLongForStatus(
+          VerseVideoLimits.statusDuration.inSeconds,
+        );
+      }
+    }
+
+    final labelStyle = theme.textTheme.bodyLarge?.copyWith(
+      color: colorScheme.onSurface,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 12,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(localizations.shareFromVerse, style: labelStyle),
+            _buildVerseDropdown(
+              key: const ValueKey('share-range-first'),
+              value: _firstVerse,
+              first: 1,
+              last: _verseCount,
+              onChanged: _setFirstVerse,
+            ),
+            Text(localizations.shareToVerse, style: labelStyle),
+            _buildVerseDropdown(
+              key: const ValueKey('share-range-last'),
+              value: _lastVerse,
+              first: _firstVerse,
+              last: _maxLastVerse,
+              onChanged: _setLastVerse,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          summary,
+          key: const ValueKey('share-range-summary'),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+            fontFeatures: const [ui.FontFeature.tabularFigures()],
+          ),
+        ),
+        if (notice != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            notice,
+            key: const ValueKey('share-range-notice'),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: noticeIsError
+                  ? colorScheme.error
+                  : colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildVerseDropdown({
+    required Key key,
+    required int value,
+    required int first,
+    required int last,
+    required ValueChanged<int> onChanged,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          key: key,
+          value: value,
+          menuMaxHeight: 320,
+          borderRadius: BorderRadius.circular(12),
+          items: [
+            for (var verse = first; verse <= last; verse++)
+              DropdownMenuItem(value: verse, child: Text('$verse')),
+          ],
+          onChanged: (verse) {
+            if (verse != null && verse != value) onChanged(verse);
+          },
+        ),
+      ),
+    );
+  }
+
+  static String _formatDuration(Duration duration) {
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
+  }
+
   Widget _buildPreviewCard() {
+    final (arabicText, translationText) = _textsOf(_previewVerse);
     final onBackground = _selectedForeground;
     final onBackgroundMuted = _selectedForegroundMuted;
     final showArabic =
@@ -303,27 +625,36 @@ class _DailyInspirationShareModalState
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 2),
-                      child: Icon(
-                        Icons.auto_stories_outlined,
-                        color: onBackground,
-                        size: 36,
+                // The surah label gives way first, so the header never
+                // overflows on a narrow card.
+                Flexible(
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 2),
+                        child: Icon(
+                          Icons.auto_stories_outlined,
+                          color: onBackground,
+                          size: 36,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${widget.surahName} (${widget.surahNumber}): ${widget.verseNumber}',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: onBackground,
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          '${widget.surahName} (${widget.surahNumber}): $_previewVerse',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: onBackground,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -349,11 +680,11 @@ class _DailyInspirationShareModalState
               child: _AyahTexts(
                 showArabic: showArabic,
                 showTranslation: showTranslation,
-                arabicText: widget.arabicText,
-                translationText: widget.translation,
+                arabicText: arabicText,
+                translationText: translationText,
                 translationSource: widget.translationSource,
                 surahNumber: widget.surahNumber,
-                verseNumber: widget.verseNumber,
+                verseNumber: _previewVerse,
                 onBackground: onBackground,
                 onBackgroundMuted: onBackgroundMuted,
               ),
@@ -514,47 +845,159 @@ class _DailyInspirationShareModalState
         }
         return [XFile(imageFile.path, mimeType: 'image/png')];
       },
-      shareText: _buildShareText(localizations),
+      shareText: _buildShareText(localizations, _previewVerse, _previewVerse),
       fallbackMessage: localizations.shareActionCancelled,
     );
   }
 
   Future<void> _shareVideo() async {
     final localizations = AppLocalizations.of(context)!;
+    _videoCancelled = false;
+    _videoProgress.value = null;
     await _shareWithGuard(
       originKey: _shareVideoButtonKey,
       isVideoShare: true,
-      prepareFiles: () async {
-        final imageFile = await _capturePreviewToFile(jpeg: true);
-        if (imageFile == null) {
-          _showMessage(localizations.shareCaptureFailed);
-          return null;
-        }
-
-        final audioPath = await _getAyahAudioPath();
-        if (audioPath == null) return null;
-
-        final videoPath = await _generateVideoFromAssets(
-          imagePath: imageFile.path,
-          audioPath: audioPath,
-        );
-        if (videoPath == null) {
-          _showMessage(localizations.shareVideoGenerationFailed);
-          return null;
-        }
-
-        return [XFile(videoPath, mimeType: 'video/mp4')];
-      },
-      shareText: _buildShareText(localizations),
+      prepareFiles: _prepareVideo,
+      shareText: _buildShareText(localizations, _firstVerse, _lastVerse),
       fallbackMessage: localizations.shareActionCancelled,
     );
   }
 
-  String _buildShareText(AppLocalizations localizations) {
-    final baseText = localizations.shareDefaultText(
-      widget.surahName,
-      widget.verseNumber,
+  /// Builds the video of the selected verses; `null`, after telling the
+  /// user why, when it cannot be built or was cancelled.
+  Future<List<XFile>?> _prepareVideo() async {
+    final localizations = AppLocalizations.of(context)!;
+    final firstVerse = _firstVerse;
+    final lastVerse = _lastVerse;
+
+    final selection = await _resolveAudioSelection(
+      firstVerse: firstVerse,
+      lastVerse: lastVerse,
+      silent: false,
     );
+    if (selection == null) return null;
+    if (!selection.isComplete) {
+      _showMessage(
+        firstVerse == lastVerse
+            ? localizations.shareAudioFileMissingAyah
+            : localizations.shareAudioMissingVerses(
+                selection.missingVerses.join(', '),
+              ),
+      );
+      return null;
+    }
+    if (selection.length == VerseVideoLength.tooLong) {
+      _showMessage(
+        localizations.shareVideoTooLong(VerseVideoLimits.maxDuration.inMinutes),
+      );
+      return null;
+    }
+
+    final cards = await _captureRangeCards(firstVerse, lastVerse);
+    try {
+      if (_videoCancelled) return null;
+      if (cards == null) {
+        _showMessage(localizations.shareCaptureFailed);
+        return null;
+      }
+
+      final tempDir = await getTemporaryDirectory();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final verses = firstVerse == lastVerse
+          ? 'verse_$firstVerse'
+          : 'verses_${firstVerse}_$lastVerse';
+      final builder = VerseVideoBuilder();
+      _videoBuilder = builder;
+      final result = await builder.build(
+        segments: [
+          for (var index = 0; index < cards.length; index++)
+            VerseVideoSegment(
+              imagePath: cards[index].path,
+              audioPath: selection.audios[index].localPath,
+            ),
+        ],
+        workDir: tempDir,
+        outputPath:
+            '${tempDir.path}/chapter_${widget.surahNumber}_${verses}_$timestamp.mp4',
+        onProgress: (done, total) {
+          if (mounted) _videoProgress.value = (done, total);
+        },
+      );
+
+      switch (result.status) {
+        case VerseVideoStatus.success:
+          return [XFile(result.path!, mimeType: 'video/mp4')];
+        case VerseVideoStatus.cancelled:
+          return null;
+        case VerseVideoStatus.failed:
+          _showMessage(localizations.shareVideoGenerationFailed);
+          return null;
+      }
+    } finally {
+      _videoBuilder = null;
+      for (final card in cards ?? const <File>[]) {
+        try {
+          await card.delete();
+        } catch (_) {
+          // Left to the system's temporary files clean-up.
+        }
+      }
+    }
+  }
+
+  void _cancelVideo() {
+    _videoCancelled = true;
+    _videoBuilder?.cancel();
+  }
+
+  /// Renders the card of each verse in turn and captures it; `null`
+  /// when a capture fails or the video is cancelled meanwhile.
+  Future<List<File>?> _captureRangeCards(int firstVerse, int lastVerse) async {
+    final shownVerse = _previewVerse;
+    final cards = <File>[];
+    try {
+      for (var verse = firstVerse; verse <= lastVerse; verse++) {
+        if (!mounted || _videoCancelled) return _discard(cards);
+        if (_previewVerse != verse) {
+          setState(() => _previewVerse = verse);
+          await WidgetsBinding.instance.endOfFrame;
+          if (!mounted) return _discard(cards);
+        }
+        final card = await _capturePreviewToFile(jpeg: true);
+        if (card == null) return _discard(cards);
+        cards.add(card);
+      }
+      return cards;
+    } finally {
+      if (mounted && _previewVerse != shownVerse) {
+        setState(() => _previewVerse = shownVerse);
+      }
+    }
+  }
+
+  List<File>? _discard(List<File> cards) {
+    for (final card in cards) {
+      try {
+        card.deleteSync();
+      } catch (_) {
+        // Left to the system's temporary files clean-up.
+      }
+    }
+    return null;
+  }
+
+  String _buildShareText(
+    AppLocalizations localizations,
+    int firstVerse,
+    int lastVerse,
+  ) {
+    final baseText = firstVerse == lastVerse
+        ? localizations.shareDefaultText(widget.surahName, firstVerse)
+        : localizations.shareDefaultTextRange(
+            widget.surahName,
+            firstVerse,
+            lastVerse,
+          );
     return '$baseText\n\nAndroid: ${AppLinks.playStoreUrl}\niOS: ${AppLinks.appStoreUrl}';
   }
 
@@ -677,22 +1120,52 @@ class _DailyInspirationShareModalState
               ],
             ),
             const SizedBox(height: 12),
-            Text(
-              statusText,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-                height: 1.25,
-              ),
+            ValueListenableBuilder<(int, int)?>(
+              valueListenable: _videoProgress,
+              builder: (context, progress, _) {
+                // Per-verse progress only makes sense for several verses.
+                final steps =
+                    isVideoShare && progress != null && progress.$2 > 1
+                    ? progress
+                    : null;
+                final current = steps == null
+                    ? 0
+                    : (steps.$1 + 1).clamp(1, steps.$2);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      steps == null
+                          ? statusText
+                          : '$statusText\n${localizations.shareVideoProgress(current, steps.$2)}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: LinearProgressIndicator(
+                        value: steps == null ? null : steps.$1 / steps.$2,
+                        minHeight: 7,
+                        backgroundColor: colorScheme.surfaceContainerHighest,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 14),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(99),
-              child: LinearProgressIndicator(
-                minHeight: 7,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                color: colorScheme.primary,
+            if (isVideoShare)
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton(
+                  key: const ValueKey('share-video-cancel'),
+                  onPressed: _cancelVideo,
+                  child: Text(localizations.cancel),
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -771,18 +1244,24 @@ class _DailyInspirationShareModalState
     final tempDir = await getTemporaryDirectory();
     final extension = jpeg ? 'jpg' : 'png';
     final file = File(
-      '${tempDir.path}/daily_inspiration_${widget.surahNumber}_${widget.verseNumber}_${DateTime.now().millisecondsSinceEpoch}.$extension',
+      '${tempDir.path}/daily_inspiration_${widget.surahNumber}_${_previewVerse}_${DateTime.now().microsecondsSinceEpoch}.$extension',
     );
     await file.writeAsBytes(uint8List);
     return file;
   }
 
-  Future<String?> _getAyahAudioPath() async {
+  /// Audios of the surah for the selected reciter; `null` when there are
+  /// none on the device. Says why unless [silent].
+  Future<List<AyahAudio>?> _loadSurahAudios({required bool silent}) async {
+    void tell(String message) {
+      if (!silent) _showMessage(message);
+    }
+
     final localizations = AppLocalizations.of(context)!;
     final quranSettings = context.read<QuranSettingsCubit>();
     final selectedReciter = quranSettings.state.selectedReciter;
     if (selectedReciter == null) {
-      _showMessage(localizations.shareSelectReciterForVideo);
+      tell(localizations.shareSelectReciterForVideo);
       return null;
     }
 
@@ -806,54 +1285,79 @@ class _DailyInspirationShareModalState
       final key = '${selectedReciter.id}_${widget.surahNumber}';
       ayahAudios = audioState.previousAyahAudiosMap[key] ?? [];
     } else {
-      _showMessage(localizations.shareAudioUnavailableForSurah);
+      tell(localizations.shareAudioUnavailableForSurah);
       return null;
     }
 
     if (ayahAudios.isEmpty) {
-      _showMessage(localizations.shareAudioNotDownloaded);
+      tell(localizations.shareAudioNotDownloaded);
       return null;
     }
-
-    final AyahAudio ayahAudio = ayahAudios.firstWhere(
-      (audio) => audio.ayahNumber == widget.verseNumber,
-      orElse: () => const AyahAudio(
-        surahNumber: -1,
-        ayahNumber: -1,
-        reciterId: '',
-        localPath: '',
-      ),
-    );
-
-    if ((ayahAudio.surahNumber == -1 || ayahAudio.localPath.isEmpty)) {
-      _showMessage(localizations.shareAudioFileMissingAyah);
-      return null;
-    }
-
-    final file = File(ayahAudio.localPath);
-    if (!await file.exists()) {
-      _showMessage(localizations.shareAudioFileMissingDevice);
-      return null;
-    }
-
-    return file.path;
+    return ayahAudios;
   }
 
-  Future<String?> _generateVideoFromAssets({
-    required String imagePath,
-    required String audioPath,
+  /// Audios of the verses [firstVerse] to [lastVerse], with their
+  /// lengths; `null` when the surah has no audio on the device.
+  Future<VerseAudioSelection?> _resolveAudioSelection({
+    required int firstVerse,
+    required int lastVerse,
+    required bool silent,
   }) async {
-    final tempDir = await getTemporaryDirectory();
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final outputPath =
-        '${tempDir.path}/chapter_${widget.surahNumber}_verse_${widget.verseNumber}_$timestamp.mp4';
+    // A share reads the files again: one may have been deleted since.
+    final surahAudios = silent && _surahAudios != null
+        ? _surahAudios
+        : await _loadSurahAudios(silent: silent);
+    if (surahAudios == null) return null;
+    _surahAudios = surahAudios;
 
-    final result = await VerseVideoBuilder().build(
-      segments: [VerseVideoSegment(imagePath: imagePath, audioPath: audioPath)],
-      workDir: tempDir,
-      outputPath: outputPath,
+    final selection = VerseAudioSelection.resolve(
+      available: surahAudios,
+      firstVerse: firstVerse,
+      lastVerse: lastVerse,
+      fileExists: (path) => File(path).existsSync(),
     );
-    return result.path;
+
+    // The length of an audio is cached the first time it is played; ask
+    // ffprobe for those never played.
+    final audios = <AyahAudio>[];
+    for (final audio in selection.audios) {
+      final duration =
+          audio.duration ??
+          (_probedDurations[audio.localPath] ??=
+              await VerseVideoBuilder.probeDuration(audio.localPath) ??
+              Duration.zero);
+      audios.add(
+        AyahAudio(
+          surahNumber: audio.surahNumber,
+          ayahNumber: audio.ayahNumber,
+          reciterId: audio.reciterId,
+          localPath: audio.localPath,
+          duration: duration == Duration.zero ? null : duration,
+        ),
+      );
+    }
+    return VerseAudioSelection(
+      audios: audios,
+      missingVerses: selection.missingVerses,
+    );
+  }
+
+  /// Reloads [_audioSelection] for the selected verses.
+  Future<void> _refreshAudioSelection() async {
+    if (!_canPickRange) return;
+    final request = ++_selectionRequest;
+    VerseAudioSelection? selection;
+    try {
+      selection = await _resolveAudioSelection(
+        firstVerse: _firstVerse,
+        lastVerse: _lastVerse,
+        silent: true,
+      );
+    } catch (_) {
+      selection = null;
+    }
+    if (!mounted || request != _selectionRequest) return;
+    setState(() => _audioSelection = selection);
   }
 
   void _showMessage(String message) {

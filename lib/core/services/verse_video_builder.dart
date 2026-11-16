@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:ffmpeg_kit_flutter_new_min_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_new_min_gpl/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
 
 /// One verse of a shared video: its card, shown while its audio plays.
@@ -206,4 +207,21 @@ class VerseVideoBuilder {
   }
 
   static Future<void> _cancelFfmpeg() => FFmpegKit.cancel();
+
+  /// Length of the audio file at [path], read by ffprobe; `null` when
+  /// it cannot be read.
+  static Future<Duration?> probeDuration(String path) async {
+    try {
+      final session = await FFprobeKit.getMediaInformation(path);
+      final seconds = double.tryParse(
+        session.getMediaInformation()?.getDuration() ?? '',
+      );
+      if (seconds == null || seconds <= 0) {
+        return null;
+      }
+      return Duration(milliseconds: (seconds * 1000).round());
+    } catch (_) {
+      return null;
+    }
+  }
 }
