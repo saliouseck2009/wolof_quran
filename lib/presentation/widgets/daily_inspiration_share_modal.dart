@@ -207,22 +207,31 @@ class _DailyInspirationShareModalState
   }
 
   // Customization options
-  late Color _selectedBackgroundColor;
+  late _ShareBackground _selectedBackground;
   AyahDisplayMode _selectedDisplayMode = AyahDisplayMode.both;
 
-  // Available background colors
-  late List<Color> _backgroundColors;
+  /// Backgrounds offered for the card, in the order they are shown.
+  late List<_ShareBackground> _backgrounds;
   bool _didConfigureTheme = false;
 
-  Color get _selectedForeground {
-    final brightness = ThemeData.estimateBrightnessForColor(
-      _selectedBackgroundColor,
-    );
-    return brightness == Brightness.dark ? Colors.white : Colors.black87;
-  }
+  /// Tool whose options are shown over the bottom of the card.
+  _ShareTool? _openTool;
+
+  Color get _selectedBackgroundColor => _selectedBackground.color;
+
+  bool get _isDarkBackground =>
+      ThemeData.estimateBrightnessForColor(_selectedBackgroundColor) ==
+      Brightness.dark;
+
+  Color get _selectedForeground =>
+      _isDarkBackground ? Colors.white : const Color(0xFF1B1F1E);
 
   Color get _selectedForegroundMuted =>
-      _selectedForeground.withValues(alpha: 0.72);
+      _selectedForeground.withValues(alpha: 0.78);
+
+  /// Colour of the ornament between the Arabic text and its translation.
+  Color get _selectedAccent =>
+      _isDarkBackground ? const Color(0xFFE9D48F) : const Color(0xFF8A7430);
 
   @override
   void didChangeDependencies() {
@@ -235,42 +244,34 @@ class _DailyInspirationShareModalState
     } catch (_) {
       mushafBloc = null;
     }
-    final mushafThemeColor = mushafBloc?.state.theme.pageBackgroundColor;
-    final mushafPalette = MushafThemeData.allThemes
-        .map((theme) => theme.pageBackgroundColor)
-        .toSet()
-        .toList(growable: false);
+    final mushafColor = mushafBloc?.state.theme.pageBackgroundColor;
 
-    final colorScheme = Theme.of(context).colorScheme;
-    _backgroundColors = mushafPalette.isNotEmpty
-        ? mushafPalette
-        : <Color>{
-            colorScheme.primary,
-            colorScheme.primaryContainer,
-            colorScheme.secondary,
-            colorScheme.secondaryContainer,
-            colorScheme.tertiary,
-            colorScheme.tertiaryContainer,
-            colorScheme.surface,
-            colorScheme.surfaceContainerHighest,
-            colorScheme.inverseSurface,
-            colorScheme.error,
-          }.toList();
-
-    _selectedBackgroundColor = mushafThemeColor ?? _backgroundColors.first;
+    // The card opens on the colour of the reader's Mushaf: it is added to
+    // the list when it is not one of the backgrounds always offered.
+    _backgrounds = [..._ShareBackground.curated];
+    var selected = _backgrounds.first;
+    if (mushafColor != null) {
+      final match = _backgrounds.where((b) => b.color == mushafColor);
+      if (match.isNotEmpty) {
+        selected = match.first;
+      } else {
+        selected = _ShareBackground(mushafColor, (l) => l.shareBgMushaf);
+        _backgrounds.insert(0, selected);
+      }
+    }
+    _selectedBackground = selected;
     _didConfigureTheme = true;
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final localizations = AppLocalizations.of(context)!;
     final isDark = colorScheme.brightness == Brightness.dark;
 
     return Container(
       height: double.infinity,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -285,138 +286,190 @@ class _DailyInspirationShareModalState
           Container(
             width: 40,
             height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 12),
+            margin: const EdgeInsets.only(top: 10, bottom: 2),
             decoration: BoxDecoration(
               color: colorScheme.outlineVariant.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          _buildHeader(localizations),
+          Expanded(child: _buildStage(localizations)),
+          if (_selectedVerseCount > 1) _buildPreviewPager(),
+          _buildToolBar(localizations),
+          _buildShareBar(localizations),
+        ],
+      ),
+    );
+  }
+
+  /// The app's green as text, icon or outline on the sheet: the primary
+  /// colour is too dark to read on a dark surface.
+  Color _accentOn(ColorScheme colorScheme) =>
+      colorScheme.brightness == Brightness.dark
+      ? colorScheme.tertiary
+      : colorScheme.primary;
+
+  Widget _buildHeader(AppLocalizations localizations) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(start: 20, end: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   localizations.shareAyah,
-                  style: textTheme.titleMedium?.copyWith(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: colorScheme.onSurface,
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
-                ),
+                if (_canPickRange)
+                  Text(
+                    localizations.shareVerseLabel(_previewVerse),
+                    key: const ValueKey('share-preview-verse'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                      fontFeatures: const [ui.FontFeature.tabularFigures()],
+                    ),
+                  ),
               ],
             ),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 64),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  GestureDetector(
-                    onHorizontalDragEnd: _onPreviewSwipe,
-                    child: RepaintBoundary(
-                      key: _captureKey,
-                      child: _buildPreviewCard(),
-                    ),
-                  ),
-                  if (_selectedVerseCount > 1) ...[
-                    const SizedBox(height: 8),
-                    _buildPreviewPager(),
-                  ],
-                  const SizedBox(height: 32),
-                  if (_canPickRange) ...[
-                    _buildSectionTitle(localizations.shareVersesTitle),
-                    const SizedBox(height: 12),
-                    _buildRangeSelector(localizations),
-                    const SizedBox(height: 32),
-                  ],
-                  _buildSectionTitle(localizations.backgroundStyle),
-                  const SizedBox(height: 16),
-                  _buildBackgroundColorSelector(),
-                  const SizedBox(height: 32),
-                  _buildSectionTitle(localizations.displayStyle),
-                  const SizedBox(height: 16),
-                  _buildDisplayModeSelector(localizations),
-                  const SizedBox(height: 32),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          key: _shareImageButtonKey,
-                          onPressed: _shareImage,
-                          icon: Icon(
-                            Icons.image_outlined,
-                            color: colorScheme.onPrimary,
-                          ),
-                          label: Text(
-                            localizations.shareImage,
-                            style: textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: colorScheme.onPrimary,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: colorScheme.primary,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          key: _shareVideoButtonKey,
-                          onPressed:
-                              _audioSelection?.length ==
-                                  VerseVideoLength.tooLong
-                              ? null
-                              : _shareVideo,
-                          icon: Icon(
-                            Icons.movie_creation_outlined,
-                            color: colorScheme.primary,
-                          ),
-                          label: Text(
-                            localizations.shareVideo,
-                            style: textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: colorScheme.primary,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: colorScheme.primary),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+          IconButton(
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    final theme = Theme.of(context);
-    return Text(
-      title,
-      style: theme.textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: theme.colorScheme.onSurface,
+  /// The card, as large as the sheet allows, with the options of the
+  /// open tool over its bottom edge.
+  Widget _buildStage(AppLocalizations localizations) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
+            child: Center(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _openTool == null
+                    ? null
+                    : () => setState(() => _openTool = null),
+                onHorizontalDragEnd: _onPreviewSwipe,
+                child: AspectRatio(
+                  aspectRatio: 9 / 16,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.3 : 0.14,
+                          ),
+                          blurRadius: 22,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      // The card is always laid out at the same size and
+                      // scaled to fit, so the shared image is the same on
+                      // every screen.
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: RepaintBoundary(
+                          key: _captureKey,
+                          child: _buildPreviewCard(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: 12,
+          right: 12,
+          bottom: 4,
+          child: Center(
+            heightFactor: 1,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: _buildTray(localizations),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTray(AppLocalizations localizations) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final tool = _openTool;
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 180),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.08),
+            end: Offset.zero,
+          ).animate(animation),
+          child: child,
+        ),
       ),
+      child: tool == null
+          ? const SizedBox(
+              key: ValueKey('share-tray-none'),
+              width: double.infinity,
+            )
+          : Container(
+              key: ValueKey('share-tray-${tool.name}'),
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark ? colorScheme.surfaceContainerHigh : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.2),
+                    blurRadius: 28,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: switch (tool) {
+                _ShareTool.text => _buildDisplayModeSelector(localizations),
+                _ShareTool.background => _buildBackgroundColorSelector(
+                  localizations,
+                ),
+                _ShareTool.verses => _buildRangeSelector(localizations),
+              },
+            ),
     );
   }
 
@@ -433,48 +486,197 @@ class _DailyInspirationShareModalState
   Widget _buildPreviewPager() {
     final colorScheme = Theme.of(context).colorScheme;
     final localizations = MaterialLocalizations.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          key: const ValueKey('share-preview-previous'),
-          tooltip: localizations.previousPageTooltip,
-          onPressed: _previewVerse > _firstVerse
-              ? () => _showPreviewVerse(_previewVerse - 1)
-              : null,
-          icon: const Icon(Icons.chevron_left),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(
-            '${_previewVerse - _firstVerse + 1} / $_selectedVerseCount',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-              fontFeatures: const [ui.FontFeature.tabularFigures()],
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    return SizedBox(
+      height: 40,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            key: const ValueKey('share-preview-previous'),
+            tooltip: localizations.previousPageTooltip,
+            visualDensity: VisualDensity.compact,
+            onPressed: _previewVerse > _firstVerse
+                ? () => _showPreviewVerse(_previewVerse - 1)
+                : null,
+            icon: Icon(isRtl ? Icons.chevron_right : Icons.chevron_left),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              '${_previewVerse - _firstVerse + 1} / $_selectedVerseCount',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontFeatures: const [ui.FontFeature.tabularFigures()],
+              ),
             ),
           ),
-        ),
-        IconButton(
-          key: const ValueKey('share-preview-next'),
-          tooltip: localizations.nextPageTooltip,
-          onPressed: _previewVerse < _lastVerse
-              ? () => _showPreviewVerse(_previewVerse + 1)
-              : null,
-          icon: const Icon(Icons.chevron_right),
-        ),
-      ],
+          IconButton(
+            key: const ValueKey('share-preview-next'),
+            tooltip: localizations.nextPageTooltip,
+            visualDensity: VisualDensity.compact,
+            onPressed: _previewVerse < _lastVerse
+                ? () => _showPreviewVerse(_previewVerse + 1)
+                : null,
+            icon: Icon(isRtl ? Icons.chevron_left : Icons.chevron_right),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildRangeSelector(AppLocalizations localizations) {
+  /// The three tools; each opens its options over the bottom of the card.
+  Widget _buildToolBar(AppLocalizations localizations) {
+    final colorScheme = Theme.of(context).colorScheme;
+    // A range shows its two numbers only: with the word in front, the
+    // label does not fit a phone. Screen readers still get it in full.
+    final hasRange = _selectedVerseCount > 1;
+    final versesLabel = hasRange
+        ? '$_firstVerse–$_lastVerse'
+        : localizations.shareVersesTitle;
+
+    return _buildBarContent(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 10,
+            child: _buildToolButton(
+              tool: _ShareTool.text,
+              label: localizations.shareToolText,
+              leading: (color) =>
+                  Icon(Icons.text_fields, size: 18, color: color),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 10,
+            child: _buildToolButton(
+              tool: _ShareTool.background,
+              label: localizations.shareToolBackground,
+              leading: (_) => Container(
+                width: 16,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: _selectedBackgroundColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: colorScheme.onSurface.withValues(alpha: 0.25),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_canPickRange) ...[
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 13,
+              child: _buildToolButton(
+                tool: _ShareTool.verses,
+                label: versesLabel,
+                semanticLabel: hasRange
+                    ? localizations.shareToolVersesRange(
+                        _firstVerse,
+                        _lastVerse,
+                      )
+                    : null,
+                leading: (color) =>
+                    Icon(Icons.format_list_numbered, size: 18, color: color),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Keeps a bar of buttons at a comfortable width on a wide screen.
+  Widget _buildBarContent({
+    required EdgeInsets padding,
+    required Widget child,
+  }) {
+    return Center(
+      heightFactor: 1,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: Padding(padding: padding, child: child),
+      ),
+    );
+  }
+
+  Widget _buildToolButton({
+    required _ShareTool tool,
+    required String label,
+    required Widget Function(Color color) leading,
+    String? semanticLabel,
+  }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final selected = _openTool == tool;
+    final foreground = selected
+        ? _accentOn(colorScheme)
+        : colorScheme.onSurface;
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: semanticLabel,
+      excludeSemantics: semanticLabel != null,
+      child: Material(
+        color: selected
+            ? _accentOn(colorScheme).withValues(alpha: 0.14)
+            : (isDark ? colorScheme.surfaceContainerHigh : Colors.white),
+        shape: StadiumBorder(
+          side: BorderSide(
+            color: selected
+                ? _accentOn(colorScheme)
+                : colorScheme.outlineVariant,
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          key: ValueKey('share-tool-${tool.name}'),
+          onTap: () => setState(() => _openTool = selected ? null : tool),
+          child: Container(
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                leading(foreground),
+                const SizedBox(width: 6),
+                // A label a little too wide is scaled down, not cut.
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: foreground,
+                        fontFeatures: const [ui.FontFeature.tabularFigures()],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The share actions, always in reach under the card.
+  Widget _buildShareBar(AppLocalizations localizations) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
     final selection = _audioSelection;
-    final duration = selection?.totalDuration;
-    final count = localizations.versesCount(_selectedVerseCount);
-    final summary = duration == null
-        ? count
-        : '$count · ${_formatDuration(duration)}';
 
     String? notice;
     var noticeIsError = false;
@@ -496,15 +698,154 @@ class _DailyInspirationShareModalState
       }
     }
 
-    final labelStyle = theme.textTheme.bodyLarge?.copyWith(
+    final duration = selection?.totalDuration;
+    final videoLabel = duration == null
+        ? localizations.shareVideoShort
+        : '${localizations.shareVideoShort} · ${_formatDuration(duration)}';
+    final buttonShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(14),
+    );
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? colorScheme.surfaceContainer : Colors.white,
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: _buildBarContent(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (notice != null) ...[
+                _buildNotice(notice, isError: noticeIsError),
+                const SizedBox(height: 8),
+              ],
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      key: _shareImageButtonKey,
+                      onPressed: _shareImage,
+                      icon: Icon(
+                        Icons.image_outlined,
+                        color: colorScheme.onPrimary,
+                      ),
+                      label: Text(
+                        localizations.shareImageShort,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        minimumSize: const Size.fromHeight(52),
+                        shape: buttonShape,
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      key: _shareVideoButtonKey,
+                      onPressed:
+                          _audioSelection?.length == VerseVideoLength.tooLong
+                          ? null
+                          : _shareVideo,
+                      icon: Icon(
+                        Icons.movie_creation_outlined,
+                        color: _accentOn(colorScheme),
+                      ),
+                      label: Text(
+                        videoLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: _accentOn(colorScheme),
+                          fontFeatures: const [ui.FontFeature.tabularFigures()],
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: _accentOn(colorScheme)),
+                        minimumSize: const Size.fromHeight(52),
+                        shape: buttonShape,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// What stops or shortens the video, right above the button it is about.
+  Widget _buildNotice(String notice, {required bool isError}) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final background = isError
+        ? colorScheme.errorContainer
+        : colorScheme.secondaryContainer;
+    final foreground = isError
+        ? colorScheme.onErrorContainer
+        : colorScheme.onSecondaryContainer;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isError ? Icons.error_outline : Icons.info_outline,
+            size: 16,
+            color: foreground,
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              notice,
+              key: const ValueKey('share-range-notice'),
+              style: theme.textTheme.bodySmall?.copyWith(color: foreground),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRangeSelector(AppLocalizations localizations) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final duration = _audioSelection?.totalDuration;
+    final count = localizations.versesCount(_selectedVerseCount);
+    final summary = duration == null
+        ? count
+        : '$count · ${_formatDuration(duration)}';
+    final labelStyle = theme.textTheme.bodyMedium?.copyWith(
       color: colorScheme.onSurface,
     );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Wrap(
-          spacing: 12,
+          spacing: 10,
           runSpacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
@@ -526,27 +867,15 @@ class _DailyInspirationShareModalState
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         Text(
           summary,
           key: const ValueKey('share-range-summary'),
-          style: theme.textTheme.bodyMedium?.copyWith(
+          style: theme.textTheme.bodySmall?.copyWith(
             color: colorScheme.onSurfaceVariant,
             fontFeatures: const [ui.FontFeature.tabularFigures()],
           ),
         ),
-        if (notice != null) ...[
-          const SizedBox(height: 6),
-          Text(
-            notice,
-            key: const ValueKey('share-range-notice'),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: noticeIsError
-                  ? colorScheme.error
-                  : colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -591,6 +920,16 @@ class _DailyInspirationShareModalState
     return '$minutes:$seconds';
   }
 
+  /// Surah and verse shown at the top of the card; `null` when the sheet
+  /// was opened without a surah name.
+  String? get _cardReference {
+    final name = widget.surahName.trim();
+    if (name.isEmpty) return null;
+    final isRealSurah = widget.surahNumber >= 1 && widget.surahNumber <= 114;
+    return isRealSurah ? '$name · ${widget.surahNumber}:$_previewVerse' : name;
+  }
+
+  /// The shared image: always [_cardSize], whatever the screen.
   Widget _buildPreviewCard() {
     final (arabicText, translationText) = _textsOf(_previewVerse);
     final onBackground = _selectedForeground;
@@ -601,81 +940,35 @@ class _DailyInspirationShareModalState
     final showTranslation =
         _selectedDisplayMode == AyahDisplayMode.both ||
         _selectedDisplayMode == AyahDisplayMode.translationOnly;
+    final reference = _cardReference;
+    // Spacing out the letters would break a name written in Arabic script.
+    final referenceIsLatin =
+        reference != null && !RegExp(r'[؀-ۿ]').hasMatch(reference);
 
-    return AspectRatio(
-      aspectRatio: 9 / 16,
+    return MediaQuery.withNoTextScaling(
       child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: _selectedBackgroundColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: Theme.of(context).brightness == Brightness.dark
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ]
-              : null,
-        ),
+        key: const ValueKey('share-card'),
+        width: _cardSize.width,
+        height: _cardSize.height,
+        color: _selectedBackgroundColor,
+        padding: const EdgeInsets.fromLTRB(32, 36, 32, 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // The surah label gives way first, so the header never
-                // overflows on a narrow card.
-                Flexible(
-                  child: Row(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 2),
-                        child: Icon(
-                          Icons.auto_stories_outlined,
-                          color: onBackground,
-                          size: 36,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          '${widget.surahName} (${widget.surahNumber}): $_previewVerse',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: onBackground,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+            if (reference != null)
+              Text(
+                referenceIsLatin ? reference.toUpperCase() : reference,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: referenceIsLatin ? 2.2 : 0,
+                  color: onBackgroundMuted,
                 ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: onBackgroundMuted.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    Constants.appName,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: onBackground,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
+              ),
+            const SizedBox(height: 12),
             Expanded(
               child: _AyahTexts(
                 showArabic: showArabic,
@@ -686,149 +979,187 @@ class _DailyInspirationShareModalState
                 surahNumber: widget.surahNumber,
                 verseNumber: _previewVerse,
                 onBackground: onBackground,
-                onBackgroundMuted: onBackgroundMuted,
+                accent: _selectedAccent,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.auto_stories_outlined,
+                  color: onBackgroundMuted,
+                  size: 16,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  Constants.appName,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.4,
+                    color: onBackgroundMuted,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBackgroundColorSelector() {
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: _backgroundColors.map((color) {
-        final isSelected = color == _selectedBackgroundColor;
-        final onColor =
-            ThemeData.estimateBrightnessForColor(color) == Brightness.dark
-            ? Colors.white
-            : Colors.black87;
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedBackgroundColor = color;
-            });
-          },
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isSelected ? onColor : Colors.transparent,
-                width: 3,
-              ),
-              boxShadow: Theme.of(context).brightness == Brightness.dark
-                  ? [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
-                  : null,
+  /// One row of named backgrounds; the name of the selected one is
+  /// spelled out above it.
+  Widget _buildBackgroundColorSelector(AppLocalizations localizations) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Text(
+            localizations.shareBackgroundNamed(
+              _selectedBackground.name(localizations),
             ),
-            child: isSelected
-                ? Icon(Icons.check, color: onColor, size: 20)
-                : null,
+            key: const ValueKey('share-background-name'),
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
-        );
-      }).toList(),
+        ),
+        const SizedBox(height: 4),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final fitted = constraints.maxWidth / _backgrounds.length;
+            return SizedBox(
+              height: 44,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemExtent: fitted < 40 ? 40 : fitted,
+                itemCount: _backgrounds.length,
+                itemBuilder: (context, index) {
+                  final background = _backgrounds[index];
+                  final isSelected = background == _selectedBackground;
+                  return Semantics(
+                    button: true,
+                    selected: isSelected,
+                    label: background.name(localizations),
+                    child: InkResponse(
+                      key: ValueKey('share-background-$index'),
+                      radius: 22,
+                      onTap: () =>
+                          setState(() => _selectedBackground = background),
+                      child: Center(
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected
+                                  ? _accentOn(colorScheme)
+                                  : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: background.color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: colorScheme.onSurface.withValues(
+                                  alpha: 0.16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
+  /// What the card shows: one control with three segments.
   Widget _buildDisplayModeSelector(AppLocalizations localizations) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
 
     final modes = [
-      (
-        AyahDisplayMode.both,
-        localizations.arabicAndTranslation,
-        Icons.view_headline,
-      ),
-      (
-        AyahDisplayMode.arabicOnly,
-        localizations.arabicOnly,
-        Icons.format_textdirection_r_to_l,
-      ),
-      (
-        AyahDisplayMode.translationOnly,
-        localizations.translationOnly,
-        Icons.translate,
-      ),
+      (AyahDisplayMode.both, localizations.shareModeBoth, 3),
+      (AyahDisplayMode.arabicOnly, localizations.shareModeArabic, 2),
+      (AyahDisplayMode.translationOnly, localizations.shareModeTranslation, 2),
     ];
 
-    return Column(
-      children: modes.map((modeData) {
-        final mode = modeData.$1;
-        final label = modeData.$2;
-        final icon = modeData.$3;
-        final isSelected = mode == _selectedDisplayMode;
-
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedDisplayMode = mode;
-            });
-          },
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? colorScheme.primary.withValues(alpha: 0.14)
-                  : colorScheme.surfaceContainerHigh.withValues(
-                      alpha: isDark ? 0.35 : 0.6,
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: colorScheme.onSurface.withValues(alpha: isDark ? 0.16 : 0.08),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          for (final (mode, label, flex) in modes)
+            Expanded(
+              flex: flex,
+              child: Semantics(
+                button: true,
+                selected: mode == _selectedDisplayMode,
+                child: GestureDetector(
+                  key: ValueKey('share-mode-${mode.name}'),
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => _selectedDisplayMode = mode),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    height: 44,
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: mode == _selectedDisplayMode
+                          ? (isDark ? colorScheme.surface : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(11),
+                      boxShadow: mode == _selectedDisplayMode
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.14),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ]
+                          : null,
                     ),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSelected
-                    ? colorScheme.primary
-                    : colorScheme.outlineVariant.withValues(alpha: 0.3),
-                width: 2,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: mode == _selectedDisplayMode
+                              ? _accentOn(colorScheme)
+                              : colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: isSelected
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.w500,
-                      color: isSelected
-                          ? colorScheme.primary
-                          : colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-                if (isSelected)
-                  Icon(
-                    Icons.check_circle,
-                    color: colorScheme.primary,
-                    size: 20,
-                  ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+        ],
+      ),
     );
   }
 
@@ -1471,7 +1802,7 @@ class _AyahTexts extends StatelessWidget {
     required this.surahNumber,
     required this.verseNumber,
     required this.onBackground,
-    required this.onBackgroundMuted,
+    required this.accent,
   });
 
   final bool showArabic;
@@ -1482,7 +1813,9 @@ class _AyahTexts extends StatelessWidget {
   final int surahNumber;
   final int verseNumber;
   final Color onBackground;
-  final Color onBackgroundMuted;
+
+  /// Colour of the ornament between the two texts.
+  final Color accent;
 
   bool get _isLongestQuranVerse => surahNumber == 2 && verseNumber == 282;
 
@@ -1533,8 +1866,8 @@ class _AyahTexts extends StatelessWidget {
 
     final textScaler = MediaQuery.textScalerOf(context);
     final baseDirection = Directionality.of(context);
-    const dividerHeight = 2.0;
-    const dividerPadding = 12.0;
+    const dividerHeight = 14.0;
+    const dividerPadding = 14.0;
     const dividerSpace = dividerHeight + dividerPadding * 2;
     const layoutSafety =
         8.0; // Leave breathing room so we never clip the last line.
@@ -1566,7 +1899,7 @@ class _AyahTexts extends StatelessWidget {
       final isArabicOnly = showArabic && !showTranslation;
       return _AdaptiveText(
         text: isArabicOnly ? arabicText : translationText,
-        textAlign: TextAlign.justify,
+        textAlign: TextAlign.center,
         textDirection: isArabicOnly ? TextDirection.rtl : baseDirection,
         minFontSize: isArabicOnly ? arabicMinFont : translationMinFont,
         maxFontSize: isArabicOnly ? arabicMaxFont : translationMaxFont,
@@ -1588,7 +1921,7 @@ class _AyahTexts extends StatelessWidget {
             style: arabicStyle,
             fontSize: aSize,
             maxWidth: maxWidth,
-            textAlign: TextAlign.justify,
+            textAlign: TextAlign.center,
             textDirection: TextDirection.rtl,
             textScaler: textScaler,
           );
@@ -1597,7 +1930,7 @@ class _AyahTexts extends StatelessWidget {
             style: translationStyle,
             fontSize: tSize,
             maxWidth: maxWidth,
-            textAlign: TextAlign.justify,
+            textAlign: TextAlign.center,
             textDirection: baseDirection,
             textScaler: textScaler,
           );
@@ -1692,7 +2025,7 @@ class _AyahTexts extends StatelessWidget {
           style: arabicStyle,
           fontSize: arabicFont,
           maxWidth: maxWidth,
-          textAlign: TextAlign.justify,
+          textAlign: TextAlign.center,
           textDirection: TextDirection.rtl,
           textScaler: textScaler,
         );
@@ -1701,7 +2034,7 @@ class _AyahTexts extends StatelessWidget {
           style: translationStyle,
           fontSize: translationFont,
           maxWidth: maxWidth,
-          textAlign: TextAlign.justify,
+          textAlign: TextAlign.center,
           textDirection: baseDirection,
           textScaler: textScaler,
         );
@@ -1723,7 +2056,7 @@ class _AyahTexts extends StatelessWidget {
               height: currentArabicHeight,
               child: Text(
                 arabicText,
-                textAlign: TextAlign.justify,
+                textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
                 style: arabicStyle.copyWith(fontSize: arabicFont),
                 softWrap: true,
@@ -1731,20 +2064,16 @@ class _AyahTexts extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: dividerPadding),
-              child: Container(
-                width: 60,
+              child: SizedBox(
                 height: dividerHeight,
-                decoration: BoxDecoration(
-                  color: onBackgroundMuted,
-                  borderRadius: BorderRadius.circular(1),
-                ),
+                child: _CardOrnament(color: accent),
               ),
             ),
             SizedBox(
               height: currentTranslationHeight,
               child: Text(
                 translationText,
-                textAlign: TextAlign.justify,
+                textAlign: TextAlign.center,
                 style: translationStyle.copyWith(fontSize: translationFont),
                 softWrap: true,
               ),
@@ -1755,4 +2084,90 @@ class _AyahTexts extends StatelessWidget {
       },
     );
   }
+}
+
+/// Size the card is laid out at; captured at three times that, it gives
+/// a 1080 × 1920 image.
+const Size _cardSize = Size(360, 640);
+
+/// Tools of the share sheet; each opens its options over the card.
+enum _ShareTool { text, background, verses }
+
+/// A background the card can take, with the name it is offered under.
+class _ShareBackground {
+  const _ShareBackground(this.color, this.name);
+
+  final Color color;
+  final String Function(AppLocalizations localizations) name;
+
+  static Color _mushaf(int index) =>
+      MushafThemeData.fromIndex(index).pageBackgroundColor;
+
+  /// The backgrounds always offered: a few Mushaf themes that are easy to
+  /// tell apart, and the green of the app.
+  static final List<_ShareBackground> curated = [
+    _ShareBackground(_mushaf(0), (l) => l.shareBgIvory),
+    _ShareBackground(_mushaf(2), (l) => l.shareBgCream),
+    _ShareBackground(_mushaf(4), (l) => l.shareBgSand),
+    _ShareBackground(_mushaf(5), (l) => l.shareBgGold),
+    _ShareBackground(_mushaf(14), (l) => l.shareBgSage),
+    _ShareBackground(const Color(0xFF004A41), (l) => l.shareBgDeepGreen),
+    _ShareBackground(_mushaf(10), (l) => l.shareBgNight),
+    _ShareBackground(_mushaf(9), (l) => l.shareBgBlack),
+  ];
+}
+
+/// Ornament between the Arabic text and its translation: an eight-point
+/// star between two hairlines.
+class _CardOrnament extends StatelessWidget {
+  const _CardOrnament({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final line = Container(
+      width: 40,
+      height: 1,
+      color: color.withValues(alpha: 0.7),
+    );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        line,
+        const SizedBox(width: 10),
+        CustomPaint(size: const Size(14, 14), painter: _StarPainter(color)),
+        const SizedBox(width: 10),
+        line,
+      ],
+    );
+  }
+}
+
+class _StarPainter extends CustomPainter {
+  const _StarPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    final center = size.center(Offset.zero);
+    // Two squares, one turned by an eighth of a turn.
+    final side = size.shortestSide / 1.4142;
+    final square = Rect.fromCenter(center: center, width: side, height: side);
+    canvas.drawRect(square, paint);
+    canvas.save();
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(0.7853981633974483);
+    canvas.translate(-center.dx, -center.dy);
+    canvas.drawRect(square, paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_StarPainter oldDelegate) => oldDelegate.color != color;
 }

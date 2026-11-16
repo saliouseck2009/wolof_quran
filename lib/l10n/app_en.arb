@@ -610,6 +610,60 @@
       }
     }
   },
+  "shareToolText": "Text",
+  "@shareToolText": {"description": "Share sheet tool that picks what the card shows: Arabic, translation or both"},
+  "shareToolBackground": "Background",
+  "@shareToolBackground": {"description": "Share sheet tool that picks the background of the card"},
+  "shareToolVersesRange": "Verses {first}–{last}",
+  "@shareToolVersesRange": {
+    "description": "Share sheet tool label when several verses are selected",
+    "placeholders": {
+      "first": {"type": "int"},
+      "last": {"type": "int"}
+    }
+  },
+  "shareImageShort": "Image",
+  "@shareImageShort": {"description": "Short label of the button that shares the card as an image"},
+  "shareVideoShort": "Video",
+  "@shareVideoShort": {"description": "Short label of the button that shares the verses as a video"},
+  "shareVerseLabel": "Verse {verse}",
+  "@shareVerseLabel": {
+    "description": "Verse shown on the share card, under the sheet title",
+    "placeholders": {
+      "verse": {"type": "int"}
+    }
+  },
+  "shareBackgroundNamed": "Background · {name}",
+  "@shareBackgroundNamed": {
+    "description": "Name of the selected card background",
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "shareModeBoth": "Arabic + translation",
+  "@shareModeBoth": {"description": "Short label: the card shows the Arabic text and its translation"},
+  "shareModeArabic": "Arabic",
+  "@shareModeArabic": {"description": "Short label: the card shows the Arabic text only"},
+  "shareModeTranslation": "Translation",
+  "@shareModeTranslation": {"description": "Short label: the card shows the translation only"},
+  "shareBgMushaf": "My Mushaf",
+  "@shareBgMushaf": {"description": "Card background taken from the reader's Mushaf theme"},
+  "shareBgIvory": "Ivory",
+  "@shareBgIvory": {"description": "Card background name"},
+  "shareBgCream": "Cream",
+  "@shareBgCream": {"description": "Card background name"},
+  "shareBgSand": "Sand",
+  "@shareBgSand": {"description": "Card background name"},
+  "shareBgGold": "Gold",
+  "@shareBgGold": {"description": "Card background name"},
+  "shareBgSage": "Sage",
+  "@shareBgSage": {"description": "Card background name"},
+  "shareBgDeepGreen": "Deep green",
+  "@shareBgDeepGreen": {"description": "Card background name"},
+  "shareBgNight": "Night",
+  "@shareBgNight": {"description": "Card background name"},
+  "shareBgBlack": "Black",
+  "@shareBgBlack": {"description": "Card background name"},
   "bookmarkAdded": "Bookmark added",
   "@bookmarkAdded": {
     "description": "Confirmation message when bookmark is added"

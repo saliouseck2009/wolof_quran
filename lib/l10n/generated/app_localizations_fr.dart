@@ -442,6 +442,69 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get shareToolText => 'Texte';
+
+  @override
+  String get shareToolBackground => 'Fond';
+
+  @override
+  String shareToolVersesRange(int first, int last) {
+    return 'Versets $first–$last';
+  }
+
+  @override
+  String get shareImageShort => 'Image';
+
+  @override
+  String get shareVideoShort => 'Vidéo';
+
+  @override
+  String shareVerseLabel(int verse) {
+    return 'Verset $verse';
+  }
+
+  @override
+  String shareBackgroundNamed(String name) {
+    return 'Fond · $name';
+  }
+
+  @override
+  String get shareModeBoth => 'Arabe + traduction';
+
+  @override
+  String get shareModeArabic => 'Arabe';
+
+  @override
+  String get shareModeTranslation => 'Traduction';
+
+  @override
+  String get shareBgMushaf => 'Mon Mushaf';
+
+  @override
+  String get shareBgIvory => 'Ivoire';
+
+  @override
+  String get shareBgCream => 'Crème';
+
+  @override
+  String get shareBgSand => 'Sable';
+
+  @override
+  String get shareBgGold => 'Doré';
+
+  @override
+  String get shareBgSage => 'Sauge';
+
+  @override
+  String get shareBgDeepGreen => 'Vert profond';
+
+  @override
+  String get shareBgNight => 'Nuit';
+
+  @override
+  String get shareBgBlack => 'Noir';
+
+  @override
   String get bookmarkAdded => 'Marque-page ajouté';
 
   @override

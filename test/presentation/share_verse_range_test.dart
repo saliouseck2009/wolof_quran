@@ -38,7 +38,7 @@ void main() {
           body: DailyInspirationShareModal(
             verseNumber: verse,
             arabicText: surah == 0 ? 'نص' : _arabic(surah, verse),
-            translation: surah == 0 ? 'Texte' : _french(surah, verse),
+            translation: surah == 0 ? 'Sans sourate' : _french(surah, verse),
             translationSource: 'Hamidullah',
             surahName: surah == 0 ? '' : quran.getSurahName(surah),
             surahNumber: surah,
@@ -50,7 +50,15 @@ void main() {
     await tester.pump();
   }
 
+  Future<void> openTool(WidgetTester tester, String tool) async {
+    final tray = find.byKey(ValueKey('share-tray-$tool'));
+    if (tray.evaluate().isNotEmpty) return;
+    await tester.tap(find.byKey(ValueKey('share-tool-$tool')));
+    await tester.pumpAndSettle();
+  }
+
   Future<void> pick(WidgetTester tester, String dropdown, int verse) async {
+    await openTool(tester, 'verses');
     final finder = find.byKey(ValueKey(dropdown));
     await tester.ensureVisible(finder);
     await tester.pumpAndSettle();
@@ -68,6 +76,8 @@ void main() {
     await pumpSheet(tester, surah: 1, verse: 2);
 
     expect(find.text('Versets'), findsOneWidget);
+    expect(find.text('Verset 2'), findsOneWidget);
+    await openTool(tester, 'verses');
     expect(summary(tester), '1 verset');
     expect(find.byKey(const ValueKey('share-preview-next')), findsNothing);
     expect(find.text(_french(1, 2)), findsOneWidget);
@@ -92,7 +102,10 @@ void main() {
     expect(find.text(_french(1, 3)), findsOneWidget);
     expect(find.text(_arabic(1, 3)), findsOneWidget);
     expect(find.text(_french(1, 2)), findsNothing);
-    expect(find.textContaining('(1): 3'), findsOneWidget);
+    expect(find.textContaining('· 1:3'), findsOneWidget);
+    expect(find.text('Verset 3'), findsOneWidget);
+    expect(find.text('2–4'), findsOneWidget);
+    expect(find.bySemanticsLabel('Versets 2–4'), findsOneWidget);
   });
 
   testWidgets('the pager stops at both ends of the range', (tester) async {
@@ -144,8 +157,90 @@ void main() {
     await pumpSheet(tester, surah: 0, verse: 0);
 
     expect(find.text('Versets'), findsNothing);
+    expect(find.byKey(const ValueKey('share-tool-verses')), findsNothing);
     expect(find.byKey(const ValueKey('share-range-first')), findsNothing);
-    expect(find.text('Texte'), findsOneWidget);
+    expect(find.text('Sans sourate'), findsOneWidget);
+  });
+
+  testWidgets('the share buttons are in reach as soon as the sheet opens', (
+    tester,
+  ) async {
+    await pumpSheet(tester, surah: 1, verse: 2);
+
+    final sheet = tester.getRect(find.byType(DailyInspirationShareModal));
+    for (final label in ['Image', 'Vidéo']) {
+      final button = tester.getRect(find.text(label));
+      expect(sheet.contains(button.topLeft), isTrue, reason: label);
+      expect(sheet.contains(button.bottomRight), isTrue, reason: label);
+    }
+    expect(find.byType(Scrollable), findsNothing);
+  });
+
+  testWidgets('a tool opens its options and closes them again', (tester) async {
+    await pumpSheet(tester, surah: 1, verse: 2);
+    expect(find.byKey(const ValueKey('share-tray-text')), findsNothing);
+
+    await openTool(tester, 'text');
+    expect(find.byKey(const ValueKey('share-tray-text')), findsOneWidget);
+
+    // Another tool takes its place.
+    await openTool(tester, 'background');
+    expect(find.byKey(const ValueKey('share-tray-text')), findsNothing);
+    expect(find.byKey(const ValueKey('share-tray-background')), findsOneWidget);
+
+    // The same tool again closes it.
+    await tester.tap(find.byKey(const ValueKey('share-tool-background')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('share-tray-background')), findsNothing);
+  });
+
+  testWidgets('the text tool picks what the card shows', (tester) async {
+    await pumpSheet(tester, surah: 1, verse: 2);
+    expect(find.text(_arabic(1, 2)), findsOneWidget);
+    expect(find.text(_french(1, 2)), findsOneWidget);
+
+    await openTool(tester, 'text');
+    await tester.tap(find.byKey(const ValueKey('share-mode-arabicOnly')));
+    await tester.pumpAndSettle();
+    expect(find.text(_arabic(1, 2)), findsOneWidget);
+    expect(find.text(_french(1, 2)), findsNothing);
+
+    await tester.tap(find.byKey(const ValueKey('share-mode-translationOnly')));
+    await tester.pumpAndSettle();
+    expect(find.text(_arabic(1, 2)), findsNothing);
+    expect(find.text(_french(1, 2)), findsOneWidget);
+  });
+
+  testWidgets('the background tool names the background it sets', (
+    tester,
+  ) async {
+    await pumpSheet(tester, surah: 1, verse: 2);
+    await openTool(tester, 'background');
+    expect(find.text('Fond · Ivoire'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('share-background-5')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fond · Vert profond'), findsOneWidget);
+    final card = tester.widget<Container>(
+      find.byKey(const ValueKey('share-card')),
+    );
+    expect(card.color, const Color(0xFF004A41));
+  });
+
+  testWidgets('the card keeps the size of the shared image on any screen', (
+    tester,
+  ) async {
+    for (final size in const [Size(390, 844), Size(1024, 1366)]) {
+      await pumpSheet(tester, surah: 1, verse: 2, size: size);
+      final card = tester.renderObject<RenderBox>(
+        find.descendant(
+          of: find.byType(FittedBox),
+          matching: find.byType(RepaintBoundary),
+        ),
+      );
+      expect(card.size, const Size(360, 640), reason: '$size');
+    }
   });
 
   testWidgets('fits a tablet without overflowing', (tester) async {

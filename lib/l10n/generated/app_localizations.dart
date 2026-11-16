@@ -862,6 +862,120 @@ abstract class AppLocalizations {
   /// **'Verse {current} of {total}'**
   String shareVideoProgress(int current, int total);
 
+  /// Share sheet tool that picks what the card shows: Arabic, translation or both
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get shareToolText;
+
+  /// Share sheet tool that picks the background of the card
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get shareToolBackground;
+
+  /// Share sheet tool label when several verses are selected
+  ///
+  /// In en, this message translates to:
+  /// **'Verses {first}–{last}'**
+  String shareToolVersesRange(int first, int last);
+
+  /// Short label of the button that shares the card as an image
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get shareImageShort;
+
+  /// Short label of the button that shares the verses as a video
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get shareVideoShort;
+
+  /// Verse shown on the share card, under the sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Verse {verse}'**
+  String shareVerseLabel(int verse);
+
+  /// Name of the selected card background
+  ///
+  /// In en, this message translates to:
+  /// **'Background · {name}'**
+  String shareBackgroundNamed(String name);
+
+  /// Short label: the card shows the Arabic text and its translation
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic + translation'**
+  String get shareModeBoth;
+
+  /// Short label: the card shows the Arabic text only
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get shareModeArabic;
+
+  /// Short label: the card shows the translation only
+  ///
+  /// In en, this message translates to:
+  /// **'Translation'**
+  String get shareModeTranslation;
+
+  /// Card background taken from the reader's Mushaf theme
+  ///
+  /// In en, this message translates to:
+  /// **'My Mushaf'**
+  String get shareBgMushaf;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Ivory'**
+  String get shareBgIvory;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Cream'**
+  String get shareBgCream;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Sand'**
+  String get shareBgSand;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get shareBgGold;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Sage'**
+  String get shareBgSage;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Deep green'**
+  String get shareBgDeepGreen;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get shareBgNight;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Black'**
+  String get shareBgBlack;
+
   /// Confirmation message when bookmark is added
   ///
   /// In en, this message translates to:

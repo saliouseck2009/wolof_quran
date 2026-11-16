@@ -430,6 +430,69 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get shareToolText => 'النص';
+
+  @override
+  String get shareToolBackground => 'الخلفية';
+
+  @override
+  String shareToolVersesRange(int first, int last) {
+    return 'الآيات $first–$last';
+  }
+
+  @override
+  String get shareImageShort => 'صورة';
+
+  @override
+  String get shareVideoShort => 'فيديو';
+
+  @override
+  String shareVerseLabel(int verse) {
+    return 'الآية $verse';
+  }
+
+  @override
+  String shareBackgroundNamed(String name) {
+    return 'الخلفية · $name';
+  }
+
+  @override
+  String get shareModeBoth => 'عربي + ترجمة';
+
+  @override
+  String get shareModeArabic => 'عربي';
+
+  @override
+  String get shareModeTranslation => 'ترجمة';
+
+  @override
+  String get shareBgMushaf => 'مصحفي';
+
+  @override
+  String get shareBgIvory => 'عاجي';
+
+  @override
+  String get shareBgCream => 'كريمي';
+
+  @override
+  String get shareBgSand => 'رملي';
+
+  @override
+  String get shareBgGold => 'ذهبي';
+
+  @override
+  String get shareBgSage => 'أخضر فاتح';
+
+  @override
+  String get shareBgDeepGreen => 'أخضر داكن';
+
+  @override
+  String get shareBgNight => 'ليلي';
+
+  @override
+  String get shareBgBlack => 'أسود';
+
+  @override
   String get bookmarkAdded => 'تم إضافة الإشارة المرجعية';
 
   @override
