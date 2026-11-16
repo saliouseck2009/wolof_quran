@@ -13,6 +13,8 @@ import '../../data/datasources/remote_config_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../../service_locator.dart';
 import '../widgets/snackbar.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class SupportPage extends StatelessWidget {
   static const String routeName = '/support';
@@ -85,6 +87,7 @@ class SupportPage extends StatelessWidget {
           ),
         ),
         backgroundColor: isDark ? colorScheme.surface : primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -256,6 +259,7 @@ class _IosWebSupportView extends StatelessWidget {
           ),
         ),
         backgroundColor: isDark ? colorScheme.surface : primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -404,6 +408,7 @@ class _SupportUnavailableOnIosView extends StatelessWidget {
           ),
         ),
         backgroundColor: isDark ? colorScheme.surface : primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -593,6 +598,7 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
           ),
         ),
         backgroundColor: isDark ? cs.surface : cs.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: cs.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -632,7 +638,7 @@ class _AppleSupportViewState extends State<_AppleSupportView> {
                     ),
                     const SizedBox(height: 28),
                     if (_loading)
-                      const CircularProgressIndicator()
+                      const AppLoader()
                     else if (_product != null) ...[
                       SizedBox(
                         width: double.infinity,

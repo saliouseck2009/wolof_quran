@@ -11,6 +11,8 @@ import '../cubits/bookmark_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../widgets/ayah_card.dart';
 import '../widgets/ayah_play_button.dart';
+import 'app_loader.dart';
+import 'seasonal/night_sky.dart';
 
 class BookmarksTab extends StatelessWidget {
   const BookmarksTab({super.key});
@@ -38,6 +40,7 @@ class BookmarksTab extends StatelessWidget {
         backgroundColor: colorScheme.brightness == Brightness.dark
             ? colorScheme.surface
             : colorScheme.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -48,7 +51,7 @@ class BookmarksTab extends StatelessWidget {
           return BlocBuilder<BookmarkCubit, BookmarkState>(
             builder: (context, state) {
               if (state is BookmarkLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: AppLoader());
               }
 
               if (state is BookmarkError) {

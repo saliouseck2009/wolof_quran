@@ -7,6 +7,7 @@ import '../../../core/services/audio_player_service.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../../cubits/surah_mini_player_cubit.dart';
+import '../seasonal/night_sky.dart';
 
 /// Full-screen audio player page.
 /// Opened via [buildFullscreenRoute] — a slide-up PageRoute.
@@ -338,12 +339,15 @@ class _SurahArtwork extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [colorScheme.primary, colorScheme.onPrimaryContainer],
+      decoration: seasonalSky(
+        context,
+        BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [colorScheme.primary, colorScheme.onPrimaryContainer],
+          ),
         ),
       ),
       child: Center(

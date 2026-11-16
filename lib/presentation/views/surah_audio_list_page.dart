@@ -20,6 +20,7 @@ import '../cubits/surah_mini_player_cubit.dart';
 import '../utils/audio_error_formatter.dart';
 import '../utils/download_network_guard.dart';
 import '../widgets/snackbar.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class SurahAudioListPage extends StatelessWidget {
   static const String routeName = '/surah-audio-list';
@@ -461,14 +462,17 @@ class _ReciterSliverHeader extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         collapseMode: CollapseMode.pin,
         background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                colorScheme.primary,
-                colorScheme.primary.withValues(alpha: 0.7),
-              ],
+          decoration: seasonalSky(
+            context,
+            BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.primary,
+                  colorScheme.primary.withValues(alpha: 0.7),
+                ],
+              ),
             ),
           ),
           child: SafeArea(

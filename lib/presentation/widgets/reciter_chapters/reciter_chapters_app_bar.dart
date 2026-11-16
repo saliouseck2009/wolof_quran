@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../domain/entities/reciter.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../seasonal/night_sky.dart';
 
 class ReciterChaptersAppBar extends StatelessWidget {
   final Reciter reciter;
@@ -40,13 +41,16 @@ class ReciterChaptersAppBar extends StatelessWidget {
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: EdgeInsets.zero,
         background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? [colorScheme.surfaceContainer, colorScheme.surface]
-                  : [accentColor.withValues(alpha: 0.85), accentColor],
+          decoration: seasonalSky(
+            context,
+            BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [colorScheme.surfaceContainer, colorScheme.surface]
+                    : [accentColor.withValues(alpha: 0.85), accentColor],
+              ),
             ),
           ),
           child: SafeArea(

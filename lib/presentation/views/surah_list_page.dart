@@ -10,6 +10,7 @@ import '../widgets/app_search_bar.dart';
 import '../widgets/surah_list/surah_card.dart';
 import '../widgets/surah_list/surah_list_no_results.dart';
 import '../widgets/surah_list/surah_list_sliver_header.dart';
+import '../widgets/app_loader.dart';
 
 class SurahListPage extends StatelessWidget {
   static const String routeName = "/surahs";
@@ -74,7 +75,7 @@ class _SurahListViewState extends State<_SurahListView> {
         child: BlocBuilder<SurahListCubit, SurahListState>(
           builder: (context, state) {
             if (state is! SurahListLoaded) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: AppLoader());
             }
 
             return CustomScrollView(

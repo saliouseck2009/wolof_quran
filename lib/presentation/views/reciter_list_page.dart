@@ -12,6 +12,8 @@ import '../widgets/reciter_list/reciter_list_empty_state.dart';
 import '../widgets/reciter_list/reciter_list_error_state.dart';
 import '../widgets/reciter_list/reciter_list_view.dart';
 import '../widgets/snackbar.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class ReciterListPage extends StatefulWidget {
   const ReciterListPage({super.key});
@@ -86,6 +88,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
         backgroundColor: colorScheme.brightness == Brightness.dark
             ? colorScheme.surface
             : colorScheme.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -104,7 +107,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
         },
         builder: (context, reciterState) {
           if (reciterState is ReciterLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: AppLoader());
           }
 
           if (reciterState is ReciterError) {

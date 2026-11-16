@@ -7,6 +7,9 @@ import 'package:wolof_quran/core/config/theme/seasonal_theme.dart';
 import 'package:wolof_quran/core/config/theme/theme.dart';
 import 'package:wolof_quran/l10n/generated/app_localizations.dart';
 import 'package:wolof_quran/presentation/cubits/seasonal_theme_cubit.dart';
+import 'package:wolof_quran/presentation/widgets/app_loader.dart';
+import 'package:wolof_quran/presentation/widgets/seasonal/night_sky.dart';
+import 'package:wolof_quran/presentation/widgets/seasonal/ramadan_loader.dart';
 import 'package:wolof_quran/presentation/widgets/seasonal/ramadan_banner.dart';
 import 'package:wolof_quran/presentation/widgets/settings/seasonal_theme_settings_item.dart';
 
@@ -167,6 +170,111 @@ void main() {
 
       expect(cubit.state.active, SeasonalTheme.ramadan);
       expect(repository.disabledByUser, isEmpty);
+    });
+  });
+
+  group('AppLoader', () {
+    Widget themed(SeasonalTheme season, Widget child) => MaterialApp(
+      theme: MaterialTheme(season: season).light(),
+      home: Scaffold(body: Center(child: child)),
+    );
+
+    testWidgets('is the standard spinner out of season', (tester) async {
+      await tester.pumpWidget(
+        themed(
+          SeasonalTheme.none,
+          const AppLoader(size: 20, strokeWidth: 2, color: Colors.red),
+        ),
+      );
+
+      final spinner = tester.widget<CircularProgressIndicator>(
+        find.byType(CircularProgressIndicator),
+      );
+      expect(spinner.strokeWidth, 2);
+      expect(spinner.color, Colors.red);
+      expect(tester.getSize(find.byType(CircularProgressIndicator)).width, 20);
+      expect(find.byType(RamadanLoader), findsNothing);
+    });
+
+    testWidgets('becomes the crescent during Ramadan and keeps moving', (
+      tester,
+    ) async {
+      await tester.pumpWidget(themed(SeasonalTheme.ramadan, const AppLoader()));
+      await tester.pump(const Duration(milliseconds: 700));
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(
+        tester.getSize(find.byType(RamadanLoader)).width,
+        RamadanLoader.defaultSize,
+      );
+      expect(tester.hasRunningAnimations, isTrue);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a small loader stays large enough to be read', (tester) async {
+      await tester.pumpWidget(
+        themed(SeasonalTheme.ramadan, const AppLoader(size: 20)),
+      );
+
+      expect(tester.getSize(find.byType(RamadanLoader)).width, 28);
+    });
+
+    testWidgets('stays still when the system turns animations off', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(disableAnimations: true),
+          child: themed(SeasonalTheme.ramadan, const AppLoader()),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.byType(RamadanLoader), findsOneWidget);
+      expect(tester.hasRunningAnimations, isFalse);
+    });
+  });
+
+  group('seasonal sky', () {
+    Future<BuildContext> pumpBar(
+      WidgetTester tester,
+      SeasonalTheme season,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: MaterialTheme(season: season).light(),
+          home: Scaffold(
+            appBar: AppBar(
+              title: const Text('Sourates'),
+              flexibleSpace: const SeasonalSky(),
+            ),
+          ),
+        ),
+      );
+      return tester.element(find.byType(SeasonalSky));
+    }
+
+    testWidgets('leaves the headers as they are out of season', (tester) async {
+      final context = await pumpBar(tester, SeasonalTheme.none);
+      const base = BoxDecoration(color: Colors.teal);
+
+      expect(seasonalSky(context, base), same(base));
+      expect(tester.getSize(find.byType(AppBar)).height, kToolbarHeight);
+    });
+
+    testWidgets('scatters stars behind the headers during Ramadan', (
+      tester,
+    ) async {
+      final context = await pumpBar(tester, SeasonalTheme.ramadan);
+      const base = BoxDecoration(color: Colors.indigo);
+
+      final decoration = seasonalSky(context, base);
+      expect(decoration, isA<NightSkyDecoration>());
+      expect((decoration as NightSkyDecoration).base, same(base));
+      // Same bar, the title stays in front of the sky.
+      expect(tester.getSize(find.byType(AppBar)).height, kToolbarHeight);
+      expect(find.text('Sourates'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/config/theme/seasonal_theme.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import 'night_sky.dart';
 
 /// Home greeting of the Ramadan look: a night sky with a crescent, a few
 /// stars and two lanterns next to the greeting. Purely decorative, it draws
@@ -156,18 +157,8 @@ class _NightSkyPainter extends CustomPainter {
     );
 
     final disc = Rect.fromCircle(center: center, radius: radius);
-    final crescent = Path.combine(
-      PathOperation.difference,
-      Path()..addOval(disc),
-      Path()..addOval(
-        Rect.fromCircle(
-          center: center + Offset(radius * 0.36, -radius * 0.18),
-          radius: radius * 0.82,
-        ),
-      ),
-    );
     canvas.drawPath(
-      crescent,
+      NightSky.crescent(center, radius),
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
@@ -180,24 +171,10 @@ class _NightSkyPainter extends CustomPainter {
     );
   }
 
-  /// Four-pointed star with hollowed sides.
   void _paintSparkle(Canvas canvas, Offset c, double r, double alpha) {
-    final k = r * 0.16;
-    final path = Path()
-      ..moveTo(c.dx, c.dy - r)
-      ..quadraticBezierTo(c.dx + k, c.dy - k, c.dx + r, c.dy)
-      ..quadraticBezierTo(c.dx + k, c.dy + k, c.dx, c.dy + r)
-      ..quadraticBezierTo(c.dx - k, c.dy + k, c.dx - r, c.dy)
-      ..quadraticBezierTo(c.dx - k, c.dy - k, c.dx, c.dy - r)
-      ..close();
     canvas.drawPath(
-      path,
-      Paint()
-        ..color = Color.lerp(
-          decor.ornament,
-          Colors.white,
-          0.5,
-        )!.withValues(alpha: alpha),
+      NightSky.sparkle(c, r),
+      Paint()..color = NightSky.starColor(decor).withValues(alpha: alpha),
     );
   }
 

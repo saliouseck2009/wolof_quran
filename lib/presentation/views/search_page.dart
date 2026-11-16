@@ -11,6 +11,8 @@ import '../widgets/search/search_initial_state.dart';
 import '../widgets/search/search_results_list.dart';
 import '../../service_locator.dart';
 import '../../domain/repositories/bookmark_repository.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class SearchPage extends StatelessWidget {
   static const String routeName = "/search";
@@ -172,7 +174,7 @@ class _SearchViewState extends State<SearchView> {
                 }
 
                 if (state is SearchLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: AppLoader());
                 }
 
                 if (state is SearchError) {
@@ -251,7 +253,7 @@ class _SearchHeader extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      color: _background,
+      decoration: seasonalSky(context, BoxDecoration(color: _background)),
       child: SafeArea(
         bottom: false,
         child: Column(

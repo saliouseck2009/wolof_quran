@@ -9,6 +9,7 @@ import '../../../service_locator.dart';
 import '../../blocs/surah_download_status_bloc.dart';
 import '../../cubits/surah_detail_cubit.dart';
 import 'surah_detail_play_button.dart';
+import '../seasonal/night_sky.dart';
 
 class SurahDetailAppBar extends StatelessWidget {
   final SurahDetailLoaded state;
@@ -104,10 +105,13 @@ class SurahDetailAppBar extends StatelessWidget {
         flexibleSpace: FlexibleSpaceBar(
           titlePadding: EdgeInsets.zero,
           background: Container(
-            decoration: BoxDecoration(
-              color: colorScheme.brightness == Brightness.dark
-                  ? colorScheme.surface
-                  : colorScheme.primary,
+            decoration: seasonalSky(
+              context,
+              BoxDecoration(
+                color: colorScheme.brightness == Brightness.dark
+                    ? colorScheme.surface
+                    : colorScheme.primary,
+              ),
             ),
             child: SafeArea(
               child: Padding(

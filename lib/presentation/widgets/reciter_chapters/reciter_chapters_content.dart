@@ -12,6 +12,7 @@ import '../../utils/audio_error_formatter.dart';
 import '../snackbar.dart';
 import 'chapter_card.dart';
 import 'reciter_chapters_summary.dart';
+import '../app_loader.dart';
 
 class ReciterChaptersContent extends StatelessWidget {
   final Reciter reciter;
@@ -51,9 +52,7 @@ class ReciterChaptersContent extends StatelessWidget {
           return SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
             child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              child: AppLoader(color: Theme.of(context).colorScheme.primary),
             ),
           );
         }

@@ -14,6 +14,7 @@ import '../utils/reading_goal_formatting.dart';
 import '../widgets/reading_goals/page_picker_field.dart';
 import '../widgets/reading_goals/reading_goal_form_widgets.dart';
 import '../widgets/reading_goals/reminder_settings_sheet.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 enum _DurationMode { preset, custom, endDate }
 
@@ -235,6 +236,7 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
           ),
           centerTitle: true,
           backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
+          flexibleSpace: const SeasonalSky(),
           iconTheme: IconThemeData(color: colorScheme.onPrimary),
           elevation: 0,
           scrolledUnderElevation: 0,

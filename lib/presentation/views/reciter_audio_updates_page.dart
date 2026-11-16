@@ -9,6 +9,7 @@ import '../cubits/audio_management_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../utils/download_network_guard.dart';
 import '../widgets/snackbar.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class ReciterAudioUpdatesPage extends StatefulWidget {
   static const String routeName = '/reciter-audio-updates';
@@ -69,6 +70,7 @@ class _ReciterAudioUpdatesPageState extends State<ReciterAudioUpdatesPage> {
           backgroundColor: colorScheme.brightness == Brightness.dark
               ? colorScheme.surface
               : colorScheme.primary,
+          flexibleSpace: const SeasonalSky(),
           iconTheme: IconThemeData(color: colorScheme.onPrimary),
           titleTextStyle: TextStyle(
             fontSize: 18,

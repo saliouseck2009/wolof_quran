@@ -18,6 +18,8 @@ import '../widgets/reading_goals/reading_goal_actions.dart';
 import '../widgets/reading_goals/reading_pages_map.dart';
 import '../widgets/reading_goals/reading_progress_bar.dart';
 import 'mushaf_page.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 /// Everything about one goal: progress, today's quota, the page map with
 /// its gaps, the daily history and the validation journal.
@@ -96,6 +98,7 @@ class _DetailView extends StatelessWidget {
             ),
             centerTitle: false,
             backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
+            flexibleSpace: const SeasonalSky(),
             iconTheme: IconThemeData(color: colorScheme.onPrimary),
             elevation: 0,
             scrolledUnderElevation: 0,
@@ -777,10 +780,7 @@ class _Journal extends StatelessWidget {
         if (state.isLoading) {
           return const SliverToBoxAdapter(
             child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(),
-              ),
+              child: Padding(padding: EdgeInsets.all(16), child: AppLoader()),
             ),
           );
         }

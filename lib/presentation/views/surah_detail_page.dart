@@ -7,6 +7,7 @@ import '../cubits/bookmark_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
 import '../widgets/surah_detail/surah_detail_content.dart';
 import '../../service_locator.dart';
+import '../widgets/app_loader.dart';
 
 class SurahDetailPage extends StatelessWidget {
   static const String routeName = "/surah-detail";
@@ -88,7 +89,7 @@ class SurahDetailLoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator());
+    return const Center(child: AppLoader());
   }
 }
 
