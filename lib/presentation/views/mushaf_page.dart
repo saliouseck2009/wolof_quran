@@ -974,6 +974,9 @@ class _MushafBottomBar extends StatelessWidget {
 
   const _MushafBottomBar({required this.visiblePages, required this.onGoalTap});
 
+  /// Space between the goal button and a page number beside it.
+  static const double _spreadLabelGap = 28;
+
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -983,10 +986,82 @@ class _MushafBottomBar extends StatelessWidget {
         final pageInfo = state.pageInfo;
         final theme = state.theme;
         final pageNumber = pageInfo?.pageNumber ?? 1;
+        final hizb = pageInfo?.hizbInfo != null
+            ? Text(
+                pageInfo!.hizbInfo!.localizedText(localizations),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: theme.bottomBarSubtext, fontSize: 12),
+              )
+            : const SizedBox.shrink();
+        final goal = _ReadingGoalIndicator(theme: theme, onTap: onGoalTap);
         // The bloc knows the page being read; the view, its neighbour.
-        final pages = visiblePages.contains(pageNumber)
-            ? visiblePages
-            : [pageNumber];
+        final isSpread =
+            visiblePages.length == 2 && visiblePages.contains(pageNumber);
+
+        final List<Widget> children;
+        if (isSpread) {
+          // Each number sits on the side of its page, around the goal
+          // button: the first page of a spread is the right-hand one,
+          // whatever the direction of the app's language.
+          final isRtl = Directionality.of(context) == TextDirection.rtl;
+          final rightPage = visiblePages.first;
+          final leftPage = visiblePages.last;
+          children = [
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      heightFactor: 1,
+                      child: hizb,
+                    ),
+                  ),
+                  _PageLabel(
+                    theme: theme,
+                    pageNumber: isRtl ? rightPage : leftPage,
+                  ),
+                  const SizedBox(width: _spreadLabelGap),
+                ],
+              ),
+            ),
+            goal,
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                heightFactor: 1,
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    start: _spreadLabelGap,
+                  ),
+                  child: _PageLabel(
+                    theme: theme,
+                    pageNumber: isRtl ? leftPage : rightPage,
+                  ),
+                ),
+              ),
+            ),
+          ];
+        } else {
+          children = [
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                heightFactor: 1,
+                child: hizb,
+              ),
+            ),
+            goal,
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerEnd,
+                heightFactor: 1,
+                child: _PageLabel(theme: theme, pageNumber: pageNumber),
+              ),
+            ),
+          ];
+        }
 
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
@@ -994,35 +1069,7 @@ class _MushafBottomBar extends StatelessWidget {
           child: SafeArea(
             top: false,
             minimum: const EdgeInsets.only(bottom: 2),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    heightFactor: 1,
-                    child: pageInfo?.hizbInfo != null
-                        ? Text(
-                            pageInfo!.hizbInfo!.localizedText(localizations),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: theme.bottomBarSubtext,
-                              fontSize: 12,
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ),
-                _ReadingGoalIndicator(theme: theme, onTap: onGoalTap),
-                Expanded(
-                  child: Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    heightFactor: 1,
-                    child: _PageLabel(theme: theme, pages: pages),
-                  ),
-                ),
-              ],
-            ),
+            child: Row(children: children),
           ),
         );
       },
@@ -1030,18 +1077,12 @@ class _MushafBottomBar extends StatelessWidget {
   }
 }
 
-/// Page number, or both numbers of a spread, with a check when every
-/// page shown is read in the followed goal.
+/// Page number, with a check when the page is read in the followed goal.
 class _PageLabel extends StatelessWidget {
   final MushafThemeData theme;
-  final List<int> pages;
+  final int pageNumber;
 
-  const _PageLabel({required this.theme, required this.pages});
-
-  bool _allValidated(ReadingGoalsState state) {
-    final progress = state.activeProgress;
-    return progress != null && pages.every(progress.isValidated);
-  }
+  const _PageLabel({required this.theme, required this.pageNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -1049,9 +1090,11 @@ class _PageLabel extends StatelessWidget {
 
     return BlocBuilder<ReadingGoalsCubit, ReadingGoalsState>(
       buildWhen: (previous, current) =>
-          _allValidated(previous) != _allValidated(current),
+          previous.activeProgress?.isValidated(pageNumber) !=
+          current.activeProgress?.isValidated(pageNumber),
       builder: (context, state) {
-        final isValidated = _allValidated(state);
+        final isValidated =
+            state.activeProgress?.isValidated(pageNumber) ?? false;
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1076,9 +1119,7 @@ class _PageLabel extends StatelessWidget {
                   : const SizedBox.shrink(key: ValueKey('unvalidated')),
             ),
             Text(
-              pages.length > 1
-                  ? localizations.pageRangeLabel(pages.first, pages.last)
-                  : localizations.pageNumberLabel(pages.single),
+              localizations.pageNumberLabel(pageNumber),
               style: TextStyle(
                 color: theme.bottomBarText,
                 fontSize: 13,
