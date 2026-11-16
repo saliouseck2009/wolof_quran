@@ -193,6 +193,27 @@ class MushafPageRenderer {
         ? room / linesHeight
         : 1.0;
 
+    // A short line that ends a surah is centred, not stretched. It is
+    // drawn as large as the stretched lines around it: at its natural
+    // size it would look tiny on a wide page, where they are enlarged.
+    final lineWidth = width - 2 * _lineInset;
+    var stretchSum = 0.0;
+    var stretchedLines = 0;
+    for (final line in lines) {
+      if (line.centered) {
+        continue;
+      }
+      final painter = line.painter(style);
+      if (painter.width > 0) {
+        stretchSum += lineWidth / painter.width;
+        stretchedLines++;
+      }
+      painter.dispose();
+    }
+    final centredScale = stretchedLines == 0
+        ? 1.0
+        : (stretchSum / stretchedLines).clamp(1.0, double.infinity);
+
     final hits = <_LineHit>[];
     var y = 0.0;
     for (var i = 0; i < lines.length; i++) {
@@ -206,10 +227,19 @@ class MushafPageRenderer {
       final rect = Rect.fromLTWH(
         _lineInset,
         y,
-        width - 2 * _lineInset,
+        lineWidth,
         lineHeights[i] * scale,
       );
-      hits.add(_paintLine(canvas, line, style, rect, fill: !line.centered));
+      hits.add(
+        _paintLine(
+          canvas,
+          line,
+          style,
+          rect,
+          fill: !line.centered,
+          maxScale: centredScale,
+        ),
+      );
       y += rect.height;
     }
     return hits;
@@ -275,6 +305,7 @@ class MushafPageRenderer {
     _LineStyle style,
     Rect rect, {
     required bool fill,
+    double maxScale = 1.0,
   }) {
     final painter = line.painter(style);
     final naturalWidth = painter.width;
@@ -291,7 +322,7 @@ class MushafPageRenderer {
       final scale = [
         rect.width / naturalWidth,
         rect.height / naturalHeight,
-        1.0,
+        maxScale,
       ].reduce((a, b) => a < b ? a : b);
       scaleX = scale;
       scaleY = scale;
