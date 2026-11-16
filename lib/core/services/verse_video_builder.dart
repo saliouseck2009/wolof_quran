@@ -162,10 +162,8 @@ class VerseVideoBuilder {
     '-b:a', '192k',
     '-ar', '$audioSampleRate',
     '-ac', '2',
-    // Without these two, `-shortest` lets the picture run past the end
-    // of the audio, which would leave a silence at each join.
-    '-fflags', '+shortest',
-    '-max_interleave_delta', '100M',
+    // Stops the looping picture with the audio. FFmpeg 8 cuts within a
+    // frame of it, so the clips join without an audible gap.
     '-shortest',
     outputPath,
   ];
