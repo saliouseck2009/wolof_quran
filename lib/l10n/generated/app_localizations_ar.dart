@@ -392,6 +392,107 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String shareDefaultTextRange(
+    String surahName,
+    int firstVerse,
+    int lastVerse,
+  ) {
+    return 'الإلهام اليومي - $surahName - الآيات $firstVerse–$lastVerse';
+  }
+
+  @override
+  String get shareVersesTitle => 'الآيات';
+
+  @override
+  String get shareFromVerse => 'من الآية';
+
+  @override
+  String get shareToVerse => 'إلى الآية';
+
+  @override
+  String shareVideoTooLong(int minutes) {
+    return 'الفيديو طويل جدًا (الحد الأقصى $minutes دقائق). اختر آيات أقل.';
+  }
+
+  @override
+  String shareVideoLongForStatus(int seconds) {
+    return 'أطول من $seconds ثانية: ستقصّ حالة واتساب الفيديو.';
+  }
+
+  @override
+  String shareAudioMissingVerses(String verses) {
+    return 'لا يوجد صوت محمّل للآيات: $verses.';
+  }
+
+  @override
+  String shareVideoProgress(int current, int total) {
+    return 'الآية $current من $total';
+  }
+
+  @override
+  String get shareToolText => 'النص';
+
+  @override
+  String get shareToolBackground => 'الخلفية';
+
+  @override
+  String shareToolVersesRange(int first, int last) {
+    return 'الآيات $first–$last';
+  }
+
+  @override
+  String get shareImageShort => 'صورة';
+
+  @override
+  String get shareVideoShort => 'فيديو';
+
+  @override
+  String shareVerseLabel(int verse) {
+    return 'الآية $verse';
+  }
+
+  @override
+  String shareBackgroundNamed(String name) {
+    return 'الخلفية · $name';
+  }
+
+  @override
+  String get shareModeBoth => 'عربي + ترجمة';
+
+  @override
+  String get shareModeArabic => 'عربي';
+
+  @override
+  String get shareModeTranslation => 'ترجمة';
+
+  @override
+  String get shareBgMushaf => 'مصحفي';
+
+  @override
+  String get shareBgIvory => 'عاجي';
+
+  @override
+  String get shareBgCream => 'كريمي';
+
+  @override
+  String get shareBgSand => 'رملي';
+
+  @override
+  String get shareBgGold => 'ذهبي';
+
+  @override
+  String get shareBgSage => 'أخضر فاتح';
+
+  @override
+  String get shareBgDeepGreen => 'أخضر داكن';
+
+  @override
+  String get shareBgNight => 'ليلي';
+
+  @override
+  String get shareBgBlack => 'أسود';
+
+  @override
   String get bookmarkAdded => 'تم إضافة الإشارة المرجعية';
 
   @override

@@ -398,6 +398,107 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String shareDefaultTextRange(
+    String surahName,
+    int firstVerse,
+    int lastVerse,
+  ) {
+    return 'Daily Inspiration - $surahName - Verses $firstVerse–$lastVerse';
+  }
+
+  @override
+  String get shareVersesTitle => 'Verses';
+
+  @override
+  String get shareFromVerse => 'From verse';
+
+  @override
+  String get shareToVerse => 'to verse';
+
+  @override
+  String shareVideoTooLong(int minutes) {
+    return 'Video too long (maximum $minutes min). Pick fewer verses.';
+  }
+
+  @override
+  String shareVideoLongForStatus(int seconds) {
+    return 'Longer than $seconds s: a WhatsApp status will cut the video.';
+  }
+
+  @override
+  String shareAudioMissingVerses(String verses) {
+    return 'No downloaded audio for verses: $verses.';
+  }
+
+  @override
+  String shareVideoProgress(int current, int total) {
+    return 'Verse $current of $total';
+  }
+
+  @override
+  String get shareToolText => 'Text';
+
+  @override
+  String get shareToolBackground => 'Background';
+
+  @override
+  String shareToolVersesRange(int first, int last) {
+    return 'Verses $first–$last';
+  }
+
+  @override
+  String get shareImageShort => 'Image';
+
+  @override
+  String get shareVideoShort => 'Video';
+
+  @override
+  String shareVerseLabel(int verse) {
+    return 'Verse $verse';
+  }
+
+  @override
+  String shareBackgroundNamed(String name) {
+    return 'Background · $name';
+  }
+
+  @override
+  String get shareModeBoth => 'Arabic + translation';
+
+  @override
+  String get shareModeArabic => 'Arabic';
+
+  @override
+  String get shareModeTranslation => 'Translation';
+
+  @override
+  String get shareBgMushaf => 'My Mushaf';
+
+  @override
+  String get shareBgIvory => 'Ivory';
+
+  @override
+  String get shareBgCream => 'Cream';
+
+  @override
+  String get shareBgSand => 'Sand';
+
+  @override
+  String get shareBgGold => 'Gold';
+
+  @override
+  String get shareBgSage => 'Sage';
+
+  @override
+  String get shareBgDeepGreen => 'Deep green';
+
+  @override
+  String get shareBgNight => 'Night';
+
+  @override
+  String get shareBgBlack => 'Black';
+
+  @override
   String get bookmarkAdded => 'Bookmark added';
 
   @override
