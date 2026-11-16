@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../core/config/theme/app_color.dart';
 import '../../core/mushaf/quran_page_data.dart';
 import '../../core/navigation/create_reading_goal_arguments.dart';
 import '../../core/reading/local_date.dart';
@@ -220,7 +219,7 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: isDark ? AppColor.surfaceDark : colorScheme.surface,
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
           title: Text(
             _step == _Step.summary
@@ -235,7 +234,7 @@ class _CreateReadingGoalPageState extends State<CreateReadingGoalPage> {
             ),
           ),
           centerTitle: true,
-          backgroundColor: isDark ? AppColor.surfaceDark : colorScheme.primary,
+          backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
           iconTheme: IconThemeData(color: colorScheme.onPrimary),
           elevation: 0,
           scrolledUnderElevation: 0,
@@ -718,10 +717,9 @@ class _BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColor.surfaceDark : colorScheme.surface,
+        color: colorScheme.surface,
         border: Border(
           top: BorderSide(color: colorScheme.outline.withValues(alpha: 0.12)),
         ),

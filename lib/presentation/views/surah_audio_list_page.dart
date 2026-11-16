@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
-import '../../core/config/theme/app_color.dart';
 import '../../core/services/audio_download_queue_service.dart';
 import '../../core/services/audio_player_service.dart';
 import '../../domain/entities/reciter.dart';
@@ -467,8 +466,8 @@ class _ReciterSliverHeader extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppColor.primary,
-                AppColor.primary.withValues(alpha: 0.7),
+                colorScheme.primary,
+                colorScheme.primary.withValues(alpha: 0.7),
               ],
             ),
           ),

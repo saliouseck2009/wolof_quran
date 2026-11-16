@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../core/config/theme/app_color.dart';
 import '../../core/navigation/create_reading_goal_arguments.dart';
 import '../../domain/entities/reading_goal_progress.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -44,7 +43,7 @@ class _ReadingGoalsPageState extends State<ReadingGoalsPage> {
 
     return ReadingGoalCompletionListener(
       child: Scaffold(
-        backgroundColor: isDark ? AppColor.surfaceDark : colorScheme.surface,
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
           title: Text(
             localizations.readingGoals,
@@ -55,7 +54,7 @@ class _ReadingGoalsPageState extends State<ReadingGoalsPage> {
             ),
           ),
           centerTitle: false,
-          backgroundColor: isDark ? AppColor.surfaceDark : colorScheme.primary,
+          backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
           iconTheme: IconThemeData(color: colorScheme.onPrimary),
           elevation: 0,
           scrolledUnderElevation: 0,

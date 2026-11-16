@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/navigation/reciter_audio_updates_arguments.dart';
 import '../../domain/entities/reciter.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -85,7 +84,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
           ),
         ),
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? AppColor.surfaceDark
+            ? colorScheme.surface
             : colorScheme.primary,
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/config/theme/app_color.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
 class SearchSliverHeader extends StatelessWidget {
@@ -37,7 +36,7 @@ class SearchSliverHeader extends StatelessWidget {
           pinned: true,
           elevation: 0,
           backgroundColor: colorScheme.brightness == Brightness.dark
-              ? AppColor.surfaceDark
+              ? colorScheme.surface
               : colorScheme.primary,
           iconTheme: IconThemeData(color: colorScheme.onPrimary),
           surfaceTintColor: Colors.transparent,
@@ -66,7 +65,7 @@ class SearchSliverHeader extends StatelessWidget {
             titlePadding: EdgeInsets.zero,
             background: Container(
               color: colorScheme.brightness == Brightness.dark
-                  ? AppColor.surfaceDark
+                  ? colorScheme.surface
                   : colorScheme.primary,
               child: SafeArea(
                 child: Padding(

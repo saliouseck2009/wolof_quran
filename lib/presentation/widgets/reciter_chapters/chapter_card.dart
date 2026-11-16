@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
-import '../../../core/config/theme/app_color.dart';
 import '../../../core/services/audio_download_queue_service.dart';
 import '../../../domain/entities/reciter.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -38,7 +37,7 @@ class ChapterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final accentColor = isDark ? AppColor.tertiary : colorScheme.primary;
+    final accentColor = isDark ? colorScheme.tertiary : colorScheme.primary;
     final bgColor = isDark
         ? colorScheme.surfaceContainerLow
         : colorScheme.onPrimary;
@@ -205,7 +204,7 @@ class _DownloadActions extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    final accentColor = isDark ? AppColor.tertiary : colorScheme.primary;
+    final accentColor = isDark ? colorScheme.tertiary : colorScheme.primary;
 
     return BlocBuilder<AudioDownloadQueueCubit, AudioDownloadQueueState>(
       builder: (context, queueState) {

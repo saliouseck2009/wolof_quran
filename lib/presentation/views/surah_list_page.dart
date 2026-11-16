@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../core/config/theme/app_color.dart';
 
 import '../cubits/surah_list_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
@@ -56,9 +55,7 @@ class _SurahListViewState extends State<_SurahListView> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.brightness == Brightness.dark
-          ? AppColor.surfaceDark
-          : colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       body: BlocListener<SurahListCubit, SurahListState>(
         listenWhen: (previous, current) {
           if (current is! SurahListLoaded) return false;

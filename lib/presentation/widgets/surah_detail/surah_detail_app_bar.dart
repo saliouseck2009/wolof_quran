@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
-import '../../../core/config/theme/app_color.dart';
 import '../../../core/helpers/revelation_place_enum.dart';
 import '../../../domain/usecases/get_downloaded_surahs_usecase.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -35,7 +34,7 @@ class SurahDetailAppBar extends StatelessWidget {
         titleSpacing: 0,
         elevation: 0,
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? AppColor.surfaceDark
+            ? colorScheme.surface
             : colorScheme.primary,
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         title: Text(
@@ -107,7 +106,7 @@ class SurahDetailAppBar extends StatelessWidget {
           background: Container(
             decoration: BoxDecoration(
               color: colorScheme.brightness == Brightness.dark
-                  ? AppColor.surfaceDark
+                  ? colorScheme.surface
                   : colorScheme.primary,
             ),
             child: SafeArea(

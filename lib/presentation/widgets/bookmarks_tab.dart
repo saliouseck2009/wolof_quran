@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
-import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/navigation/surah_detail_arguments.dart';
 import 'package:wolof_quran/presentation/widgets/search/search_results_list.dart';
 import 'package:wolof_quran/presentation/widgets/snackbar.dart';
@@ -24,9 +23,7 @@ class BookmarksTab extends StatelessWidget {
     final accentGreen = colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: colorScheme.brightness == Brightness.dark
-          ? AppColor.surfaceDark
-          : colorScheme.surface,
+      backgroundColor: colorScheme.surface,
 
       appBar: AppBar(
         title: Text(
@@ -39,7 +36,7 @@ class BookmarksTab extends StatelessWidget {
         ),
         centerTitle: false,
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? AppColor.surfaceDark
+            ? colorScheme.surface
             : colorScheme.primary,
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,

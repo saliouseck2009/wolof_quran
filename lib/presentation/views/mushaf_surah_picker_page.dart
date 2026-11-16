@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qcf_quran_plus/qcf_quran_plus.dart' as qcf;
-import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 
 import '../../l10n/generated/app_localizations.dart';
@@ -128,9 +127,7 @@ class _MushafSurahPickerViewState extends State<_MushafSurahPickerView> {
         .currentTranslation;
 
     return Scaffold(
-      backgroundColor: colorScheme.brightness == Brightness.dark
-          ? AppColor.surfaceDark
-          : colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(title: Text(localizations.selectSurah)),
       body: Column(
         children: [
