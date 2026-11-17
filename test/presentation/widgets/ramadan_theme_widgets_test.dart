@@ -8,6 +8,7 @@ import 'package:wolof_quran/core/config/theme/theme.dart';
 import 'package:wolof_quran/l10n/generated/app_localizations.dart';
 import 'package:wolof_quran/presentation/cubits/seasonal_theme_cubit.dart';
 import 'package:wolof_quran/presentation/widgets/app_loader.dart';
+import 'package:wolof_quran/presentation/widgets/seasonal/moon_phase_progress.dart';
 import 'package:wolof_quran/presentation/widgets/seasonal/night_sky.dart';
 import 'package:wolof_quran/presentation/widgets/seasonal/ramadan_loader.dart';
 import 'package:wolof_quran/presentation/widgets/seasonal/ramadan_banner.dart';
@@ -275,6 +276,117 @@ void main() {
       expect(tester.getSize(find.byType(AppBar)).height, kToolbarHeight);
       expect(find.text('Sourates'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('MoonPhaseProgress', () {
+    const center = Offset(50, 50);
+    const radius = 40.0;
+    // The lit limb faces the bottom left, the dark one the top right.
+    const litLimb = Offset(50 - 34, 50 + 17);
+    const darkLimb = Offset(50 + 34, 50 - 17);
+
+    Path lit(double fraction) =>
+        MoonPhaseProgress.litPath(center, radius, fraction);
+
+    test('goes from the new moon to the full moon', () {
+      expect(lit(0).getBounds().isEmpty, isTrue);
+      expect(lit(-1).getBounds().isEmpty, isTrue);
+
+      final full = lit(1).getBounds();
+      expect(full.width, closeTo(2 * radius, 0.01));
+      expect(full.height, closeTo(2 * radius, 0.01));
+      expect(lit(3).getBounds(), full);
+    });
+
+    test('a crescent widens into a gibbous moon', () {
+      final crescent = lit(0.25);
+      expect(crescent.contains(litLimb), isTrue);
+      expect(crescent.contains(center), isFalse);
+      expect(crescent.contains(darkLimb), isFalse);
+
+      final gibbous = lit(0.75);
+      expect(gibbous.contains(litLimb), isTrue);
+      expect(gibbous.contains(center), isTrue);
+      expect(gibbous.contains(darkLimb), isFalse);
+    });
+
+    testWidgets('announces its label and waxes up to the progress', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: const MaterialTheme(season: SeasonalTheme.ramadan).dark(),
+          home: const Scaffold(
+            body: Center(
+              child: MoonPhaseProgress(fraction: 0.48, label: '48 %'),
+            ),
+          ),
+        ),
+      );
+      expect(tester.hasRunningAnimations, isTrue);
+      await tester.pumpAndSettle();
+
+      expect(find.bySemanticsLabel('48 %'), findsOneWidget);
+      expect(
+        tester.getSize(find.byType(MoonPhaseProgress)),
+        const Size(46, 46),
+      );
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('seasonal sky with ornaments', () {
+    testWidgets('adds the crescent and the lanterns to a picture', (
+      tester,
+    ) async {
+      late Decoration decoration;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: const MaterialTheme(season: SeasonalTheme.ramadan).light(),
+          home: Scaffold(
+            body: Center(
+              child: Builder(
+                builder: (context) {
+                  decoration = seasonalSky(
+                    context,
+                    BoxDecoration(
+                      color: Colors.indigo,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    ornaments: true,
+                  );
+                  return Container(
+                    width: 240,
+                    height: 240,
+                    decoration: decoration,
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect((decoration as NightSkyDecoration).ornaments, isTrue);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a header keeps to the stars', (tester) async {
+      late Decoration decoration;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: const MaterialTheme(season: SeasonalTheme.ramadan).light(),
+          home: Builder(
+            builder: (context) {
+              decoration = seasonalSky(context, const BoxDecoration());
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      expect((decoration as NightSkyDecoration).ornaments, isFalse);
     });
   });
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/config/theme/seasonal_theme.dart';
 import '../../../core/navigation/create_reading_goal_arguments.dart';
 import '../../../domain/entities/reading_goal_progress.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/reading_goals_cubit.dart';
 import '../../utils/home_card_colors.dart';
 import '../../views/create_reading_goal_page.dart';
+import '../seasonal/moon_phase_progress.dart';
 import 'reading_goal_actions.dart';
 
 /// Home strip showing the goal followed in the mushaf (or the first ongoing
@@ -142,6 +144,10 @@ class _ProgressRing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (SeasonalTheme.of(context) == SeasonalTheme.ramadan) {
+      // During Ramadan the reading fills a moon instead of a ring.
+      return MoonPhaseProgress(fraction: fraction, label: label, size: 46);
+    }
     return Semantics(
       label: label,
       excludeSemantics: true,

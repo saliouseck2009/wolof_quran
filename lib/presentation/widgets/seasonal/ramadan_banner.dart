@@ -114,13 +114,13 @@ class _NightSkyPainter extends CustomPainter {
     }
     final w = size.width;
 
-    _paintMoon(canvas, Offset(w - 44, 46), 24);
+    NightSky.paintMoon(canvas, Offset(w - 44, 46), 24, decor);
 
     // Bright stars near the moon, faint ones over the rest of the sky.
-    _paintSparkle(canvas, Offset(w - 30, 38), 5.5, 1);
-    _paintSparkle(canvas, Offset(w - 84, 20), 4, 0.85);
-    _paintSparkle(canvas, Offset(w - 14, 84), 3.5, 0.7);
-    _paintSparkle(canvas, Offset(w - 150, 14), 3, 0.5);
+    NightSky.paintSparkle(canvas, Offset(w - 30, 38), 5.5, decor);
+    NightSky.paintSparkle(canvas, Offset(w - 84, 20), 4, decor, opacity: 0.85);
+    NightSky.paintSparkle(canvas, Offset(w - 14, 84), 3.5, decor, opacity: 0.7);
+    NightSky.paintSparkle(canvas, Offset(w - 150, 14), 3, decor, opacity: 0.5);
     for (final (dx, dy, radius, alpha) in const [
       (0.08, 0.16, 1.1, 0.45),
       (0.22, 0.84, 0.9, 0.35),
@@ -137,134 +137,21 @@ class _NightSkyPainter extends CustomPainter {
       );
     }
 
-    _paintLantern(canvas, x: w - 98, drop: 14, height: 34);
-    _paintLantern(canvas, x: w - 124, drop: 6, height: 24);
+    NightSky.paintLantern(
+      canvas,
+      Offset(w - 98, 0),
+      drop: 14,
+      height: 34,
+      decor: decor,
+    );
+    NightSky.paintLantern(
+      canvas,
+      Offset(w - 124, 0),
+      drop: 6,
+      height: 24,
+      decor: decor,
+    );
     canvas.restore();
-  }
-
-  void _paintMoon(Canvas canvas, Offset center, double radius) {
-    final halo = Rect.fromCircle(center: center, radius: radius * 2.6);
-    canvas.drawCircle(
-      center,
-      radius * 2.6,
-      Paint()
-        ..shader = RadialGradient(
-          colors: [
-            decor.glow.withValues(alpha: 0.20),
-            decor.glow.withValues(alpha: 0),
-          ],
-        ).createShader(halo),
-    );
-
-    final disc = Rect.fromCircle(center: center, radius: radius);
-    canvas.drawPath(
-      NightSky.crescent(center, radius),
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color.lerp(decor.ornament, Colors.white, 0.45)!,
-            decor.ornament,
-          ],
-        ).createShader(disc),
-    );
-  }
-
-  void _paintSparkle(Canvas canvas, Offset c, double r, double alpha) {
-    canvas.drawPath(
-      NightSky.sparkle(c, r),
-      Paint()..color = NightSky.starColor(decor).withValues(alpha: alpha),
-    );
-  }
-
-  /// A lantern hanging from the top edge at [x]: [drop] is the length of
-  /// its string, [height] the height of its glass body.
-  void _paintLantern(
-    Canvas canvas, {
-    required double x,
-    required double drop,
-    required double height,
-  }) {
-    final s = height;
-    final gold = Paint()..color = decor.ornament;
-    final thread = Paint()
-      ..color = decor.ornament.withValues(alpha: 0.8)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    canvas.drawLine(Offset(x, 0), Offset(x, drop), thread);
-    canvas.drawCircle(Offset(x, drop + s * 0.06), s * 0.06, thread);
-
-    final capTop = drop + s * 0.12;
-    final bodyTop = capTop + s * 0.2;
-    final bodyBottom = bodyTop + s * 0.62;
-    final bodyCenter = Offset(x, (bodyTop + bodyBottom) / 2);
-
-    final haloRect = Rect.fromCircle(center: bodyCenter, radius: s * 0.95);
-    canvas.drawCircle(
-      bodyCenter,
-      s * 0.95,
-      Paint()
-        ..shader = RadialGradient(
-          colors: [
-            decor.glow.withValues(alpha: 0.38),
-            decor.glow.withValues(alpha: 0),
-          ],
-        ).createShader(haloRect),
-    );
-
-    final cap = Path()
-      ..moveTo(x - s * 0.22, bodyTop)
-      ..quadraticBezierTo(x - s * 0.2, capTop + s * 0.03, x, capTop)
-      ..quadraticBezierTo(x + s * 0.2, capTop + s * 0.03, x + s * 0.22, bodyTop)
-      ..close();
-    canvas.drawPath(cap, gold);
-
-    final body = Path()
-      ..moveTo(x - s * 0.2, bodyTop)
-      ..lineTo(x + s * 0.2, bodyTop)
-      ..quadraticBezierTo(
-        x + s * 0.38,
-        bodyTop + s * 0.3,
-        x + s * 0.15,
-        bodyBottom,
-      )
-      ..lineTo(x - s * 0.15, bodyBottom)
-      ..quadraticBezierTo(x - s * 0.38, bodyTop + s * 0.3, x - s * 0.2, bodyTop)
-      ..close();
-    canvas.drawPath(
-      body,
-      Paint()
-        ..shader = RadialGradient(
-          colors: [Color.lerp(decor.glow, Colors.white, 0.6)!, decor.glow],
-        ).createShader(Rect.fromCircle(center: bodyCenter, radius: s * 0.4)),
-    );
-    final frame = Paint()
-      ..color = decor.ornament
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2;
-    canvas.drawPath(body, frame);
-    canvas.drawLine(Offset(x, bodyTop), Offset(x, bodyBottom), frame);
-
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTRB(
-          x - s * 0.19,
-          bodyBottom,
-          x + s * 0.19,
-          bodyBottom + s * 0.08,
-        ),
-        const Radius.circular(1),
-      ),
-      gold,
-    );
-    canvas.drawLine(
-      Offset(x, bodyBottom + s * 0.08),
-      Offset(x, bodyBottom + s * 0.24),
-      thread,
-    );
-    canvas.drawCircle(Offset(x, bodyBottom + s * 0.26), s * 0.04, gold);
   }
 
   @override

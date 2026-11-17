@@ -66,6 +66,145 @@ abstract final class NightSky {
     }
   }
 
+  /// A bright star of [radius] at [center].
+  static void paintSparkle(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    SeasonalDecor decor, {
+    double opacity = 1,
+  }) {
+    canvas.drawPath(
+      sparkle(center, radius),
+      Paint()..color = starColor(decor).withValues(alpha: opacity),
+    );
+  }
+
+  /// The golden crescent, in a soft halo.
+  static void paintMoon(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    SeasonalDecor decor,
+  ) {
+    final halo = Rect.fromCircle(center: center, radius: radius * 2.6);
+    canvas.drawCircle(
+      center,
+      radius * 2.6,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            decor.glow.withValues(alpha: 0.20),
+            decor.glow.withValues(alpha: 0),
+          ],
+        ).createShader(halo),
+    );
+    canvas.drawPath(
+      crescent(center, radius),
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color.lerp(decor.ornament, Colors.white, 0.45)!,
+            decor.ornament,
+          ],
+        ).createShader(Rect.fromCircle(center: center, radius: radius)),
+    );
+  }
+
+  /// A lit lantern hanging from [anchor], a point of the top edge: [drop]
+  /// is the length of its string, [height] the height of its glass body.
+  static void paintLantern(
+    Canvas canvas,
+    Offset anchor, {
+    required double drop,
+    required double height,
+    required SeasonalDecor decor,
+  }) {
+    final x = anchor.dx;
+    final s = height;
+    final gold = Paint()..color = decor.ornament;
+    final thread = Paint()
+      ..color = decor.ornament.withValues(alpha: 0.8)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    final hook = anchor.dy + drop;
+    canvas.drawLine(anchor, Offset(x, hook), thread);
+    canvas.drawCircle(Offset(x, hook + s * 0.06), s * 0.06, thread);
+
+    final capTop = hook + s * 0.12;
+    final bodyTop = capTop + s * 0.2;
+    final bodyBottom = bodyTop + s * 0.62;
+    final bodyCenter = Offset(x, (bodyTop + bodyBottom) / 2);
+
+    final haloRect = Rect.fromCircle(center: bodyCenter, radius: s * 0.95);
+    canvas.drawCircle(
+      bodyCenter,
+      s * 0.95,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            decor.glow.withValues(alpha: 0.38),
+            decor.glow.withValues(alpha: 0),
+          ],
+        ).createShader(haloRect),
+    );
+
+    final cap = Path()
+      ..moveTo(x - s * 0.22, bodyTop)
+      ..quadraticBezierTo(x - s * 0.2, capTop + s * 0.03, x, capTop)
+      ..quadraticBezierTo(x + s * 0.2, capTop + s * 0.03, x + s * 0.22, bodyTop)
+      ..close();
+    canvas.drawPath(cap, gold);
+
+    final body = Path()
+      ..moveTo(x - s * 0.2, bodyTop)
+      ..lineTo(x + s * 0.2, bodyTop)
+      ..quadraticBezierTo(
+        x + s * 0.38,
+        bodyTop + s * 0.3,
+        x + s * 0.15,
+        bodyBottom,
+      )
+      ..lineTo(x - s * 0.15, bodyBottom)
+      ..quadraticBezierTo(x - s * 0.38, bodyTop + s * 0.3, x - s * 0.2, bodyTop)
+      ..close();
+    canvas.drawPath(
+      body,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [Color.lerp(decor.glow, Colors.white, 0.6)!, decor.glow],
+        ).createShader(Rect.fromCircle(center: bodyCenter, radius: s * 0.4)),
+    );
+    final frame = Paint()
+      ..color = decor.ornament
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    canvas.drawPath(body, frame);
+    canvas.drawLine(Offset(x, bodyTop), Offset(x, bodyBottom), frame);
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTRB(
+          x - s * 0.19,
+          bodyBottom,
+          x + s * 0.19,
+          bodyBottom + s * 0.08,
+        ),
+        const Radius.circular(1),
+      ),
+      gold,
+    );
+    canvas.drawLine(
+      Offset(x, bodyBottom + s * 0.08),
+      Offset(x, bodyBottom + s * 0.24),
+      thread,
+    );
+    canvas.drawCircle(Offset(x, bodyBottom + s * 0.26), s * 0.04, gold);
+  }
+
   /// The star pattern repeats beyond this size, on tablets.
   static const Size _tile = Size(420, 230);
 
@@ -111,7 +250,15 @@ class NightSkyDecoration extends Decoration {
   final BoxDecoration base;
   final SeasonalDecor decor;
 
-  const NightSkyDecoration({required this.base, required this.decor});
+  /// Also hangs two lanterns from the top of the box and puts the crescent
+  /// in its top end corner: for a picture, not for a header.
+  final bool ornaments;
+
+  const NightSkyDecoration({
+    required this.base,
+    required this.decor,
+    this.ornaments = false,
+  });
 
   @override
   EdgeInsetsGeometry get padding => base.padding;
@@ -133,10 +280,13 @@ class NightSkyDecoration extends Decoration {
 
   @override
   bool operator ==(Object other) =>
-      other is NightSkyDecoration && other.base == base && other.decor == decor;
+      other is NightSkyDecoration &&
+      other.base == base &&
+      other.decor == decor &&
+      other.ornaments == ornaments;
 
   @override
-  int get hashCode => Object.hash(base, decor);
+  int get hashCode => Object.hash(base, decor, ornaments);
 }
 
 class _NightSkyBoxPainter extends BoxPainter {
@@ -161,7 +311,37 @@ class _NightSkyBoxPainter extends BoxPainter {
           configuration.textDirection ?? TextDirection.ltr,
         ),
       );
-    NightSky.paintStars(canvas, rect, _decoration.decor);
+    final decor = _decoration.decor;
+    NightSky.paintStars(canvas, rect, decor);
+    if (_decoration.ornaments) {
+      final side = rect.shortestSide;
+      NightSky.paintMoon(
+        canvas,
+        rect.topRight + Offset(-side * 0.24, side * 0.25),
+        side * 0.115,
+        decor,
+      );
+      NightSky.paintSparkle(
+        canvas,
+        rect.topRight + Offset(-side * 0.2, side * 0.21),
+        side * 0.026,
+        decor,
+      );
+      NightSky.paintLantern(
+        canvas,
+        rect.topLeft + Offset(side * 0.2, 0),
+        drop: side * 0.07,
+        height: side * 0.16,
+        decor: decor,
+      );
+      NightSky.paintLantern(
+        canvas,
+        rect.topLeft + Offset(side * 0.34, 0),
+        drop: side * 0.03,
+        height: side * 0.11,
+        decor: decor,
+      );
+    }
     canvas.restore();
   }
 
@@ -174,12 +354,19 @@ class _NightSkyBoxPainter extends BoxPainter {
 
 /// The decoration of a header: [base] as it is out of season, with a starry
 /// sky over it during Ramadan.
-Decoration seasonalSky(BuildContext context, BoxDecoration base) {
+///
+/// With [ornaments] the sky also gets its crescent and lanterns, for a
+/// picture such as the artwork of the audio player.
+Decoration seasonalSky(
+  BuildContext context,
+  BoxDecoration base, {
+  bool ornaments = false,
+}) {
   final decor = Theme.of(context).extension<SeasonalDecor>();
   if (decor == null || decor.season != SeasonalTheme.ramadan) {
     return base;
   }
-  return NightSkyDecoration(base: base, decor: decor);
+  return NightSkyDecoration(base: base, decor: decor, ornaments: ornaments);
 }
 
 /// Starry sky to put in the `flexibleSpace` of an app bar. It keeps the

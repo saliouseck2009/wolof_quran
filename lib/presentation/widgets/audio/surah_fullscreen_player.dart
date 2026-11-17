@@ -349,6 +349,7 @@ class _SurahArtwork extends StatelessWidget {
             colors: [colorScheme.primary, colorScheme.onPrimaryContainer],
           ),
         ),
+        ornaments: true,
       ),
       child: Center(
         child: _AnimatedMusicNote(

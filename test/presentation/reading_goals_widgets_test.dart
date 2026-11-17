@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:wolof_quran/core/config/theme/seasonal_theme.dart';
+import 'package:wolof_quran/core/config/theme/theme.dart';
 import 'package:wolof_quran/core/reading/local_date.dart';
 import 'package:wolof_quran/domain/entities/reading_goal.dart';
 import 'package:wolof_quran/domain/entities/reading_session.dart';
@@ -11,6 +13,7 @@ import 'package:wolof_quran/l10n/generated/app_localizations.dart';
 import 'package:wolof_quran/presentation/cubits/reading_goals_cubit.dart';
 import 'package:wolof_quran/presentation/views/reading_goals_page.dart';
 import 'package:wolof_quran/presentation/widgets/reading_goals/home_reading_card.dart';
+import 'package:wolof_quran/presentation/widgets/seasonal/moon_phase_progress.dart';
 
 class _FakeRepository implements ReadingGoalRepository {
   final Map<String, ReadingGoal> goals = {};
@@ -80,10 +83,11 @@ class _FakeRepository implements ReadingGoalRepository {
   Future<void> setActiveGoalId(String? goalId) async => activeGoalId = goalId;
 }
 
-Widget _wrap(ReadingGoalsCubit cubit, Widget child) {
+Widget _wrap(ReadingGoalsCubit cubit, Widget child, {ThemeData? theme}) {
   return BlocProvider.value(
     value: cubit,
     child: MaterialApp(
+      theme: theme,
       locale: const Locale('fr'),
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -155,6 +159,45 @@ void main() {
       // Target 21, read 10 → 11 left.
       expect(find.text('11 pages aujourd\'hui'), findsOneWidget);
       expect(find.text('Page 11'), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(MoonPhaseProgress), findsNothing);
+    });
+
+    testWidgets('fills a moon instead of the ring during Ramadan', (
+      tester,
+    ) async {
+      final repository = _FakeRepository()
+        ..goals['g1'] = goal('g1', 'Khatm Ramadan')
+        ..pages['g1'] = {for (var p = 1; p <= 302; p++) p: now}
+        ..activeGoalId = 'g1';
+      final cubit = ReadingGoalsCubit(
+        repository: repository,
+        today: () => today,
+        totalPages: 604,
+      );
+      addTearDown(cubit.close);
+      await cubit.load();
+
+      await tester.pumpWidget(
+        _wrap(
+          cubit,
+          const Scaffold(body: HomeReadingCard()),
+          theme: const MaterialTheme(season: SeasonalTheme.ramadan).light(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final moon = tester.widget<MoonPhaseProgress>(
+        find.byType(MoonPhaseProgress),
+      );
+      expect(moon.fraction, 0.5);
+      // It carries the same localized percent as the ring.
+      expect(moon.label, startsWith('50'));
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      // The rest of the strip does not change.
+      expect(find.text('Khatm Ramadan'), findsOneWidget);
+      expect(find.text('Page 303'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 
