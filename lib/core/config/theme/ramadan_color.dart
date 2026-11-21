@@ -53,4 +53,17 @@ class RamadanColor {
   static const Color ornament = Color(0xFFE9C46A);
   static const Color glow = Color(0xFFFFC766);
   static const Color onSky = Color(0xFFFFFFFF);
+
+  // Skies of the home banner through the day (the night is skyStart and
+  // skyEnd). Each stays dark enough for the white and gold text.
+  static const Color preDawnStart = Color(0xFF0E1638);
+  static const Color preDawnEnd = Color(0xFF34457E);
+  static const Color dayStart = Color(0xFF1F3A80);
+  static const Color dayEnd = Color(0xFF3A58A8);
+  static const Color sunsetStart = Color(0xFF2E2766);
+  static const Color sunsetEnd = Color(0xFF94443A);
+
+  // Korité: a festive green under the same gold
+  static const Color eidStart = Color(0xFF0B3D30);
+  static const Color eidEnd = Color(0xFF1B6650);
 }

@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/config/theme/seasonal_theme.dart';
 import 'package:wolof_quran/core/config/theme/theme.dart';
+import 'package:wolof_quran/core/seasonal/ramadan_calendar.dart';
+import 'package:wolof_quran/presentation/widgets/seasonal/ramadan_banner.dart';
 
 /// WCAG contrast ratio between two opaque colors.
 double _contrast(Color a, Color b) {
@@ -95,5 +97,40 @@ void main() {
         expect(_contrast(tagline, sky), greaterThan(4.5));
       }
     });
+  });
+
+  test('the banner text reads on every sky of the day and on the Korité', () {
+    final decor = const MaterialTheme(
+      season: SeasonalTheme.ramadan,
+    ).light().extension<SeasonalDecor>()!;
+    final status = RamadanBanner.statusColor(decor);
+    // The tagline is white at 85 %: check its blend on each color.
+    Color tagline(Color sky) =>
+        Color.alphaBlend(decor.onSky.withValues(alpha: 0.85), sky);
+
+    for (final moment in [
+      for (final sky in RamadanSky.values)
+        RamadanMoment(period: RamadanPeriod.ramadan, sky: sky, moonPhase: 0),
+      const RamadanMoment(
+        period: RamadanPeriod.eid,
+        sky: RamadanSky.day,
+        moonPhase: 0,
+      ),
+    ]) {
+      final (start, end) = RamadanBanner.skyOf(decor, moment);
+      for (final sky in [start, end]) {
+        expect(
+          _contrast(decor.onSky, sky),
+          greaterThan(4.5),
+          reason: '$moment',
+        );
+        expect(_contrast(status, sky), greaterThan(4.5), reason: '$moment');
+        expect(
+          _contrast(tagline(sky), sky),
+          greaterThan(4.5),
+          reason: '$moment',
+        );
+      }
+    }
   });
 }

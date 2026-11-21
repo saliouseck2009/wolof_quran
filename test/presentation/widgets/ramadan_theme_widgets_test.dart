@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -118,6 +120,151 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        expect(tester.takeException(), isNull, reason: '$locale');
+      }
+    });
+  });
+
+  group('RamadanBanner through the month', () {
+    // First day of fasting on 8 February 2027: day 26 is 5 March.
+    final dated = SeasonalThemeConfig(
+      theme: SeasonalTheme.ramadan,
+      enabled: true,
+      start: DateTime(2027, 2, 8),
+      end: DateTime(2027, 3, 9),
+      eidEnd: DateTime(2027, 3, 10),
+    );
+
+    // A dated month runs a timer: its cubits close before the end of the
+    // test, which fails on pending timers.
+    final cubits = <SeasonalThemeCubit>[];
+
+    void bannerTest(String name, Future<void> Function(WidgetTester) body) {
+      testWidgets(name, (tester) async {
+        await body(tester);
+        // Closing awaits the listeners of the widget tree: unmount it first,
+        // then let the fake clock deliver the close.
+        await tester.pumpWidget(const SizedBox());
+        for (final cubit in cubits) {
+          unawaited(cubit.close());
+        }
+        await tester.pump();
+        cubits.clear();
+      });
+    }
+
+    Future<SeasonalThemeCubit> pumpAt(
+      WidgetTester tester,
+      DateTime now, {
+      Locale locale = const Locale('fr'),
+    }) async {
+      // Not through createCubit: its tear-down would close the cubit a
+      // second time, outside the fake clock, and wait forever.
+      repository = FakeSeasonalThemeRepository(config: dated);
+      final cubit = SeasonalThemeCubit(
+        repository: repository,
+        clock: () => now,
+      );
+      cubits.add(cubit);
+      await tester.pumpWidget(
+        _app(cubit: cubit, locale: locale, child: const RamadanBanner()),
+      );
+      await tester.pump();
+      return cubit;
+    }
+
+    bannerTest('the eve announces the month', (tester) async {
+      await pumpAt(tester, DateTime(2027, 2, 7, 11));
+
+      expect(find.text('Ramadan Moubarak'), findsOneWidget);
+      expect(find.text('Le Ramadan commence ce soir'), findsOneWidget);
+    });
+
+    bannerTest('a day of fasting shows its number', (tester) async {
+      await pumpAt(tester, DateTime(2027, 2, 19, 11));
+
+      expect(find.text('Jour 12 du Ramadan'), findsOneWidget);
+      expect(find.text('Le mois du Coran'), findsOneWidget);
+    });
+
+    bannerTest('day 26 announces night 27, which follows at nightfall', (
+      tester,
+    ) async {
+      await pumpAt(tester, DateTime(2027, 3, 5, 15));
+      expect(find.text('Jour 26 du Ramadan'), findsOneWidget);
+      expect(find.text('Ce soir : nuit 27'), findsOneWidget);
+
+      await pumpAt(tester, DateTime(2027, 3, 5, 21));
+      expect(find.text('Nuit 27 du Ramadan'), findsOneWidget);
+      expect(find.text('Les 10 dernières nuits'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(
+          'Ramadan Moubarak. Nuit 27 du Ramadan. Les 10 dernières nuits',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    bannerTest('the Korité greets with its own sky', (tester) async {
+      await pumpAt(tester, DateTime(2027, 3, 10, 10));
+
+      expect(find.text('Korité Moubarak'), findsOneWidget);
+      expect(find.textContaining('Jour'), findsNothing);
+      expect(find.text('Ajuster la date'), findsNothing);
+    });
+
+    bannerTest('adjusting the date moves the day', (tester) async {
+      final cubit = await pumpAt(tester, DateTime(2027, 2, 19, 11));
+      expect(find.text('Jour 12 du Ramadan'), findsOneWidget);
+
+      await tester.tap(find.text('Ajuster la date'));
+      await tester.pumpAndSettle();
+      expect(find.text('Début de votre Ramadan'), findsOneWidget);
+      // The earliest start is chosen, the next day is offered.
+      expect(find.bySemanticsLabel(RegExp('8 février 2027')), findsOneWidget);
+
+      await tester.tap(find.textContaining('9 février 2027'));
+      await tester.pumpAndSettle();
+
+      expect(cubit.state.startOffset, 1);
+      expect(find.text('Début de votre Ramadan'), findsNothing);
+      expect(find.text('Jour 11 du Ramadan'), findsOneWidget);
+    });
+
+    bannerTest('the date button is a named button for screen readers', (
+      tester,
+    ) async {
+      await pumpAt(tester, DateTime(2027, 2, 19, 11));
+
+      expect(
+        tester.getSemantics(find.text('Ajuster la date')),
+        matchesSemantics(
+          label: 'Ajuster la date',
+          isButton: true,
+          hasTapAction: true,
+          hasFocusAction: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          isFocusable: true,
+        ),
+      );
+      expect(
+        tester.getSize(find.byType(TextButton)).height,
+        greaterThanOrEqualTo(48),
+      );
+    });
+
+    bannerTest('fits a small phone with enlarged text at night 27', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(320 * 3, 640 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      for (final locale in const [Locale('fr'), Locale('en'), Locale('ar')]) {
+        await pumpAt(tester, DateTime(2027, 3, 5, 21), locale: locale);
         expect(tester.takeException(), isNull, reason: '$locale');
       }
     });

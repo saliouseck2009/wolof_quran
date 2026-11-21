@@ -3219,6 +3219,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dress the app in the colors of Ramadan'**
   String get ramadanThemeSubtitle;
+
+  /// Banner line during the daytime of a day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} of Ramadan'**
+  String ramadanDay(int day);
+
+  /// Banner line between nightfall and dawn; night N starts on the evening of day N-1
+  ///
+  /// In en, this message translates to:
+  /// **'Night {night} of Ramadan'**
+  String ramadanNight(int night);
+
+  /// Banner line during the day before an odd night of the last ten
+  ///
+  /// In en, this message translates to:
+  /// **'Tonight: night {night}'**
+  String ramadanTonight(int night);
+
+  /// Banner line on the eve of Ramadan
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan begins tonight'**
+  String get ramadanStartsTonight;
+
+  /// Banner tagline from the 21st night
+  ///
+  /// In en, this message translates to:
+  /// **'The last ten nights'**
+  String get ramadanLastTenNights;
+
+  /// Banner greeting during the Korité (Eid al-Fitr)
+  ///
+  /// In en, this message translates to:
+  /// **'Eid Mubarak'**
+  String get eidGreeting;
+
+  /// Banner tagline during the Korité
+  ///
+  /// In en, this message translates to:
+  /// **'A blessed Eid to you and your loved ones'**
+  String get eidTagline;
+
+  /// Button of the Ramadan banner that opens the choice of the first day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust the date'**
+  String get ramadanAdjustDate;
+
+  /// Title of the sheet where the user picks their first day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Start of your Ramadan'**
+  String get ramadanStartTitle;
+
+  /// Explains the choice of the first day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Depending on your community, fasting began on one of these days. The days and nights of the app follow your choice.'**
+  String get ramadanStartSubtitle;
+
+  /// Settings row opening the choice of the first day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Start of Ramadan'**
+  String get ramadanStartSetting;
 }
 
 class _AppLocalizationsDelegate

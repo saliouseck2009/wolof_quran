@@ -529,5 +529,16 @@
   "ramadanGreeting": "Ramadan Moubarak",
   "ramadanTagline": "Le mois du Coran",
   "ramadanTheme": "Thème Ramadan",
-  "ramadanThemeSubtitle": "Habiller l'application aux couleurs du Ramadan"
+  "ramadanThemeSubtitle": "Habiller l'application aux couleurs du Ramadan",
+  "ramadanDay": "Jour {day} du Ramadan",
+  "ramadanNight": "Nuit {night} du Ramadan",
+  "ramadanTonight": "Ce soir : nuit {night}",
+  "ramadanStartsTonight": "Le Ramadan commence ce soir",
+  "ramadanLastTenNights": "Les 10 dernières nuits",
+  "eidGreeting": "Korité Moubarak",
+  "eidTagline": "Bonne fête à vous et à vos proches",
+  "ramadanAdjustDate": "Ajuster la date",
+  "ramadanStartTitle": "Début de votre Ramadan",
+  "ramadanStartSubtitle": "Selon votre communauté, le jeûne a commencé l'un de ces jours. Les jours et les nuits de l'application suivent votre choix.",
+  "ramadanStartSetting": "Début du Ramadan"
 }

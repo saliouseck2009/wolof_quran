@@ -1923,4 +1923,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ramadanThemeSubtitle => 'Dress the app in the colors of Ramadan';
+
+  @override
+  String ramadanDay(int day) {
+    return 'Day $day of Ramadan';
+  }
+
+  @override
+  String ramadanNight(int night) {
+    return 'Night $night of Ramadan';
+  }
+
+  @override
+  String ramadanTonight(int night) {
+    return 'Tonight: night $night';
+  }
+
+  @override
+  String get ramadanStartsTonight => 'Ramadan begins tonight';
+
+  @override
+  String get ramadanLastTenNights => 'The last ten nights';
+
+  @override
+  String get eidGreeting => 'Eid Mubarak';
+
+  @override
+  String get eidTagline => 'A blessed Eid to you and your loved ones';
+
+  @override
+  String get ramadanAdjustDate => 'Adjust the date';
+
+  @override
+  String get ramadanStartTitle => 'Start of your Ramadan';
+
+  @override
+  String get ramadanStartSubtitle =>
+      'Depending on your community, fasting began on one of these days. The days and nights of the app follow your choice.';
+
+  @override
+  String get ramadanStartSetting => 'Start of Ramadan';
 }

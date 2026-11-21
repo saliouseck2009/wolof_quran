@@ -1,6 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/config/theme/seasonal_theme.dart';
+import 'moon_phase_progress.dart';
 
 /// Shapes shared by the Ramadan ornaments: the home banner, the loader and
 /// the starry headers.
@@ -101,6 +104,66 @@ abstract final class NightSky {
     );
     canvas.drawPath(
       crescent(center, radius),
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color.lerp(decor.ornament, Colors.white, 0.45)!,
+            decor.ornament,
+          ],
+        ).createShader(Rect.fromCircle(center: center, radius: radius)),
+    );
+  }
+
+  /// The real moon of the night, [phase] being its place in the lunar cycle
+  /// (see `LunarPhase.fractionAt`). Seen from Senegal, the waxing moon is
+  /// lit on its right side and the waning moon on its left. The rest of
+  /// the disc keeps a faint earthshine, and the thinnest crescents keep a
+  /// minimum width so the moon of the first nights still shows.
+  static void paintRealMoon(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double phase,
+    SeasonalDecor decor,
+  ) {
+    final halo = Rect.fromCircle(center: center, radius: radius * 2.6);
+    final waxing = phase < 0.5;
+    final lit = (1 - math.cos(2 * math.pi * phase)) / 2;
+    canvas.drawCircle(
+      center,
+      radius * 2.6,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            decor.glow.withValues(alpha: 0.08 + 0.14 * lit),
+            decor.glow.withValues(alpha: 0),
+          ],
+        ).createShader(halo),
+    );
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()..color = decor.onSky.withValues(alpha: 0.10),
+    );
+
+    // [MoonPhaseProgress.litPath] lights the side facing the bottom left:
+    // mirror it for the waxing moon.
+    var litPart = MoonPhaseProgress.litPath(
+      center,
+      radius,
+      lit.clamp(0.06, 1.0),
+    );
+    if (waxing) {
+      final mirror = Matrix4.identity()
+        ..translateByDouble(center.dx, center.dy, 0, 1)
+        ..scaleByDouble(-1, 1, 1, 1)
+        ..translateByDouble(-center.dx, -center.dy, 0, 1);
+      litPart = litPart.transform(mirror.storage);
+    }
+    canvas.drawPath(
+      litPart,
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topLeft,

@@ -1947,4 +1947,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get ramadanThemeSubtitle => 'تزيين التطبيق بألوان رمضان';
+
+  @override
+  String ramadanDay(int day) {
+    return 'اليوم $day من رمضان';
+  }
+
+  @override
+  String ramadanNight(int night) {
+    return 'الليلة $night من رمضان';
+  }
+
+  @override
+  String ramadanTonight(int night) {
+    return 'هذا المساء: الليلة $night';
+  }
+
+  @override
+  String get ramadanStartsTonight => 'يبدأ رمضان هذا المساء';
+
+  @override
+  String get ramadanLastTenNights => 'العشر الأواخر';
+
+  @override
+  String get eidGreeting => 'عيد مبارك';
+
+  @override
+  String get eidTagline => 'كل عام وأنتم بخير';
+
+  @override
+  String get ramadanAdjustDate => 'تعديل التاريخ';
+
+  @override
+  String get ramadanStartTitle => 'بداية رمضان لديك';
+
+  @override
+  String get ramadanStartSubtitle =>
+      'حسب جماعتك، بدأ الصيام في أحد هذين اليومين. تتبع أيام التطبيق ولياليه اختيارك.';
+
+  @override
+  String get ramadanStartSetting => 'بداية رمضان';
 }
