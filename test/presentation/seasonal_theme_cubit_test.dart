@@ -189,7 +189,7 @@ void main() {
       },
     );
 
-    test('the offset never goes beyond one day', () async {
+    test('the offset never goes beyond the last day offered', () async {
       final repository = FakeSeasonalThemeRepository(config: ramadanWindow);
       final cubit = SeasonalThemeCubit(
         repository: repository,

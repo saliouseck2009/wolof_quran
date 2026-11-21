@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wolof_quran/core/config/seasonal_theme_config.dart';
 import 'package:wolof_quran/core/config/theme/seasonal_theme.dart';
+import 'package:wolof_quran/core/seasonal/ramadan_calendar.dart';
 import 'package:wolof_quran/data/datasources/remote_config_service.dart';
 import 'package:wolof_quran/data/repositories/seasonal_theme_repository_impl.dart';
 
@@ -36,12 +37,14 @@ void main() {
     expect(repo.startOffset(season2028), 0);
   });
 
-  test('the start offset stays within one day', () async {
+  test('the start offset stays within the days offered', () async {
     final repo = await repository();
     final season = ramadanFrom(DateTime(2027, 2, 8));
 
+    await repo.setStartOffset(season, 7);
+    expect(repo.startOffset(season), RamadanCalendar.maxStartOffset);
     await repo.setStartOffset(season, 3);
-    expect(repo.startOffset(season), 1);
+    expect(repo.startOffset(season), 3);
     await repo.setStartOffset(season, -2);
     expect(repo.startOffset(season), 0);
   });

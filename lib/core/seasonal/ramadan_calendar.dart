@@ -110,8 +110,8 @@ class RamadanCalendar extends Equatable {
   });
 
   /// The calendar of the Ramadan [config], with the start moved by
-  /// [startOffset] days (the user started one day after the earliest
-  /// community). Null when the config is not a dated Ramadan.
+  /// [startOffset] days (the user's community started after the
+  /// earliest one). Null when the config is not a dated Ramadan.
   static RamadanCalendar? fromConfig(
     SeasonalThemeConfig config, {
     int startOffset = 0,
@@ -135,7 +135,7 @@ class RamadanCalendar extends Equatable {
 
   /// The user may start at most this many days after the earliest
   /// community (`start` in the config).
-  static const int maxStartOffset = 1;
+  static const int maxStartOffset = 3;
 
   /// A lunar month has 29 or 30 days: without an announced end, the
   /// calendar never goes past 30.

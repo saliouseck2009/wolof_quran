@@ -223,6 +223,10 @@ void main() {
       // The earliest start is chosen, the next day is offered.
       expect(find.bySemanticsLabel(RegExp('8 février 2027')), findsOneWidget);
 
+      // Four days are offered, from the earliest start.
+      expect(find.textContaining('11 février 2027'), findsOneWidget);
+      expect(find.textContaining('12 février 2027'), findsNothing);
+
       await tester.tap(find.textContaining('9 février 2027'));
       await tester.pumpAndSettle();
 

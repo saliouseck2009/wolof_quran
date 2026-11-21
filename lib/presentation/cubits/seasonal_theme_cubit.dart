@@ -155,7 +155,8 @@ class SeasonalThemeCubit extends Cubit<SeasonalThemeState> {
     }
   }
 
-  /// The user's community started [days] after the earliest one (0 or 1).
+  /// The user's community started [days] after the earliest one (0 to
+  /// [RamadanCalendar.maxStartOffset]).
   /// Moves the days, the nights and the Korité of this user.
   Future<void> setStartOffset(int days) async {
     final config = _repository.config;

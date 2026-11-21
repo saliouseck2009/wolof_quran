@@ -1983,7 +1983,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get ramadanStartSubtitle =>
-      'حسب جماعتك، بدأ الصيام في أحد هذين اليومين. تتبع أيام التطبيق ولياليه اختيارك.';
+      'حسب جماعتك، بدأ الصيام في أحد هذه الأيام. تتبع أيام التطبيق ولياليه اختيارك.';
 
   @override
   String get ramadanStartSetting => 'بداية رمضان';
