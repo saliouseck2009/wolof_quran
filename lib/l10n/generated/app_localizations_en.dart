@@ -1963,4 +1963,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ramadanStartSetting => 'Start of Ramadan';
+
+  @override
+  String get ramadanStartKhatm => 'Start my Khatm';
+
+  @override
+  String get ramadanKhatmName => 'Ramadan Khatm';
 }

@@ -3,9 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/config/theme/ramadan_color.dart';
 import '../../../core/config/theme/seasonal_theme.dart';
+import '../../../core/navigation/create_reading_goal_arguments.dart';
+import '../../../core/reading/local_date.dart';
 import '../../../core/seasonal/ramadan_calendar.dart';
+import '../../../domain/entities/reading_goal.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../cubits/reading_goals_cubit.dart';
 import '../../cubits/seasonal_theme_cubit.dart';
+import '../../views/create_reading_goal_page.dart';
 import 'night_sky.dart';
 import 'ramadan_start_sheet.dart';
 
@@ -81,72 +86,74 @@ class RamadanBanner extends StatelessWidget {
           starry: moment == null || moment.sky != RamadanSky.day,
         ),
         child: Padding(
-          padding: const EdgeInsetsDirectional.fromSTEB(
-            20,
-            18,
-            _ornamentWidth,
-            12,
-          ),
+          padding: const EdgeInsetsDirectional.fromSTEB(20, 18, 20, 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Semantics(
-                container: true,
-                label: texts.semanticsLabel,
-                child: ExcludeSemantics(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: AlignmentDirectional.centerStart,
-                        child: Text(
-                          texts.greeting,
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.2,
-                            height: 1.3,
-                            color: decor.onSky,
+              Padding(
+                // The texts leave the top end corner to the ornaments; the
+                // buttons below take the whole width.
+                padding: const EdgeInsetsDirectional.only(
+                  end: _ornamentWidth - 20,
+                ),
+                child: Semantics(
+                  container: true,
+                  label: texts.semanticsLabel,
+                  child: ExcludeSemantics(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            texts.greeting,
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
+                              height: 1.3,
+                              color: decor.onSky,
+                            ),
                           ),
                         ),
-                      ),
-                      if (texts.status case final status?) ...[
+                        if (texts.status case final status?) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            status,
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              height: 1.35,
+                              color: statusColor(decor),
+                            ),
+                          ),
+                        ],
                         const SizedBox(height: 2),
                         Text(
-                          status,
+                          texts.tagline,
                           style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            height: 1.35,
-                            color: statusColor(decor),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
+                            color: decor.onSky.withValues(alpha: 0.85),
                           ),
                         ),
                       ],
-                      const SizedBox(height: 2),
-                      Text(
-                        texts.tagline,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          height: 1.4,
-                          color: decor.onSky.withValues(alpha: 0.85),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
               // The start day is chosen during the month; the Korité greets.
               if (moment != null && moment.period != RamadanPeriod.eid) ...[
                 const SizedBox(height: 4),
-                _AdjustDateButton(
-                  label: localizations.ramadanAdjustDate,
-                  color: decor.onSky,
+                _BannerActions(
+                  decor: decor,
+                  adjustDateLabel: localizations.ramadanAdjustDate,
                 ),
               ] else
                 const SizedBox(height: 6),
@@ -216,14 +223,125 @@ class _BannerTexts {
   }
 }
 
+/// The buttons of the banner: "Start my Khatm" while the user has no goal
+/// ongoing or planned (the reading card of the home already resumes an
+/// existing one), and "Adjust the date", reduced to its icon next to the
+/// Khatm so both fit on one line.
+class _BannerActions extends StatelessWidget {
+  final SeasonalDecor decor;
+  final String adjustDateLabel;
+
+  const _BannerActions({required this.decor, required this.adjustDateLabel});
+
+  @override
+  Widget build(BuildContext context) {
+    // The banner also lives in places without reading goals (tests).
+    final goals = context.read<ReadingGoalsCubit?>();
+    if (goals == null) {
+      return _AdjustDateButton(label: adjustDateLabel, color: decor.onSky);
+    }
+    return BlocBuilder<ReadingGoalsCubit, ReadingGoalsState>(
+      bloc: goals,
+      buildWhen: (previous, current) =>
+          _canStartKhatm(previous) != _canStartKhatm(current),
+      builder: (context, state) {
+        final adjust = _AdjustDateButton(
+          label: adjustDateLabel,
+          color: decor.onSky,
+          compact: _canStartKhatm(state),
+        );
+        if (!_canStartKhatm(state)) {
+          return adjust;
+        }
+        return Wrap(
+          spacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            FilledButton.icon(
+              onPressed: () => _openKhatm(context),
+              icon: const Icon(Icons.auto_stories_outlined, size: 16),
+              label: Text(AppLocalizations.of(context)!.ramadanStartKhatm),
+              style: FilledButton.styleFrom(
+                backgroundColor: decor.ornament,
+                foregroundColor: RamadanColor.onSecondaryContainer,
+                textStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                minimumSize: const Size(0, 34),
+                tapTargetSize: MaterialTapTargetSize.padded,
+                shape: const StadiumBorder(),
+              ),
+            ),
+            adjust,
+          ],
+        );
+      },
+    );
+  }
+
+  static bool _canStartKhatm(ReadingGoalsState state) =>
+      !state.isLoading && state.ongoing.isEmpty && state.planned.isEmpty;
+
+  /// Opens a reading goal prefilled to finish the Quran by the last day of
+  /// fasting of this user.
+  void _openKhatm(BuildContext context) {
+    final seasonal = context.read<SeasonalThemeCubit>();
+    final calendar = seasonal.state.calendar;
+    if (calendar == null) {
+      return;
+    }
+    final now = seasonal.now();
+    final today = LocalDate.fromDateTime(now);
+    final days = calendar.daysLeftFrom(today);
+    if (days < 1) {
+      return;
+    }
+    final template = ReadingGoal(
+      id: '',
+      name: AppLocalizations.of(context)!.ramadanKhatmName,
+      status: ReadingGoalStatus.active,
+      startPage: 1,
+      totalPages: context.read<ReadingGoalsCubit>().totalPages,
+      startDate: today,
+      endDate: today.addDays(days - 1),
+      createdAt: now,
+      updatedAt: now,
+    );
+    Navigator.of(context).pushNamed(
+      CreateReadingGoalPage.routeName,
+      arguments: CreateReadingGoalArguments(template: template),
+    );
+  }
+}
+
 class _AdjustDateButton extends StatelessWidget {
   final String label;
   final Color color;
 
-  const _AdjustDateButton({required this.label, required this.color});
+  /// Only the icon, named by its tooltip for screen readers.
+  final bool compact;
+
+  const _AdjustDateButton({
+    required this.label,
+    required this.color,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (compact) {
+      return IconButton(
+        onPressed: () => showRamadanStartSheet(context),
+        tooltip: label,
+        icon: const Icon(Icons.edit_calendar_outlined, size: 18),
+        style: IconButton.styleFrom(
+          foregroundColor: color,
+          backgroundColor: color.withValues(alpha: 0.12),
+        ),
+      );
+    }
     return TextButton.icon(
       onPressed: () => showRamadanStartSheet(context),
       icon: const Icon(Icons.edit_calendar_outlined, size: 16),

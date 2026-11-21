@@ -3285,6 +3285,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start of Ramadan'**
   String get ramadanStartSetting;
+
+  /// Button of the Ramadan banner opening a reading goal prefilled to finish the Quran by the end of the month
+  ///
+  /// In en, this message translates to:
+  /// **'Start my Khatm'**
+  String get ramadanStartKhatm;
+
+  /// Default name of the reading goal created from the Ramadan banner
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan Khatm'**
+  String get ramadanKhatmName;
 }
 
 class _AppLocalizationsDelegate

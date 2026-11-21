@@ -2170,5 +2170,9 @@
   "ramadanStartSubtitle": "Depending on your community, fasting began on one of these days. The days and nights of the app follow your choice.",
   "@ramadanStartSubtitle": {"description": "Explains the choice of the first day of fasting"},
   "ramadanStartSetting": "Start of Ramadan",
-  "@ramadanStartSetting": {"description": "Settings row opening the choice of the first day of fasting"}
+  "@ramadanStartSetting": {"description": "Settings row opening the choice of the first day of fasting"},
+  "ramadanStartKhatm": "Start my Khatm",
+  "@ramadanStartKhatm": {"description": "Button of the Ramadan banner opening a reading goal prefilled to finish the Quran by the end of the month"},
+  "ramadanKhatmName": "Ramadan Khatm",
+  "@ramadanKhatmName": {"description": "Default name of the reading goal created from the Ramadan banner"}
 }

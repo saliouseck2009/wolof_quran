@@ -7,7 +7,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wolof_quran/core/config/seasonal_theme_config.dart';
 import 'package:wolof_quran/core/config/theme/seasonal_theme.dart';
 import 'package:wolof_quran/core/config/theme/theme.dart';
+import 'package:wolof_quran/core/navigation/create_reading_goal_arguments.dart';
+import 'package:wolof_quran/core/reading/local_date.dart';
+import 'package:wolof_quran/domain/entities/reading_goal.dart';
 import 'package:wolof_quran/l10n/generated/app_localizations.dart';
+import 'package:wolof_quran/presentation/cubits/reading_goals_cubit.dart';
+import 'package:wolof_quran/presentation/views/create_reading_goal_page.dart';
 import 'package:wolof_quran/presentation/cubits/seasonal_theme_cubit.dart';
 import 'package:wolof_quran/presentation/widgets/app_loader.dart';
 import 'package:wolof_quran/presentation/widgets/seasonal/moon_phase_progress.dart';
@@ -16,6 +21,7 @@ import 'package:wolof_quran/presentation/widgets/seasonal/ramadan_loader.dart';
 import 'package:wolof_quran/presentation/widgets/seasonal/ramadan_banner.dart';
 import 'package:wolof_quran/presentation/widgets/settings/seasonal_theme_settings_item.dart';
 
+import '../../support/fake_reading_goal_repository.dart';
 import '../../support/fake_seasonal_theme_repository.dart';
 
 /// An app whose theme follows [cubit], like the real one.
@@ -271,6 +277,163 @@ void main() {
         await pumpAt(tester, DateTime(2027, 3, 5, 21), locale: locale);
         expect(tester.takeException(), isNull, reason: '$locale');
       }
+    });
+  });
+
+  group('Ramadan Khatm button', () {
+    final dated = SeasonalThemeConfig(
+      theme: SeasonalTheme.ramadan,
+      enabled: true,
+      start: DateTime(2027, 2, 8),
+      end: DateTime(2027, 3, 9),
+      eidEnd: DateTime(2027, 3, 10),
+    );
+    final cubits = <Cubit<Object?>>[];
+
+    void khatmTest(String name, Future<void> Function(WidgetTester) body) {
+      testWidgets(name, (tester) async {
+        await body(tester);
+        await tester.pumpWidget(const SizedBox());
+        for (final cubit in cubits) {
+          unawaited(cubit.close());
+        }
+        cubits.clear();
+        await tester.pump();
+      });
+    }
+
+    /// The banner at [now], with the goals of [goals]; returns the routes
+    /// pushed from it.
+    Future<List<RouteSettings>> pumpAt(
+      WidgetTester tester,
+      DateTime now, {
+      FakeReadingGoalRepository? goals,
+    }) async {
+      final seasonal = SeasonalThemeCubit(
+        repository: FakeSeasonalThemeRepository(config: dated),
+        clock: () => now,
+      );
+      final readingGoals = ReadingGoalsCubit(
+        repository: goals ?? FakeReadingGoalRepository(),
+        today: () => LocalDate.fromDateTime(now),
+        now: () => now,
+        totalPages: 604,
+      );
+      cubits.addAll([seasonal, readingGoals]);
+      await tester.runAsync(readingGoals.load);
+      final pushed = <RouteSettings>[];
+      await tester.pumpWidget(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: seasonal),
+            BlocProvider.value(value: readingGoals),
+          ],
+          child: MaterialApp(
+            locale: const Locale('fr'),
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            theme: MaterialTheme(season: seasonal.state.active).light(),
+            home: const Scaffold(
+              body: SingleChildScrollView(child: RamadanBanner()),
+            ),
+            onGenerateRoute: (settings) {
+              pushed.add(settings);
+              return MaterialPageRoute(builder: (_) => const SizedBox());
+            },
+          ),
+        ),
+      );
+      await tester.pump();
+      return pushed;
+    }
+
+    khatmTest('opens a goal that ends with the month', (tester) async {
+      // Day 12: 19 days left, today included.
+      final pushed = await pumpAt(tester, DateTime(2027, 2, 19, 11));
+
+      await tester.tap(find.text('Commencer mon Khatm'));
+      await tester.pumpAndSettle();
+
+      expect(pushed.single.name, CreateReadingGoalPage.routeName);
+      final template =
+          (pushed.single.arguments! as CreateReadingGoalArguments).template!;
+      expect(template.name, 'Khatm du Ramadan');
+      expect(template.startPage, 1);
+      expect(template.startDate, const LocalDate(2027, 2, 19));
+      expect(template.endDate, const LocalDate(2027, 3, 9));
+      expect(template.durationDays, 19);
+    });
+
+    khatmTest('a later start keeps the end of the user', (tester) async {
+      final pushed = await pumpAt(tester, DateTime(2027, 2, 19, 11));
+      final seasonal = cubits.whereType<SeasonalThemeCubit>().single;
+      await seasonal.setStartOffset(1);
+      await tester.pump();
+
+      await tester.tap(find.text('Commencer mon Khatm'));
+      await tester.pumpAndSettle();
+
+      final template =
+          (pushed.single.arguments! as CreateReadingGoalArguments).template!;
+      expect(template.endDate, const LocalDate(2027, 3, 10));
+    });
+
+    khatmTest('next to the Khatm, the date button keeps its name', (
+      tester,
+    ) async {
+      await pumpAt(tester, DateTime(2027, 2, 19, 11));
+
+      expect(find.text('Ajuster la date'), findsNothing);
+      expect(find.byTooltip('Ajuster la date'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Ajuster la date'));
+      await tester.pumpAndSettle();
+      expect(find.text('Début de votre Ramadan'), findsOneWidget);
+    });
+
+    khatmTest('is not offered while a goal is ongoing', (tester) async {
+      final now = DateTime(2027, 2, 19, 11);
+      final goals = FakeReadingGoalRepository()
+        ..goals['g1'] = ReadingGoal(
+          id: 'g1',
+          name: 'Mon Khatm',
+          status: ReadingGoalStatus.active,
+          startPage: 1,
+          totalPages: 604,
+          startDate: const LocalDate(2027, 2, 8),
+          endDate: const LocalDate(2027, 3, 9),
+          createdAt: now,
+          updatedAt: now,
+        );
+      await pumpAt(tester, now, goals: goals);
+
+      expect(find.text('Commencer mon Khatm'), findsNothing);
+      expect(find.text('Ajuster la date'), findsOneWidget);
+    });
+
+    khatmTest('is not offered during the Korité', (tester) async {
+      await pumpAt(tester, DateTime(2027, 3, 10, 11));
+
+      expect(find.text('Korité Moubarak'), findsOneWidget);
+      expect(find.text('Commencer mon Khatm'), findsNothing);
+    });
+
+    khatmTest('fits a small phone with enlarged text', (tester) async {
+      tester.view.physicalSize = const Size(320 * 3, 640 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      await pumpAt(tester, DateTime(2027, 2, 19, 11));
+
+      expect(find.text('Commencer mon Khatm'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 

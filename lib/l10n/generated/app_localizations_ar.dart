@@ -1987,4 +1987,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get ramadanStartSetting => 'بداية رمضان';
+
+  @override
+  String get ramadanStartKhatm => 'ابدأ ختمتي';
+
+  @override
+  String get ramadanKhatmName => 'ختمة رمضان';
 }

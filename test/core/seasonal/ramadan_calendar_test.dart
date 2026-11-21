@@ -262,4 +262,28 @@ void main() {
       );
     });
   });
+
+  group('daysLeftFrom', () {
+    const calendar = RamadanCalendar(
+      firstDay: firstDay,
+      lastDay: LocalDate(2027, 3, 9),
+    );
+
+    test('counts today up to the last day of fasting', () {
+      // Day 12 of a 30-day month: 19 days to read, today included.
+      expect(calendar.daysLeftFrom(const LocalDate(2027, 2, 19)), 19);
+      expect(calendar.daysLeftFrom(const LocalDate(2027, 3, 9)), 1);
+      expect(calendar.daysLeftFrom(const LocalDate(2027, 3, 10)), 0);
+    });
+
+    test('the eve counts the night of the first tarawih', () {
+      expect(calendar.daysLeftFrom(const LocalDate(2027, 2, 7)), 31);
+    });
+
+    test('an unknown end counts 30 days', () {
+      const open = RamadanCalendar(firstDay: firstDay);
+      expect(open.lastFastingDay, const LocalDate(2027, 3, 9));
+      expect(open.daysLeftFrom(firstDay), 30);
+    });
+  });
 }

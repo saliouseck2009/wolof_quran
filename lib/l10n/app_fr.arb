@@ -540,5 +540,7 @@
   "ramadanAdjustDate": "Ajuster la date",
   "ramadanStartTitle": "Début de votre Ramadan",
   "ramadanStartSubtitle": "Selon votre communauté, le jeûne a commencé l'un de ces jours. Les jours et les nuits de l'application suivent votre choix.",
-  "ramadanStartSetting": "Début du Ramadan"
+  "ramadanStartSetting": "Début du Ramadan",
+  "ramadanStartKhatm": "Commencer mon Khatm",
+  "ramadanKhatmName": "Khatm du Ramadan"
 }

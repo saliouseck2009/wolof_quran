@@ -6,82 +6,13 @@ import 'package:wolof_quran/core/config/theme/seasonal_theme.dart';
 import 'package:wolof_quran/core/config/theme/theme.dart';
 import 'package:wolof_quran/core/reading/local_date.dart';
 import 'package:wolof_quran/domain/entities/reading_goal.dart';
-import 'package:wolof_quran/domain/entities/reading_session.dart';
-import 'package:wolof_quran/domain/entities/reading_validation.dart';
-import 'package:wolof_quran/domain/repositories/reading_goal_repository.dart';
 import 'package:wolof_quran/l10n/generated/app_localizations.dart';
 import 'package:wolof_quran/presentation/cubits/reading_goals_cubit.dart';
 import 'package:wolof_quran/presentation/views/reading_goals_page.dart';
 import 'package:wolof_quran/presentation/widgets/reading_goals/home_reading_card.dart';
 import 'package:wolof_quran/presentation/widgets/seasonal/moon_phase_progress.dart';
 
-class _FakeRepository implements ReadingGoalRepository {
-  final Map<String, ReadingGoal> goals = {};
-  final Map<String, Map<int, DateTime>> pages = {};
-  String? activeGoalId;
-
-  @override
-  Future<List<ReadingGoal>> getGoals() async => goals.values.toList();
-
-  @override
-  Future<ReadingGoal?> getGoal(String id) async => goals[id];
-
-  @override
-  Future<void> saveGoal(ReadingGoal goal) async => goals[goal.id] = goal;
-
-  @override
-  Future<void> deleteGoal(String id) async => goals.remove(id);
-
-  @override
-  Future<Map<int, DateTime>> getValidatedPages(String goalId) async =>
-      pages[goalId] ?? {};
-
-  @override
-  Future<Map<String, Map<int, DateTime>>> getAllValidatedPages() async => pages;
-
-  @override
-  Future<ReadingValidation?> validatePages({
-    required String goalId,
-    required List<int> pages,
-    required ReadingValidationSource source,
-    required ReadingValidationAction action,
-    int? fromPage,
-    int? toPage,
-  }) async => null;
-
-  @override
-  Future<ReadingValidation?> unmarkPages({
-    required String goalId,
-    required List<int> pages,
-  }) async => null;
-
-  @override
-  Future<List<ReadingValidation>> getValidations(String goalId) async => [];
-
-  @override
-  Future<void> undoValidation(String validationId) async {}
-
-  final List<ReadingSession> sessions = [];
-
-  @override
-  Future<void> saveSession(ReadingSession session) async {
-    sessions.removeWhere((s) => s.id == session.id);
-    sessions.add(session);
-  }
-
-  @override
-  Future<List<ReadingSession>> getSessions(String goalId) async =>
-      sessions.where((s) => s.goalId == goalId).toList();
-
-  @override
-  Future<List<ReadingSession>> getAllSessions() async => sessions;
-
-  @override
-  Future<String?> getActiveGoalId() async => activeGoalId;
-
-  @override
-  Future<void> setActiveGoalId(String? goalId) async => activeGoalId = goalId;
-}
+import '../support/fake_reading_goal_repository.dart';
 
 Widget _wrap(ReadingGoalsCubit cubit, Widget child, {ThemeData? theme}) {
   return BlocProvider.value(
@@ -120,7 +51,7 @@ void main() {
   group('HomeReadingCard', () {
     testWidgets('invites to create a goal when none exists', (tester) async {
       final cubit = ReadingGoalsCubit(
-        repository: _FakeRepository(),
+        repository: FakeReadingGoalRepository(),
         today: () => today,
         totalPages: 604,
       );
@@ -137,7 +68,7 @@ void main() {
     });
 
     testWidgets('shows the followed goal with today\'s quota', (tester) async {
-      final repository = _FakeRepository()
+      final repository = FakeReadingGoalRepository()
         ..goals['g1'] = goal('g1', 'Khatm Ramadan')
         ..pages['g1'] = {for (var p = 1; p <= 10; p++) p: now}
         ..activeGoalId = 'g1';
@@ -166,7 +97,7 @@ void main() {
     testWidgets('fills a moon instead of the ring during Ramadan', (
       tester,
     ) async {
-      final repository = _FakeRepository()
+      final repository = FakeReadingGoalRepository()
         ..goals['g1'] = goal('g1', 'Khatm Ramadan')
         ..pages['g1'] = {for (var p = 1; p <= 302; p++) p: now}
         ..activeGoalId = 'g1';
@@ -203,7 +134,7 @@ void main() {
 
   group('ReadingGoalsPage', () {
     testWidgets('lists goals by phase with their status', (tester) async {
-      final repository = _FakeRepository()
+      final repository = FakeReadingGoalRepository()
         ..goals['a'] = goal('a', 'Actif')
         ..goals['b'] = goal(
           'b',
@@ -244,7 +175,7 @@ void main() {
 
     testWidgets('shows the empty state without goals', (tester) async {
       final cubit = ReadingGoalsCubit(
-        repository: _FakeRepository(),
+        repository: FakeReadingGoalRepository(),
         today: () => today,
         totalPages: 604,
       );

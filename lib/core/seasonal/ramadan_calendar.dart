@@ -153,6 +153,17 @@ class RamadanCalendar extends Equatable {
   /// First day of the Korité.
   LocalDate get eidDay => firstDay.addDays(length);
 
+  /// Last day of fasting: announced, or the 30th day.
+  LocalDate get lastFastingDay => firstDay.addDays(length - 1);
+
+  /// Days left to read in the month from [today] included, up to the last
+  /// day of fasting; 0 once it is over. On the eve it counts the eve too,
+  /// the night of the first tarawih.
+  int daysLeftFrom(LocalDate today) {
+    final days = today.daysUntil(lastFastingDay) + 1;
+    return days < 0 ? 0 : days;
+  }
+
   /// What to show at [now], local time of the device. Null outside the eve,
   /// the month and the Korité.
   RamadanMoment? momentAt(DateTime now) {

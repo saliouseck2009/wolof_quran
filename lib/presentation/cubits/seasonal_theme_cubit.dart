@@ -125,6 +125,10 @@ class SeasonalThemeCubit extends Cubit<SeasonalThemeState> {
     _nextChange = Timer(delay, _update);
   }
 
+  /// The instant the season is evaluated at (the device clock, or the
+  /// clock given to the cubit).
+  DateTime now() => _clock();
+
   /// To call when the app comes back to the foreground: the season may have
   /// started or ended with the day, or been switched remotely meanwhile.
   Future<void> onAppResumed() async {
