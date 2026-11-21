@@ -10,7 +10,8 @@ import 'theme/seasonal_theme.dart';
 ///   "id": "ramadan",
 ///   "enabled": true,
 ///   "start": "2027-02-08",
-///   "end": "2027-03-09"
+///   "end": "2027-03-09",
+///   "eid_end": "2027-03-11"
 /// }
 /// ```
 ///
@@ -20,6 +21,10 @@ import 'theme/seasonal_theme.dart';
 ///   with the date of the device. With them the look turns itself on and
 ///   off, even offline once the config is cached. Without them it follows
 ///   `enabled` alone.
+/// - For Ramadan, `start` is the first day of fasting of the earliest
+///   community and `end` its last day, once announced. `eid_end`, also
+///   optional, is the last day of the Korité greetings. `RamadanCalendar`
+///   reads them; the window above stays `start` to `end`.
 ///
 /// The default is off, so nothing changes until the config says so.
 class SeasonalThemeConfig extends Equatable {
@@ -30,11 +35,16 @@ class SeasonalThemeConfig extends Equatable {
   final DateTime? start;
   final DateTime? end;
 
+  /// Last day of the Eid that follows the season, both included; null when
+  /// the config does not announce it.
+  final DateTime? eidEnd;
+
   const SeasonalThemeConfig({
     this.theme = SeasonalTheme.none,
     this.enabled = false,
     this.start,
     this.end,
+    this.eidEnd,
   });
 
   static const SeasonalThemeConfig disabled = SeasonalThemeConfig();
@@ -54,7 +64,8 @@ class SeasonalThemeConfig extends Equatable {
     }
     final start = _parseDay(json['start']);
     final end = _parseDay(json['end']);
-    if (start == _invalidDay || end == _invalidDay) {
+    final eidEnd = _parseDay(json['eid_end']);
+    if (start == _invalidDay || end == _invalidDay || eidEnd == _invalidDay) {
       return disabled;
     }
     return SeasonalThemeConfig(
@@ -62,6 +73,7 @@ class SeasonalThemeConfig extends Equatable {
       enabled: enabled,
       start: start,
       end: end,
+      eidEnd: eidEnd,
     );
   }
 
@@ -70,6 +82,7 @@ class SeasonalThemeConfig extends Equatable {
     'enabled': enabled,
     if (start != null) 'start': _formatDay(start!),
     if (end != null) 'end': _formatDay(end!),
+    if (eidEnd != null) 'eid_end': _formatDay(eidEnd!),
   };
 
   /// The seasonal theme to show on the calendar day of [now], or
@@ -91,7 +104,7 @@ class SeasonalThemeConfig extends Equatable {
   }
 
   @override
-  List<Object?> get props => [theme, enabled, start, end];
+  List<Object?> get props => [theme, enabled, start, end, eidEnd];
 
   static final DateTime _invalidDay = DateTime.utc(0);
   static final RegExp _dayPattern = RegExp(r'^(\d{4})-(\d{2})-(\d{2})');

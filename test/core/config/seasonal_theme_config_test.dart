@@ -48,6 +48,7 @@ void main() {
         {'id': 'ramadan', 'enabled': true, 'start': '8 février 2027'},
         {'id': 'ramadan', 'enabled': true, 'end': 20270309},
         {'id': 'ramadan', 'enabled': true, 'end': '2027-02-31'},
+        {'id': 'ramadan', 'enabled': true, 'eid_end': 'Korité'},
       ]) {
         expect(
           SeasonalThemeConfig.fromJson(json),
@@ -71,6 +72,20 @@ void main() {
         'start': '2027-02-08',
         'end': '2027-03-09',
       });
+      expect(SeasonalThemeConfig.fromJson(config.toJson()), config);
+    });
+
+    test('reads the optional end of the Eid', () {
+      final config = SeasonalThemeConfig.fromJson({
+        'id': 'ramadan',
+        'enabled': true,
+        'start': '2027-02-08',
+        'end': '2027-03-09',
+        'eid_end': '2027-03-11',
+      });
+
+      expect(config.eidEnd, DateTime(2027, 3, 11));
+      expect(config.toJson()['eid_end'], '2027-03-11');
       expect(SeasonalThemeConfig.fromJson(config.toJson()), config);
     });
   });
