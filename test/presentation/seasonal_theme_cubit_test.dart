@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:wolof_quran/core/reading/local_date.dart';
 import 'package:wolof_quran/core/seasonal/ramadan_calendar.dart';
+import 'package:wolof_quran/core/seasonal/ramadan_verses.dart';
 import 'package:wolof_quran/core/config/seasonal_theme_config.dart';
 import 'package:wolof_quran/core/config/theme/seasonal_theme.dart';
 import 'package:wolof_quran/presentation/cubits/seasonal_theme_cubit.dart';
@@ -239,6 +240,77 @@ void main() {
       );
       // Closed only after the test: a pending timer would fail it first.
       addTearDown(cubit.close);
+    });
+  });
+
+  group('pickVerse', () {
+    test('gives the verse of the day of the month, shared by its night', () {
+      var now = DateTime(2027, 2, 19, 11); // day 12
+      final cubit = SeasonalThemeCubit(
+        repository: FakeSeasonalThemeRepository(config: ramadanWindow),
+        clock: () => now,
+      );
+      addTearDown(cubit.close);
+      expect(cubit.pickVerse(first: true), (2, 152));
+
+      now = DateTime(2027, 3, 5, 21); // night 27
+      cubit.onAppResumed();
+      expect(cubit.pickVerse(first: true), (97, 3));
+
+      now = DateTime(2027, 3, 6, 12); // day 27
+      cubit.onAppResumed();
+      expect(cubit.pickVerse(first: true), (97, 3));
+    });
+
+    test('the eve gives the month of the Quran', () {
+      final cubit = SeasonalThemeCubit(
+        repository: FakeSeasonalThemeRepository(config: ramadanWindow),
+        clock: () => DateTime(2027, 2, 7, 11),
+      );
+      addTearDown(cubit.close);
+
+      expect(cubit.pickVerse(first: true), (2, 185));
+    });
+
+    test('another verse stays in the Ramadan selection', () {
+      final cubit = SeasonalThemeCubit(
+        repository: FakeSeasonalThemeRepository(config: ramadanWindow),
+        clock: () => DateTime(2027, 3, 5, 21),
+      );
+      addTearDown(cubit.close);
+      final first = cubit.pickVerse(first: true);
+
+      for (var i = 0; i < 20; i++) {
+        final next = cubit.pickVerse(first: false);
+        expect(RamadanVerses.pool, contains(next));
+        expect(next, isNot(first));
+      }
+    });
+
+    test('leaves the choice to the random draw out of Ramadan', () async {
+      final outOfSeason = SeasonalThemeCubit(
+        repository: FakeSeasonalThemeRepository(),
+      );
+      addTearDown(outOfSeason.close);
+      expect(outOfSeason.pickVerse(first: true), isNull);
+
+      // Without dates, the Ramadan look has no day of the month.
+      final undated = SeasonalThemeCubit(
+        repository: FakeSeasonalThemeRepository(
+          config: FakeSeasonalThemeRepository.ramadanOn,
+        ),
+      );
+      addTearDown(undated.close);
+      expect(undated.pickVerse(first: true), isNull);
+
+      // The user kept the standard look.
+      final standard = SeasonalThemeCubit(
+        repository: FakeSeasonalThemeRepository(config: ramadanWindow),
+        clock: () => DateTime(2027, 2, 19, 11),
+      );
+      addTearDown(standard.close);
+      await standard.setEnabledByUser(false);
+      expect(standard.pickVerse(first: true), isNull);
     });
   });
 }

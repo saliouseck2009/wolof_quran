@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/config/theme/seasonal_theme.dart';
 import '../../core/reading/local_date.dart';
 import '../../core/seasonal/ramadan_calendar.dart';
+import '../../core/seasonal/ramadan_verses.dart';
 import '../../domain/repositories/seasonal_theme_repository.dart';
 
 class SeasonalThemeState extends Equatable {
@@ -128,6 +129,27 @@ class SeasonalThemeCubit extends Cubit<SeasonalThemeState> {
   /// The instant the season is evaluated at (the device clock, or the
   /// clock given to the cubit).
   DateTime now() => _clock();
+
+  /// The verse of the day card while the Ramadan look is worn: the verse of
+  /// the day of the month when the card loads ([first]), a verse of the
+  /// Ramadan selection for "another verse". Null out of a dated Ramadan,
+  /// which leaves the card to its random draw.
+  (int, int)? pickVerse({required bool first}) {
+    final moment = state.moment;
+    if (state.active != SeasonalTheme.ramadan || moment == null) {
+      return null;
+    }
+    if (!first) {
+      return RamadanVerses.another(_lastVerse);
+    }
+    final day = moment.dayOfMonth;
+    return _lastVerse = day == null
+        ? RamadanVerses.eveAndEid
+        : RamadanVerses.ofDay(day);
+  }
+
+  /// The verse of the day last given, so "another verse" changes it.
+  VerseRef? _lastVerse;
 
   /// To call when the app comes back to the foreground: the season may have
   /// started or ended with the day, or been switched remotely meanwhile.
