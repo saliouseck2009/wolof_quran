@@ -13,6 +13,7 @@ import '../widgets/quran_settings/quran_settings_menu.dart';
 import '../widgets/quran_settings/reading_tracking_settings_sheet.dart';
 import '../widgets/settings/settings_menu_item.dart';
 import 'support_page.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class QuranSettingsPage extends StatelessWidget {
   static const String routeName = "/quran-settings";
@@ -56,6 +57,7 @@ class _QuranSettingsView extends StatelessWidget {
         backgroundColor: colorScheme.brightness == Brightness.dark
             ? colorScheme.surface
             : colorScheme.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,

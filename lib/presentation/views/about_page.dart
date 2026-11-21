@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../core/services/app_info_service.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../widgets/snackbar.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class AboutPage extends StatefulWidget {
   static const String routeName = '/about';
@@ -48,6 +49,7 @@ class _AboutPageState extends State<AboutPage> {
         backgroundColor: colorScheme.brightness == Brightness.dark
             ? colorScheme.surface
             : colorScheme.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,

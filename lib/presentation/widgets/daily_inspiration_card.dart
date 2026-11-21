@@ -10,6 +10,7 @@ import '../../core/navigation/surah_detail_arguments.dart';
 import '../utils/home_card_colors.dart';
 import 'ayah_play_button.dart';
 import 'daily_inspiration_share_modal.dart';
+import 'app_loader.dart';
 
 /// Home card of the verse of the day, in the same white card style as the
 /// reading strip and the menu: Arabic first, then the translation, and a
@@ -131,7 +132,10 @@ class _VerseCard extends StatelessWidget {
             padding: const EdgeInsetsDirectional.only(end: 8),
             child: _CardLabel(
               trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: isDark
                       ? colorScheme.surfaceContainerHigh
@@ -252,6 +256,7 @@ class _VerseCard extends StatelessWidget {
                   _translationSourceName(state.currentTranslation),
                   state.surahName,
                   state.surahNumber,
+                  translationId: state.currentTranslation,
                 ),
               ),
               IconButton(
@@ -307,13 +312,10 @@ class _LoadingCard extends StatelessWidget {
           const _CardLabel(),
           const SizedBox(height: 28),
           Center(
-            child: SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: homeAccentColor(colorScheme),
-              ),
+            child: AppLoader(
+              size: 20,
+              strokeWidth: 2,
+              color: homeAccentColor(colorScheme),
             ),
           ),
           const SizedBox(height: 12),

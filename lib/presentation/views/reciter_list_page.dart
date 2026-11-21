@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/navigation/reciter_audio_updates_arguments.dart';
 import '../../domain/entities/reciter.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -13,6 +12,8 @@ import '../widgets/reciter_list/reciter_list_empty_state.dart';
 import '../widgets/reciter_list/reciter_list_error_state.dart';
 import '../widgets/reciter_list/reciter_list_view.dart';
 import '../widgets/snackbar.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class ReciterListPage extends StatefulWidget {
   const ReciterListPage({super.key});
@@ -85,8 +86,9 @@ class _ReciterListPageState extends State<ReciterListPage> {
           ),
         ),
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? AppColor.surfaceDark
+            ? colorScheme.surface
             : colorScheme.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -105,7 +107,7 @@ class _ReciterListPageState extends State<ReciterListPage> {
         },
         builder: (context, reciterState) {
           if (reciterState is ReciterLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: AppLoader());
           }
 
           if (reciterState is ReciterError) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/generated/app_localizations.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   static const String routeName = '/privacy-policy';
@@ -47,6 +48,7 @@ class PrivacyPolicyPage extends StatelessWidget {
           ),
         ),
         backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,

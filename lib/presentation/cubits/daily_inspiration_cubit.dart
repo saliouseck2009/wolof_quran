@@ -4,8 +4,31 @@ import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
+/// Chooses the verse of the card, as (surah, verse): [first] for the verse
+/// shown when the card loads, false for "another verse". Returns null to
+/// leave the choice to the random draw over the whole Quran.
+typedef VersePicker = (int, int)? Function({required bool first});
+
 class DailyInspirationCubit extends Cubit<DailyInspirationState> {
-  DailyInspirationCubit() : super(DailyInspirationInitial());
+  /// A season may pick the verses (see `SeasonalThemeCubit.pickVerse`);
+  /// without it, or when it returns null, the verse is drawn at random.
+  final VersePicker? _picker;
+
+  DailyInspirationCubit({VersePicker? picker})
+    : _picker = picker,
+      super(DailyInspirationInitial());
+
+  (int, int) _choose({required bool first}) {
+    final picked = _picker?.call(first: first);
+    if (picked != null) {
+      return picked;
+    }
+    final random = Random();
+    // Random surah (1-114), then a random verse of it.
+    final surahNumber = random.nextInt(114) + 1;
+    final verseCount = quran.getVerseCount(surahNumber);
+    return (surahNumber, random.nextInt(verseCount) + 1);
+  }
 
   // Store the expansion state to preserve it during refresh
   bool _wasExpanded = false;
@@ -14,16 +37,7 @@ class DailyInspirationCubit extends Cubit<DailyInspirationState> {
     emit(DailyInspirationLoading());
 
     try {
-      final random = Random();
-
-      // Generate random surah (1-114)
-      final surahNumber = random.nextInt(114) + 1;
-
-      // Get verse count for the surah
-      final verseCount = quran.getVerseCount(surahNumber);
-
-      // Generate random verse (1 to verseCount)
-      final verseNumber = random.nextInt(verseCount) + 1;
+      final (surahNumber, verseNumber) = _choose(first: true);
 
       // Get ayah data
       final arabicText = quran.getVerse(surahNumber, verseNumber);
@@ -99,16 +113,7 @@ class DailyInspirationCubit extends Cubit<DailyInspirationState> {
     emit(DailyInspirationLoading());
 
     try {
-      final random = Random();
-
-      // Generate random surah (1-114)
-      final surahNumber = random.nextInt(114) + 1;
-
-      // Get verse count for the surah
-      final verseCount = quran.getVerseCount(surahNumber);
-
-      // Generate random verse (1 to verseCount)
-      final verseNumber = random.nextInt(verseCount) + 1;
+      final (surahNumber, verseNumber) = _choose(first: false);
 
       // Get ayah data
       final arabicText = quran.getVerse(surahNumber, verseNumber);

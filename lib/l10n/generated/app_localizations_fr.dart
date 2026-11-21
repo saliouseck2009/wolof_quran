@@ -404,6 +404,107 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String shareDefaultTextRange(
+    String surahName,
+    int firstVerse,
+    int lastVerse,
+  ) {
+    return 'Inspiration quotidienne - $surahName - Versets $firstVerse–$lastVerse';
+  }
+
+  @override
+  String get shareVersesTitle => 'Versets';
+
+  @override
+  String get shareFromVerse => 'Du verset';
+
+  @override
+  String get shareToVerse => 'au verset';
+
+  @override
+  String shareVideoTooLong(int minutes) {
+    return 'Vidéo trop longue (maximum $minutes min). Choisissez moins de versets.';
+  }
+
+  @override
+  String shareVideoLongForStatus(int seconds) {
+    return 'Plus de $seconds s : un statut WhatsApp coupera la vidéo.';
+  }
+
+  @override
+  String shareAudioMissingVerses(String verses) {
+    return 'Audio non téléchargé pour les versets : $verses.';
+  }
+
+  @override
+  String shareVideoProgress(int current, int total) {
+    return 'Verset $current sur $total';
+  }
+
+  @override
+  String get shareToolText => 'Texte';
+
+  @override
+  String get shareToolBackground => 'Fond';
+
+  @override
+  String shareToolVersesRange(int first, int last) {
+    return 'Versets $first–$last';
+  }
+
+  @override
+  String get shareImageShort => 'Image';
+
+  @override
+  String get shareVideoShort => 'Vidéo';
+
+  @override
+  String shareVerseLabel(int verse) {
+    return 'Verset $verse';
+  }
+
+  @override
+  String shareBackgroundNamed(String name) {
+    return 'Fond · $name';
+  }
+
+  @override
+  String get shareModeBoth => 'Arabe + traduction';
+
+  @override
+  String get shareModeArabic => 'Arabe';
+
+  @override
+  String get shareModeTranslation => 'Traduction';
+
+  @override
+  String get shareBgMushaf => 'Mon Mushaf';
+
+  @override
+  String get shareBgIvory => 'Ivoire';
+
+  @override
+  String get shareBgCream => 'Crème';
+
+  @override
+  String get shareBgSand => 'Sable';
+
+  @override
+  String get shareBgGold => 'Doré';
+
+  @override
+  String get shareBgSage => 'Sauge';
+
+  @override
+  String get shareBgDeepGreen => 'Vert profond';
+
+  @override
+  String get shareBgNight => 'Nuit';
+
+  @override
+  String get shareBgBlack => 'Noir';
+
+  @override
   String get bookmarkAdded => 'Marque-page ajouté';
 
   @override
@@ -1828,4 +1929,66 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get anotherVerse => 'Autre verset';
+
+  @override
+  String get ramadanGreeting => 'Ramadan Moubarak';
+
+  @override
+  String get ramadanTagline => 'Le mois du Coran';
+
+  @override
+  String get ramadanTheme => 'Thème Ramadan';
+
+  @override
+  String get ramadanThemeSubtitle =>
+      'Habiller l\'application aux couleurs du Ramadan';
+
+  @override
+  String ramadanDay(int day) {
+    return 'Jour $day du Ramadan';
+  }
+
+  @override
+  String ramadanNight(int night) {
+    return 'Nuit $night du Ramadan';
+  }
+
+  @override
+  String ramadanTonight(int night) {
+    return 'Ce soir : nuit $night';
+  }
+
+  @override
+  String get ramadanStartsTonight => 'Le Ramadan commence ce soir';
+
+  @override
+  String get ramadanLastTenNights => 'Les 10 dernières nuits';
+
+  @override
+  String get eidGreeting => 'Korité Moubarak';
+
+  @override
+  String get eidTagline => 'Bonne fête à vous et à vos proches';
+
+  @override
+  String get ramadanAdjustDate => 'Ajuster la date';
+
+  @override
+  String get ramadanStartTitle => 'Début de votre Ramadan';
+
+  @override
+  String get ramadanStartSubtitle =>
+      'Selon votre communauté, le jeûne a commencé l\'un de ces jours. Les jours et les nuits de l\'application suivent votre choix.';
+
+  @override
+  String get ramadanStartSetting => 'Début du Ramadan';
+
+  @override
+  String get ramadanStartKhatm => 'Commencer mon Khatm';
+
+  @override
+  String get ramadanKhatmName => 'Khatm du Ramadan';
+
+  @override
+  String get shareBgRamadan => 'Nuit du Ramadan';
 }

@@ -544,6 +544,126 @@
       }
     }
   },
+  "shareDefaultTextRange": "Daily Inspiration - {surahName} - Verses {firstVerse}–{lastVerse}",
+  "@shareDefaultTextRange": {
+    "description": "Default text shared alongside a video of several verses",
+    "placeholders": {
+      "surahName": {
+        "type": "String"
+      },
+      "firstVerse": {
+        "type": "int"
+      },
+      "lastVerse": {
+        "type": "int"
+      }
+    }
+  },
+  "shareVersesTitle": "Verses",
+  "@shareVersesTitle": {
+    "description": "Title of the verse range section of the share sheet"
+  },
+  "shareFromVerse": "From verse",
+  "@shareFromVerse": {
+    "description": "Label before the first verse of the shared range"
+  },
+  "shareToVerse": "to verse",
+  "@shareToVerse": {
+    "description": "Label before the last verse of the shared range"
+  },
+  "shareVideoTooLong": "Video too long (maximum {minutes} min). Pick fewer verses.",
+  "@shareVideoTooLong": {
+    "description": "Shown when the chosen verses make a video over the limit",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "shareVideoLongForStatus": "Longer than {seconds} s: a WhatsApp status will cut the video.",
+  "@shareVideoLongForStatus": {
+    "description": "Warning for a video longer than a WhatsApp status",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "shareAudioMissingVerses": "No downloaded audio for verses: {verses}.",
+  "@shareAudioMissingVerses": {
+    "description": "Verses of the range without a downloaded audio file",
+    "placeholders": {
+      "verses": {
+        "type": "String"
+      }
+    }
+  },
+  "shareVideoProgress": "Verse {current} of {total}",
+  "@shareVideoProgress": {
+    "description": "Progress of the video generation, verse by verse",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "shareToolText": "Text",
+  "@shareToolText": {"description": "Share sheet tool that picks what the card shows: Arabic, translation or both"},
+  "shareToolBackground": "Background",
+  "@shareToolBackground": {"description": "Share sheet tool that picks the background of the card"},
+  "shareToolVersesRange": "Verses {first}–{last}",
+  "@shareToolVersesRange": {
+    "description": "Share sheet tool label when several verses are selected",
+    "placeholders": {
+      "first": {"type": "int"},
+      "last": {"type": "int"}
+    }
+  },
+  "shareImageShort": "Image",
+  "@shareImageShort": {"description": "Short label of the button that shares the card as an image"},
+  "shareVideoShort": "Video",
+  "@shareVideoShort": {"description": "Short label of the button that shares the verses as a video"},
+  "shareVerseLabel": "Verse {verse}",
+  "@shareVerseLabel": {
+    "description": "Verse shown on the share card, under the sheet title",
+    "placeholders": {
+      "verse": {"type": "int"}
+    }
+  },
+  "shareBackgroundNamed": "Background · {name}",
+  "@shareBackgroundNamed": {
+    "description": "Name of the selected card background",
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "shareModeBoth": "Arabic + translation",
+  "@shareModeBoth": {"description": "Short label: the card shows the Arabic text and its translation"},
+  "shareModeArabic": "Arabic",
+  "@shareModeArabic": {"description": "Short label: the card shows the Arabic text only"},
+  "shareModeTranslation": "Translation",
+  "@shareModeTranslation": {"description": "Short label: the card shows the translation only"},
+  "shareBgMushaf": "My Mushaf",
+  "@shareBgMushaf": {"description": "Card background taken from the reader's Mushaf theme"},
+  "shareBgIvory": "Ivory",
+  "@shareBgIvory": {"description": "Card background name"},
+  "shareBgCream": "Cream",
+  "@shareBgCream": {"description": "Card background name"},
+  "shareBgSand": "Sand",
+  "@shareBgSand": {"description": "Card background name"},
+  "shareBgGold": "Gold",
+  "@shareBgGold": {"description": "Card background name"},
+  "shareBgSage": "Sage",
+  "@shareBgSage": {"description": "Card background name"},
+  "shareBgDeepGreen": "Deep green",
+  "@shareBgDeepGreen": {"description": "Card background name"},
+  "shareBgNight": "Night",
+  "@shareBgNight": {"description": "Card background name"},
+  "shareBgBlack": "Black",
+  "@shareBgBlack": {"description": "Card background name"},
   "bookmarkAdded": "Bookmark added",
   "@bookmarkAdded": {
     "description": "Confirmation message when bookmark is added"
@@ -2020,5 +2140,41 @@
   "listenAction": "Listen",
   "@listenAction": {"description": "Short button label that plays a verse"},
   "anotherVerse": "Another verse",
-  "@anotherVerse": {"description": "Tooltip of the button that draws another verse of the day"}
+  "@anotherVerse": {"description": "Tooltip of the button that draws another verse of the day"},
+  "ramadanGreeting": "Ramadan Mubarak",
+  "@ramadanGreeting": {"description": "Greeting on the home banner shown during Ramadan"},
+  "ramadanTagline": "The month of the Quran",
+  "@ramadanTagline": {"description": "Line under the Ramadan greeting on the home banner"},
+  "ramadanTheme": "Ramadan theme",
+  "@ramadanTheme": {"description": "Settings switch shown during Ramadan to keep or leave the seasonal look"},
+  "ramadanThemeSubtitle": "Dress the app in the colors of Ramadan",
+  "@ramadanThemeSubtitle": {"description": "Explains the Ramadan theme switch in the settings"},
+  "ramadanDay": "Day {day} of Ramadan",
+  "@ramadanDay": {"description": "Banner line during the daytime of a day of fasting", "placeholders": {"day": {"type": "int"}}},
+  "ramadanNight": "Night {night} of Ramadan",
+  "@ramadanNight": {"description": "Banner line between nightfall and dawn; night N starts on the evening of day N-1", "placeholders": {"night": {"type": "int"}}},
+  "ramadanTonight": "Tonight: night {night}",
+  "@ramadanTonight": {"description": "Banner line during the day before an odd night of the last ten", "placeholders": {"night": {"type": "int"}}},
+  "ramadanStartsTonight": "Ramadan begins tonight",
+  "@ramadanStartsTonight": {"description": "Banner line on the eve of Ramadan"},
+  "ramadanLastTenNights": "The last ten nights",
+  "@ramadanLastTenNights": {"description": "Banner tagline from the 21st night"},
+  "eidGreeting": "Eid Mubarak",
+  "@eidGreeting": {"description": "Banner greeting during the Korité (Eid al-Fitr)"},
+  "eidTagline": "A blessed Eid to you and your loved ones",
+  "@eidTagline": {"description": "Banner tagline during the Korité"},
+  "ramadanAdjustDate": "Adjust the date",
+  "@ramadanAdjustDate": {"description": "Button of the Ramadan banner that opens the choice of the first day of fasting"},
+  "ramadanStartTitle": "Start of your Ramadan",
+  "@ramadanStartTitle": {"description": "Title of the sheet where the user picks their first day of fasting"},
+  "ramadanStartSubtitle": "Depending on your community, fasting began on one of these days. The days and nights of the app follow your choice.",
+  "@ramadanStartSubtitle": {"description": "Explains the choice of the first day of fasting"},
+  "ramadanStartSetting": "Start of Ramadan",
+  "@ramadanStartSetting": {"description": "Settings row opening the choice of the first day of fasting"},
+  "ramadanStartKhatm": "Start my Khatm",
+  "@ramadanStartKhatm": {"description": "Button of the Ramadan banner opening a reading goal prefilled to finish the Quran by the end of the month"},
+  "ramadanKhatmName": "Ramadan Khatm",
+  "@ramadanKhatmName": {"description": "Default name of the reading goal created from the Ramadan banner"},
+  "shareBgRamadan": "Ramadan night",
+  "@shareBgRamadan": {"description": "Share card background offered first during Ramadan: the night sky of the season"}
 }

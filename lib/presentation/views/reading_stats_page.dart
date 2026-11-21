@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import '../../core/config/theme/app_color.dart';
 import '../../core/reading/local_date.dart';
 import '../../core/reading/reading_stats_calculator.dart';
 import '../../domain/repositories/reading_goal_repository.dart';
@@ -12,6 +11,8 @@ import '../cubits/reading_stats_cubit.dart';
 import '../utils/reading_goal_formatting.dart';
 import '../widgets/reading_goals/reading_goal_form_widgets.dart';
 import '../widgets/reading_goals/reading_progress_bar.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 /// Cross-goal figures: totals, streaks, pages per day, split by goal and
 /// completed khatm. Facts only, no ranking.
@@ -50,7 +51,7 @@ class _StatsViewState extends State<_StatsView> {
     final isDark = colorScheme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColor.surfaceDark : colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: Text(
           localizations.statsTitle,
@@ -61,7 +62,8 @@ class _StatsViewState extends State<_StatsView> {
           ),
         ),
         centerTitle: false,
-        backgroundColor: isDark ? AppColor.surfaceDark : colorScheme.primary,
+        backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -70,7 +72,7 @@ class _StatsViewState extends State<_StatsView> {
         builder: (context, state) {
           final stats = state.stats;
           if (state.isLoading || stats == null) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: AppLoader());
           }
           if (stats.isEmpty) {
             return Center(

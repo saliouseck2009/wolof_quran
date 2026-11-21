@@ -10,6 +10,7 @@ import 'package:wolof_quran/domain/repositories/reciter_repository.dart';
 import 'package:wolof_quran/domain/repositories/download_repository.dart';
 import 'package:wolof_quran/domain/repositories/audio_repository.dart';
 import 'package:wolof_quran/domain/repositories/reading_goal_repository.dart';
+import 'package:wolof_quran/domain/repositories/seasonal_theme_repository.dart';
 import 'package:wolof_quran/domain/usecases/download_surah_audio_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_ayah_audios_usecase.dart';
 import 'package:wolof_quran/domain/usecases/get_reciters_usecase.dart';
@@ -30,10 +31,13 @@ import 'package:wolof_quran/service_locator.dart';
 
 import 'core/navigation/app_routes.dart';
 import 'core/navigation/route_observers.dart';
+import 'core/config/theme/seasonal_theme.dart';
 import 'core/config/theme/theme.dart';
 import 'core/config/localization/localization_service.dart';
 import 'presentation/cubits/language_cubit.dart';
+import 'presentation/cubits/seasonal_theme_cubit.dart';
 import 'presentation/cubits/theme_cubit.dart';
+import 'presentation/widgets/seasonal/seasonal_theme_lifecycle.dart';
 import 'l10n/generated/app_localizations.dart';
 
 void main() async {
@@ -55,6 +59,11 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => LanguageCubit()),
         BlocProvider(create: (context) => ThemeCubit()),
+        BlocProvider(
+          create: (context) => SeasonalThemeCubit(
+            repository: locator<SeasonalThemeRepository>(),
+          ),
+        ),
         BlocProvider(
           create: (context) => ReciterCubit(
             getRecitersUseCase: locator<GetRecitersUseCase>(),
@@ -133,67 +142,77 @@ class MyApp extends StatelessWidget {
                 },
               ),
             ],
-            child: ReadingGoalsLifecycle(
-              child: BlocBuilder<LanguageCubit, Locale>(
-                builder: (context, locale) {
-                  return BlocBuilder<ThemeCubit, ThemeMode>(
-                    builder: (context, themeMode) {
-                      return MaterialApp(
-                        navigatorKey: AppRoutes.navigatorKey,
-                        onGenerateTitle: (context) {
-                          return AppLocalizations.of(context)?.appTitle ??
-                              'Wolof Quran';
-                        },
-                        debugShowCheckedModeBanner: false,
+            child: SeasonalThemeLifecycle(
+              child: ReadingGoalsLifecycle(
+                child: BlocBuilder<LanguageCubit, Locale>(
+                  builder: (context, locale) {
+                    return BlocBuilder<ThemeCubit, ThemeMode>(
+                      builder: (context, themeMode) {
+                        // The season only swaps the palette: the user's light
+                        // or dark choice still applies.
+                        final season = context
+                            .select<SeasonalThemeCubit, SeasonalTheme>(
+                              (cubit) => cubit.state.active,
+                            );
+                        final appTheme = MaterialTheme(season: season);
+                        return MaterialApp(
+                          navigatorKey: AppRoutes.navigatorKey,
+                          onGenerateTitle: (context) {
+                            return AppLocalizations.of(context)?.appTitle ??
+                                'Wolof Quran';
+                          },
+                          debugShowCheckedModeBanner: false,
 
-                        // Localization setup
-                        locale: locale,
-                        supportedLocales: LocalizationService.supportedLocales,
-                        localizationsDelegates: const [
-                          AppLocalizations.delegate,
-                          GlobalMaterialLocalizations.delegate,
-                          GlobalWidgetsLocalizations.delegate,
-                          GlobalCupertinoLocalizations.delegate,
-                        ],
+                          // Localization setup
+                          locale: locale,
+                          supportedLocales:
+                              LocalizationService.supportedLocales,
+                          localizationsDelegates: const [
+                            AppLocalizations.delegate,
+                            GlobalMaterialLocalizations.delegate,
+                            GlobalWidgetsLocalizations.delegate,
+                            GlobalCupertinoLocalizations.delegate,
+                          ],
 
-                        // Theme setup
-                        theme: MaterialTheme().light(),
-                        darkTheme: MaterialTheme().dark(),
-                        themeMode: themeMode,
-                        builder: (context, child) {
-                          final theme = Theme.of(context);
-                          final isDark = theme.brightness == Brightness.dark;
-                          final overlayStyle = isDark
-                              ? SystemUiOverlayStyle.light.copyWith(
-                                  statusBarColor: Colors.transparent,
-                                  systemNavigationBarColor:
-                                      theme.colorScheme.surface,
-                                  systemNavigationBarIconBrightness:
-                                      Brightness.light,
-                                  statusBarIconBrightness: Brightness.light,
-                                  statusBarBrightness: Brightness.dark,
-                                )
-                              : SystemUiOverlayStyle.dark.copyWith(
-                                  statusBarColor: Colors.transparent,
-                                  systemNavigationBarColor:
-                                      theme.colorScheme.surface,
-                                  systemNavigationBarIconBrightness:
-                                      Brightness.dark,
-                                  statusBarIconBrightness: Brightness.dark,
-                                  statusBarBrightness: Brightness.light,
-                                );
+                          // Theme setup
+                          theme: appTheme.light(),
+                          darkTheme: appTheme.dark(),
+                          themeMode: themeMode,
+                          builder: (context, child) {
+                            final theme = Theme.of(context);
+                            final isDark = theme.brightness == Brightness.dark;
+                            final overlayStyle = isDark
+                                ? SystemUiOverlayStyle.light.copyWith(
+                                    statusBarColor: Colors.transparent,
+                                    systemNavigationBarColor:
+                                        theme.colorScheme.surface,
+                                    systemNavigationBarIconBrightness:
+                                        Brightness.light,
+                                    statusBarIconBrightness: Brightness.light,
+                                    statusBarBrightness: Brightness.dark,
+                                  )
+                                : SystemUiOverlayStyle.dark.copyWith(
+                                    statusBarColor: Colors.transparent,
+                                    systemNavigationBarColor:
+                                        theme.colorScheme.surface,
+                                    systemNavigationBarIconBrightness:
+                                        Brightness.dark,
+                                    statusBarIconBrightness: Brightness.dark,
+                                    statusBarBrightness: Brightness.light,
+                                  );
 
-                          return AnnotatedRegion<SystemUiOverlayStyle>(
-                            value: overlayStyle,
-                            child: child ?? const SizedBox.shrink(),
-                          );
-                        },
-                        onGenerateRoute: AppRoutes.onGenerateRoutes,
-                        navigatorObservers: [modalRouteObserver],
-                      );
-                    },
-                  );
-                },
+                            return AnnotatedRegion<SystemUiOverlayStyle>(
+                              value: overlayStyle,
+                              child: child ?? const SizedBox.shrink(),
+                            );
+                          },
+                          onGenerateRoute: AppRoutes.onGenerateRoutes,
+                          navigatorObservers: [modalRouteObserver],
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           );

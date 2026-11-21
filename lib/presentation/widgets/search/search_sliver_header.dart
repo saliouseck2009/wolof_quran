@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/config/theme/app_color.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../seasonal/night_sky.dart';
 
 class SearchSliverHeader extends StatelessWidget {
   const SearchSliverHeader({
@@ -37,7 +37,7 @@ class SearchSliverHeader extends StatelessWidget {
           pinned: true,
           elevation: 0,
           backgroundColor: colorScheme.brightness == Brightness.dark
-              ? AppColor.surfaceDark
+              ? colorScheme.surface
               : colorScheme.primary,
           iconTheme: IconThemeData(color: colorScheme.onPrimary),
           surfaceTintColor: Colors.transparent,
@@ -65,9 +65,14 @@ class SearchSliverHeader extends StatelessWidget {
           flexibleSpace: FlexibleSpaceBar(
             titlePadding: EdgeInsets.zero,
             background: Container(
-              color: colorScheme.brightness == Brightness.dark
-                  ? AppColor.surfaceDark
-                  : colorScheme.primary,
+              decoration: seasonalSky(
+                context,
+                BoxDecoration(
+                  color: colorScheme.brightness == Brightness.dark
+                      ? colorScheme.surface
+                      : colorScheme.primary,
+                ),
+              ),
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.only(

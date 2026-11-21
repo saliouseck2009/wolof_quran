@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wolof_quran/domain/repositories/bookmark_repository.dart';
 
 import '../../l10n/generated/app_localizations.dart';
-import '../../core/config/theme/app_color.dart';
 import '../cubits/bookmark_cubit.dart';
 import '../cubits/surah_detail_cubit.dart';
 import '../widgets/surah_detail/surah_detail_content.dart';
 import '../../service_locator.dart';
+import '../widgets/app_loader.dart';
 
 class SurahDetailPage extends StatelessWidget {
   static const String routeName = "/surah-detail";
@@ -54,9 +54,7 @@ class SurahDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.brightness == Brightness.dark
-          ? AppColor.surfaceDark
-          : colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       body: BlocBuilder<SurahDetailCubit, SurahDetailState>(
         builder: (context, state) {
           if (state is SurahDetailLoading) {
@@ -91,7 +89,7 @@ class SurahDetailLoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator());
+    return const Center(child: AppLoader());
   }
 }
 

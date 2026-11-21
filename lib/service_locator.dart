@@ -20,6 +20,7 @@ import 'data/repositories/download_queue_repository_impl.dart';
 import 'data/repositories/bookmark_repository_impl.dart';
 import 'data/repositories/audio_availability_repository_impl.dart';
 import 'data/repositories/reading_goal_repository_impl.dart';
+import 'data/repositories/seasonal_theme_repository_impl.dart';
 import 'domain/repositories/reciter_repository.dart';
 import 'domain/repositories/audio_repository.dart';
 import 'domain/repositories/download_repository.dart';
@@ -27,6 +28,7 @@ import 'domain/repositories/download_queue_repository.dart';
 import 'domain/repositories/bookmark_repository.dart';
 import 'domain/repositories/audio_availability_repository.dart';
 import 'domain/repositories/reading_goal_repository.dart';
+import 'domain/repositories/seasonal_theme_repository.dart';
 
 // Use Cases
 import 'domain/usecases/get_reciters_usecase.dart';
@@ -179,4 +181,10 @@ Future<void> setupDependencies() async {
   // Non-blocking init — fetches config in background.
   remoteConfigService.init();
   locator.registerSingleton<RemoteConfigService>(remoteConfigService);
+  locator.registerLazySingleton<SeasonalThemeRepository>(
+    () => SeasonalThemeRepositoryImpl(
+      remoteConfig: remoteConfigService,
+      prefs: prefs,
+    ),
+  );
 }

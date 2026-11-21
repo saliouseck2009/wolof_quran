@@ -14,6 +14,9 @@ class SettingsMenuItem extends StatelessWidget {
   /// [showArrow] is set).
   final IconData? trailingIcon;
 
+  /// Replaces the trailing icon altogether, e.g. with a switch.
+  final Widget? trailing;
+
   /// Tints the card, e.g. while a menu anchored to it is open.
   final bool highlighted;
 
@@ -26,6 +29,7 @@ class SettingsMenuItem extends StatelessWidget {
     required this.onTap,
     this.showArrow = false,
     this.trailingIcon,
+    this.trailing,
     this.highlighted = false,
   });
 
@@ -116,20 +120,24 @@ class SettingsMenuItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    trailingIcon ??
-                        (showArrow ? Icons.arrow_forward_ios : Icons.edit),
-                    color: isDark ? colorScheme.onPrimary : colorScheme.primary,
-                    // A chevron glyph fills less of its box than the pencil.
-                    size: trailingIcon == null ? 16 : 20,
-                  ),
-                ),
+                trailing ??
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        trailingIcon ??
+                            (showArrow ? Icons.arrow_forward_ios : Icons.edit),
+                        color: isDark
+                            ? colorScheme.onPrimary
+                            : colorScheme.primary,
+                        // A chevron glyph fills less of its box than the
+                        // pencil.
+                        size: trailingIcon == null ? 16 : 20,
+                      ),
+                    ),
               ],
             ),
           ),

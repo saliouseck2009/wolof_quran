@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wolof_quran/presentation/cubits/audio_management_cubit.dart';
 import 'package:wolof_quran/presentation/cubits/daily_inspiration_cubit.dart';
+import 'package:wolof_quran/presentation/cubits/seasonal_theme_cubit.dart';
+import '../../core/config/theme/seasonal_theme.dart';
 import '../../l10n/generated/app_localizations.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../cubits/bookmark_cubit.dart';
@@ -12,6 +14,7 @@ import '../widgets/home_header.dart';
 import '../widgets/daily_inspiration_card.dart';
 import '../widgets/home_actions_grid.dart';
 import '../widgets/reading_goals/home_reading_card.dart';
+import '../widgets/seasonal/ramadan_banner.dart';
 import '../utils/audio_error_formatter.dart';
 import '../widgets/snackbar.dart';
 
@@ -33,8 +36,9 @@ class HomePage extends StatelessWidget {
               BookmarkCubit(locator<BookmarkRepository>())..loadBookmarks(),
         ),
         BlocProvider(
-          create: (context) =>
-              DailyInspirationCubit()..generateRandomAyah(currentTranslation),
+          create: (context) => DailyInspirationCubit(
+            picker: context.read<SeasonalThemeCubit>().pickVerse,
+          )..generateRandomAyah(currentTranslation),
         ),
       ],
       child: MultiBlocListener(
@@ -79,6 +83,11 @@ class HomePage extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
                   sliver: SliverToBoxAdapter(child: const HomeHeader()),
                 ),
+                if (SeasonalTheme.of(context) == SeasonalTheme.ramadan)
+                  const SliverPadding(
+                    padding: EdgeInsets.fromLTRB(24, 20, 24, 0),
+                    sliver: SliverToBoxAdapter(child: RamadanBanner()),
+                  ),
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
                   sliver: SliverToBoxAdapter(

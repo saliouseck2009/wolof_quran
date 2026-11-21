@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../domain/repositories/download_repository.dart';
 import '../../service_locator.dart';
-import '../config/theme/app_color.dart';
 
 class DownloadStatusIndicator extends StatefulWidget {
   final String reciterId;
@@ -86,7 +85,7 @@ class DownloadStatusIcon extends StatelessWidget {
         return Icon(
           Icons.download_done,
           size: size,
-          color: AppColor.primaryGreen,
+          color: Theme.of(context).colorScheme.primary,
         );
       },
     );

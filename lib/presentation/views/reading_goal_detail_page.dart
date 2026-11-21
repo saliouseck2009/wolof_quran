@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import '../../core/config/theme/app_color.dart';
 import '../../core/navigation/mushaf_arguments.dart';
 import '../../core/reading/reading_plan_calculator.dart';
 import '../../domain/entities/reading_goal.dart';
@@ -19,6 +18,8 @@ import '../widgets/reading_goals/reading_goal_actions.dart';
 import '../widgets/reading_goals/reading_pages_map.dart';
 import '../widgets/reading_goals/reading_progress_bar.dart';
 import 'mushaf_page.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 /// Everything about one goal: progress, today's quota, the page map with
 /// its gaps, the daily history and the validation journal.
@@ -83,7 +84,7 @@ class _DetailView extends StatelessWidget {
         final isFollowed = goalsState.activeGoalId == goalId;
 
         return Scaffold(
-          backgroundColor: isDark ? AppColor.surfaceDark : colorScheme.surface,
+          backgroundColor: colorScheme.surface,
           appBar: AppBar(
             title: Text(
               progress.goal.name,
@@ -96,9 +97,8 @@ class _DetailView extends StatelessWidget {
               ),
             ),
             centerTitle: false,
-            backgroundColor: isDark
-                ? AppColor.surfaceDark
-                : colorScheme.primary,
+            backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
+            flexibleSpace: const SeasonalSky(),
             iconTheme: IconThemeData(color: colorScheme.onPrimary),
             elevation: 0,
             scrolledUnderElevation: 0,
@@ -780,10 +780,7 @@ class _Journal extends StatelessWidget {
         if (state.isLoading) {
           return const SliverToBoxAdapter(
             child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(),
-              ),
+              child: Padding(padding: EdgeInsets.all(16), child: AppLoader()),
             ),
           );
         }

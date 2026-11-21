@@ -9,9 +9,11 @@ import 'privacy_policy_page.dart';
 import 'support_page.dart';
 import '../cubits/language_cubit.dart';
 import '../cubits/theme_cubit.dart';
+import '../widgets/settings/seasonal_theme_settings_item.dart';
 import '../widgets/settings/settings_choice_menu_item.dart';
 import '../widgets/settings/settings_header.dart';
 import '../widgets/settings/settings_menu_item.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 class SettingsPage extends StatefulWidget {
   static const String routeName = "/settings";
@@ -51,6 +53,7 @@ class _SettingsPageState extends State<SettingsPage> {
         backgroundColor: colorScheme.brightness == Brightness.dark
             ? colorScheme.surface
             : colorScheme.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -158,6 +161,7 @@ class _SettingsMenu extends StatelessWidget {
           ],
           onSelected: themeCubit.changeTheme,
         ),
+        const SeasonalThemeSettingsItem(),
         const SizedBox(height: 16),
         SettingsMenuItem(
           icon: Icons.settings_applications,

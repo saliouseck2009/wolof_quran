@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:wolof_quran/core/helpers/revelation_place_enum.dart';
 import '../../l10n/generated/app_localizations.dart';
-import '../../core/config/theme/app_color.dart';
 
 import '../cubits/surah_list_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
@@ -11,6 +10,7 @@ import '../widgets/app_search_bar.dart';
 import '../widgets/surah_list/surah_card.dart';
 import '../widgets/surah_list/surah_list_no_results.dart';
 import '../widgets/surah_list/surah_list_sliver_header.dart';
+import '../widgets/app_loader.dart';
 
 class SurahListPage extends StatelessWidget {
   static const String routeName = "/surahs";
@@ -56,9 +56,7 @@ class _SurahListViewState extends State<_SurahListView> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.brightness == Brightness.dark
-          ? AppColor.surfaceDark
-          : colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       body: BlocListener<SurahListCubit, SurahListState>(
         listenWhen: (previous, current) {
           if (current is! SurahListLoaded) return false;
@@ -77,7 +75,7 @@ class _SurahListViewState extends State<_SurahListView> {
         child: BlocBuilder<SurahListCubit, SurahListState>(
           builder: (context, state) {
             if (state is! SurahListLoaded) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: AppLoader());
             }
 
             return CustomScrollView(

@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
-import '../../../core/config/theme/app_color.dart';
 import '../../../core/services/audio_player_service.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../cubits/quran_settings_cubit.dart';
 import '../../cubits/surah_mini_player_cubit.dart';
+import '../seasonal/night_sky.dart';
 
 /// Full-screen audio player page.
 /// Opened via [buildFullscreenRoute] — a slide-up PageRoute.
@@ -59,7 +59,7 @@ class _ThemeTokens {
     return _ThemeTokens(
       isDark: dark,
       // Dark: lighter teal for readability; Light: deep teal primary.
-      accent: dark ? AppColor.tertiary : cs.primary,
+      accent: dark ? cs.tertiary : cs.primary,
       content: dark ? Colors.white : cs.onSurface,
       muted: dark ? Colors.white.withValues(alpha: 0.6) : cs.onSurfaceVariant,
       disabled: dark
@@ -335,16 +335,21 @@ class _SurahArtwork extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF006E62), Color(0xFF00201B)],
+      decoration: seasonalSky(
+        context,
+        BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [colorScheme.primary, colorScheme.onPrimaryContainer],
+          ),
         ),
+        ornaments: true,
       ),
       child: Center(
         child: _AnimatedMusicNote(
@@ -578,7 +583,7 @@ class _PlayPauseButton extends StatelessWidget {
     // Dark: white circle with teal icon (pop on dark bg).
     // Light: teal circle with white icon (standard FilledButton look).
     final circleBg = t.isDark ? Colors.white : t.accent;
-    final iconColor = t.isDark ? AppColor.primary : Colors.white;
+    final iconColor = t.isDark ? colorScheme.primary : Colors.white;
 
     return GestureDetector(
       onTap: onTap,

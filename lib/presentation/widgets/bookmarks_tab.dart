@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
-import 'package:wolof_quran/core/config/theme/app_color.dart';
 import 'package:wolof_quran/core/navigation/surah_detail_arguments.dart';
 import 'package:wolof_quran/presentation/widgets/search/search_results_list.dart';
 import 'package:wolof_quran/presentation/widgets/snackbar.dart';
@@ -12,6 +11,8 @@ import '../cubits/bookmark_cubit.dart';
 import '../cubits/quran_settings_cubit.dart';
 import '../widgets/ayah_card.dart';
 import '../widgets/ayah_play_button.dart';
+import 'app_loader.dart';
+import 'seasonal/night_sky.dart';
 
 class BookmarksTab extends StatelessWidget {
   const BookmarksTab({super.key});
@@ -24,9 +25,7 @@ class BookmarksTab extends StatelessWidget {
     final accentGreen = colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: colorScheme.brightness == Brightness.dark
-          ? AppColor.surfaceDark
-          : colorScheme.surface,
+      backgroundColor: colorScheme.surface,
 
       appBar: AppBar(
         title: Text(
@@ -39,8 +38,9 @@ class BookmarksTab extends StatelessWidget {
         ),
         centerTitle: false,
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? AppColor.surfaceDark
+            ? colorScheme.surface
             : colorScheme.primary,
+        flexibleSpace: const SeasonalSky(),
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -51,7 +51,7 @@ class BookmarksTab extends StatelessWidget {
           return BlocBuilder<BookmarkCubit, BookmarkState>(
             builder: (context, state) {
               if (state is BookmarkLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: AppLoader());
               }
 
               if (state is BookmarkError) {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran/quran.dart' as quran;
 
-import '../../../core/config/theme/app_color.dart';
 import '../../../core/helpers/revelation_place_enum.dart';
 import '../../../domain/usecases/get_downloaded_surahs_usecase.dart';
 import '../../../l10n/generated/app_localizations.dart';
@@ -10,6 +9,7 @@ import '../../../service_locator.dart';
 import '../../blocs/surah_download_status_bloc.dart';
 import '../../cubits/surah_detail_cubit.dart';
 import 'surah_detail_play_button.dart';
+import '../seasonal/night_sky.dart';
 
 class SurahDetailAppBar extends StatelessWidget {
   final SurahDetailLoaded state;
@@ -35,7 +35,7 @@ class SurahDetailAppBar extends StatelessWidget {
         titleSpacing: 0,
         elevation: 0,
         backgroundColor: colorScheme.brightness == Brightness.dark
-            ? AppColor.surfaceDark
+            ? colorScheme.surface
             : colorScheme.primary,
         iconTheme: IconThemeData(color: colorScheme.onPrimary),
         title: Text(
@@ -105,10 +105,13 @@ class SurahDetailAppBar extends StatelessWidget {
         flexibleSpace: FlexibleSpaceBar(
           titlePadding: EdgeInsets.zero,
           background: Container(
-            decoration: BoxDecoration(
-              color: colorScheme.brightness == Brightness.dark
-                  ? AppColor.surfaceDark
-                  : colorScheme.primary,
+            decoration: seasonalSky(
+              context,
+              BoxDecoration(
+                color: colorScheme.brightness == Brightness.dark
+                    ? colorScheme.surface
+                    : colorScheme.primary,
+              ),
             ),
             child: SafeArea(
               child: Padding(

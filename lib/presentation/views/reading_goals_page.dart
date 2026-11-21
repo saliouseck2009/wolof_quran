@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../core/config/theme/app_color.dart';
 import '../../core/navigation/create_reading_goal_arguments.dart';
 import '../../domain/entities/reading_goal_progress.dart';
 import '../../l10n/generated/app_localizations.dart';
@@ -11,6 +10,8 @@ import '../widgets/reading_goals/reading_goal_card.dart';
 import '../widgets/reading_goals/reading_goal_form_widgets.dart';
 import 'create_reading_goal_page.dart';
 import 'reading_stats_page.dart';
+import '../widgets/app_loader.dart';
+import '../widgets/seasonal/night_sky.dart';
 
 enum _GoalsSection { ongoing, planned, finished }
 
@@ -44,7 +45,7 @@ class _ReadingGoalsPageState extends State<ReadingGoalsPage> {
 
     return ReadingGoalCompletionListener(
       child: Scaffold(
-        backgroundColor: isDark ? AppColor.surfaceDark : colorScheme.surface,
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
           title: Text(
             localizations.readingGoals,
@@ -55,7 +56,8 @@ class _ReadingGoalsPageState extends State<ReadingGoalsPage> {
             ),
           ),
           centerTitle: false,
-          backgroundColor: isDark ? AppColor.surfaceDark : colorScheme.primary,
+          backgroundColor: isDark ? colorScheme.surface : colorScheme.primary,
+          flexibleSpace: const SeasonalSky(),
           iconTheme: IconThemeData(color: colorScheme.onPrimary),
           elevation: 0,
           scrolledUnderElevation: 0,
@@ -91,7 +93,7 @@ class _ReadingGoalsPageState extends State<ReadingGoalsPage> {
         body: BlocBuilder<ReadingGoalsCubit, ReadingGoalsState>(
           builder: (context, state) {
             if (state.isLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: AppLoader());
             }
             if (!state.hasGoals) {
               return _EmptyState(onCreate: _createGoal);

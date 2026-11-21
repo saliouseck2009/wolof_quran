@@ -814,6 +814,168 @@ abstract class AppLocalizations {
   /// **'Daily Inspiration - {surahName} - Verse {verseNumber}'**
   String shareDefaultText(String surahName, int verseNumber);
 
+  /// Default text shared alongside a video of several verses
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Inspiration - {surahName} - Verses {firstVerse}–{lastVerse}'**
+  String shareDefaultTextRange(String surahName, int firstVerse, int lastVerse);
+
+  /// Title of the verse range section of the share sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Verses'**
+  String get shareVersesTitle;
+
+  /// Label before the first verse of the shared range
+  ///
+  /// In en, this message translates to:
+  /// **'From verse'**
+  String get shareFromVerse;
+
+  /// Label before the last verse of the shared range
+  ///
+  /// In en, this message translates to:
+  /// **'to verse'**
+  String get shareToVerse;
+
+  /// Shown when the chosen verses make a video over the limit
+  ///
+  /// In en, this message translates to:
+  /// **'Video too long (maximum {minutes} min). Pick fewer verses.'**
+  String shareVideoTooLong(int minutes);
+
+  /// Warning for a video longer than a WhatsApp status
+  ///
+  /// In en, this message translates to:
+  /// **'Longer than {seconds} s: a WhatsApp status will cut the video.'**
+  String shareVideoLongForStatus(int seconds);
+
+  /// Verses of the range without a downloaded audio file
+  ///
+  /// In en, this message translates to:
+  /// **'No downloaded audio for verses: {verses}.'**
+  String shareAudioMissingVerses(String verses);
+
+  /// Progress of the video generation, verse by verse
+  ///
+  /// In en, this message translates to:
+  /// **'Verse {current} of {total}'**
+  String shareVideoProgress(int current, int total);
+
+  /// Share sheet tool that picks what the card shows: Arabic, translation or both
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get shareToolText;
+
+  /// Share sheet tool that picks the background of the card
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get shareToolBackground;
+
+  /// Share sheet tool label when several verses are selected
+  ///
+  /// In en, this message translates to:
+  /// **'Verses {first}–{last}'**
+  String shareToolVersesRange(int first, int last);
+
+  /// Short label of the button that shares the card as an image
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get shareImageShort;
+
+  /// Short label of the button that shares the verses as a video
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get shareVideoShort;
+
+  /// Verse shown on the share card, under the sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Verse {verse}'**
+  String shareVerseLabel(int verse);
+
+  /// Name of the selected card background
+  ///
+  /// In en, this message translates to:
+  /// **'Background · {name}'**
+  String shareBackgroundNamed(String name);
+
+  /// Short label: the card shows the Arabic text and its translation
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic + translation'**
+  String get shareModeBoth;
+
+  /// Short label: the card shows the Arabic text only
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get shareModeArabic;
+
+  /// Short label: the card shows the translation only
+  ///
+  /// In en, this message translates to:
+  /// **'Translation'**
+  String get shareModeTranslation;
+
+  /// Card background taken from the reader's Mushaf theme
+  ///
+  /// In en, this message translates to:
+  /// **'My Mushaf'**
+  String get shareBgMushaf;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Ivory'**
+  String get shareBgIvory;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Cream'**
+  String get shareBgCream;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Sand'**
+  String get shareBgSand;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get shareBgGold;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Sage'**
+  String get shareBgSage;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Deep green'**
+  String get shareBgDeepGreen;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get shareBgNight;
+
+  /// Card background name
+  ///
+  /// In en, this message translates to:
+  /// **'Black'**
+  String get shareBgBlack;
+
   /// Confirmation message when bookmark is added
   ///
   /// In en, this message translates to:
@@ -3033,6 +3195,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Another verse'**
   String get anotherVerse;
+
+  /// Greeting on the home banner shown during Ramadan
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan Mubarak'**
+  String get ramadanGreeting;
+
+  /// Line under the Ramadan greeting on the home banner
+  ///
+  /// In en, this message translates to:
+  /// **'The month of the Quran'**
+  String get ramadanTagline;
+
+  /// Settings switch shown during Ramadan to keep or leave the seasonal look
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan theme'**
+  String get ramadanTheme;
+
+  /// Explains the Ramadan theme switch in the settings
+  ///
+  /// In en, this message translates to:
+  /// **'Dress the app in the colors of Ramadan'**
+  String get ramadanThemeSubtitle;
+
+  /// Banner line during the daytime of a day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} of Ramadan'**
+  String ramadanDay(int day);
+
+  /// Banner line between nightfall and dawn; night N starts on the evening of day N-1
+  ///
+  /// In en, this message translates to:
+  /// **'Night {night} of Ramadan'**
+  String ramadanNight(int night);
+
+  /// Banner line during the day before an odd night of the last ten
+  ///
+  /// In en, this message translates to:
+  /// **'Tonight: night {night}'**
+  String ramadanTonight(int night);
+
+  /// Banner line on the eve of Ramadan
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan begins tonight'**
+  String get ramadanStartsTonight;
+
+  /// Banner tagline from the 21st night
+  ///
+  /// In en, this message translates to:
+  /// **'The last ten nights'**
+  String get ramadanLastTenNights;
+
+  /// Banner greeting during the Korité (Eid al-Fitr)
+  ///
+  /// In en, this message translates to:
+  /// **'Eid Mubarak'**
+  String get eidGreeting;
+
+  /// Banner tagline during the Korité
+  ///
+  /// In en, this message translates to:
+  /// **'A blessed Eid to you and your loved ones'**
+  String get eidTagline;
+
+  /// Button of the Ramadan banner that opens the choice of the first day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust the date'**
+  String get ramadanAdjustDate;
+
+  /// Title of the sheet where the user picks their first day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Start of your Ramadan'**
+  String get ramadanStartTitle;
+
+  /// Explains the choice of the first day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Depending on your community, fasting began on one of these days. The days and nights of the app follow your choice.'**
+  String get ramadanStartSubtitle;
+
+  /// Settings row opening the choice of the first day of fasting
+  ///
+  /// In en, this message translates to:
+  /// **'Start of Ramadan'**
+  String get ramadanStartSetting;
+
+  /// Button of the Ramadan banner opening a reading goal prefilled to finish the Quran by the end of the month
+  ///
+  /// In en, this message translates to:
+  /// **'Start my Khatm'**
+  String get ramadanStartKhatm;
+
+  /// Default name of the reading goal created from the Ramadan banner
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan Khatm'**
+  String get ramadanKhatmName;
+
+  /// Share card background offered first during Ramadan: the night sky of the season
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan night'**
+  String get shareBgRamadan;
 }
 
 class _AppLocalizationsDelegate
