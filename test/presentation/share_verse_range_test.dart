@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran/quran.dart' as quran;
+import 'package:wolof_quran/core/config/theme/seasonal_theme.dart';
+import 'package:wolof_quran/core/config/theme/theme.dart';
 import 'package:wolof_quran/l10n/generated/app_localizations.dart';
 import 'package:wolof_quran/presentation/widgets/daily_inspiration_share_modal.dart';
 
@@ -19,6 +21,7 @@ void main() {
     required int surah,
     required int verse,
     Size size = const Size(390, 844),
+    ThemeData? theme,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
@@ -26,6 +29,7 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        theme: theme,
         locale: const Locale('fr'),
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: const [
@@ -226,6 +230,25 @@ void main() {
       find.byKey(const ValueKey('share-card')),
     );
     expect(card.color, const Color(0xFF004A41));
+  });
+
+  testWidgets('during Ramadan the night of the season comes first', (
+    tester,
+  ) async {
+    final theme = const MaterialTheme(season: SeasonalTheme.ramadan).light();
+    await pumpSheet(tester, surah: 97, verse: 3, theme: theme);
+    await openTool(tester, 'background');
+
+    expect(find.text('Fond · Nuit du Ramadan'), findsOneWidget);
+    final card = tester.widget<Container>(
+      find.byKey(const ValueKey('share-card')),
+    );
+    expect(card.color, theme.extension<SeasonalDecor>()!.skyStart);
+
+    // The usual backgrounds stay offered after it.
+    await tester.tap(find.byKey(const ValueKey('share-background-1')));
+    await tester.pumpAndSettle();
+    expect(find.text('Fond · Ivoire'), findsOneWidget);
   });
 
   testWidgets('the card keeps the size of the shared image on any screen', (

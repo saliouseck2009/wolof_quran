@@ -1993,4 +1993,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get ramadanKhatmName => 'ختمة رمضان';
+
+  @override
+  String get shareBgRamadan => 'ليلة رمضان';
 }

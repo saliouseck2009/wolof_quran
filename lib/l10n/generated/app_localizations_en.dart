@@ -1969,4 +1969,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ramadanKhatmName => 'Ramadan Khatm';
+
+  @override
+  String get shareBgRamadan => 'Ramadan night';
 }

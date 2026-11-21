@@ -3297,6 +3297,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ramadan Khatm'**
   String get ramadanKhatmName;
+
+  /// Share card background offered first during Ramadan: the night sky of the season
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan night'**
+  String get shareBgRamadan;
 }
 
 class _AppLocalizationsDelegate

@@ -1988,4 +1988,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get ramadanKhatmName => 'Khatm du Ramadan';
+
+  @override
+  String get shareBgRamadan => 'Nuit du Ramadan';
 }

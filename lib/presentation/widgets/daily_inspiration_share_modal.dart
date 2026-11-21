@@ -11,6 +11,7 @@ import 'package:quran/quran.dart' as quran;
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/config/app_links.dart';
+import '../../core/config/theme/seasonal_theme.dart';
 import '../../core/services/verse_video_builder.dart';
 import 'package:wolof_quran/core/mushaf/mushaf_theme.dart';
 import 'package:wolof_quran/core/utils/constants/constants.dart';
@@ -258,6 +259,12 @@ class _DailyInspirationShareModalState
         selected = _ShareBackground(mushafColor, (l) => l.shareBgMushaf);
         _backgrounds.insert(0, selected);
       }
+    }
+    // During Ramadan the night sky of the season comes first, chosen.
+    final decor = Theme.of(context).extension<SeasonalDecor>();
+    if (decor?.season == SeasonalTheme.ramadan) {
+      selected = _ShareBackground(decor!.skyStart, (l) => l.shareBgRamadan);
+      _backgrounds.insert(0, selected);
     }
     _selectedBackground = selected;
     _didConfigureTheme = true;
