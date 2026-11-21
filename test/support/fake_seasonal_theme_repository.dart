@@ -26,6 +26,9 @@ class FakeSeasonalThemeRepository implements SeasonalThemeRepository {
       StreamController<SeasonalThemeConfig>.broadcast(sync: true);
   int refreshCount = 0;
 
+  /// Saved start offsets, by `start` of the season.
+  final Map<DateTime?, int> startOffsets = {};
+
   void push(SeasonalThemeConfig newConfig) {
     config = newConfig;
     _changes.add(newConfig);
@@ -46,6 +49,17 @@ class FakeSeasonalThemeRepository implements SeasonalThemeRepository {
       disabledByUser.add(theme);
     } else {
       disabledByUser.remove(theme);
+    }
+  }
+
+  @override
+  int startOffset(SeasonalThemeConfig config) =>
+      startOffsets[config.start] ?? 0;
+
+  @override
+  Future<void> setStartOffset(SeasonalThemeConfig config, int days) async {
+    if (config.start != null) {
+      startOffsets[config.start] = days;
     }
   }
 }

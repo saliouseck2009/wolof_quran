@@ -18,4 +18,13 @@ abstract class SeasonalThemeRepository {
   bool isDisabledByUser(SeasonalTheme theme);
 
   Future<void> setDisabledByUser(SeasonalTheme theme, bool disabled);
+
+  /// Days the user started the season after the `start` of [config] (their
+  /// community started later), 0 when they never chose. The choice belongs
+  /// to that season: a new `start` the next year starts again from 0.
+  int startOffset(SeasonalThemeConfig config);
+
+  /// Saves [days] as the start offset of the season of [config]. Does
+  /// nothing for a season without a start.
+  Future<void> setStartOffset(SeasonalThemeConfig config, int days);
 }

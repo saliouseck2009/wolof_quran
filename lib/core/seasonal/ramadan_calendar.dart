@@ -93,7 +93,7 @@ class RamadanMoment extends Equatable {
 /// Nights start at a fixed local hour ([nightfallHour]) and end at
 /// [dawnHour]. The real maghrib in Senegal falls around 19:15 in February
 /// and March; these labels are landmarks, never prayer times.
-class RamadanCalendar {
+class RamadanCalendar extends Equatable {
   /// First day of fasting of this user.
   final LocalDate firstDay;
 
@@ -132,6 +132,10 @@ class RamadanCalendar {
   static const int nightfallHour = 19;
   static const int dawnHour = 5;
   static const int firstLastTenNight = 21;
+
+  /// The user may start at most this many days after the earliest
+  /// community (`start` in the config).
+  static const int maxStartOffset = 1;
 
   /// A lunar month has 29 or 30 days: without an announced end, the
   /// calendar never goes past 30.
@@ -179,11 +183,14 @@ class RamadanCalendar {
       // After midnight: still the night that started yesterday evening.
       return night(dayOf(today));
     }
+    final day = dayOf(today);
     if (hour >= nightfallHour) {
-      return night(dayOf(today) + 1);
+      // Without an announced Korité, the evening of the last day of fasting
+      // keeps that day until midnight rather than dropping the theme.
+      return night(day + 1) ??
+          (day == length ? _dayMoment(day, sky, moonPhase) : null);
     }
 
-    final day = dayOf(today);
     if (day == 0) {
       return RamadanMoment(
         period: RamadanPeriod.eve,
@@ -198,13 +205,47 @@ class RamadanCalendar {
     if (day > length) {
       return _eid(today, sky, moonPhase);
     }
-    return RamadanMoment(
-      period: _periodOf(day),
-      day: day,
-      tonight: day < length ? day + 1 : null,
-      sky: sky,
-      moonPhase: moonPhase,
-    );
+    return _dayMoment(day, sky, moonPhase);
+  }
+
+  RamadanMoment _dayMoment(int day, RamadanSky sky, double moonPhase) =>
+      RamadanMoment(
+        period: _periodOf(day),
+        day: day,
+        tonight: day < length ? day + 1 : null,
+        sky: sky,
+        moonPhase: moonPhase,
+      );
+
+  /// Local hours (in minutes) where [momentAt] or [skyAt] can change, on
+  /// top of midnight.
+  static const List<int> _changeMinutes = [
+    4 * 60,
+    dawnHour * 60,
+    7 * 60,
+    18 * 60,
+    nightfallHour * 60,
+    19 * 60 + 30,
+  ];
+
+  /// The next instant after [now] where the moment may change: a change of
+  /// sky, nightfall, dawn or midnight. A timer set for it keeps the screens
+  /// right while the app stays open.
+  static DateTime nextChangeAfter(DateTime now) {
+    final midnight = DateTime(now.year, now.month, now.day);
+    for (final minutes in _changeMinutes) {
+      final change = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        minutes ~/ 60,
+        minutes % 60,
+      );
+      if (change.isAfter(now)) {
+        return change;
+      }
+    }
+    return DateTime(midnight.year, midnight.month, midnight.day + 1);
   }
 
   /// The Korité, from the evening of the last day of fasting to the end of
@@ -225,6 +266,9 @@ class RamadanCalendar {
       moonPhase: moonPhase,
     );
   }
+
+  @override
+  List<Object?> get props => [firstDay, lastDay, eidLastDay];
 
   static RamadanPeriod _periodOf(int dayOfMonth) =>
       dayOfMonth >= firstLastTenNight

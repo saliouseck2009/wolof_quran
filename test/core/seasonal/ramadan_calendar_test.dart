@@ -141,8 +141,12 @@ void main() {
       final day30 = calendar.momentAt(DateTime(2027, 3, 9, 12))!;
       expect(day30.day, 30);
       expect(day30.tonight, isNull);
-      // Without an announced Korité the month simply ends.
-      expect(calendar.momentAt(DateTime(2027, 3, 9, 20)), isNull);
+      // Without an announced Korité the last day stays until midnight,
+      // then the month simply ends.
+      final lastEvening = calendar.momentAt(DateTime(2027, 3, 9, 20))!;
+      expect(lastEvening.day, 30);
+      expect(lastEvening.night, isNull);
+      expect(calendar.momentAt(DateTime(2027, 3, 10, 1)), isNull);
       expect(calendar.momentAt(DateTime(2027, 3, 10, 12)), isNull);
     });
 
@@ -234,6 +238,27 @@ void main() {
       expect(
         calendar.momentAt(DateTime(2027, 2, 20, 18, 45))!.sky,
         RamadanSky.sunset,
+      );
+    });
+  });
+
+  group('nextChangeAfter', () {
+    DateTime next(int hour, int minute) =>
+        RamadanCalendar.nextChangeAfter(DateTime(2027, 3, 5, hour, minute));
+
+    test('goes from one change of the day to the next', () {
+      expect(next(0, 0), DateTime(2027, 3, 5, 4));
+      expect(next(4, 0), DateTime(2027, 3, 5, 5));
+      expect(next(12, 0), DateTime(2027, 3, 5, 18));
+      expect(next(18, 59), DateTime(2027, 3, 5, 19));
+      expect(next(19, 0), DateTime(2027, 3, 5, 19, 30));
+    });
+
+    test('ends the day at midnight', () {
+      expect(next(19, 30), DateTime(2027, 3, 6));
+      expect(
+        RamadanCalendar.nextChangeAfter(DateTime(2027, 2, 28, 23)),
+        DateTime(2027, 3, 1),
       );
     });
   });
